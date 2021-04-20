@@ -62,7 +62,7 @@ def printToFile(element,filename,prettyprint=True):
     if prettyprint:    
         rough = ET.tostring(element,&#39;utf-8&#39;).replace(b&#39;\n&#39;,b&#39;&#39;).replace(b&#39;\t&#39;,b&#39;&#39;)
         reparsed = mini.parseString(rough)
-        towrite = reparsed.toprettyxml(indent=&#34;\t&#34;)
+        towrite = reparsed.toprettyxml(indent=&#34;    &#34;)
         with open(filename,&#39;w&#39;) as file_handle:
             file_handle.write(towrite)
     else:
@@ -139,7 +139,7 @@ prettyprint (bool): pretty or "ugly" print
     if prettyprint:    
         rough = ET.tostring(element,&#39;utf-8&#39;).replace(b&#39;\n&#39;,b&#39;&#39;).replace(b&#39;\t&#39;,b&#39;&#39;)
         reparsed = mini.parseString(rough)
-        towrite = reparsed.toprettyxml(indent=&#34;\t&#34;)
+        towrite = reparsed.toprettyxml(indent=&#34;    &#34;)
         with open(filename,&#39;w&#39;) as file_handle:
             file_handle.write(towrite)
     else:

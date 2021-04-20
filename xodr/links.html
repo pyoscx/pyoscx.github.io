@@ -32,7 +32,7 @@
 &#34;&#34;&#34;
 import xml.etree.ElementTree as ET
 from .helpers import enum2str
-from .enumerations import ElementType
+from .enumerations import ElementType, JunctionGroupType
 
 from .exceptions import NotSameAmountOfLanesError
 
@@ -297,7 +297,7 @@ class Connection():
         
         Parameters
         ----------
-            incoming_road (int): the id of the incoming road to the junciton
+            incoming_road (int): the id of the incoming road to the junction
 
             connecting_road (int): id of the connecting road (type junction)
             
@@ -307,7 +307,7 @@ class Connection():
 
         Attributes
         ----------
-            incoming_road (int): the id of the incoming road to the junciton
+            incoming_road (int): the id of the incoming road to the junction
 
             connecting_road (int): id of the connecting road (type junction)
             
@@ -334,7 +334,7 @@ class Connection():
 
         Parameters
         ----------
-            incoming_road (int): the id of the incoming road to the junciton
+            incoming_road (int): the id of the incoming road to the junction
 
             connecting_road (int): id of the connecting road (type junction)
             
@@ -637,7 +637,85 @@ def _create_links_roads(pre_road,suc_road):
             pre_road.lanes.lanesections[pre_connecting_lanesec].rightlanes[i].add_link(pre_linktype,linkid)
             suc_road.lanes.lanesections[suc_connecting_lanesec].rightlanes[i].add_link(suc_linktype,linkid)
     else:
-        raise NotSameAmountOfLanesError(&#39;Road &#39; + str(pre_road.id) + &#39; and road &#39; + str(suc_road.id) + &#39; does not have the same number of right lanes.&#39;)</code></pre>
+        raise NotSameAmountOfLanesError(&#39;Road &#39; + str(pre_road.id) + &#39; and road &#39; + str(suc_road.id) + &#39; does not have the same number of right lanes.&#39;)
+
+class JunctionGroup():
+    &#34;&#34;&#34; JunctionGroup creates a JunctionGroup of OpenDRIVE
+        
+        Parameters
+        ----------
+            name (str): name of the junctiongroup
+
+            group_id (int): id of the junctiongroup
+
+            junction_type (JunctionGroupType): type of junction
+                Default: JunctionGroupType.roundabout
+
+        Attributes
+        ----------
+            name (str): name of the junctiongroup
+
+            group_id (int): id of the junctiongroup
+
+            junctions (list of int): all the junctions in the junctiongroup
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+
+            get_attributes()
+                Returns a dictionary of all attributes of the class
+
+            add_junction(junction_id)
+                Adds a connection to the junction
+    &#34;&#34;&#34;
+
+    def __init__(self,name,group_id,junction_type=JunctionGroupType.roundabout):
+        &#34;&#34;&#34; initalize the JunctionGroup
+
+        Parameters
+        ----------
+            name (str): name of the junctiongroup
+
+            group_id (int): id of the junctiongroup
+
+            junction_type (JunctionGroupType): type of junction
+                Default: JunctionGroupType.roundabout
+        &#34;&#34;&#34;
+        self.name = name
+        self.group_id = group_id
+        self.junctions = []
+        self.junction_type = junction_type
+
+    def add_junction(self,junction_id):
+        &#34;&#34;&#34; Adds a new link to the Junction
+
+            Parameters
+            ----------
+                junction_id (int): adds a junction to the junctiongroup
+
+        &#34;&#34;&#34;
+        self.junctions.append(junction_id)
+
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes as a dict of the Junction
+
+        &#34;&#34;&#34;
+        retdict = {}
+        retdict[&#39;name&#39;] = self.name
+        retdict[&#39;id&#39;] = str(self.group_id)
+        retdict[&#39;type&#39;] = enum2str(self.junction_type)
+        return retdict
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the Junction
+
+        &#34;&#34;&#34;
+        element = ET.Element(&#39;junctionGroup&#39;,attrib=self.get_attributes())
+        for j in self.junctions:
+            ET.SubElement(element,&#39;junctionReference&#39;,attrib={&#39;junction&#39;:str(j)})
+        return element</code></pre>
 </details>
 </section>
 <section>
@@ -746,7 +824,7 @@ road2 (Road): second road to be lane linked
 <dd>
 <div class="desc"><p>Connection creates a connection as a base of junction</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>incoming_road (int): the id of the incoming road to the junciton
+<pre><code>incoming_road (int): the id of the incoming road to the junction
 
 connecting_road (int): id of the connecting road (type junction)
 
@@ -755,7 +833,7 @@ contact_point (ContactPoint): the contact point of the link
 id (int): id of the junction (automated?)
 </code></pre>
 <h2 id="attributes">Attributes</h2>
-<pre><code>incoming_road (int): the id of the incoming road to the junciton
+<pre><code>incoming_road (int): the id of the incoming road to the junction
 
 connecting_road (int): id of the connecting road (type junction)
 
@@ -777,7 +855,7 @@ add_lanelink(in_lane,out_lane)
 </code></pre>
 <p>initalize the Connection</p>
 <h2 id="parameters_1">Parameters</h2>
-<pre><code>incoming_road (int): the id of the incoming road to the junciton
+<pre><code>incoming_road (int): the id of the incoming road to the junction
 
 connecting_road (int): id of the connecting road (type junction)
 
@@ -794,7 +872,7 @@ id (int): id of the junction (automated)
         
         Parameters
         ----------
-            incoming_road (int): the id of the incoming road to the junciton
+            incoming_road (int): the id of the incoming road to the junction
 
             connecting_road (int): id of the connecting road (type junction)
             
@@ -804,7 +882,7 @@ id (int): id of the junction (automated)
 
         Attributes
         ----------
-            incoming_road (int): the id of the incoming road to the junciton
+            incoming_road (int): the id of the incoming road to the junction
 
             connecting_road (int): id of the connecting road (type junction)
             
@@ -831,7 +909,7 @@ id (int): id of the junction (automated)
 
         Parameters
         ----------
-            incoming_road (int): the id of the incoming road to the junciton
+            incoming_road (int): the id of the incoming road to the junction
 
             connecting_road (int): id of the connecting road (type junction)
             
@@ -1134,6 +1212,194 @@ id (int): id of the junction
 </dd>
 </dl>
 </dd>
+<dt id="scenariogeneration.xodr.links.JunctionGroup"><code class="flex name class">
+<span>class <span class="ident">JunctionGroup</span></span>
+<span>(</span><span>name, group_id, junction_type=JunctionGroupType.roundabout)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>JunctionGroup creates a JunctionGroup of OpenDRIVE</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>name (str): name of the junctiongroup
+
+group_id (int): id of the junctiongroup
+
+junction_type (JunctionGroupType): type of junction
+    Default: JunctionGroupType.roundabout
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>name (str): name of the junctiongroup
+
+group_id (int): id of the junctiongroup
+
+junctions (list of int): all the junctions in the junctiongroup
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element()
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of the class
+
+add_junction(junction_id)
+    Adds a connection to the junction
+</code></pre>
+<p>initalize the JunctionGroup</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>name (str): name of the junctiongroup
+
+group_id (int): id of the junctiongroup
+
+junction_type (JunctionGroupType): type of junction
+    Default: JunctionGroupType.roundabout
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class JunctionGroup():
+    &#34;&#34;&#34; JunctionGroup creates a JunctionGroup of OpenDRIVE
+        
+        Parameters
+        ----------
+            name (str): name of the junctiongroup
+
+            group_id (int): id of the junctiongroup
+
+            junction_type (JunctionGroupType): type of junction
+                Default: JunctionGroupType.roundabout
+
+        Attributes
+        ----------
+            name (str): name of the junctiongroup
+
+            group_id (int): id of the junctiongroup
+
+            junctions (list of int): all the junctions in the junctiongroup
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+
+            get_attributes()
+                Returns a dictionary of all attributes of the class
+
+            add_junction(junction_id)
+                Adds a connection to the junction
+    &#34;&#34;&#34;
+
+    def __init__(self,name,group_id,junction_type=JunctionGroupType.roundabout):
+        &#34;&#34;&#34; initalize the JunctionGroup
+
+        Parameters
+        ----------
+            name (str): name of the junctiongroup
+
+            group_id (int): id of the junctiongroup
+
+            junction_type (JunctionGroupType): type of junction
+                Default: JunctionGroupType.roundabout
+        &#34;&#34;&#34;
+        self.name = name
+        self.group_id = group_id
+        self.junctions = []
+        self.junction_type = junction_type
+
+    def add_junction(self,junction_id):
+        &#34;&#34;&#34; Adds a new link to the Junction
+
+            Parameters
+            ----------
+                junction_id (int): adds a junction to the junctiongroup
+
+        &#34;&#34;&#34;
+        self.junctions.append(junction_id)
+
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes as a dict of the Junction
+
+        &#34;&#34;&#34;
+        retdict = {}
+        retdict[&#39;name&#39;] = self.name
+        retdict[&#39;id&#39;] = str(self.group_id)
+        retdict[&#39;type&#39;] = enum2str(self.junction_type)
+        return retdict
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the Junction
+
+        &#34;&#34;&#34;
+        element = ET.Element(&#39;junctionGroup&#39;,attrib=self.get_attributes())
+        for j in self.junctions:
+            ET.SubElement(element,&#39;junctionReference&#39;,attrib={&#39;junction&#39;:str(j)})
+        return element</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xodr.links.JunctionGroup.add_junction"><code class="name flex">
+<span>def <span class="ident">add_junction</span></span>(<span>self, junction_id)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Adds a new link to the Junction</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>junction_id (int): adds a junction to the junctiongroup
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_junction(self,junction_id):
+    &#34;&#34;&#34; Adds a new link to the Junction
+
+        Parameters
+        ----------
+            junction_id (int): adds a junction to the junctiongroup
+
+    &#34;&#34;&#34;
+    self.junctions.append(junction_id)</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.links.JunctionGroup.get_attributes"><code class="name flex">
+<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the attributes as a dict of the Junction</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_attributes(self):
+    &#34;&#34;&#34; returns the attributes as a dict of the Junction
+
+    &#34;&#34;&#34;
+    retdict = {}
+    retdict[&#39;name&#39;] = self.name
+    retdict[&#39;id&#39;] = str(self.group_id)
+    retdict[&#39;type&#39;] = enum2str(self.junction_type)
+    return retdict</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.links.JunctionGroup.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the elementTree of the Junction</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self):
+    &#34;&#34;&#34; returns the elementTree of the Junction
+
+    &#34;&#34;&#34;
+    element = ET.Element(&#39;junctionGroup&#39;,attrib=self.get_attributes())
+    for j in self.junctions:
+        ET.SubElement(element,&#39;junctionReference&#39;,attrib={&#39;junction&#39;:str(j)})
+    return element</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
 <dt id="scenariogeneration.xodr.links.LaneLinker"><code class="flex name class">
 <span>class <span class="ident">LaneLinker</span></span>
 </code></dt>
@@ -1262,6 +1528,14 @@ connecting_road (id): id of a connecting road (used for junctions)
 <li><code><a title="scenariogeneration.xodr.links.Junction.add_connection" href="#scenariogeneration.xodr.links.Junction.add_connection">add_connection</a></code></li>
 <li><code><a title="scenariogeneration.xodr.links.Junction.get_attributes" href="#scenariogeneration.xodr.links.Junction.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xodr.links.Junction.get_element" href="#scenariogeneration.xodr.links.Junction.get_element">get_element</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xodr.links.JunctionGroup" href="#scenariogeneration.xodr.links.JunctionGroup">JunctionGroup</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xodr.links.JunctionGroup.add_junction" href="#scenariogeneration.xodr.links.JunctionGroup.add_junction">add_junction</a></code></li>
+<li><code><a title="scenariogeneration.xodr.links.JunctionGroup.get_attributes" href="#scenariogeneration.xodr.links.JunctionGroup.get_attributes">get_attributes</a></code></li>
+<li><code><a title="scenariogeneration.xodr.links.JunctionGroup.get_element" href="#scenariogeneration.xodr.links.JunctionGroup.get_element">get_element</a></code></li>
 </ul>
 </li>
 <li>

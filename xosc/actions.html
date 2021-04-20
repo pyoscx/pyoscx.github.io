@@ -1050,6 +1050,8 @@ class FollowTrajectoryAction(_PrivateActionType):
                 Default: None
             offset (double): offset for time values (must be combined with reference_domain and scale)
                 Default: None
+            initialDistanceOffset (double): start at this offset into the trajectory (v1.1)
+                Default: None
 
         Attributes
         ----------
@@ -1059,13 +1061,15 @@ class FollowTrajectoryAction(_PrivateActionType):
 
             timeref (TimeReference): the time reference of the trajectory
 
+            initialDistanceOffset (double): start at this offset into the trajectory (v1.1)
+
         Methods
         -------
             get_element()
                 Returns the full ElementTree of the class
 
     &#34;&#34;&#34;
-    def __init__(self,trajectory,following_mode,reference_domain=None,scale=None,offset=None):
+    def __init__(self,trajectory,following_mode,reference_domain=None,scale=None,offset=None,initialDistanceOffset=None):
         &#34;&#34;&#34; initalize the FollowTrajectoryAction 
 
             Parameters
@@ -1080,6 +1084,9 @@ class FollowTrajectoryAction(_PrivateActionType):
                     Default: None
                 offset (double): offset for time values (must be combined with reference_domain and scale)
                     Default: None
+                initialDistanceOffset (double): start at this offset into the trajectory (v1.1)
+                    Default: None
+                    
         &#34;&#34;&#34;
         # if following_mode not in FollowMode:
         #     ValueError(str(following_mode) + &#39; is not a valied following mode.&#39;)
@@ -1089,6 +1096,17 @@ class FollowTrajectoryAction(_PrivateActionType):
         self.following_mode = following_mode
         # TODO: check reference_domain
         self.timeref = TimeReference(reference_domain,scale,offset)
+        self.initialDistanceOffset = initialDistanceOffset
+
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the ActivateControllerAction as a dict
+
+        &#34;&#34;&#34;
+        if self.initialDistanceOffset:
+            return {&#39;initialDistanceOffset&#39;:str(self.initialDistanceOffset)}
+        else:
+            # If initialDistanceOffset is not set, return empty to stay backward compatible with v1.0
+            return {}
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the AssignRouteAction
@@ -1096,7 +1114,7 @@ class FollowTrajectoryAction(_PrivateActionType):
         &#34;&#34;&#34;
         element = ET.Element(&#39;PrivateAction&#39;)
         routeaction = ET.SubElement(element,&#39;RoutingAction&#39;)
-        trajaction = ET.SubElement(routeaction,&#39;FollowTrajectoryAction&#39;)
+        trajaction = ET.SubElement(routeaction,&#39;FollowTrajectoryAction&#39;,attrib=self.get_attributes())
         trajaction.append(self.trajectory.get_element())
         trajaction.append(self.timeref.get_element())
         ET.SubElement(trajaction,&#39;TrajectoryFollowingMode&#39;,attrib={&#39;followingMode&#39;:self.following_mode.name})
@@ -1599,7 +1617,7 @@ class VisibilityAction(_PrivateActionType):
         &#34;&#34;&#34; returns the attributes of the VisibilityAction as a dict
 
         &#34;&#34;&#34;
-        return {&#39;graphics&#39;:convert_bool(self.graphics),&#39;active&#39;:convert_bool(self.traffic),&#39;sensors&#39;:convert_bool(self.sensors)}
+        return {&#39;graphics&#39;:convert_bool(self.graphics),&#39;traffic&#39;:convert_bool(self.traffic),&#39;sensors&#39;:convert_bool(self.sensors)}
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the VisibilityAction
@@ -4241,7 +4259,7 @@ environment (Environment or CatalogReference): the environment to change to
 </dd>
 <dt id="scenariogeneration.xosc.actions.FollowTrajectoryAction"><code class="flex name class">
 <span>class <span class="ident">FollowTrajectoryAction</span></span>
-<span>(</span><span>trajectory, following_mode, reference_domain=None, scale=None, offset=None)</span>
+<span>(</span><span>trajectory, following_mode, reference_domain=None, scale=None, offset=None, initialDistanceOffset=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>FollowTrajectoryAction creates a RouteAction of type FollowTrajectoryAction</p>
@@ -4256,6 +4274,8 @@ scale (double): scalefactor of the timeings (must be combined with reference_dom
     Default: None
 offset (double): offset for time values (must be combined with reference_domain and scale)
     Default: None
+initialDistanceOffset (double): start at this offset into the trajectory (v1.1)
+    Default: None
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>trajectory (Trajectory, or CatalogReference): the trajectory to follow
@@ -4263,6 +4283,8 @@ offset (double): offset for time values (must be combined with reference_domain 
 following_mode (str): the following mode of the action
 
 timeref (TimeReference): the time reference of the trajectory
+
+initialDistanceOffset (double): start at this offset into the trajectory (v1.1)
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>get_element()
@@ -4279,6 +4301,8 @@ reference_domain (str): absolute or relative time reference (must be combined wi
 scale (double): scalefactor of the timings (must be combined with reference_domain and offset)
     Default: None
 offset (double): offset for time values (must be combined with reference_domain and scale)
+    Default: None
+initialDistanceOffset (double): start at this offset into the trajectory (v1.1)
     Default: None
 </code></pre></div>
 <details class="source">
@@ -4300,6 +4324,8 @@ offset (double): offset for time values (must be combined with reference_domain 
                 Default: None
             offset (double): offset for time values (must be combined with reference_domain and scale)
                 Default: None
+            initialDistanceOffset (double): start at this offset into the trajectory (v1.1)
+                Default: None
 
         Attributes
         ----------
@@ -4309,13 +4335,15 @@ offset (double): offset for time values (must be combined with reference_domain 
 
             timeref (TimeReference): the time reference of the trajectory
 
+            initialDistanceOffset (double): start at this offset into the trajectory (v1.1)
+
         Methods
         -------
             get_element()
                 Returns the full ElementTree of the class
 
     &#34;&#34;&#34;
-    def __init__(self,trajectory,following_mode,reference_domain=None,scale=None,offset=None):
+    def __init__(self,trajectory,following_mode,reference_domain=None,scale=None,offset=None,initialDistanceOffset=None):
         &#34;&#34;&#34; initalize the FollowTrajectoryAction 
 
             Parameters
@@ -4330,6 +4358,9 @@ offset (double): offset for time values (must be combined with reference_domain 
                     Default: None
                 offset (double): offset for time values (must be combined with reference_domain and scale)
                     Default: None
+                initialDistanceOffset (double): start at this offset into the trajectory (v1.1)
+                    Default: None
+                    
         &#34;&#34;&#34;
         # if following_mode not in FollowMode:
         #     ValueError(str(following_mode) + &#39; is not a valied following mode.&#39;)
@@ -4339,6 +4370,17 @@ offset (double): offset for time values (must be combined with reference_domain 
         self.following_mode = following_mode
         # TODO: check reference_domain
         self.timeref = TimeReference(reference_domain,scale,offset)
+        self.initialDistanceOffset = initialDistanceOffset
+
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the ActivateControllerAction as a dict
+
+        &#34;&#34;&#34;
+        if self.initialDistanceOffset:
+            return {&#39;initialDistanceOffset&#39;:str(self.initialDistanceOffset)}
+        else:
+            # If initialDistanceOffset is not set, return empty to stay backward compatible with v1.0
+            return {}
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the AssignRouteAction
@@ -4346,7 +4388,7 @@ offset (double): offset for time values (must be combined with reference_domain 
         &#34;&#34;&#34;
         element = ET.Element(&#39;PrivateAction&#39;)
         routeaction = ET.SubElement(element,&#39;RoutingAction&#39;)
-        trajaction = ET.SubElement(routeaction,&#39;FollowTrajectoryAction&#39;)
+        trajaction = ET.SubElement(routeaction,&#39;FollowTrajectoryAction&#39;,attrib=self.get_attributes())
         trajaction.append(self.trajectory.get_element())
         trajaction.append(self.timeref.get_element())
         ET.SubElement(trajaction,&#39;TrajectoryFollowingMode&#39;,attrib={&#39;followingMode&#39;:self.following_mode.name})
@@ -4360,6 +4402,26 @@ offset (double): offset for time values (must be combined with reference_domain 
 </ul>
 <h3>Methods</h3>
 <dl>
+<dt id="scenariogeneration.xosc.actions.FollowTrajectoryAction.get_attributes"><code class="name flex">
+<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the attributes of the ActivateControllerAction as a dict</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_attributes(self):
+    &#34;&#34;&#34; returns the attributes of the ActivateControllerAction as a dict
+
+    &#34;&#34;&#34;
+    if self.initialDistanceOffset:
+        return {&#39;initialDistanceOffset&#39;:str(self.initialDistanceOffset)}
+    else:
+        # If initialDistanceOffset is not set, return empty to stay backward compatible with v1.0
+        return {}</code></pre>
+</details>
+</dd>
 <dt id="scenariogeneration.xosc.actions.FollowTrajectoryAction.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
@@ -4375,7 +4437,7 @@ offset (double): offset for time values (must be combined with reference_domain 
     &#34;&#34;&#34;
     element = ET.Element(&#39;PrivateAction&#39;)
     routeaction = ET.SubElement(element,&#39;RoutingAction&#39;)
-    trajaction = ET.SubElement(routeaction,&#39;FollowTrajectoryAction&#39;)
+    trajaction = ET.SubElement(routeaction,&#39;FollowTrajectoryAction&#39;,attrib=self.get_attributes())
     trajaction.append(self.trajectory.get_element())
     trajaction.append(self.timeref.get_element())
     ET.SubElement(trajaction,&#39;TrajectoryFollowingMode&#39;,attrib={&#39;followingMode&#39;:self.following_mode.name})
@@ -8112,7 +8174,7 @@ get_attributes()
         &#34;&#34;&#34; returns the attributes of the VisibilityAction as a dict
 
         &#34;&#34;&#34;
-        return {&#39;graphics&#39;:convert_bool(self.graphics),&#39;active&#39;:convert_bool(self.traffic),&#39;sensors&#39;:convert_bool(self.sensors)}
+        return {&#39;graphics&#39;:convert_bool(self.graphics),&#39;traffic&#39;:convert_bool(self.traffic),&#39;sensors&#39;:convert_bool(self.sensors)}
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the VisibilityAction
@@ -8142,7 +8204,7 @@ get_attributes()
     &#34;&#34;&#34; returns the attributes of the VisibilityAction as a dict
 
     &#34;&#34;&#34;
-    return {&#39;graphics&#39;:convert_bool(self.graphics),&#39;active&#39;:convert_bool(self.traffic),&#39;sensors&#39;:convert_bool(self.sensors)}</code></pre>
+    return {&#39;graphics&#39;:convert_bool(self.graphics),&#39;traffic&#39;:convert_bool(self.traffic),&#39;sensors&#39;:convert_bool(self.sensors)}</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xosc.actions.VisibilityAction.get_element"><code class="name flex">
@@ -8265,6 +8327,7 @@ get_attributes()
 <li>
 <h4><code><a title="scenariogeneration.xosc.actions.FollowTrajectoryAction" href="#scenariogeneration.xosc.actions.FollowTrajectoryAction">FollowTrajectoryAction</a></code></h4>
 <ul class="">
+<li><code><a title="scenariogeneration.xosc.actions.FollowTrajectoryAction.get_attributes" href="#scenariogeneration.xosc.actions.FollowTrajectoryAction.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.actions.FollowTrajectoryAction.get_element" href="#scenariogeneration.xosc.actions.FollowTrajectoryAction.get_element">get_element</a></code></li>
 </ul>
 </li>

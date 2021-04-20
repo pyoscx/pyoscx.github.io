@@ -47,6 +47,7 @@ def esmini(generator,esminipath=&#39;esmini&#39;,
     args = &#39;&#39;,
     index_to_run= &#39;first&#39;,
     run_with_replayer = False,
+    timestep = 0.01,
     car_density = 15):
     &#34;&#34;&#34; write a scenario and runs it in esminis OpenDriveViewer with some random traffic
      
@@ -78,6 +79,8 @@ def esmini(generator,esminipath=&#39;esmini&#39;,
             run_with_replayer (bool): bool to run esmini in headless mode and then run the viewer afterwards (only used for scenarios not for roads)
                 Default: False
 
+            timestep (double): fixed timestep to use in combination with replayer
+
             car_density (int): density of fictious cars (used only for pure OpenDRIVE cases)
 
     &#34;&#34;&#34;
@@ -95,9 +98,12 @@ def esmini(generator,esminipath=&#39;esmini&#39;,
         executable = &#39;esmini&#39;
         filetype = &#39; --osc &#39;
         if run_with_replayer:
-            additional_args += &#39; --headless&#39;
+            additional_args += &#39; --headless&#39; + &#39; --fixed_timestep &#39; +  str(timestep)
             if not record:
                 record = &#39;python_record&#39;
+        else:
+                additional_args += &#39; --window &#39;+ window_size
+
         filename = os.path.join(resource_path,&#39;xosc&#39;,&#39;python_scenario.xosc&#39;)
         generator.write_xml(filename)
 
@@ -114,9 +120,12 @@ def esmini(generator,esminipath=&#39;esmini&#39;,
             executable = &#39;esmini&#39;
             filetype = &#39; --osc &#39;
             if run_with_replayer:
-                additional_args += &#39; --headless&#39;
+                additional_args += &#39; --headless&#39; + &#39; --fixed_timestep &#39; +  str(timestep)
                 if not record:
                     record = &#39;python_record&#39;
+            else:
+                additional_args += &#39; --window &#39;+ window_size
+            
             filename = scenario_file
     else:
         raise TypeError(&#39;generator is not of type OpenDrive, Scenario, or ScenarioGenerator&#39;)
@@ -124,7 +133,6 @@ def esmini(generator,esminipath=&#39;esmini&#39;,
 
     
     # create the additional_args for the esmini execusion
-    additional_args += &#39; --window &#39;+ window_size
     if save_osi:
         additional_args += &#39; --osi_file on&#39;
     
@@ -167,7 +175,7 @@ def prettyprint(element):
         element = element.get_element()
     rough = ET.tostring(element, &#39;utf-8&#39;)
     reparsed = mini.parseString(rough)
-    print(reparsed.toprettyxml(indent=&#34;\t&#34;))</code></pre>
+    print(reparsed.toprettyxml(indent=&#34;    &#34;))</code></pre>
 </details>
 </section>
 <section>
@@ -178,7 +186,7 @@ def prettyprint(element):
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="scenariogeneration.helpers.esmini"><code class="name flex">
-<span>def <span class="ident">esmini</span></span>(<span>generator, esminipath='esmini', window_size='60 60 800 400', save_osi=False, record=False, disable_controllers=False, args='', index_to_run='first', run_with_replayer=False, car_density=15)</span>
+<span>def <span class="ident">esmini</span></span>(<span>generator, esminipath='esmini', window_size='60 60 800 400', save_osi=False, record=False, disable_controllers=False, args='', index_to_run='first', run_with_replayer=False, timestep=0.01, car_density=15)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>write a scenario and runs it in esminis OpenDriveViewer with some random traffic</p>
@@ -209,6 +217,8 @@ index_to_run (str,int): if the a class inheriting ScenarioGenerator is used as i
 run_with_replayer (bool): bool to run esmini in headless mode and then run the viewer afterwards (only used for scenarios not for roads)
     Default: False
 
+timestep (double): fixed timestep to use in combination with replayer
+
 car_density (int): density of fictious cars (used only for pure OpenDRIVE cases)
 </code></pre></div>
 <details class="source">
@@ -223,6 +233,7 @@ car_density (int): density of fictious cars (used only for pure OpenDRIVE cases)
     args = &#39;&#39;,
     index_to_run= &#39;first&#39;,
     run_with_replayer = False,
+    timestep = 0.01,
     car_density = 15):
     &#34;&#34;&#34; write a scenario and runs it in esminis OpenDriveViewer with some random traffic
      
@@ -254,6 +265,8 @@ car_density (int): density of fictious cars (used only for pure OpenDRIVE cases)
             run_with_replayer (bool): bool to run esmini in headless mode and then run the viewer afterwards (only used for scenarios not for roads)
                 Default: False
 
+            timestep (double): fixed timestep to use in combination with replayer
+
             car_density (int): density of fictious cars (used only for pure OpenDRIVE cases)
 
     &#34;&#34;&#34;
@@ -271,9 +284,12 @@ car_density (int): density of fictious cars (used only for pure OpenDRIVE cases)
         executable = &#39;esmini&#39;
         filetype = &#39; --osc &#39;
         if run_with_replayer:
-            additional_args += &#39; --headless&#39;
+            additional_args += &#39; --headless&#39; + &#39; --fixed_timestep &#39; +  str(timestep)
             if not record:
                 record = &#39;python_record&#39;
+        else:
+                additional_args += &#39; --window &#39;+ window_size
+
         filename = os.path.join(resource_path,&#39;xosc&#39;,&#39;python_scenario.xosc&#39;)
         generator.write_xml(filename)
 
@@ -290,9 +306,12 @@ car_density (int): density of fictious cars (used only for pure OpenDRIVE cases)
             executable = &#39;esmini&#39;
             filetype = &#39; --osc &#39;
             if run_with_replayer:
-                additional_args += &#39; --headless&#39;
+                additional_args += &#39; --headless&#39; + &#39; --fixed_timestep &#39; +  str(timestep)
                 if not record:
                     record = &#39;python_record&#39;
+            else:
+                additional_args += &#39; --window &#39;+ window_size
+            
             filename = scenario_file
     else:
         raise TypeError(&#39;generator is not of type OpenDrive, Scenario, or ScenarioGenerator&#39;)
@@ -300,7 +319,6 @@ car_density (int): density of fictious cars (used only for pure OpenDRIVE cases)
 
     
     # create the additional_args for the esmini execusion
-    additional_args += &#39; --window &#39;+ window_size
     if save_osi:
         additional_args += &#39; --osi_file on&#39;
     
@@ -354,7 +372,7 @@ car_density (int): density of fictious cars (used only for pure OpenDRIVE cases)
         element = element.get_element()
     rough = ET.tostring(element, &#39;utf-8&#39;)
     reparsed = mini.parseString(rough)
-    print(reparsed.toprettyxml(indent=&#34;\t&#34;))</code></pre>
+    print(reparsed.toprettyxml(indent=&#34;    &#34;))</code></pre>
 </details>
 </dd>
 </dl>

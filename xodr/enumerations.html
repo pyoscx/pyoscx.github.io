@@ -107,7 +107,7 @@ class RoadMarkType(Enum):
     custom = auto()
     edge = auto()
 
-class RoadType():
+class RoadType(Enum):
     &#34;&#34;&#34; Enum for RoadType
     &#34;&#34;&#34;
     unknown = auto()
@@ -189,7 +189,13 @@ class RoadSide(Enum):
     &#34;&#34;&#34;
     both = auto()
     left = auto()
-    right = auto()</code></pre>
+    right = auto()
+
+class JunctionGroupType(Enum):
+    &#34;&#34;&#34; Enum for JunctionGroup
+    &#34;&#34;&#34;
+    roundabout = auto()
+    unknown = auto()</code></pre>
 </details>
 </section>
 <section>
@@ -324,6 +330,38 @@ class RoadSide(Enum):
 <div class="desc"></div>
 </dd>
 <dt id="scenariogeneration.xodr.enumerations.ElementType.road"><code class="name">var <span class="ident">road</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="scenariogeneration.xodr.enumerations.JunctionGroupType"><code class="flex name class">
+<span>class <span class="ident">JunctionGroupType</span></span>
+<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enum for JunctionGroup</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class JunctionGroupType(Enum):
+    &#34;&#34;&#34; Enum for JunctionGroup
+    &#34;&#34;&#34;
+    roundabout = auto()
+    unknown = auto()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="scenariogeneration.xodr.enumerations.JunctionGroupType.roundabout"><code class="name">var <span class="ident">roundabout</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xodr.enumerations.JunctionGroupType.unknown"><code class="name">var <span class="ident">unknown</span></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -914,6 +952,7 @@ class RoadSide(Enum):
 </dd>
 <dt id="scenariogeneration.xodr.enumerations.RoadType"><code class="flex name class">
 <span>class <span class="ident">RoadType</span></span>
+<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Enum for RoadType</p></div>
@@ -921,7 +960,7 @@ class RoadSide(Enum):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class RoadType():
+<pre><code class="python">class RoadType(Enum):
     &#34;&#34;&#34; Enum for RoadType
     &#34;&#34;&#34;
     unknown = auto()
@@ -938,6 +977,10 @@ class RoadSide(Enum):
     townLocal = auto()
     townPlayStreet = auto()</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
 <h3>Class variables</h3>
 <dl>
 <dt id="scenariogeneration.xodr.enumerations.RoadType.bicycle"><code class="name">var <span class="ident">bicycle</span></code></dt>
@@ -1036,6 +1079,13 @@ class RoadSide(Enum):
 <ul class="">
 <li><code><a title="scenariogeneration.xodr.enumerations.ElementType.junction" href="#scenariogeneration.xodr.enumerations.ElementType.junction">junction</a></code></li>
 <li><code><a title="scenariogeneration.xodr.enumerations.ElementType.road" href="#scenariogeneration.xodr.enumerations.ElementType.road">road</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xodr.enumerations.JunctionGroupType" href="#scenariogeneration.xodr.enumerations.JunctionGroupType">JunctionGroupType</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xodr.enumerations.JunctionGroupType.roundabout" href="#scenariogeneration.xodr.enumerations.JunctionGroupType.roundabout">roundabout</a></code></li>
+<li><code><a title="scenariogeneration.xodr.enumerations.JunctionGroupType.unknown" href="#scenariogeneration.xodr.enumerations.JunctionGroupType.unknown">unknown</a></code></li>
 </ul>
 </li>
 <li>

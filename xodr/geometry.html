@@ -34,7 +34,7 @@
 import xml.etree.ElementTree as ET
 
 import numpy as np
-from .exceptions import NotEnoughInputArguments, ToManyOptionalArguments
+from .exceptions import NotEnoughInputArguments, ToManyOptionalArguments, MixOfGeometryAddition
 from scipy.integrate import quad
 from scipy.special import fresnel
 
@@ -191,7 +191,6 @@ class PlanView():
         self.fixed = False
         if all([x_start != None, y_start!=None,h_start!=None]):
             self.set_start_point(x_start, y_start, h_start)
-            self.fixed = True
         elif any([x_start != None, y_start!=None,h_start!=None]):
             raise NotEnoughInputArguments(&#39;If a start position is wanted for the PlanView, all inputs must be used.&#39;)
 
@@ -208,9 +207,16 @@ class PlanView():
         self._overridden_headings = []
 
         self.adjusted = False
+        # variable to track what mode of adding geometries are used
+
+        self._addition_mode = None
 
     def add_geometry(self,geom,heading = None):
-        &#34;&#34;&#34; add_geometry adds a geometry to the planview and calculates
+        &#34;&#34;&#34; add_geometry adds a geometry to the planview and will stich together all geometries (in order the order added)
+            
+            Should be used together with &#34;adjust_roads_and_lanes&#34; in the OpenDrive class. 
+
+            NOTE: DO NOT MIX WITH with add_fixed_geometry
         
         Parameters
         ----------
@@ -220,10 +226,57 @@ class PlanView():
                 if used, use for ALL geometries
 
         &#34;&#34;&#34;
+        if self._addition_mode == &#39;add_fixed_geometry&#39;:
+            raise MixOfGeometryAddition(&#34;A fixed geometry has already been added, please use either add_geometry or add_fixed_geometry&#34;)
 
         if heading is not None:
             self._overridden_headings.append(heading)
         self._raw_geometries.append(geom)
+        self._addition_mode = &#39;add_geometry&#39;
+    
+    def add_fixed_geometry(self, geom, x_start, y_start, h_start,s=None):
+        &#34;&#34;&#34; add_fixed_geometry adds a geometry to a certain point to the planview 
+
+            if s is used, the values will be coded and is up to the user to make correct, not for a correct opendrive file please add the geometires in order
+            if s is not used, the geometries are supposed to be added in order (and s will be calculated)
+        
+            NOTE: DO NOT MIX WITH the method add_geometry
+
+        Parameters
+        ----------
+            geom (Line, Spiral, ParamPoly3, or Arc): the geometry to add
+
+            x_start (float): start x position of the geometry
+
+            y_start (float): start y position of the geometry
+
+            h_start (float): start heading of the geometry
+
+            s (float): start s value of the geometry (optional)
+                Default: None
+
+        &#34;&#34;&#34;
+        if self._addition_mode == &#39;add_geometry&#39;:
+            raise MixOfGeometryAddition(&#34;A geometry has already been added with add_geometry, please use either add_geometry, or add_fixed_geometry not both&#34;)
+        
+        if s != None:
+            pres_s = s
+        else:
+            pres_s = self.present_s
+        
+        if not self.fixed:
+            self.x_start = x_start
+            self.y_start = y_start
+            self.h_start = h_start
+            self.fixed = True
+        
+        newgeom = _Geometry(pres_s,x_start,y_start,h_start,geom)
+        self._adjusted_geometries.append(newgeom)
+        self.x_end, self.y_end, self.h_end, length = newgeom.get_end_data()
+        self.present_s += length
+        self.adjusted = True
+        self._addition_mode == &#39;add_fixed_geometry&#39;
+
 
     def set_start_point(self,x_start=0,y_start=0,h_start=0):
         &#34;&#34;&#34; sets the start point of the planview
@@ -243,6 +296,7 @@ class PlanView():
         self.present_x = x_start
         self.present_y = y_start
         self.present_h = h_start
+        self.fixed = True
 
     def get_start_point(self):
         &#34;&#34;&#34; returns the start point of the planview
@@ -2291,7 +2345,6 @@ Note: if multiple roads are used, the start values can be recalculated.</p></div
         self.fixed = False
         if all([x_start != None, y_start!=None,h_start!=None]):
             self.set_start_point(x_start, y_start, h_start)
-            self.fixed = True
         elif any([x_start != None, y_start!=None,h_start!=None]):
             raise NotEnoughInputArguments(&#39;If a start position is wanted for the PlanView, all inputs must be used.&#39;)
 
@@ -2308,9 +2361,16 @@ Note: if multiple roads are used, the start values can be recalculated.</p></div
         self._overridden_headings = []
 
         self.adjusted = False
+        # variable to track what mode of adding geometries are used
+
+        self._addition_mode = None
 
     def add_geometry(self,geom,heading = None):
-        &#34;&#34;&#34; add_geometry adds a geometry to the planview and calculates
+        &#34;&#34;&#34; add_geometry adds a geometry to the planview and will stich together all geometries (in order the order added)
+            
+            Should be used together with &#34;adjust_roads_and_lanes&#34; in the OpenDrive class. 
+
+            NOTE: DO NOT MIX WITH with add_fixed_geometry
         
         Parameters
         ----------
@@ -2320,10 +2380,57 @@ Note: if multiple roads are used, the start values can be recalculated.</p></div
                 if used, use for ALL geometries
 
         &#34;&#34;&#34;
+        if self._addition_mode == &#39;add_fixed_geometry&#39;:
+            raise MixOfGeometryAddition(&#34;A fixed geometry has already been added, please use either add_geometry or add_fixed_geometry&#34;)
 
         if heading is not None:
             self._overridden_headings.append(heading)
         self._raw_geometries.append(geom)
+        self._addition_mode = &#39;add_geometry&#39;
+    
+    def add_fixed_geometry(self, geom, x_start, y_start, h_start,s=None):
+        &#34;&#34;&#34; add_fixed_geometry adds a geometry to a certain point to the planview 
+
+            if s is used, the values will be coded and is up to the user to make correct, not for a correct opendrive file please add the geometires in order
+            if s is not used, the geometries are supposed to be added in order (and s will be calculated)
+        
+            NOTE: DO NOT MIX WITH the method add_geometry
+
+        Parameters
+        ----------
+            geom (Line, Spiral, ParamPoly3, or Arc): the geometry to add
+
+            x_start (float): start x position of the geometry
+
+            y_start (float): start y position of the geometry
+
+            h_start (float): start heading of the geometry
+
+            s (float): start s value of the geometry (optional)
+                Default: None
+
+        &#34;&#34;&#34;
+        if self._addition_mode == &#39;add_geometry&#39;:
+            raise MixOfGeometryAddition(&#34;A geometry has already been added with add_geometry, please use either add_geometry, or add_fixed_geometry not both&#34;)
+        
+        if s != None:
+            pres_s = s
+        else:
+            pres_s = self.present_s
+        
+        if not self.fixed:
+            self.x_start = x_start
+            self.y_start = y_start
+            self.h_start = h_start
+            self.fixed = True
+        
+        newgeom = _Geometry(pres_s,x_start,y_start,h_start,geom)
+        self._adjusted_geometries.append(newgeom)
+        self.x_end, self.y_end, self.h_end, length = newgeom.get_end_data()
+        self.present_s += length
+        self.adjusted = True
+        self._addition_mode == &#39;add_fixed_geometry&#39;
+
 
     def set_start_point(self,x_start=0,y_start=0,h_start=0):
         &#34;&#34;&#34; sets the start point of the planview
@@ -2343,6 +2450,7 @@ Note: if multiple roads are used, the start values can be recalculated.</p></div
         self.present_x = x_start
         self.present_y = y_start
         self.present_h = h_start
+        self.fixed = True
 
     def get_start_point(self):
         &#34;&#34;&#34; returns the start point of the planview
@@ -2446,11 +2554,85 @@ Note: if multiple roads are used, the start values can be recalculated.</p></div
 </details>
 <h3>Methods</h3>
 <dl>
+<dt id="scenariogeneration.xodr.geometry.PlanView.add_fixed_geometry"><code class="name flex">
+<span>def <span class="ident">add_fixed_geometry</span></span>(<span>self, geom, x_start, y_start, h_start, s=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>add_fixed_geometry adds a geometry to a certain point to the planview </p>
+<pre><code>if s is used, the values will be coded and is up to the user to make correct, not for a correct opendrive file please add the geometires in order
+if s is not used, the geometries are supposed to be added in order (and s will be calculated)
+
+NOTE: DO NOT MIX WITH the method add_geometry
+</code></pre>
+<h2 id="parameters">Parameters</h2>
+<pre><code>geom (Line, Spiral, ParamPoly3, or Arc): the geometry to add
+
+x_start (float): start x position of the geometry
+
+y_start (float): start y position of the geometry
+
+h_start (float): start heading of the geometry
+
+s (float): start s value of the geometry (optional)
+    Default: None
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_fixed_geometry(self, geom, x_start, y_start, h_start,s=None):
+    &#34;&#34;&#34; add_fixed_geometry adds a geometry to a certain point to the planview 
+
+        if s is used, the values will be coded and is up to the user to make correct, not for a correct opendrive file please add the geometires in order
+        if s is not used, the geometries are supposed to be added in order (and s will be calculated)
+    
+        NOTE: DO NOT MIX WITH the method add_geometry
+
+    Parameters
+    ----------
+        geom (Line, Spiral, ParamPoly3, or Arc): the geometry to add
+
+        x_start (float): start x position of the geometry
+
+        y_start (float): start y position of the geometry
+
+        h_start (float): start heading of the geometry
+
+        s (float): start s value of the geometry (optional)
+            Default: None
+
+    &#34;&#34;&#34;
+    if self._addition_mode == &#39;add_geometry&#39;:
+        raise MixOfGeometryAddition(&#34;A geometry has already been added with add_geometry, please use either add_geometry, or add_fixed_geometry not both&#34;)
+    
+    if s != None:
+        pres_s = s
+    else:
+        pres_s = self.present_s
+    
+    if not self.fixed:
+        self.x_start = x_start
+        self.y_start = y_start
+        self.h_start = h_start
+        self.fixed = True
+    
+    newgeom = _Geometry(pres_s,x_start,y_start,h_start,geom)
+    self._adjusted_geometries.append(newgeom)
+    self.x_end, self.y_end, self.h_end, length = newgeom.get_end_data()
+    self.present_s += length
+    self.adjusted = True
+    self._addition_mode == &#39;add_fixed_geometry&#39;</code></pre>
+</details>
+</dd>
 <dt id="scenariogeneration.xodr.geometry.PlanView.add_geometry"><code class="name flex">
 <span>def <span class="ident">add_geometry</span></span>(<span>self, geom, heading=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>add_geometry adds a geometry to the planview and calculates</p>
+<div class="desc"><p>add_geometry adds a geometry to the planview and will stich together all geometries (in order the order added)</p>
+<pre><code>Should be used together with "adjust_roads_and_lanes" in the OpenDrive class.
+
+NOTE: DO NOT MIX WITH with add_fixed_geometry
+</code></pre>
 <h2 id="parameters">Parameters</h2>
 <pre><code>geom (Line, Spiral, ParamPoly3, or Arc): the type of geometry
 
@@ -2462,7 +2644,11 @@ heading (float): override the previous heading (optional), not recommended
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def add_geometry(self,geom,heading = None):
-    &#34;&#34;&#34; add_geometry adds a geometry to the planview and calculates
+    &#34;&#34;&#34; add_geometry adds a geometry to the planview and will stich together all geometries (in order the order added)
+        
+        Should be used together with &#34;adjust_roads_and_lanes&#34; in the OpenDrive class. 
+
+        NOTE: DO NOT MIX WITH with add_fixed_geometry
     
     Parameters
     ----------
@@ -2472,10 +2658,13 @@ heading (float): override the previous heading (optional), not recommended
             if used, use for ALL geometries
 
     &#34;&#34;&#34;
+    if self._addition_mode == &#39;add_fixed_geometry&#39;:
+        raise MixOfGeometryAddition(&#34;A fixed geometry has already been added, please use either add_geometry or add_fixed_geometry&#34;)
 
     if heading is not None:
         self._overridden_headings.append(heading)
-    self._raw_geometries.append(geom)</code></pre>
+    self._raw_geometries.append(geom)
+    self._addition_mode = &#39;add_geometry&#39;</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.PlanView.adjust_geometries"><code class="name flex">
@@ -2670,7 +2859,8 @@ Default: 0</p></div>
 
     self.present_x = x_start
     self.present_y = y_start
-    self.present_h = h_start</code></pre>
+    self.present_h = h_start
+    self.fixed = True</code></pre>
 </details>
 </dd>
 </dl>
@@ -3027,6 +3217,7 @@ l (float): length of the spiral
 <li>
 <h4><code><a title="scenariogeneration.xodr.geometry.PlanView" href="#scenariogeneration.xodr.geometry.PlanView">PlanView</a></code></h4>
 <ul class="two-column">
+<li><code><a title="scenariogeneration.xodr.geometry.PlanView.add_fixed_geometry" href="#scenariogeneration.xodr.geometry.PlanView.add_fixed_geometry">add_fixed_geometry</a></code></li>
 <li><code><a title="scenariogeneration.xodr.geometry.PlanView.add_geometry" href="#scenariogeneration.xodr.geometry.PlanView.add_geometry">add_geometry</a></code></li>
 <li><code><a title="scenariogeneration.xodr.geometry.PlanView.adjust_geometries" href="#scenariogeneration.xodr.geometry.PlanView.adjust_geometries">adjust_geometries</a></code></li>
 <li><code><a title="scenariogeneration.xodr.geometry.PlanView.get_element" href="#scenariogeneration.xodr.geometry.PlanView.get_element">get_element</a></code></li>

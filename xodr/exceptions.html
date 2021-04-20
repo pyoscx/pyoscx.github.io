@@ -55,6 +55,11 @@ class UndefinedRoadNetwork(Exception):
 class RoadsAndLanesNotAdjusted(Exception):
     &#34;&#34;&#34; Raised when the user tries to perform an action on non-adjusted lanes and roads that requires adjusted lanes and roads
     &#34;&#34;&#34;
+    pass
+
+class MixOfGeometryAddition(Exception):
+    &#34;&#34;&#34; Raise when the wrong way of adding geometires are used for the planview
+    &#34;&#34;&#34;
     pass</code></pre>
 </details>
 </section>
@@ -67,6 +72,27 @@ class RoadsAndLanesNotAdjusted(Exception):
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="scenariogeneration.xodr.exceptions.MixOfGeometryAddition"><code class="flex name class">
+<span>class <span class="ident">MixOfGeometryAddition</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Raise when the wrong way of adding geometires are used for the planview</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class MixOfGeometryAddition(Exception):
+    &#34;&#34;&#34; Raise when the wrong way of adding geometires are used for the planview
+    &#34;&#34;&#34;
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
 <dt id="scenariogeneration.xodr.exceptions.NotEnoughInputArguments"><code class="flex name class">
 <span>class <span class="ident">NotEnoughInputArguments</span></span>
 <span>(</span><span>*args, **kwargs)</span>
@@ -188,6 +214,9 @@ class RoadsAndLanesNotAdjusted(Exception):
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
+<li>
+<h4><code><a title="scenariogeneration.xodr.exceptions.MixOfGeometryAddition" href="#scenariogeneration.xodr.exceptions.MixOfGeometryAddition">MixOfGeometryAddition</a></code></h4>
+</li>
 <li>
 <h4><code><a title="scenariogeneration.xodr.exceptions.NotEnoughInputArguments" href="#scenariogeneration.xodr.exceptions.NotEnoughInputArguments">NotEnoughInputArguments</a></code></h4>
 </li>

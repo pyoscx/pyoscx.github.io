@@ -267,19 +267,19 @@ class Lane():
             lane_type (LaneType): type of lane
                 Default: LaneType.driving
 
-            a (float): a coefficient
+            a (float): a polynomial coefficient for width (left/right) or laneoffset (center)
                 Default: 0
 
-            b (float): b coefficient
+            b (float): b polynomial coefficient for width (left/right) or laneoffset (center)
                 Default: 0
 
-            c (float): c coefficient
+            c (float): c polynomial coefficient for width (left/right) or laneoffset (center)
                 Default: 0
 
-            d (float): d coefficient
+            d (float): d polynomial coefficient for width (left/right) or laneoffset (center)
                 Default: 0
 
-            soffset (float): soffset of lane
+            soffset (float): soffset of lane renamed to s in case of centerlane
                 Default: 0
 
         &#34;&#34;&#34; 
@@ -309,10 +309,12 @@ class Lane():
         self.links.add_link(_Link(link_type,str(id)))
 
     def _set_lane_id(self,lane_id):
-        &#34;&#34;&#34; set the lane id of the lane
+        &#34;&#34;&#34; set the lane id of the lane and set lane type to &#39;none&#39; in case of centerlane
 
         &#34;&#34;&#34;
         self.lane_id = lane_id
+        if self.lane_id == 0:
+            self.lane_type = LaneType.none
 
     def add_roadmark(self,roadmark):
         &#34;&#34;&#34; add_roadmark adds a roadmark to the lane
@@ -367,16 +369,25 @@ class Lane():
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;lane&#39;,attrib=self.get_attributes())
-        element.append(self.links.get_element())
-
-        widthdict = {}
-        widthdict[&#39;a&#39;] = str(self.a)
-        widthdict[&#39;b&#39;] = str(self.b)
-        widthdict[&#39;c&#39;] = str(self.c)
-        widthdict[&#39;d&#39;] = str(self.d)
-        widthdict[&#39;sOffset&#39;] = str(self.soffset)
-
-        ET.SubElement(element,&#39;width&#39;,attrib=widthdict)
+                
+        #polynomial dict either for width (left/right lanes) or laneOffset (center lane)
+        polynomialdict = {}
+        polynomialdict[&#39;a&#39;] = str(self.a)
+        polynomialdict[&#39;b&#39;] = str(self.b)
+        polynomialdict[&#39;c&#39;] = str(self.c)
+        polynomialdict[&#39;d&#39;] = str(self.d)
+        polynomialdict[&#39;sOffset&#39;] = str(self.soffset) 
+        
+        #according to standard if lane is centerlane it should 
+        #not have a width record and omit the link record        
+        if self.lane_id != 0: 
+            element.append(self.links.get_element())
+            ET.SubElement(element,&#39;width&#39;,attrib=polynomialdict)        
+        #use polynomial dict for laneOffset in case of center lane (only if values provided)
+        elif any([self.a,self.b,self.c,self.d]):
+            polynomialdict[&#39;s&#39;] = polynomialdict.pop(&#39;sOffset&#39;)            
+            ET.SubElement(element,&#39;laneOffset&#39;,attrib=polynomialdict)                         
+            
         if self.roadmark:
             element.append(self.roadmark.get_element())
             
@@ -705,19 +716,19 @@ add_roadmark(roadmark)
 <pre><code>lane_type (LaneType): type of lane
     Default: LaneType.driving
 
-a (float): a coefficient
+a (float): a polynomial coefficient for width (left/right) or laneoffset (center)
     Default: 0
 
-b (float): b coefficient
+b (float): b polynomial coefficient for width (left/right) or laneoffset (center)
     Default: 0
 
-c (float): c coefficient
+c (float): c polynomial coefficient for width (left/right) or laneoffset (center)
     Default: 0
 
-d (float): d coefficient
+d (float): d polynomial coefficient for width (left/right) or laneoffset (center)
     Default: 0
 
-soffset (float): soffset of lane
+soffset (float): soffset of lane renamed to s in case of centerlane
     Default: 0
 </code></pre></div>
 <details class="source">
@@ -793,19 +804,19 @@ soffset (float): soffset of lane
             lane_type (LaneType): type of lane
                 Default: LaneType.driving
 
-            a (float): a coefficient
+            a (float): a polynomial coefficient for width (left/right) or laneoffset (center)
                 Default: 0
 
-            b (float): b coefficient
+            b (float): b polynomial coefficient for width (left/right) or laneoffset (center)
                 Default: 0
 
-            c (float): c coefficient
+            c (float): c polynomial coefficient for width (left/right) or laneoffset (center)
                 Default: 0
 
-            d (float): d coefficient
+            d (float): d polynomial coefficient for width (left/right) or laneoffset (center)
                 Default: 0
 
-            soffset (float): soffset of lane
+            soffset (float): soffset of lane renamed to s in case of centerlane
                 Default: 0
 
         &#34;&#34;&#34; 
@@ -835,10 +846,12 @@ soffset (float): soffset of lane
         self.links.add_link(_Link(link_type,str(id)))
 
     def _set_lane_id(self,lane_id):
-        &#34;&#34;&#34; set the lane id of the lane
+        &#34;&#34;&#34; set the lane id of the lane and set lane type to &#39;none&#39; in case of centerlane
 
         &#34;&#34;&#34;
         self.lane_id = lane_id
+        if self.lane_id == 0:
+            self.lane_type = LaneType.none
 
     def add_roadmark(self,roadmark):
         &#34;&#34;&#34; add_roadmark adds a roadmark to the lane
@@ -893,16 +906,25 @@ soffset (float): soffset of lane
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;lane&#39;,attrib=self.get_attributes())
-        element.append(self.links.get_element())
-
-        widthdict = {}
-        widthdict[&#39;a&#39;] = str(self.a)
-        widthdict[&#39;b&#39;] = str(self.b)
-        widthdict[&#39;c&#39;] = str(self.c)
-        widthdict[&#39;d&#39;] = str(self.d)
-        widthdict[&#39;sOffset&#39;] = str(self.soffset)
-
-        ET.SubElement(element,&#39;width&#39;,attrib=widthdict)
+                
+        #polynomial dict either for width (left/right lanes) or laneOffset (center lane)
+        polynomialdict = {}
+        polynomialdict[&#39;a&#39;] = str(self.a)
+        polynomialdict[&#39;b&#39;] = str(self.b)
+        polynomialdict[&#39;c&#39;] = str(self.c)
+        polynomialdict[&#39;d&#39;] = str(self.d)
+        polynomialdict[&#39;sOffset&#39;] = str(self.soffset) 
+        
+        #according to standard if lane is centerlane it should 
+        #not have a width record and omit the link record        
+        if self.lane_id != 0: 
+            element.append(self.links.get_element())
+            ET.SubElement(element,&#39;width&#39;,attrib=polynomialdict)        
+        #use polynomial dict for laneOffset in case of center lane (only if values provided)
+        elif any([self.a,self.b,self.c,self.d]):
+            polynomialdict[&#39;s&#39;] = polynomialdict.pop(&#39;sOffset&#39;)            
+            ET.SubElement(element,&#39;laneOffset&#39;,attrib=polynomialdict)                         
+            
         if self.roadmark:
             element.append(self.roadmark.get_element())
             
@@ -1041,16 +1063,25 @@ id (str/id): id of the linked lane
 
     &#34;&#34;&#34;
     element = ET.Element(&#39;lane&#39;,attrib=self.get_attributes())
-    element.append(self.links.get_element())
-
-    widthdict = {}
-    widthdict[&#39;a&#39;] = str(self.a)
-    widthdict[&#39;b&#39;] = str(self.b)
-    widthdict[&#39;c&#39;] = str(self.c)
-    widthdict[&#39;d&#39;] = str(self.d)
-    widthdict[&#39;sOffset&#39;] = str(self.soffset)
-
-    ET.SubElement(element,&#39;width&#39;,attrib=widthdict)
+            
+    #polynomial dict either for width (left/right lanes) or laneOffset (center lane)
+    polynomialdict = {}
+    polynomialdict[&#39;a&#39;] = str(self.a)
+    polynomialdict[&#39;b&#39;] = str(self.b)
+    polynomialdict[&#39;c&#39;] = str(self.c)
+    polynomialdict[&#39;d&#39;] = str(self.d)
+    polynomialdict[&#39;sOffset&#39;] = str(self.soffset) 
+    
+    #according to standard if lane is centerlane it should 
+    #not have a width record and omit the link record        
+    if self.lane_id != 0: 
+        element.append(self.links.get_element())
+        ET.SubElement(element,&#39;width&#39;,attrib=polynomialdict)        
+    #use polynomial dict for laneOffset in case of center lane (only if values provided)
+    elif any([self.a,self.b,self.c,self.d]):
+        polynomialdict[&#39;s&#39;] = polynomialdict.pop(&#39;sOffset&#39;)            
+        ET.SubElement(element,&#39;laneOffset&#39;,attrib=polynomialdict)                         
+        
     if self.roadmark:
         element.append(self.roadmark.get_element())
         
