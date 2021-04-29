@@ -52,12 +52,17 @@ class Lanes():
 
             add_lanesection(lanesection)
                 adds a lane section to Lanes
+
+            add_laneoffset(laneoffset) 
+                adds a lane offset to Lanes
     &#34;&#34;&#34;
     def __init__(self):
         &#34;&#34;&#34; initalize Lanes
 
         &#34;&#34;&#34;
         self.lanesections = []
+        self.laneoffsets = []
+
     def add_lanesection(self,lanesection, lanelinks=None):
         &#34;&#34;&#34; creates the Lanes element of opendrive
     
@@ -84,12 +89,25 @@ class Lanes():
           
         self.lanesections.append(lanesection)
 
+    def add_laneoffset(self, laneoffset):
+        &#34;&#34;&#34; adds a lane offset to Lanes
+
+        Parameters
+        ----------
+            laneoffset (LaneOffset): a LaneOffset to add
+        &#34;&#34;&#34;
+        if not isinstance(laneoffset, LaneOffset):
+            raise TypeError(&#39;add_laneoffset requires a LaneOffset as input, not &#39; + str(type(laneoffset)))
+        self.laneoffsets.append(laneoffset)
+
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of Lanes
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;lanes&#39;)
         for l in self.lanesections:
+            element.append(l.get_element())
+        for l in self.laneoffsets:
             element.append(l.get_element())
         return element
 
@@ -197,6 +215,82 @@ class LaneSection():
 
         return element
         
+class LaneOffset():
+    &#34;&#34;&#34; the LaneOffset class defines an overall lateral offset along the road, described as a third degree polynomial
+
+        Parameters
+        ----------
+            s (float): s start coordinate of the elevation
+
+            a (float): a coefficient of the polynomial
+
+            b (float): b coefficient of the polynomial
+
+            c (float): c coefficient of the polynomial
+
+            d (float): d coefficient of the polynomial
+
+        Attributes
+        ----------
+            s (float): s start coordinate of the elevation
+
+            a (float): a coefficient of the polynomial
+
+            b (float): b coefficient of the polynomial
+
+            c (float): c coefficient of the polynomial
+
+            d (float): d coefficient of the polynomial
+
+        Methods
+        -------
+            get_element(elementname)
+                Returns the full ElementTree of the class
+
+            get_attributes()
+                Returns the attributes of the class
+
+    &#34;&#34;&#34;
+    def __init__(self, s=0, a=0, b=0, c=0, d=0):
+        &#34;&#34;&#34; initalize the LaneOffset class
+
+        Parameters
+        ----------
+            s (float): s start coordinate of the LaneOffset
+
+            a (float): a coefficient of the polynomial
+
+            b (float): b coefficient of the polynomial
+
+            c (float): c coefficient of the polynomial
+
+            d (float): d coefficient of the polynomial
+
+        &#34;&#34;&#34;
+        self.s = s
+        self.a = a
+        self.b = b
+        self.c = c
+        self.d = d
+
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the LaneOffset
+        &#34;&#34;&#34;
+    
+        retdict = {}
+        retdict[&#39;s&#39;] = str(self.s)
+        retdict[&#39;a&#39;] = str(self.a)
+        retdict[&#39;b&#39;] = str(self.b)
+        retdict[&#39;c&#39;] = str(self.c)
+        retdict[&#39;d&#39;] = str(self.d)
+        return retdict
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the LaneOffset
+        &#34;&#34;&#34;
+        element = ET.Element(&#39;laneOffset&#39;,attrib=self.get_attributes())
+        
+        return element
 
 class Lane():
     &#34;&#34;&#34; creates a Lane of opendrive
@@ -1093,6 +1187,177 @@ id (str/id): id of the linked lane
 </dd>
 </dl>
 </dd>
+<dt id="scenariogeneration.xodr.lane.LaneOffset"><code class="flex name class">
+<span>class <span class="ident">LaneOffset</span></span>
+<span>(</span><span>s=0, a=0, b=0, c=0, d=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>the LaneOffset class defines an overall lateral offset along the road, described as a third degree polynomial</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>s (float): s start coordinate of the elevation
+
+a (float): a coefficient of the polynomial
+
+b (float): b coefficient of the polynomial
+
+c (float): c coefficient of the polynomial
+
+d (float): d coefficient of the polynomial
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>s (float): s start coordinate of the elevation
+
+a (float): a coefficient of the polynomial
+
+b (float): b coefficient of the polynomial
+
+c (float): c coefficient of the polynomial
+
+d (float): d coefficient of the polynomial
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element(elementname)
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns the attributes of the class
+</code></pre>
+<p>initalize the LaneOffset class</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>s (float): s start coordinate of the LaneOffset
+
+a (float): a coefficient of the polynomial
+
+b (float): b coefficient of the polynomial
+
+c (float): c coefficient of the polynomial
+
+d (float): d coefficient of the polynomial
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LaneOffset():
+    &#34;&#34;&#34; the LaneOffset class defines an overall lateral offset along the road, described as a third degree polynomial
+
+        Parameters
+        ----------
+            s (float): s start coordinate of the elevation
+
+            a (float): a coefficient of the polynomial
+
+            b (float): b coefficient of the polynomial
+
+            c (float): c coefficient of the polynomial
+
+            d (float): d coefficient of the polynomial
+
+        Attributes
+        ----------
+            s (float): s start coordinate of the elevation
+
+            a (float): a coefficient of the polynomial
+
+            b (float): b coefficient of the polynomial
+
+            c (float): c coefficient of the polynomial
+
+            d (float): d coefficient of the polynomial
+
+        Methods
+        -------
+            get_element(elementname)
+                Returns the full ElementTree of the class
+
+            get_attributes()
+                Returns the attributes of the class
+
+    &#34;&#34;&#34;
+    def __init__(self, s=0, a=0, b=0, c=0, d=0):
+        &#34;&#34;&#34; initalize the LaneOffset class
+
+        Parameters
+        ----------
+            s (float): s start coordinate of the LaneOffset
+
+            a (float): a coefficient of the polynomial
+
+            b (float): b coefficient of the polynomial
+
+            c (float): c coefficient of the polynomial
+
+            d (float): d coefficient of the polynomial
+
+        &#34;&#34;&#34;
+        self.s = s
+        self.a = a
+        self.b = b
+        self.c = c
+        self.d = d
+
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the LaneOffset
+        &#34;&#34;&#34;
+    
+        retdict = {}
+        retdict[&#39;s&#39;] = str(self.s)
+        retdict[&#39;a&#39;] = str(self.a)
+        retdict[&#39;b&#39;] = str(self.b)
+        retdict[&#39;c&#39;] = str(self.c)
+        retdict[&#39;d&#39;] = str(self.d)
+        return retdict
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the LaneOffset
+        &#34;&#34;&#34;
+        element = ET.Element(&#39;laneOffset&#39;,attrib=self.get_attributes())
+        
+        return element</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xodr.lane.LaneOffset.get_attributes"><code class="name flex">
+<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the attributes of the LaneOffset</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_attributes(self):
+    &#34;&#34;&#34; returns the attributes of the LaneOffset
+    &#34;&#34;&#34;
+
+    retdict = {}
+    retdict[&#39;s&#39;] = str(self.s)
+    retdict[&#39;a&#39;] = str(self.a)
+    retdict[&#39;b&#39;] = str(self.b)
+    retdict[&#39;c&#39;] = str(self.c)
+    retdict[&#39;d&#39;] = str(self.d)
+    return retdict</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.lane.LaneOffset.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the elementTree of the LaneOffset</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self):
+    &#34;&#34;&#34; returns the elementTree of the LaneOffset
+    &#34;&#34;&#34;
+    element = ET.Element(&#39;laneOffset&#39;,attrib=self.get_attributes())
+    
+    return element</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
 <dt id="scenariogeneration.xodr.lane.LaneSection"><code class="flex name class">
 <span>class <span class="ident">LaneSection</span></span>
 <span>(</span><span>s, centerlane)</span>
@@ -1356,6 +1621,9 @@ centerlane (Lane): the centerline of the road
 
 add_lanesection(lanesection)
     adds a lane section to Lanes
+
+add_laneoffset(laneoffset) 
+    adds a lane offset to Lanes
 </code></pre>
 <p>initalize Lanes</p></div>
 <details class="source">
@@ -1377,12 +1645,17 @@ add_lanesection(lanesection)
 
             add_lanesection(lanesection)
                 adds a lane section to Lanes
+
+            add_laneoffset(laneoffset) 
+                adds a lane offset to Lanes
     &#34;&#34;&#34;
     def __init__(self):
         &#34;&#34;&#34; initalize Lanes
 
         &#34;&#34;&#34;
         self.lanesections = []
+        self.laneoffsets = []
+
     def add_lanesection(self,lanesection, lanelinks=None):
         &#34;&#34;&#34; creates the Lanes element of opendrive
     
@@ -1409,6 +1682,17 @@ add_lanesection(lanesection)
           
         self.lanesections.append(lanesection)
 
+    def add_laneoffset(self, laneoffset):
+        &#34;&#34;&#34; adds a lane offset to Lanes
+
+        Parameters
+        ----------
+            laneoffset (LaneOffset): a LaneOffset to add
+        &#34;&#34;&#34;
+        if not isinstance(laneoffset, LaneOffset):
+            raise TypeError(&#39;add_laneoffset requires a LaneOffset as input, not &#39; + str(type(laneoffset)))
+        self.laneoffsets.append(laneoffset)
+
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of Lanes
 
@@ -1416,10 +1700,36 @@ add_lanesection(lanesection)
         element = ET.Element(&#39;lanes&#39;)
         for l in self.lanesections:
             element.append(l.get_element())
+        for l in self.laneoffsets:
+            element.append(l.get_element())
         return element</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
+<dt id="scenariogeneration.xodr.lane.Lanes.add_laneoffset"><code class="name flex">
+<span>def <span class="ident">add_laneoffset</span></span>(<span>self, laneoffset)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>adds a lane offset to Lanes</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>laneoffset (LaneOffset): a LaneOffset to add
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_laneoffset(self, laneoffset):
+    &#34;&#34;&#34; adds a lane offset to Lanes
+
+    Parameters
+    ----------
+        laneoffset (LaneOffset): a LaneOffset to add
+    &#34;&#34;&#34;
+    if not isinstance(laneoffset, LaneOffset):
+        raise TypeError(&#39;add_laneoffset requires a LaneOffset as input, not &#39; + str(type(laneoffset)))
+    self.laneoffsets.append(laneoffset)</code></pre>
+</details>
+</dd>
 <dt id="scenariogeneration.xodr.lane.Lanes.add_lanesection"><code class="name flex">
 <span>def <span class="ident">add_lanesection</span></span>(<span>self, lanesection, lanelinks=None)</span>
 </code></dt>
@@ -1476,6 +1786,8 @@ lanelink (LaneLinker): (optional) a LaneLink to add
     &#34;&#34;&#34;
     element = ET.Element(&#39;lanes&#39;)
     for l in self.lanesections:
+        element.append(l.get_element())
+    for l in self.laneoffsets:
         element.append(l.get_element())
     return element</code></pre>
 </details>
@@ -1989,6 +2301,13 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
 </ul>
 </li>
 <li>
+<h4><code><a title="scenariogeneration.xodr.lane.LaneOffset" href="#scenariogeneration.xodr.lane.LaneOffset">LaneOffset</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xodr.lane.LaneOffset.get_attributes" href="#scenariogeneration.xodr.lane.LaneOffset.get_attributes">get_attributes</a></code></li>
+<li><code><a title="scenariogeneration.xodr.lane.LaneOffset.get_element" href="#scenariogeneration.xodr.lane.LaneOffset.get_element">get_element</a></code></li>
+</ul>
+</li>
+<li>
 <h4><code><a title="scenariogeneration.xodr.lane.LaneSection" href="#scenariogeneration.xodr.lane.LaneSection">LaneSection</a></code></h4>
 <ul class="">
 <li><code><a title="scenariogeneration.xodr.lane.LaneSection.add_left_lane" href="#scenariogeneration.xodr.lane.LaneSection.add_left_lane">add_left_lane</a></code></li>
@@ -2000,6 +2319,7 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
 <li>
 <h4><code><a title="scenariogeneration.xodr.lane.Lanes" href="#scenariogeneration.xodr.lane.Lanes">Lanes</a></code></h4>
 <ul class="">
+<li><code><a title="scenariogeneration.xodr.lane.Lanes.add_laneoffset" href="#scenariogeneration.xodr.lane.Lanes.add_laneoffset">add_laneoffset</a></code></li>
 <li><code><a title="scenariogeneration.xodr.lane.Lanes.add_lanesection" href="#scenariogeneration.xodr.lane.Lanes.add_lanesection">add_lanesection</a></code></li>
 <li><code><a title="scenariogeneration.xodr.lane.Lanes.get_element" href="#scenariogeneration.xodr.lane.Lanes.get_element">get_element</a></code></li>
 </ul>
