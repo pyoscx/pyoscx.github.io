@@ -63,9 +63,15 @@ class Lanes():
         self.lanesections = []
         self.laneoffsets = []
 
+    def __eq__(self, other):
+        if isinstance(other,Lanes):
+            if self.laneoffsets == other.laneoffsets and \
+            self.lanesections == other.lanesections:
+                return True
+        return False
+
     def add_lanesection(self,lanesection, lanelinks=None):
-        &#34;&#34;&#34; creates the Lanes element of opendrive
-    
+        &#34;&#34;&#34; creates the Lanes element of opendrive    
 
         Parameters
         ----------
@@ -162,6 +168,14 @@ class LaneSection():
         self._left_id = 1
         self._right_id = -1
 
+    def __eq__(self, other):
+        if isinstance(other,LaneSection):
+            if self.get_attributes() == other.get_attributes() and \
+            self.centerlane == other.centerlane and \
+            self.leftlanes == other.leftlanes and \
+            self.rightlanes == other.rightlanes:
+                return True
+        return False
 
     def add_left_lane(self,lane):
         &#34;&#34;&#34; adds a lane to the left of the center, add from center outwards
@@ -272,6 +286,12 @@ class LaneOffset():
         self.b = b
         self.c = c
         self.d = d
+
+    def __eq__(self, other):
+        if isinstance(other,LaneOffset):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the LaneOffset
@@ -389,6 +409,19 @@ class Lane():
         self.roadmark = None
         self.links = _Links()
 
+    def __eq__(self, other):
+        if isinstance(other,Lane):
+            if self.links == other.links and \
+            self.get_attributes() == other.get_attributes() and \
+            self.a == other.a and \
+            self.b == other.b and \
+            self.c == other.c and \
+            self.d == other.d and \
+            self.soffset == other.soffset and \
+            self.heights == other.heights and \
+            self.roadmark == other.roadmark:
+                return True
+        return False
         
         #TODO: add more features to add for lane
     def add_link(self,link_type,id):
@@ -478,9 +511,10 @@ class Lane():
             element.append(self.links.get_element())
             ET.SubElement(element,&#39;width&#39;,attrib=polynomialdict)        
         #use polynomial dict for laneOffset in case of center lane (only if values provided)
-        elif any([self.a,self.b,self.c,self.d]):
-            polynomialdict[&#39;s&#39;] = polynomialdict.pop(&#39;sOffset&#39;)            
-            ET.SubElement(element,&#39;laneOffset&#39;,attrib=polynomialdict)                         
+        # removed, should not be here..
+        # elif any([self.a,self.b,self.c,self.d]):
+        #     polynomialdict[&#39;s&#39;] = polynomialdict.pop(&#39;sOffset&#39;)            
+        #     ET.SubElement(element,&#39;laneOffset&#39;,attrib=polynomialdict)                         
             
         if self.roadmark:
             element.append(self.roadmark.get_element())
@@ -568,7 +602,11 @@ class RoadLine():
         self.color = color
 
 
-
+    def __eq__(self, other):
+        if isinstance(other,RoadLine):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
         
 
     def get_attributes(self):
@@ -713,8 +751,16 @@ class RoadMark():
             self.rule = rule or MarkRule.none
             self._line = RoadLine(self.width,self.length,self.space,self.toffset,self.soffset,self.rule,self.color)          
 
+    def __eq__(self, other):
+        if isinstance(other,RoadMark):
+            if self._line == other._line and \
+            self.get_attributes() == other.get_attributes() and \
+            self.marking_type == other.marking_type:
+                return True
+        return False
+
     def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes of the Lane as a dict
+        &#34;&#34;&#34; returns the attributes of the RoadMark as a dict
 
         &#34;&#34;&#34;
         retdict = {}
@@ -730,7 +776,7 @@ class RoadMark():
         return retdict
 
     def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the WorldPostion
+        &#34;&#34;&#34; returns the elementTree of the RoadMark
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;roadMark&#39;,attrib=self.get_attributes())
@@ -926,6 +972,19 @@ soffset (float): soffset of lane renamed to s in case of centerlane
         self.roadmark = None
         self.links = _Links()
 
+    def __eq__(self, other):
+        if isinstance(other,Lane):
+            if self.links == other.links and \
+            self.get_attributes() == other.get_attributes() and \
+            self.a == other.a and \
+            self.b == other.b and \
+            self.c == other.c and \
+            self.d == other.d and \
+            self.soffset == other.soffset and \
+            self.heights == other.heights and \
+            self.roadmark == other.roadmark:
+                return True
+        return False
         
         #TODO: add more features to add for lane
     def add_link(self,link_type,id):
@@ -1015,9 +1074,10 @@ soffset (float): soffset of lane renamed to s in case of centerlane
             element.append(self.links.get_element())
             ET.SubElement(element,&#39;width&#39;,attrib=polynomialdict)        
         #use polynomial dict for laneOffset in case of center lane (only if values provided)
-        elif any([self.a,self.b,self.c,self.d]):
-            polynomialdict[&#39;s&#39;] = polynomialdict.pop(&#39;sOffset&#39;)            
-            ET.SubElement(element,&#39;laneOffset&#39;,attrib=polynomialdict)                         
+        # removed, should not be here..
+        # elif any([self.a,self.b,self.c,self.d]):
+        #     polynomialdict[&#39;s&#39;] = polynomialdict.pop(&#39;sOffset&#39;)            
+        #     ET.SubElement(element,&#39;laneOffset&#39;,attrib=polynomialdict)                         
             
         if self.roadmark:
             element.append(self.roadmark.get_element())
@@ -1172,9 +1232,10 @@ id (str/id): id of the linked lane
         element.append(self.links.get_element())
         ET.SubElement(element,&#39;width&#39;,attrib=polynomialdict)        
     #use polynomial dict for laneOffset in case of center lane (only if values provided)
-    elif any([self.a,self.b,self.c,self.d]):
-        polynomialdict[&#39;s&#39;] = polynomialdict.pop(&#39;sOffset&#39;)            
-        ET.SubElement(element,&#39;laneOffset&#39;,attrib=polynomialdict)                         
+    # removed, should not be here..
+    # elif any([self.a,self.b,self.c,self.d]):
+    #     polynomialdict[&#39;s&#39;] = polynomialdict.pop(&#39;sOffset&#39;)            
+    #     ET.SubElement(element,&#39;laneOffset&#39;,attrib=polynomialdict)                         
         
     if self.roadmark:
         element.append(self.roadmark.get_element())
@@ -1295,6 +1356,12 @@ d (float): d coefficient of the polynomial
         self.b = b
         self.c = c
         self.d = d
+
+    def __eq__(self, other):
+        if isinstance(other,LaneOffset):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the LaneOffset
@@ -1452,6 +1519,14 @@ centerlane (Lane): the centerline of the road
         self._left_id = 1
         self._right_id = -1
 
+    def __eq__(self, other):
+        if isinstance(other,LaneSection):
+            if self.get_attributes() == other.get_attributes() and \
+            self.centerlane == other.centerlane and \
+            self.leftlanes == other.leftlanes and \
+            self.rightlanes == other.rightlanes:
+                return True
+        return False
 
     def add_left_lane(self,lane):
         &#34;&#34;&#34; adds a lane to the left of the center, add from center outwards
@@ -1656,9 +1731,15 @@ add_laneoffset(laneoffset)
         self.lanesections = []
         self.laneoffsets = []
 
+    def __eq__(self, other):
+        if isinstance(other,Lanes):
+            if self.laneoffsets == other.laneoffsets and \
+            self.lanesections == other.lanesections:
+                return True
+        return False
+
     def add_lanesection(self,lanesection, lanelinks=None):
-        &#34;&#34;&#34; creates the Lanes element of opendrive
-    
+        &#34;&#34;&#34; creates the Lanes element of opendrive    
 
         Parameters
         ----------
@@ -1734,7 +1815,8 @@ add_laneoffset(laneoffset)
 <span>def <span class="ident">add_lanesection</span></span>(<span>self, lanesection, lanelinks=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>creates the Lanes element of opendrive</p>
+<div class="desc"><p>creates the Lanes element of opendrive
+</p>
 <h2 id="parameters">Parameters</h2>
 <pre><code>lanesection (LaneSection): a LaneSection to add
 
@@ -1745,8 +1827,7 @@ lanelink (LaneLinker): (optional) a LaneLink to add
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def add_lanesection(self,lanesection, lanelinks=None):
-    &#34;&#34;&#34; creates the Lanes element of opendrive
-
+    &#34;&#34;&#34; creates the Lanes element of opendrive    
 
     Parameters
     ----------
@@ -1932,7 +2013,11 @@ color (RoadMarkColor): color of line (optional)
         self.color = color
 
 
-
+    def __eq__(self, other):
+        if isinstance(other,RoadLine):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
         
 
     def get_attributes(self):
@@ -2198,8 +2283,16 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
             self.rule = rule or MarkRule.none
             self._line = RoadLine(self.width,self.length,self.space,self.toffset,self.soffset,self.rule,self.color)          
 
+    def __eq__(self, other):
+        if isinstance(other,RoadMark):
+            if self._line == other._line and \
+            self.get_attributes() == other.get_attributes() and \
+            self.marking_type == other.marking_type:
+                return True
+        return False
+
     def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes of the Lane as a dict
+        &#34;&#34;&#34; returns the attributes of the RoadMark as a dict
 
         &#34;&#34;&#34;
         retdict = {}
@@ -2215,7 +2308,7 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
         return retdict
 
     def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the WorldPostion
+        &#34;&#34;&#34; returns the elementTree of the RoadMark
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;roadMark&#39;,attrib=self.get_attributes())
@@ -2230,13 +2323,13 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes of the Lane as a dict</p></div>
+<div class="desc"><p>returns the attributes of the RoadMark as a dict</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34; returns the attributes of the Lane as a dict
+    &#34;&#34;&#34; returns the attributes of the RoadMark as a dict
 
     &#34;&#34;&#34;
     retdict = {}
@@ -2256,13 +2349,13 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the WorldPostion</p></div>
+<div class="desc"><p>returns the elementTree of the RoadMark</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_element(self):
-    &#34;&#34;&#34; returns the elementTree of the WorldPostion
+    &#34;&#34;&#34; returns the elementTree of the RoadMark
 
     &#34;&#34;&#34;
     element = ET.Element(&#39;roadMark&#39;,attrib=self.get_attributes())

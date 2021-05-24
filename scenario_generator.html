@@ -49,7 +49,9 @@ class ScenarioGenerator():
 
             parameters (dict of lists, or list of dicts): parameter sets to be used
 
-            naming (str): two options
+            naming (str): two options &#34;numerical&#34; or &#34;parameter&#34;
+
+            generate_all_roads (bool): will only generate unique roads 
     &#34;&#34;&#34;
     def __init__(self):
         self.road_file = &#39;&#39;
@@ -57,7 +59,9 @@ class ScenarioGenerator():
         self.naming = &#39;numerical&#39; # can be &#39;numerical&#39;, &#39;parameter&#39;
         self._it = 0
         self._generation_folder = &#39;&#39;
-        self._write_relative_road_path = False
+        self.write_relative_road_path = False
+        self.generate_all_roads = True
+        self._created_roads = {}
     def road(self,**kwargs):
         &#34;&#34;&#34; Dummy method for generating an OpenDRIVE road
 
@@ -130,9 +134,6 @@ class ScenarioGenerator():
 
         elif isinstance(self.parameters,list):
             self.all_permutations = self.parameters
-
-  
-        
     
     def _generate_road_and_scenario(self,permutation):
         &#34;&#34;&#34; _generate_road_and_scenario takes a permutation and generates the road/scenario (if specified)
@@ -151,11 +152,21 @@ class ScenarioGenerator():
 
         road = self.road(**permutation)
         if road:
-            self.road_file = os.path.abspath(os.path.join(self._generation_folder,&#39;xodr&#39;,scenario_name+&#39;.xodr&#39;))
-            road.write_xml(self.road_file)
-            if self.write_relative_road_path:
-                self.road_file = self.road_file.replace(os.path.abspath(self._generation_folder),os.path.pardir)
+            new_unique_road = True
+            if not self.generate_all_roads:
+                for previous_road in self._created_roads:
+                    if self._created_roads[previous_road] == road:
+                        self.road_file = previous_road
+                        new_unique_road = False
+            
+                
+            if new_unique_road:
+                self.road_file = os.path.abspath(os.path.join(self._generation_folder,&#39;xodr&#39;,scenario_name+&#39;.xodr&#39;))
+                road.write_xml(self.road_file)
+                if self.write_relative_road_path:
+                    self.road_file = self.road_file.replace(os.path.abspath(self._generation_folder),os.path.pardir)
 
+                self._created_roads[self.road_file] = road
 
         sce = self.scenario(**permutation)
         if sce:
@@ -300,7 +311,9 @@ class ScenarioGenerator():
 
 parameters (dict of lists, or list of dicts): parameter sets to be used
 
-naming (str): two options
+naming (str): two options "numerical" or "parameter"
+
+generate_all_roads (bool): will only generate unique roads
 </code></pre></div>
 <details class="source">
 <summary>
@@ -319,7 +332,9 @@ naming (str): two options
 
             parameters (dict of lists, or list of dicts): parameter sets to be used
 
-            naming (str): two options
+            naming (str): two options &#34;numerical&#34; or &#34;parameter&#34;
+
+            generate_all_roads (bool): will only generate unique roads 
     &#34;&#34;&#34;
     def __init__(self):
         self.road_file = &#39;&#39;
@@ -327,7 +342,9 @@ naming (str): two options
         self.naming = &#39;numerical&#39; # can be &#39;numerical&#39;, &#39;parameter&#39;
         self._it = 0
         self._generation_folder = &#39;&#39;
-        self._write_relative_road_path = False
+        self.write_relative_road_path = False
+        self.generate_all_roads = True
+        self._created_roads = {}
     def road(self,**kwargs):
         &#34;&#34;&#34; Dummy method for generating an OpenDRIVE road
 
@@ -400,9 +417,6 @@ naming (str): two options
 
         elif isinstance(self.parameters,list):
             self.all_permutations = self.parameters
-
-  
-        
     
     def _generate_road_and_scenario(self,permutation):
         &#34;&#34;&#34; _generate_road_and_scenario takes a permutation and generates the road/scenario (if specified)
@@ -421,11 +435,21 @@ naming (str): two options
 
         road = self.road(**permutation)
         if road:
-            self.road_file = os.path.abspath(os.path.join(self._generation_folder,&#39;xodr&#39;,scenario_name+&#39;.xodr&#39;))
-            road.write_xml(self.road_file)
-            if self.write_relative_road_path:
-                self.road_file = self.road_file.replace(os.path.abspath(self._generation_folder),os.path.pardir)
+            new_unique_road = True
+            if not self.generate_all_roads:
+                for previous_road in self._created_roads:
+                    if self._created_roads[previous_road] == road:
+                        self.road_file = previous_road
+                        new_unique_road = False
+            
+                
+            if new_unique_road:
+                self.road_file = os.path.abspath(os.path.join(self._generation_folder,&#39;xodr&#39;,scenario_name+&#39;.xodr&#39;))
+                road.write_xml(self.road_file)
+                if self.write_relative_road_path:
+                    self.road_file = self.road_file.replace(os.path.abspath(self._generation_folder),os.path.pardir)
 
+                self._created_roads[self.road_file] = road
 
         sce = self.scenario(**permutation)
         if sce:

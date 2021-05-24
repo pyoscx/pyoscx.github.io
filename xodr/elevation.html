@@ -104,6 +104,12 @@ class _Poly3Profile():
         self.d = d
         self.t = t
 
+    def __eq__(self, other):
+        if isinstance(other,_Poly3Profile):
+            if self.get_attributes() == other.get_attributes():         
+                return True
+        return False
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the Elevetion
 
@@ -157,6 +163,12 @@ class ElevationProfile():
         &#34;&#34;&#34;
         self.elevations = []
 
+    def __eq__(self, other):
+        if isinstance(other,ElevationProfile):
+            if self.elevations == other.elevations:         
+                return True
+        return False
+
     def add_elevation(self,elevation):
         &#34;&#34;&#34; adds an elevation to the ElevationProfile
 
@@ -209,6 +221,12 @@ class LateralProfile():
         &#34;&#34;&#34;
         self.superelevations = []
         self.shapes = []
+
+    def __eq__(self, other):
+        if isinstance(other,LateralProfile):
+            if self.superelevations == other.superelevations and self.shapes == other.shapes:         
+                return True
+        return False
 
     def add_superelevation(self,superelevation):
         &#34;&#34;&#34; adds an elevation to the LateralProfile
@@ -297,6 +315,12 @@ add_elevation(elevation)
 
         &#34;&#34;&#34;
         self.elevations = []
+
+    def __eq__(self, other):
+        if isinstance(other,ElevationProfile):
+            if self.elevations == other.elevations:         
+                return True
+        return False
 
     def add_elevation(self,elevation):
         &#34;&#34;&#34; adds an elevation to the ElevationProfile
@@ -423,6 +447,12 @@ add_shape(shape)
         &#34;&#34;&#34;
         self.superelevations = []
         self.shapes = []
+
+    def __eq__(self, other):
+        if isinstance(other,LateralProfile):
+            if self.superelevations == other.superelevations and self.shapes == other.shapes:         
+                return True
+        return False
 
     def add_superelevation(self,superelevation):
         &#34;&#34;&#34; adds an elevation to the LateralProfile

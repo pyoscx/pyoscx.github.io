@@ -85,7 +85,13 @@ class _Action():
         self.name = name
         
         self.action = action
-        
+
+    def __eq__(self,other):
+        if isinstance(other,_Action):
+            if self.get_attributes() == other.get_attributes() and self.action == other.action:
+                return True
+        return False
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the _Action as a dict
 
@@ -144,6 +150,13 @@ class AbsoluteSpeedAction(_PrivateActionType):
         if not isinstance(transition_dynamics,TransitionDynamics):
             raise TypeError(&#39;transition_dynamics input not of type TransitionDynamics&#39;)
         self.transition_dynamics = transition_dynamics
+
+    def __eq__(self,other):
+        if isinstance(other,AbsoluteSpeedAction):
+            if self.get_attributes() == other.get_attributes() and self.transition_dynamics == other.transition_dynamics:
+                return True
+        return False
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the AbsoluteSpeedAction as a dict
 
@@ -228,6 +241,11 @@ class RelativeSpeedAction(_PrivateActionType):
         self.transition_dynamics = transition_dynamics
         self.continuous = continuous
 
+    def __eq__(self,other):
+        if isinstance(other,RelativeSpeedAction):
+            if self.get_attributes() == other.get_attributes() and self.transition_dynamics == other.transition_dynamics:
+                return True
+        return False
     
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the RelativeSpeedAction as a dict
@@ -330,8 +348,13 @@ class LongitudinalDistanceAction(_PrivateActionType):
         self.freespace = freespace
         self.continuous = continuous
         self.dynamic_constraint = DynamicsConstrains(max_acceleration,max_deceleration,max_speed)
-        self.distance = distance   
-        
+        self.distance = distance
+
+    def __eq__(self,other):
+        if isinstance(other,LongitudinalDistanceAction):
+            if self.get_attributes() == other.get_attributes() and self.dynamic_constraint == other.dynamic_constraint:
+                return True
+        return False
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the LongitudinalDistanceAction as a dict
@@ -440,7 +463,11 @@ class LongitudinalTimegapAction(_PrivateActionType):
         self.timegap = timegap
         self.dynamic_constraint = DynamicsConstrains(max_acceleration,max_deceleration,max_speed)
         
-       
+    def __eq__(self,other):
+        if isinstance(other,LongitudinalTimegapAction):
+            if self.get_attributes() == other.get_attributes() and self.dynamic_constraint == other.dynamic_constraint:
+                return True
+        return False
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the LongitudinalTimegapAction as a dict
@@ -515,6 +542,14 @@ class AbsoluteLaneChangeAction(_PrivateActionType):
         if not isinstance(transition_dynamics,TransitionDynamics):
             raise TypeError(&#39;transition_dynamics input not of type TransitionDynamics&#39;)
         self.transition_dynamics = transition_dynamics
+
+    def __eq__(self,other):
+        if isinstance(other,AbsoluteLaneChangeAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.transition_dynamics == other.transition_dynamics and \
+            self.target_lane_offset == other.target_lane_offset:
+                return True
+        return False
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the AbsoluteLaneChangeAction as a dict
@@ -599,6 +634,13 @@ class RelativeLaneChangeAction(_PrivateActionType):
             raise TypeError(&#39;transition_dynamics input not of type TransitionDynamics&#39;)
         self.transition_dynamics = transition_dynamics
 
+    def __eq__(self,other):
+        if isinstance(other,RelativeLaneChangeAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.transition_dynamics == other.transition_dynamics and \
+            self.target_lane_offset == other.target_lane_offset:
+                return True
+        return False
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the RelativeLaneChangeAction as a dict
@@ -662,7 +704,7 @@ class AbsoluteLaneOffsetAction(_PrivateActionType):
 
     &#34;&#34;&#34;
     def __init__(self,value,shape,maxlatacc,continuous = True):
-        &#34;&#34;&#34; initalizes the LaneOffsetAction
+        &#34;&#34;&#34; initalizes the AbsoluteLaneOffsetAction
             Parameters
             ----------
                 value (float): lateral offset of the lane
@@ -684,8 +726,17 @@ class AbsoluteLaneOffsetAction(_PrivateActionType):
         self.dynshape = shape
         self.maxlatacc = maxlatacc
 
+    def __eq__(self,other):
+        if isinstance(other,AbsoluteLaneOffsetAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.dynshape == other.dynshape and \
+            self.maxlatacc == other.maxlatacc and \
+            self.continuous == other.continuous:
+                return True
+        return False
+
     def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes of the LaneOffsetAction as a dict
+        &#34;&#34;&#34; returns the attributes of the AbsoluteLaneOffsetAction as a dict
 
         &#34;&#34;&#34;
         retdict = {}
@@ -693,7 +744,7 @@ class AbsoluteLaneOffsetAction(_PrivateActionType):
         return retdict
         
     def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the LaneOffsetAction
+        &#34;&#34;&#34; returns the elementTree of the AbsoluteLaneOffsetAction
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;PrivateAction&#39;)
@@ -743,7 +794,7 @@ class RelativeLaneOffsetAction(_PrivateActionType):
 
     &#34;&#34;&#34;
     def __init__(self,value,entity,shape,maxlatacc,continuous = True):
-        &#34;&#34;&#34; initalizes the LaneOffsetAction,
+        &#34;&#34;&#34; initalizes the RelativeLaneOffsetAction,
 
             Parameters
             ----------
@@ -769,8 +820,18 @@ class RelativeLaneOffsetAction(_PrivateActionType):
         self.dynshape = shape
         self.maxlatacc = maxlatacc
 
+    def __eq__(self,other):
+        if isinstance(other,RelativeLaneOffsetAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.dynshape == other.dynshape and \
+            self.maxlatacc == other.maxlatacc and \
+            self.continuous == other.continuous and \
+            self.target == other.target:
+                return True
+        return False
+
     def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes of the LaneOffsetAction as a dict
+        &#34;&#34;&#34; returns the attributes of the RelativeLaneOffsetAction as a dict
 
         &#34;&#34;&#34;
         retdict = {}
@@ -779,7 +840,7 @@ class RelativeLaneOffsetAction(_PrivateActionType):
         return retdict
         
     def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the LaneOffsetAction
+        &#34;&#34;&#34; returns the elementTree of the RelativeLaneOffsetAction
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;PrivateAction&#39;)
@@ -878,6 +939,13 @@ class LateralDistanceAction(_PrivateActionType):
         self.continuous = continuous
         self.dynamic_constraint = DynamicsConstrains(max_acceleration,max_deceleration,max_speed)
 
+    def __eq__(self,other):
+        if isinstance(other,LateralDistanceAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.dynamic_constraint == other.dynamic_constraint:
+                return True
+        return False
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the LateralDistanceAction as a dict
 
@@ -886,7 +954,7 @@ class LateralDistanceAction(_PrivateActionType):
         retdict[&#39;entityRef&#39;] = self.target
         retdict[&#39;freespace&#39;] = convert_bool(self.freespace)
         retdict[&#39;continuous&#39;] = convert_bool(self.continuous)
-        if self.distance:
+        if self.distance != None:
             retdict[&#39;distance&#39;] = str(self.distance)
         return retdict
 
@@ -936,6 +1004,12 @@ class TeleportAction(_PrivateActionType):
 
         self.position = position
 
+    def __eq__(self,other):
+        if isinstance(other,TeleportAction):
+            if self.position == other.position:
+                return True
+        return False
+
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the TeleportAction
 
@@ -980,6 +1054,12 @@ class AssignRouteAction(_PrivateActionType):
 
         self.route = route
 
+    def __eq__(self,other):
+        if isinstance(other,AssignRouteAction):
+            if self.route == other.route:
+                return True
+        return False
+
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the AssignRouteAction
 
@@ -1010,7 +1090,7 @@ class AcquirePositionAction(_PrivateActionType):
 
     &#34;&#34;&#34;
     def __init__(self,position):
-        &#34;&#34;&#34; initalizes the AssignRouteAction
+        &#34;&#34;&#34; initalizes the AcquirePositionAction
 
             Parameters
             ----------
@@ -1022,8 +1102,14 @@ class AcquirePositionAction(_PrivateActionType):
 
         self.position = position
 
+    def __eq__(self,other):
+        if isinstance(other,AcquirePositionAction):
+            if self.position == other.position:
+                return True
+        return False
+
     def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the AssignRouteAction
+        &#34;&#34;&#34; returns the elementTree of the AcquirePositionAction
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;PrivateAction&#39;)
@@ -1098,8 +1184,17 @@ class FollowTrajectoryAction(_PrivateActionType):
         self.timeref = TimeReference(reference_domain,scale,offset)
         self.initialDistanceOffset = initialDistanceOffset
 
+    def __eq__(self,other):
+        if isinstance(other,FollowTrajectoryAction):
+            if self.timeref == other.timeref and \
+            self.get_attributes() == other.get_attributes() and \
+            self.trajectory == other.trajectory and \
+            self.following_mode == other.following_mode:
+                return True
+        return False
+
     def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes of the ActivateControllerAction as a dict
+        &#34;&#34;&#34; returns the attributes of the FollowTrajectoryAction as a dict
 
         &#34;&#34;&#34;
         if self.initialDistanceOffset:
@@ -1109,7 +1204,7 @@ class FollowTrajectoryAction(_PrivateActionType):
             return {}
 
     def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the AssignRouteAction
+        &#34;&#34;&#34; returns the elementTree of the FollowTrajectoryAction
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;PrivateAction&#39;)
@@ -1166,6 +1261,12 @@ class ActivateControllerAction(_PrivateActionType):
         self.lateral = lateral
         self.longitudinal = longitudinal
 
+    def __eq__(self,other):
+        if isinstance(other,ActivateControllerAction):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the ActivateControllerAction as a dict
 
@@ -1210,6 +1311,12 @@ class AssignControllerAction(_PrivateActionType):
         if not ( isinstance(controller,Controller) or isinstance(controller,CatalogReference)):
             raise TypeError(&#39;route input not of type Route or CatalogReference&#39;) 
         self.controller = controller
+
+    def __eq__(self,other):
+        if isinstance(other,AssignControllerAction):
+            if self.controller == other.controller:
+                return True
+        return False
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the AssignControllerAction
@@ -1298,6 +1405,23 @@ class OverrideControllerValueAction(_PrivateActionType):
         self.gear_value = 0
         self.parkingbrake_active = None
         self.parkingbrake_value = 0
+
+    def __eq__(self,other):
+        if isinstance(other,OverrideControllerValueAction):
+            if self.throttle_value == other.throttle_value and \
+            self.throttle_value == other.throttle_value and \
+            self.brake_active == other.brake_active and \
+            self.brake_value == other.brake_value and \
+            self.clutch_active == other.clutch_active and \
+            self.clutch_value == other.clutch_value and \
+            self.steeringwheel_active == other.steeringwheel_active and \
+            self.steeringwheel_value == other.steeringwheel_value and \
+            self.gear_active == other.gear_active and \
+            self.gear_value == other.gear_value and \
+            self.parkingbrake_active == other.parkingbrake_active and \
+            self.parkingbrake_value == other.parkingbrake_value:
+                return True
+        return False
 
     def set_clutch(self,active,value=0):
         &#34;&#34;&#34; Sets the clutch value
@@ -1455,6 +1579,12 @@ class VisibilityAction(_PrivateActionType):
         self.traffic = traffic
         self.sensors = sensors
 
+    def __eq__(self,other):
+        if isinstance(other,VisibilityAction):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the VisibilityAction as a dict
 
@@ -1538,6 +1668,15 @@ class AbsoluteSynchronizeAction(_PrivateActionType):
         self.speed = speed
         self.target_tolerance_master = target_tolerance_master
         self.target_tolerance = target_tolerance
+
+    def __eq__(self,other):
+        if isinstance(other,AbsoluteSynchronizeAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.entity_PositionType == other.entity_PositionType and \
+            self.target_PositionType == other.target_PositionType and \
+            self.speed == other.speed:
+                return True
+        return False
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the AbsoluteSynchronizeAction as a dict
@@ -1643,8 +1782,18 @@ class RelativeSynchronizeAction(_PrivateActionType):
         self.target_tolerance_master = target_tolerance_master
         self.target_tolerance = target_tolerance
 
+    def __eq__(self,other):
+        if isinstance(other,RelativeSynchronizeAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.entity_PositionType == other.entity_PositionType and \
+            self.target_PositionType == other.target_PositionType and \
+            self.speed_target_type == other.speed_target_type and \
+            self.speed == other.speed:
+                return True
+        return False
+
     def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes of the VisibilityAction as a dict
+        &#34;&#34;&#34; returns the attributes of the RelativeSynchronizeAction as a dict
 
         &#34;&#34;&#34;
         attr = {&#39;masterEntityRef&#39;:self.entity}
@@ -1655,7 +1804,7 @@ class RelativeSynchronizeAction(_PrivateActionType):
         return attr
 
     def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the VisibilityAction
+        &#34;&#34;&#34; returns the elementTree of the RelativeSynchronizeAction
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;PrivateAction&#39;)
@@ -1708,6 +1857,14 @@ class ParameterAddAction(_ActionType):
         &#34;&#34;&#34;
         self.parameter_ref = parameter_ref
         self.value = value
+
+    def __eq__(self,other):
+        if isinstance(other,ParameterAddAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.parameter_ref == other.parameter_ref:
+                return True
+        return False
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the AbsoluteSpeedAction as a dict
 
@@ -1765,14 +1922,22 @@ class ParameterMultiplyAction(_ActionType):
         &#34;&#34;&#34;
         self.parameter_ref = parameter_ref
         self.value = value
+
+    def __eq__(self,other):
+        if isinstance(other,ParameterMultiplyAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.parameter_ref == other.parameter_ref:
+                return True
+        return False
+
     def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes of the AbsoluteSpeedAction as a dict
+        &#34;&#34;&#34; returns the attributes of the ParameterMultiplyAction as a dict
 
         &#34;&#34;&#34;
         return {&#39;value&#39;:str(self.value)}
 
     def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the AbsoluteSpeedAction
+        &#34;&#34;&#34; returns the elementTree of the ParameterMultiplyAction
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;GlobalAction&#39;)
@@ -1821,14 +1986,22 @@ class ParameterSetAction(_ActionType):
         &#34;&#34;&#34;
         self.parameter_ref = parameter_ref
         self.value = value
+
+    def __eq__(self,other):
+        if isinstance(other,ParameterSetAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.parameter_ref == other.parameter_ref:
+                return True
+        return False
+
     def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes of the AbsoluteSpeedAction as a dict
+        &#34;&#34;&#34; returns the attributes of the ParameterSetAction as a dict
 
         &#34;&#34;&#34;
         return {&#39;value&#39;:str(self.value)}
 
     def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the AbsoluteSpeedAction
+        &#34;&#34;&#34; returns the elementTree of the ParameterSetAction
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;GlobalAction&#39;)
@@ -1876,14 +2049,20 @@ class TrafficSignalStateAction(_ActionType):
         self.name = name
         self.state = state
 
+    def __eq__(self,other):
+        if isinstance(other,TrafficSignalStateAction):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+
     def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes of the AbsoluteSpeedAction as a dict
+        &#34;&#34;&#34; returns the attributes of the TrafficSignalStateAction as a dict
 
         &#34;&#34;&#34;
         return {&#39;name&#39;:self.name,&#39;state&#39;:self.state}
 
     def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the AbsoluteSpeedAction
+        &#34;&#34;&#34; returns the elementTree of the TrafficSignalStateAction
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;GlobalAction&#39;)
@@ -1933,6 +2112,12 @@ class AddEntityAction(_ActionType):
         self.entityref = entityref
         self.position = position
 
+    def __eq__(self,other):
+        if isinstance(other,AddEntityAction):
+            if self.get_attributes() == other.get_attributes() and self.position == other.position:
+                return True
+        return False
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the AddEntityAction as a dict
 
@@ -1954,7 +2139,7 @@ class AddEntityAction(_ActionType):
 
 
 class DeleteEntityAction(_ActionType):
-    &#34;&#34;&#34; The DeleteEntityAction class creates a EntityAction which removes a entity to the scenario
+    &#34;&#34;&#34; The DeleteEntityAction class creates a EntityAction which removes an entity to the scenario
         
         Parameters
         ----------
@@ -1986,6 +2171,12 @@ class DeleteEntityAction(_ActionType):
         
         self.entityref = entityref
 
+    def __eq__(self,other):
+        if isinstance(other,DeleteEntityAction):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the DeleteEntityAction as a dict
 
@@ -2011,16 +2202,16 @@ class TrafficSignalControllerAction(_ActionType):
         
         Parameters
         ----------
-            name (str): id of the signal in the road network
+            phase (str): phase of the signal
 
-            state (str): the state to set to the traffic light
+            traffic_signalcontroller_ref (str): reference to traffic signal controller
 
         Attributes
         ----------
 
-            name (str): id of the signal in the road network
+            phase (str): phase of the signal
 
-            state (str): the state to set to the traffic light
+            traffic_signalcontroller_ref (str): reference to traffic signal controller
 
         Methods
         -------
@@ -2031,33 +2222,39 @@ class TrafficSignalControllerAction(_ActionType):
                 Returns a dictionary of all attributes of the class
     &#34;&#34;&#34;
 
-    def __init__(self,name,state):
-        &#34;&#34;&#34; initalize the TrafficSignalStateAction
+    def __init__(self,phase,traffic_signalcontroller_ref):
+        &#34;&#34;&#34; initalize the TrafficSignalControllerAction
 
         Parameters
         ----------
-            name (str): id of the signal in the road network
+            phase (str): phase of the signal
 
-            state (str): the state to set to the traffic light
+            traffic_signalcontroller_ref (str): reference to traffic signal controller
 
         &#34;&#34;&#34;
-        self.name = name
-        self.state = state
+        self.phase = phase
+        self.traffic_signalcontroller_ref = traffic_signalcontroller_ref
+
+    def __eq__(self,other):
+        if isinstance(other,TrafficSignalControllerAction):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
 
     def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes of the AbsoluteSpeedAction as a dict
+        &#34;&#34;&#34; returns the attributes of the TrafficSignalControllerAction as a dict
 
         &#34;&#34;&#34;
-        return {&#39;name&#39;:self.name,&#39;state&#39;:self.state}
+        return {&#39;phase&#39;:self.phase,&#39;trafficSignalControllerRef&#39;:self.traffic_signalcontroller_ref}
 
     def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the AbsoluteSpeedAction
+        &#34;&#34;&#34; returns the elementTree of the TrafficSignalControllerAction
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;GlobalAction&#39;)
         infra = ET.SubElement(element,&#39;InfrastructureAction&#39;)
         tsa = ET.SubElement(infra,&#39;TrafficSignalAction&#39;)
-        ET.SubElement(tsa,&#39;TrafficSignalStateAction&#39;,self.get_attributes())
+        ET.SubElement(tsa,&#39;TrafficSignalControllerAction&#39;,self.get_attributes())
         
         return element
 
@@ -2129,6 +2326,14 @@ class TrafficSourceAction(_ActionType):
         self.position = position
         self.trafficdefinition = trafficdefinition
         self.velocity = velocity
+
+    def __eq__(self,other):
+        if isinstance(other,TrafficSourceAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.position == other.position and \
+            self.trafficdefinition == other.trafficdefinition:
+                return True
+        return False
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the TrafficSourceAction as a dict
@@ -2213,6 +2418,13 @@ class TrafficSinkAction(_ActionType):
         self.position = position
         self.trafficdefinition = trafficdefinition
 
+    def __eq__(self,other):
+        if isinstance(other,TrafficSinkAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.position == other.position and \
+            self.trafficdefinition == other.trafficdefinition:
+                return True
+        return False
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the TrafficSinkAction as a dict
@@ -2288,7 +2500,7 @@ class TrafficSwarmAction(_ActionType):
     &#34;&#34;&#34;
 
     def __init__(self,semimajoraxis,semiminoraxis,innerradius,offset,numberofvehicles,centralobject,trafficdefinition,velocity = None):
-        &#34;&#34;&#34; initalize the TrafficSinkAction
+        &#34;&#34;&#34; initalize the TrafficSwarmAction
 
         Parameters
         ----------
@@ -2320,8 +2532,16 @@ class TrafficSwarmAction(_ActionType):
         self.trafficdefinition = trafficdefinition
         self.velocity = velocity
 
+    def __eq__(self,other):
+        if isinstance(other,TrafficSwarmAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.centralobject == other.centralobject and \
+            self.trafficdefinition == other.trafficdefinition:
+                return True
+        return False
+
     def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes of the TrafficSinkAction as a dict
+        &#34;&#34;&#34; returns the attributes of the TrafficSwarmAction as a dict
 
         &#34;&#34;&#34;
         retdict = {}
@@ -2335,7 +2555,7 @@ class TrafficSwarmAction(_ActionType):
         return retdict
 
     def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the TrafficSinkAction
+        &#34;&#34;&#34; returns the elementTree of the TrafficSwarmAction
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;GlobalAction&#39;)
@@ -2386,6 +2606,12 @@ class EnvironmentAction(_ActionType):
             raise TypeError(&#39;route input not of type Route or CatalogReference&#39;) 
         self.environment = environment
 
+    def __eq__(self,other):
+        if isinstance(other,EnvironmentAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.environment == other.environment:
+                return True
+        return False
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the EnvironmentAction as a dict
@@ -2556,6 +2782,14 @@ target_lane_offset (float): if a offset in the target lane is wanted
             raise TypeError(&#39;transition_dynamics input not of type TransitionDynamics&#39;)
         self.transition_dynamics = transition_dynamics
 
+    def __eq__(self,other):
+        if isinstance(other,AbsoluteLaneChangeAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.transition_dynamics == other.transition_dynamics and \
+            self.target_lane_offset == other.target_lane_offset:
+                return True
+        return False
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the AbsoluteLaneChangeAction as a dict
 
@@ -2671,7 +2905,7 @@ maxlatacc (float): maximum allowed lateral acceleration
 get_attributes()
     Returns a dictionary of all attributes of the class
 </code></pre>
-<p>initalizes the LaneOffsetAction
+<p>initalizes the AbsoluteLaneOffsetAction
 Parameters</p>
 <hr>
 <pre><code>value (float): lateral offset of the lane
@@ -2723,7 +2957,7 @@ continuous (bool): if the controller tries to keep the relative speed
 
     &#34;&#34;&#34;
     def __init__(self,value,shape,maxlatacc,continuous = True):
-        &#34;&#34;&#34; initalizes the LaneOffsetAction
+        &#34;&#34;&#34; initalizes the AbsoluteLaneOffsetAction
             Parameters
             ----------
                 value (float): lateral offset of the lane
@@ -2745,8 +2979,17 @@ continuous (bool): if the controller tries to keep the relative speed
         self.dynshape = shape
         self.maxlatacc = maxlatacc
 
+    def __eq__(self,other):
+        if isinstance(other,AbsoluteLaneOffsetAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.dynshape == other.dynshape and \
+            self.maxlatacc == other.maxlatacc and \
+            self.continuous == other.continuous:
+                return True
+        return False
+
     def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes of the LaneOffsetAction as a dict
+        &#34;&#34;&#34; returns the attributes of the AbsoluteLaneOffsetAction as a dict
 
         &#34;&#34;&#34;
         retdict = {}
@@ -2754,7 +2997,7 @@ continuous (bool): if the controller tries to keep the relative speed
         return retdict
         
     def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the LaneOffsetAction
+        &#34;&#34;&#34; returns the elementTree of the AbsoluteLaneOffsetAction
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;PrivateAction&#39;)
@@ -2777,13 +3020,13 @@ continuous (bool): if the controller tries to keep the relative speed
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes of the LaneOffsetAction as a dict</p></div>
+<div class="desc"><p>returns the attributes of the AbsoluteLaneOffsetAction as a dict</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34; returns the attributes of the LaneOffsetAction as a dict
+    &#34;&#34;&#34; returns the attributes of the AbsoluteLaneOffsetAction as a dict
 
     &#34;&#34;&#34;
     retdict = {}
@@ -2795,13 +3038,13 @@ continuous (bool): if the controller tries to keep the relative speed
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the LaneOffsetAction</p></div>
+<div class="desc"><p>returns the elementTree of the AbsoluteLaneOffsetAction</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_element(self):
-    &#34;&#34;&#34; returns the elementTree of the LaneOffsetAction
+    &#34;&#34;&#34; returns the elementTree of the AbsoluteLaneOffsetAction
 
     &#34;&#34;&#34;
     element = ET.Element(&#39;PrivateAction&#39;)
@@ -2888,6 +3131,13 @@ transition_dynamics (TransitionDynamics): how the change should be made
         if not isinstance(transition_dynamics,TransitionDynamics):
             raise TypeError(&#39;transition_dynamics input not of type TransitionDynamics&#39;)
         self.transition_dynamics = transition_dynamics
+
+    def __eq__(self,other):
+        if isinstance(other,AbsoluteSpeedAction):
+            if self.get_attributes() == other.get_attributes() and self.transition_dynamics == other.transition_dynamics:
+                return True
+        return False
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the AbsoluteSpeedAction as a dict
 
@@ -3086,6 +3336,15 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
         self.target_tolerance_master = target_tolerance_master
         self.target_tolerance = target_tolerance
 
+    def __eq__(self,other):
+        if isinstance(other,AbsoluteSynchronizeAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.entity_PositionType == other.entity_PositionType and \
+            self.target_PositionType == other.target_PositionType and \
+            self.speed == other.speed:
+                return True
+        return False
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the AbsoluteSynchronizeAction as a dict
 
@@ -3179,7 +3438,7 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
 <pre><code>get_element()
     Returns the full ElementTree of the class
 </code></pre>
-<p>initalizes the AssignRouteAction</p>
+<p>initalizes the AcquirePositionAction</p>
 <h2 id="parameters_1">Parameters</h2>
 <pre><code>position (*Position): target position
 </code></pre></div>
@@ -3205,7 +3464,7 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
 
     &#34;&#34;&#34;
     def __init__(self,position):
-        &#34;&#34;&#34; initalizes the AssignRouteAction
+        &#34;&#34;&#34; initalizes the AcquirePositionAction
 
             Parameters
             ----------
@@ -3217,8 +3476,14 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
 
         self.position = position
 
+    def __eq__(self,other):
+        if isinstance(other,AcquirePositionAction):
+            if self.position == other.position:
+                return True
+        return False
+
     def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the AssignRouteAction
+        &#34;&#34;&#34; returns the elementTree of the AcquirePositionAction
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;PrivateAction&#39;)
@@ -3239,13 +3504,13 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the AssignRouteAction</p></div>
+<div class="desc"><p>returns the elementTree of the AcquirePositionAction</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_element(self):
-    &#34;&#34;&#34; returns the elementTree of the AssignRouteAction
+    &#34;&#34;&#34; returns the elementTree of the AcquirePositionAction
 
     &#34;&#34;&#34;
     element = ET.Element(&#39;PrivateAction&#39;)
@@ -3331,6 +3596,12 @@ longitudinal (boolean): activate or deactivate the controller
             raise TypeError(&#39;longitudinal input is not of type bool&#39;) 
         self.lateral = lateral
         self.longitudinal = longitudinal
+
+    def __eq__(self,other):
+        if isinstance(other,ActivateControllerAction):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the ActivateControllerAction as a dict
@@ -3463,6 +3734,12 @@ position (*Position): position where the vehicle should be added
         self.entityref = entityref
         self.position = position
 
+    def __eq__(self,other):
+        if isinstance(other,AddEntityAction):
+            if self.get_attributes() == other.get_attributes() and self.position == other.position:
+                return True
+        return False
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the AddEntityAction as a dict
 
@@ -3580,6 +3857,12 @@ position (*Position): position where the vehicle should be added
             raise TypeError(&#39;route input not of type Route or CatalogReference&#39;) 
         self.controller = controller
 
+    def __eq__(self,other):
+        if isinstance(other,AssignControllerAction):
+            if self.controller == other.controller:
+                return True
+        return False
+
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the AssignControllerAction
 
@@ -3673,6 +3956,12 @@ position (*Position): position where the vehicle should be added
             raise TypeError(&#39;route input not of type Route or CatalogReference&#39;) 
 
         self.route = route
+
+    def __eq__(self,other):
+        if isinstance(other,AssignRouteAction):
+            if self.route == other.route:
+                return True
+        return False
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the AssignRouteAction
@@ -3843,7 +4132,7 @@ get_element()
 <span>(</span><span>entityref)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>The DeleteEntityAction class creates a EntityAction which removes a entity to the scenario</p>
+<div class="desc"><p>The DeleteEntityAction class creates a EntityAction which removes an entity to the scenario</p>
 <h2 id="parameters">Parameters</h2>
 <pre><code>entityref (str): reference name of the vehicle to remove
 </code></pre>
@@ -3866,7 +4155,7 @@ get_attributes()
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class DeleteEntityAction(_ActionType):
-    &#34;&#34;&#34; The DeleteEntityAction class creates a EntityAction which removes a entity to the scenario
+    &#34;&#34;&#34; The DeleteEntityAction class creates a EntityAction which removes an entity to the scenario
         
         Parameters
         ----------
@@ -3897,6 +4186,12 @@ get_attributes()
         &#34;&#34;&#34;
         
         self.entityref = entityref
+
+    def __eq__(self,other):
+        if isinstance(other,DeleteEntityAction):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the DeleteEntityAction as a dict
@@ -4034,6 +4329,12 @@ environment (Environment or CatalogReference): the environment to change to
             raise TypeError(&#39;route input not of type Route or CatalogReference&#39;) 
         self.environment = environment
 
+    def __eq__(self,other):
+        if isinstance(other,EnvironmentAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.environment == other.environment:
+                return True
+        return False
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the EnvironmentAction as a dict
@@ -4214,8 +4515,17 @@ initialDistanceOffset (double): start at this offset into the trajectory (v1.1)
         self.timeref = TimeReference(reference_domain,scale,offset)
         self.initialDistanceOffset = initialDistanceOffset
 
+    def __eq__(self,other):
+        if isinstance(other,FollowTrajectoryAction):
+            if self.timeref == other.timeref and \
+            self.get_attributes() == other.get_attributes() and \
+            self.trajectory == other.trajectory and \
+            self.following_mode == other.following_mode:
+                return True
+        return False
+
     def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes of the ActivateControllerAction as a dict
+        &#34;&#34;&#34; returns the attributes of the FollowTrajectoryAction as a dict
 
         &#34;&#34;&#34;
         if self.initialDistanceOffset:
@@ -4225,7 +4535,7 @@ initialDistanceOffset (double): start at this offset into the trajectory (v1.1)
             return {}
 
     def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the AssignRouteAction
+        &#34;&#34;&#34; returns the elementTree of the FollowTrajectoryAction
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;PrivateAction&#39;)
@@ -4248,13 +4558,13 @@ initialDistanceOffset (double): start at this offset into the trajectory (v1.1)
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes of the ActivateControllerAction as a dict</p></div>
+<div class="desc"><p>returns the attributes of the FollowTrajectoryAction as a dict</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34; returns the attributes of the ActivateControllerAction as a dict
+    &#34;&#34;&#34; returns the attributes of the FollowTrajectoryAction as a dict
 
     &#34;&#34;&#34;
     if self.initialDistanceOffset:
@@ -4268,13 +4578,13 @@ initialDistanceOffset (double): start at this offset into the trajectory (v1.1)
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the AssignRouteAction</p></div>
+<div class="desc"><p>returns the elementTree of the FollowTrajectoryAction</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_element(self):
-    &#34;&#34;&#34; returns the elementTree of the AssignRouteAction
+    &#34;&#34;&#34; returns the elementTree of the FollowTrajectoryAction
 
     &#34;&#34;&#34;
     element = ET.Element(&#39;PrivateAction&#39;)
@@ -4447,6 +4757,13 @@ max_speed (float): maximum speed allowed
         self.continuous = continuous
         self.dynamic_constraint = DynamicsConstrains(max_acceleration,max_deceleration,max_speed)
 
+    def __eq__(self,other):
+        if isinstance(other,LateralDistanceAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.dynamic_constraint == other.dynamic_constraint:
+                return True
+        return False
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the LateralDistanceAction as a dict
 
@@ -4455,7 +4772,7 @@ max_speed (float): maximum speed allowed
         retdict[&#39;entityRef&#39;] = self.target
         retdict[&#39;freespace&#39;] = convert_bool(self.freespace)
         retdict[&#39;continuous&#39;] = convert_bool(self.continuous)
-        if self.distance:
+        if self.distance != None:
             retdict[&#39;distance&#39;] = str(self.distance)
         return retdict
 
@@ -4495,7 +4812,7 @@ max_speed (float): maximum speed allowed
     retdict[&#39;entityRef&#39;] = self.target
     retdict[&#39;freespace&#39;] = convert_bool(self.freespace)
     retdict[&#39;continuous&#39;] = convert_bool(self.continuous)
-    if self.distance:
+    if self.distance != None:
         retdict[&#39;distance&#39;] = str(self.distance)
     return retdict</code></pre>
 </details>
@@ -4674,8 +4991,13 @@ max_speed (float): maximum speed allowed
         self.freespace = freespace
         self.continuous = continuous
         self.dynamic_constraint = DynamicsConstrains(max_acceleration,max_deceleration,max_speed)
-        self.distance = distance   
-        
+        self.distance = distance
+
+    def __eq__(self,other):
+        if isinstance(other,LongitudinalDistanceAction):
+            if self.get_attributes() == other.get_attributes() and self.dynamic_constraint == other.dynamic_constraint:
+                return True
+        return False
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the LongitudinalDistanceAction as a dict
@@ -4905,7 +5227,11 @@ max_speed (float): maximum speed allowed
         self.timegap = timegap
         self.dynamic_constraint = DynamicsConstrains(max_acceleration,max_deceleration,max_speed)
         
-       
+    def __eq__(self,other):
+        if isinstance(other,LongitudinalTimegapAction):
+            if self.get_attributes() == other.get_attributes() and self.dynamic_constraint == other.dynamic_constraint:
+                return True
+        return False
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the LongitudinalTimegapAction as a dict
@@ -5125,6 +5451,23 @@ set_parkingbrake(active,value)
         self.gear_value = 0
         self.parkingbrake_active = None
         self.parkingbrake_value = 0
+
+    def __eq__(self,other):
+        if isinstance(other,OverrideControllerValueAction):
+            if self.throttle_value == other.throttle_value and \
+            self.throttle_value == other.throttle_value and \
+            self.brake_active == other.brake_active and \
+            self.brake_value == other.brake_value and \
+            self.clutch_active == other.clutch_active and \
+            self.clutch_value == other.clutch_value and \
+            self.steeringwheel_active == other.steeringwheel_active and \
+            self.steeringwheel_value == other.steeringwheel_value and \
+            self.gear_active == other.gear_active and \
+            self.gear_value == other.gear_value and \
+            self.parkingbrake_active == other.parkingbrake_active and \
+            self.parkingbrake_value == other.parkingbrake_value:
+                return True
+        return False
 
     def set_clutch(self,active,value=0):
         &#34;&#34;&#34; Sets the clutch value
@@ -5523,6 +5866,14 @@ value (double): the value that should be added to the parameter
         &#34;&#34;&#34;
         self.parameter_ref = parameter_ref
         self.value = value
+
+    def __eq__(self,other):
+        if isinstance(other,ParameterAddAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.parameter_ref == other.parameter_ref:
+                return True
+        return False
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the AbsoluteSpeedAction as a dict
 
@@ -5659,14 +6010,22 @@ value (double): the value that should be added to the parameter
         &#34;&#34;&#34;
         self.parameter_ref = parameter_ref
         self.value = value
+
+    def __eq__(self,other):
+        if isinstance(other,ParameterMultiplyAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.parameter_ref == other.parameter_ref:
+                return True
+        return False
+
     def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes of the AbsoluteSpeedAction as a dict
+        &#34;&#34;&#34; returns the attributes of the ParameterMultiplyAction as a dict
 
         &#34;&#34;&#34;
         return {&#39;value&#39;:str(self.value)}
 
     def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the AbsoluteSpeedAction
+        &#34;&#34;&#34; returns the elementTree of the ParameterMultiplyAction
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;GlobalAction&#39;)
@@ -5687,13 +6046,13 @@ value (double): the value that should be added to the parameter
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes of the AbsoluteSpeedAction as a dict</p></div>
+<div class="desc"><p>returns the attributes of the ParameterMultiplyAction as a dict</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34; returns the attributes of the AbsoluteSpeedAction as a dict
+    &#34;&#34;&#34; returns the attributes of the ParameterMultiplyAction as a dict
 
     &#34;&#34;&#34;
     return {&#39;value&#39;:str(self.value)}</code></pre>
@@ -5703,13 +6062,13 @@ value (double): the value that should be added to the parameter
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the AbsoluteSpeedAction</p></div>
+<div class="desc"><p>returns the elementTree of the ParameterMultiplyAction</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_element(self):
-    &#34;&#34;&#34; returns the elementTree of the AbsoluteSpeedAction
+    &#34;&#34;&#34; returns the elementTree of the ParameterMultiplyAction
 
     &#34;&#34;&#34;
     element = ET.Element(&#39;GlobalAction&#39;)
@@ -5793,14 +6152,22 @@ value (double): the value that should be added to the parameter
         &#34;&#34;&#34;
         self.parameter_ref = parameter_ref
         self.value = value
+
+    def __eq__(self,other):
+        if isinstance(other,ParameterSetAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.parameter_ref == other.parameter_ref:
+                return True
+        return False
+
     def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes of the AbsoluteSpeedAction as a dict
+        &#34;&#34;&#34; returns the attributes of the ParameterSetAction as a dict
 
         &#34;&#34;&#34;
         return {&#39;value&#39;:str(self.value)}
 
     def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the AbsoluteSpeedAction
+        &#34;&#34;&#34; returns the elementTree of the ParameterSetAction
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;GlobalAction&#39;)
@@ -5819,13 +6186,13 @@ value (double): the value that should be added to the parameter
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes of the AbsoluteSpeedAction as a dict</p></div>
+<div class="desc"><p>returns the attributes of the ParameterSetAction as a dict</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34; returns the attributes of the AbsoluteSpeedAction as a dict
+    &#34;&#34;&#34; returns the attributes of the ParameterSetAction as a dict
 
     &#34;&#34;&#34;
     return {&#39;value&#39;:str(self.value)}</code></pre>
@@ -5835,13 +6202,13 @@ value (double): the value that should be added to the parameter
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the AbsoluteSpeedAction</p></div>
+<div class="desc"><p>returns the elementTree of the ParameterSetAction</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_element(self):
-    &#34;&#34;&#34; returns the elementTree of the AbsoluteSpeedAction
+    &#34;&#34;&#34; returns the elementTree of the ParameterSetAction
 
     &#34;&#34;&#34;
     element = ET.Element(&#39;GlobalAction&#39;)
@@ -5956,6 +6323,13 @@ target_lane_offset (float): if a offset in the target lane is wanted
             raise TypeError(&#39;transition_dynamics input not of type TransitionDynamics&#39;)
         self.transition_dynamics = transition_dynamics
 
+    def __eq__(self,other):
+        if isinstance(other,RelativeLaneChangeAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.transition_dynamics == other.transition_dynamics and \
+            self.target_lane_offset == other.target_lane_offset:
+                return True
+        return False
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the RelativeLaneChangeAction as a dict
@@ -6074,7 +6448,7 @@ maxlatacc (float): maximum allowed lateral acceleration
 get_attributes()
     Returns a dictionary of all attributes of the class
 </code></pre>
-<p>initalizes the LaneOffsetAction,</p>
+<p>initalizes the RelativeLaneOffsetAction,</p>
 <h2 id="parameters_1">Parameters</h2>
 <pre><code>value (float): relative lateral offset of the target
 
@@ -6129,7 +6503,7 @@ continuous (bool): if the controller tries to keep the relative speed
 
     &#34;&#34;&#34;
     def __init__(self,value,entity,shape,maxlatacc,continuous = True):
-        &#34;&#34;&#34; initalizes the LaneOffsetAction,
+        &#34;&#34;&#34; initalizes the RelativeLaneOffsetAction,
 
             Parameters
             ----------
@@ -6155,8 +6529,18 @@ continuous (bool): if the controller tries to keep the relative speed
         self.dynshape = shape
         self.maxlatacc = maxlatacc
 
+    def __eq__(self,other):
+        if isinstance(other,RelativeLaneOffsetAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.dynshape == other.dynshape and \
+            self.maxlatacc == other.maxlatacc and \
+            self.continuous == other.continuous and \
+            self.target == other.target:
+                return True
+        return False
+
     def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes of the LaneOffsetAction as a dict
+        &#34;&#34;&#34; returns the attributes of the RelativeLaneOffsetAction as a dict
 
         &#34;&#34;&#34;
         retdict = {}
@@ -6165,7 +6549,7 @@ continuous (bool): if the controller tries to keep the relative speed
         return retdict
         
     def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the LaneOffsetAction
+        &#34;&#34;&#34; returns the elementTree of the RelativeLaneOffsetAction
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;PrivateAction&#39;)
@@ -6188,13 +6572,13 @@ continuous (bool): if the controller tries to keep the relative speed
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes of the LaneOffsetAction as a dict</p></div>
+<div class="desc"><p>returns the attributes of the RelativeLaneOffsetAction as a dict</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34; returns the attributes of the LaneOffsetAction as a dict
+    &#34;&#34;&#34; returns the attributes of the RelativeLaneOffsetAction as a dict
 
     &#34;&#34;&#34;
     retdict = {}
@@ -6207,13 +6591,13 @@ continuous (bool): if the controller tries to keep the relative speed
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the LaneOffsetAction</p></div>
+<div class="desc"><p>returns the elementTree of the RelativeLaneOffsetAction</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_element(self):
-    &#34;&#34;&#34; returns the elementTree of the LaneOffsetAction
+    &#34;&#34;&#34; returns the elementTree of the RelativeLaneOffsetAction
 
     &#34;&#34;&#34;
     element = ET.Element(&#39;PrivateAction&#39;)
@@ -6342,6 +6726,11 @@ continuous (bool): if the controller tries to keep the relative speed
         self.transition_dynamics = transition_dynamics
         self.continuous = continuous
 
+    def __eq__(self,other):
+        if isinstance(other,RelativeSpeedAction):
+            if self.get_attributes() == other.get_attributes() and self.transition_dynamics == other.transition_dynamics:
+                return True
+        return False
     
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the RelativeSpeedAction as a dict
@@ -6554,8 +6943,18 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
         self.target_tolerance_master = target_tolerance_master
         self.target_tolerance = target_tolerance
 
+    def __eq__(self,other):
+        if isinstance(other,RelativeSynchronizeAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.entity_PositionType == other.entity_PositionType and \
+            self.target_PositionType == other.target_PositionType and \
+            self.speed_target_type == other.speed_target_type and \
+            self.speed == other.speed:
+                return True
+        return False
+
     def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes of the VisibilityAction as a dict
+        &#34;&#34;&#34; returns the attributes of the RelativeSynchronizeAction as a dict
 
         &#34;&#34;&#34;
         attr = {&#39;masterEntityRef&#39;:self.entity}
@@ -6566,7 +6965,7 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
         return attr
 
     def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the VisibilityAction
+        &#34;&#34;&#34; returns the elementTree of the RelativeSynchronizeAction
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;PrivateAction&#39;)
@@ -6589,13 +6988,13 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes of the VisibilityAction as a dict</p></div>
+<div class="desc"><p>returns the attributes of the RelativeSynchronizeAction as a dict</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34; returns the attributes of the VisibilityAction as a dict
+    &#34;&#34;&#34; returns the attributes of the RelativeSynchronizeAction as a dict
 
     &#34;&#34;&#34;
     attr = {&#39;masterEntityRef&#39;:self.entity}
@@ -6610,13 +7009,13 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the VisibilityAction</p></div>
+<div class="desc"><p>returns the elementTree of the RelativeSynchronizeAction</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_element(self):
-    &#34;&#34;&#34; returns the elementTree of the VisibilityAction
+    &#34;&#34;&#34; returns the elementTree of the RelativeSynchronizeAction
 
     &#34;&#34;&#34;
     element = ET.Element(&#39;PrivateAction&#39;)
@@ -6686,6 +7085,12 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
 
         self.position = position
 
+    def __eq__(self,other):
+        if isinstance(other,TeleportAction):
+            if self.position == other.position:
+                return True
+        return False
+
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the TeleportAction
 
@@ -6725,19 +7130,19 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
 </dd>
 <dt id="scenariogeneration.xosc.actions.TrafficSignalControllerAction"><code class="flex name class">
 <span>class <span class="ident">TrafficSignalControllerAction</span></span>
-<span>(</span><span>name, state)</span>
+<span>(</span><span>phase, traffic_signalcontroller_ref)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>The TrafficSignalControllerAction class creates a Infrastructure action which activates a controller of a traffic signal</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>name (str): id of the signal in the road network
+<pre><code>phase (str): phase of the signal
 
-state (str): the state to set to the traffic light
+traffic_signalcontroller_ref (str): reference to traffic signal controller
 </code></pre>
 <h2 id="attributes">Attributes</h2>
-<pre><code>name (str): id of the signal in the road network
+<pre><code>phase (str): phase of the signal
 
-state (str): the state to set to the traffic light
+traffic_signalcontroller_ref (str): reference to traffic signal controller
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>get_element()
@@ -6746,11 +7151,11 @@ state (str): the state to set to the traffic light
 get_attributes()
     Returns a dictionary of all attributes of the class
 </code></pre>
-<p>initalize the TrafficSignalStateAction</p>
+<p>initalize the TrafficSignalControllerAction</p>
 <h2 id="parameters_1">Parameters</h2>
-<pre><code>name (str): id of the signal in the road network
+<pre><code>phase (str): phase of the signal
 
-state (str): the state to set to the traffic light
+traffic_signalcontroller_ref (str): reference to traffic signal controller
 </code></pre></div>
 <details class="source">
 <summary>
@@ -6761,16 +7166,16 @@ state (str): the state to set to the traffic light
         
         Parameters
         ----------
-            name (str): id of the signal in the road network
+            phase (str): phase of the signal
 
-            state (str): the state to set to the traffic light
+            traffic_signalcontroller_ref (str): reference to traffic signal controller
 
         Attributes
         ----------
 
-            name (str): id of the signal in the road network
+            phase (str): phase of the signal
 
-            state (str): the state to set to the traffic light
+            traffic_signalcontroller_ref (str): reference to traffic signal controller
 
         Methods
         -------
@@ -6781,33 +7186,39 @@ state (str): the state to set to the traffic light
                 Returns a dictionary of all attributes of the class
     &#34;&#34;&#34;
 
-    def __init__(self,name,state):
-        &#34;&#34;&#34; initalize the TrafficSignalStateAction
+    def __init__(self,phase,traffic_signalcontroller_ref):
+        &#34;&#34;&#34; initalize the TrafficSignalControllerAction
 
         Parameters
         ----------
-            name (str): id of the signal in the road network
+            phase (str): phase of the signal
 
-            state (str): the state to set to the traffic light
+            traffic_signalcontroller_ref (str): reference to traffic signal controller
 
         &#34;&#34;&#34;
-        self.name = name
-        self.state = state
+        self.phase = phase
+        self.traffic_signalcontroller_ref = traffic_signalcontroller_ref
+
+    def __eq__(self,other):
+        if isinstance(other,TrafficSignalControllerAction):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
 
     def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes of the AbsoluteSpeedAction as a dict
+        &#34;&#34;&#34; returns the attributes of the TrafficSignalControllerAction as a dict
 
         &#34;&#34;&#34;
-        return {&#39;name&#39;:self.name,&#39;state&#39;:self.state}
+        return {&#39;phase&#39;:self.phase,&#39;trafficSignalControllerRef&#39;:self.traffic_signalcontroller_ref}
 
     def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the AbsoluteSpeedAction
+        &#34;&#34;&#34; returns the elementTree of the TrafficSignalControllerAction
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;GlobalAction&#39;)
         infra = ET.SubElement(element,&#39;InfrastructureAction&#39;)
         tsa = ET.SubElement(infra,&#39;TrafficSignalAction&#39;)
-        ET.SubElement(tsa,&#39;TrafficSignalStateAction&#39;,self.get_attributes())
+        ET.SubElement(tsa,&#39;TrafficSignalControllerAction&#39;,self.get_attributes())
         
         return element</code></pre>
 </details>
@@ -6821,35 +7232,35 @@ state (str): the state to set to the traffic light
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes of the AbsoluteSpeedAction as a dict</p></div>
+<div class="desc"><p>returns the attributes of the TrafficSignalControllerAction as a dict</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34; returns the attributes of the AbsoluteSpeedAction as a dict
+    &#34;&#34;&#34; returns the attributes of the TrafficSignalControllerAction as a dict
 
     &#34;&#34;&#34;
-    return {&#39;name&#39;:self.name,&#39;state&#39;:self.state}</code></pre>
+    return {&#39;phase&#39;:self.phase,&#39;trafficSignalControllerRef&#39;:self.traffic_signalcontroller_ref}</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xosc.actions.TrafficSignalControllerAction.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the AbsoluteSpeedAction</p></div>
+<div class="desc"><p>returns the elementTree of the TrafficSignalControllerAction</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_element(self):
-    &#34;&#34;&#34; returns the elementTree of the AbsoluteSpeedAction
+    &#34;&#34;&#34; returns the elementTree of the TrafficSignalControllerAction
 
     &#34;&#34;&#34;
     element = ET.Element(&#39;GlobalAction&#39;)
     infra = ET.SubElement(element,&#39;InfrastructureAction&#39;)
     tsa = ET.SubElement(infra,&#39;TrafficSignalAction&#39;)
-    ET.SubElement(tsa,&#39;TrafficSignalStateAction&#39;,self.get_attributes())
+    ET.SubElement(tsa,&#39;TrafficSignalControllerAction&#39;,self.get_attributes())
     
     return element</code></pre>
 </details>
@@ -6927,14 +7338,20 @@ state (str): the state to set to the traffic light
         self.name = name
         self.state = state
 
+    def __eq__(self,other):
+        if isinstance(other,TrafficSignalStateAction):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+
     def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes of the AbsoluteSpeedAction as a dict
+        &#34;&#34;&#34; returns the attributes of the TrafficSignalStateAction as a dict
 
         &#34;&#34;&#34;
         return {&#39;name&#39;:self.name,&#39;state&#39;:self.state}
 
     def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the AbsoluteSpeedAction
+        &#34;&#34;&#34; returns the elementTree of the TrafficSignalStateAction
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;GlobalAction&#39;)
@@ -6954,13 +7371,13 @@ state (str): the state to set to the traffic light
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes of the AbsoluteSpeedAction as a dict</p></div>
+<div class="desc"><p>returns the attributes of the TrafficSignalStateAction as a dict</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34; returns the attributes of the AbsoluteSpeedAction as a dict
+    &#34;&#34;&#34; returns the attributes of the TrafficSignalStateAction as a dict
 
     &#34;&#34;&#34;
     return {&#39;name&#39;:self.name,&#39;state&#39;:self.state}</code></pre>
@@ -6970,13 +7387,13 @@ state (str): the state to set to the traffic light
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the AbsoluteSpeedAction</p></div>
+<div class="desc"><p>returns the elementTree of the TrafficSignalStateAction</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_element(self):
-    &#34;&#34;&#34; returns the elementTree of the AbsoluteSpeedAction
+    &#34;&#34;&#34; returns the elementTree of the TrafficSignalStateAction
 
     &#34;&#34;&#34;
     element = ET.Element(&#39;GlobalAction&#39;)
@@ -7091,6 +7508,13 @@ trafficdefinition (TrafficDefinition): definition of the traffic
         self.position = position
         self.trafficdefinition = trafficdefinition
 
+    def __eq__(self,other):
+        if isinstance(other,TrafficSinkAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.position == other.position and \
+            self.trafficdefinition == other.trafficdefinition:
+                return True
+        return False
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the TrafficSinkAction as a dict
@@ -7286,6 +7710,14 @@ velocity (float): optional starting velocity of the traffic
         self.trafficdefinition = trafficdefinition
         self.velocity = velocity
 
+    def __eq__(self,other):
+        if isinstance(other,TrafficSourceAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.position == other.position and \
+            self.trafficdefinition == other.trafficdefinition:
+                return True
+        return False
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the TrafficSourceAction as a dict
 
@@ -7413,7 +7845,7 @@ velocity (float): optional starting velocity
 get_attributes()
     Returns a dictionary of all attributes of the class
 </code></pre>
-<p>initalize the TrafficSinkAction</p>
+<p>initalize the TrafficSwarmAction</p>
 <h2 id="parameters_1">Parameters</h2>
 <pre><code>semimajoraxis (float): half length of major axis of ellipsis around target
 
@@ -7487,7 +7919,7 @@ velocity (float): optional starting velocity
     &#34;&#34;&#34;
 
     def __init__(self,semimajoraxis,semiminoraxis,innerradius,offset,numberofvehicles,centralobject,trafficdefinition,velocity = None):
-        &#34;&#34;&#34; initalize the TrafficSinkAction
+        &#34;&#34;&#34; initalize the TrafficSwarmAction
 
         Parameters
         ----------
@@ -7519,8 +7951,16 @@ velocity (float): optional starting velocity
         self.trafficdefinition = trafficdefinition
         self.velocity = velocity
 
+    def __eq__(self,other):
+        if isinstance(other,TrafficSwarmAction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.centralobject == other.centralobject and \
+            self.trafficdefinition == other.trafficdefinition:
+                return True
+        return False
+
     def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes of the TrafficSinkAction as a dict
+        &#34;&#34;&#34; returns the attributes of the TrafficSwarmAction as a dict
 
         &#34;&#34;&#34;
         retdict = {}
@@ -7534,7 +7974,7 @@ velocity (float): optional starting velocity
         return retdict
 
     def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the TrafficSinkAction
+        &#34;&#34;&#34; returns the elementTree of the TrafficSwarmAction
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;GlobalAction&#39;)
@@ -7555,13 +7995,13 @@ velocity (float): optional starting velocity
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes of the TrafficSinkAction as a dict</p></div>
+<div class="desc"><p>returns the attributes of the TrafficSwarmAction as a dict</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34; returns the attributes of the TrafficSinkAction as a dict
+    &#34;&#34;&#34; returns the attributes of the TrafficSwarmAction as a dict
 
     &#34;&#34;&#34;
     retdict = {}
@@ -7579,13 +8019,13 @@ velocity (float): optional starting velocity
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the TrafficSinkAction</p></div>
+<div class="desc"><p>returns the elementTree of the TrafficSwarmAction</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_element(self):
-    &#34;&#34;&#34; returns the elementTree of the TrafficSinkAction
+    &#34;&#34;&#34; returns the elementTree of the TrafficSwarmAction
 
     &#34;&#34;&#34;
     element = ET.Element(&#39;GlobalAction&#39;)
@@ -7684,6 +8124,12 @@ get_attributes()
         self.graphics = graphics
         self.traffic = traffic
         self.sensors = sensors
+
+    def __eq__(self,other):
+        if isinstance(other,VisibilityAction):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the VisibilityAction as a dict

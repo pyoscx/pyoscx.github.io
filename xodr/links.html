@@ -62,6 +62,12 @@ class _Links():
 
         self.links = []
 
+    def __eq__(self, other):
+        if isinstance(other,_Links):
+            if self.links == other.links:
+                return True
+        return False
+
     def add_link(self,link):
         &#34;&#34;&#34; Adds a _Link 
 
@@ -219,6 +225,12 @@ class _Link():
         self.contact_point = contact_point
         self.direction = direction
 
+    def __eq__(self, other):
+        if isinstance(other,_Link):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes as a dict of the _Link
 
@@ -349,6 +361,13 @@ class Connection():
         self.id = id
         self.links = []
 
+    def __eq__(self, other):
+        if isinstance(other,Connection):
+            if self.get_attributes() == other.get_attributes() and \
+            self.links == other.links:
+                return True
+        return False
+
     def _set_id(self,id):
         &#34;&#34;&#34; id is set
 
@@ -434,6 +453,13 @@ class Junction():
         self.connections = []
         self._id_counter = 0
 
+    def __eq__(self, other):
+        if isinstance(other,Junction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.connections == other.connections:
+                return True
+        return False
+
     def add_connection(self,connection):
         &#34;&#34;&#34; Adds a new link to the Junction
 
@@ -488,7 +514,7 @@ def are_roads_consecutive(road1, road2):
     return False
 
 def create_lane_links(road1,road2):
-    &#34;&#34;&#34; create_lane_links takes to roads and if they are connected, match their lanes 
+    &#34;&#34;&#34; create_lane_links takes two roads and if they are connected, match their lanes 
         and creates lane links. 
         NOTE: now only works for roads/connecting roads with the same amount of lanes
 
@@ -555,7 +581,7 @@ def _create_links_connecting_road(connecting,road):
 
 
 def _get_related_lanesection(road,connected_road):
-    &#34;&#34;&#34; _get_related_lanesection takes to roads, and gives the correct lane section to use
+    &#34;&#34;&#34; _get_related_lanesection takes two roads, and gives the correct lane section to use
         the type of link and if the sign of lanes should be switched
 
         Parameters
@@ -688,8 +714,15 @@ class JunctionGroup():
         self.junctions = []
         self.junction_type = junction_type
 
+    def __eq__(self, other):
+        if isinstance(other,JunctionGroup):
+            if self.get_attributes() == other.get_attributes() and \
+            self.junctions == other.junctions:
+                return True
+        return False
+
     def add_junction(self,junction_id):
-        &#34;&#34;&#34; Adds a new link to the Junction
+        &#34;&#34;&#34; Adds a new link to the JunctionGroup
 
             Parameters
             ----------
@@ -699,7 +732,7 @@ class JunctionGroup():
         self.junctions.append(junction_id)
 
     def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes as a dict of the Junction
+        &#34;&#34;&#34; returns the attributes as a dict of the JunctionGroup
 
         &#34;&#34;&#34;
         retdict = {}
@@ -767,7 +800,7 @@ road1 (Road): the second road
 <span>def <span class="ident">create_lane_links</span></span>(<span>road1, road2)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>create_lane_links takes to roads and if they are connected, match their lanes
+<div class="desc"><p>create_lane_links takes two roads and if they are connected, match their lanes
 and creates lane links.
 NOTE: now only works for roads/connecting roads with the same amount of lanes</p>
 <h2 id="parameters">Parameters</h2>
@@ -780,7 +813,7 @@ road2 (Road): second road to be lane linked
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def create_lane_links(road1,road2):
-    &#34;&#34;&#34; create_lane_links takes to roads and if they are connected, match their lanes 
+    &#34;&#34;&#34; create_lane_links takes two roads and if they are connected, match their lanes 
         and creates lane links. 
         NOTE: now only works for roads/connecting roads with the same amount of lanes
 
@@ -923,6 +956,13 @@ id (int): id of the junction (automated)
         self.contact_point = contact_point
         self.id = id
         self.links = []
+
+    def __eq__(self, other):
+        if isinstance(other,Connection):
+            if self.get_attributes() == other.get_attributes() and \
+            self.links == other.links:
+                return True
+        return False
 
     def _set_id(self,id):
         &#34;&#34;&#34; id is set
@@ -1115,6 +1155,13 @@ id (int): id of the junction
         self.connections = []
         self._id_counter = 0
 
+    def __eq__(self, other):
+        if isinstance(other,Junction):
+            if self.get_attributes() == other.get_attributes() and \
+            self.connections == other.connections:
+                return True
+        return False
+
     def add_connection(self,connection):
         &#34;&#34;&#34; Adds a new link to the Junction
 
@@ -1305,8 +1352,15 @@ junction_type (JunctionGroupType): type of junction
         self.junctions = []
         self.junction_type = junction_type
 
+    def __eq__(self, other):
+        if isinstance(other,JunctionGroup):
+            if self.get_attributes() == other.get_attributes() and \
+            self.junctions == other.junctions:
+                return True
+        return False
+
     def add_junction(self,junction_id):
-        &#34;&#34;&#34; Adds a new link to the Junction
+        &#34;&#34;&#34; Adds a new link to the JunctionGroup
 
             Parameters
             ----------
@@ -1316,7 +1370,7 @@ junction_type (JunctionGroupType): type of junction
         self.junctions.append(junction_id)
 
     def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes as a dict of the Junction
+        &#34;&#34;&#34; returns the attributes as a dict of the JunctionGroup
 
         &#34;&#34;&#34;
         retdict = {}
@@ -1340,7 +1394,7 @@ junction_type (JunctionGroupType): type of junction
 <span>def <span class="ident">add_junction</span></span>(<span>self, junction_id)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Adds a new link to the Junction</p>
+<div class="desc"><p>Adds a new link to the JunctionGroup</p>
 <h2 id="parameters">Parameters</h2>
 <pre><code>junction_id (int): adds a junction to the junctiongroup
 </code></pre></div>
@@ -1349,7 +1403,7 @@ junction_type (JunctionGroupType): type of junction
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def add_junction(self,junction_id):
-    &#34;&#34;&#34; Adds a new link to the Junction
+    &#34;&#34;&#34; Adds a new link to the JunctionGroup
 
         Parameters
         ----------
@@ -1363,13 +1417,13 @@ junction_type (JunctionGroupType): type of junction
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes as a dict of the Junction</p></div>
+<div class="desc"><p>returns the attributes as a dict of the JunctionGroup</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34; returns the attributes as a dict of the Junction
+    &#34;&#34;&#34; returns the attributes as a dict of the JunctionGroup
 
     &#34;&#34;&#34;
     retdict = {}

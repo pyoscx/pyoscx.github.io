@@ -72,6 +72,14 @@ class Init():
         self.global_actions = []
         self.user_defined_actions = []
 
+    def __eq__(self,other):
+        if isinstance(other,Init):
+            if self.initactions == other.initactions and \
+            self.global_actions == other.global_actions and \
+            self.user_defined_actions == other.user_defined_actions:
+                return True
+        return False
+
     def add_init_action(self,entityname,action):
         &#34;&#34;&#34; add_init_action adds an Private Action to the init.
 
@@ -192,6 +200,16 @@ class StoryBoard():
         self.init = init
         self.stoptrigger = stoptrigger
         self.stories = []
+
+    def __eq__(self,other):
+        if isinstance(other,StoryBoard):
+            if self.init == other.init and \
+            self.stoptrigger == other.stoptrigger and \
+            self.stories == other.stories:
+                 
+
+                return True
+        return False
 
     def add_story(self,story):
         &#34;&#34;&#34; adds a story to the storyboard
@@ -354,6 +372,14 @@ class Story():
 
         self.parameter = parameters
 
+    def __eq__(self,other):
+        if isinstance(other,Story):
+            if self.get_attributes() == other.get_attributes() and \
+            self.parameter == other.parameter and \
+            self.acts == other.acts:
+                return True
+        return False
+
     def add_act(self,act):
         &#34;&#34;&#34; adds an act to the story
 
@@ -450,6 +476,14 @@ class Act():
 
         self.maneuvergroup = []
 
+    def __eq__(self,other):
+        if isinstance(other,Act):
+            if self.starttrigger == other.starttrigger and \
+            self.stoptrigger == other.stoptrigger and \
+            self.maneuvergroup == other.maneuvergroup:
+                return True
+        return False
+
     def add_maneuver_group(self,maneuvergroup):
         &#34;&#34;&#34; adds a maneuvuergroup to the act
 
@@ -536,7 +570,15 @@ class ManeuverGroup():
         self.maxexecution = maxexecution
         self.actors = _Actors(selecttriggeringentities)
         self.maneuvers = []
-     
+
+    def __eq__(self,other):
+        if isinstance(other,ManeuverGroup):
+            if self.get_attributes() == other.get_attributes() and \
+            self.actors == other.actors and \
+            self.maneuvers == other.maneuvers:
+                return True
+        return False
+
     def add_maneuver(self,maneuver):
         &#34;&#34;&#34; adds a maneuver to the ManeuverGroup
             
@@ -615,7 +657,12 @@ class _Actors():
         self.actors = []
         self.select = selectTriggeringEntities
 
-    
+    def __eq__(self,other):
+        if isinstance(other,_Actors):
+            if self.get_attributes() == other.get_attributes() and \
+            self.actors == other.actors:
+                return True
+        return False
 
     def add_actor(self,entity):
         &#34;&#34;&#34; adds an actor to the list of actors
@@ -696,6 +743,14 @@ class Maneuver():
         self.parameters = parameters
         self.name = name
         self.events = []
+
+    def __eq__(self,other):
+        if isinstance(other,Maneuver):
+            if self.get_attributes() == other.get_attributes() and \
+            self.parameters == other.parameters and \
+            self.events == other.events:
+                return True
+        return False
 
     def dump_to_catalog(self,filename,catalogtype,description,author):
         &#34;&#34;&#34; dump_to_catalog creates a new catalog and adds the Controller to it
@@ -809,6 +864,14 @@ class Event():
         self.action = []
         self.trigger = None
         self.maxexecution = maxexecution
+
+    def __eq__(self,other):
+        if isinstance(other,Event):
+            if self.get_attributes() == other.get_attributes() and \
+            self.trigger == other.trigger and \
+            self.action == other.action:
+                return True
+        return False
 
     def add_trigger(self,trigger):
         &#34;&#34;&#34; adds a starging trigger to the event
@@ -982,6 +1045,14 @@ stoptrigger (*Trigger): stoptrigger of the act (optional)
             self.stoptrigger = stoptrigger
 
         self.maneuvergroup = []
+
+    def __eq__(self,other):
+        if isinstance(other,Act):
+            if self.starttrigger == other.starttrigger and \
+            self.stoptrigger == other.stoptrigger and \
+            self.maneuvergroup == other.maneuvergroup:
+                return True
+        return False
 
     def add_maneuver_group(self,maneuvergroup):
         &#34;&#34;&#34; adds a maneuvuergroup to the act
@@ -1173,6 +1244,14 @@ get_attributes()
         self.action = []
         self.trigger = None
         self.maxexecution = maxexecution
+
+    def __eq__(self,other):
+        if isinstance(other,Event):
+            if self.get_attributes() == other.get_attributes() and \
+            self.trigger == other.trigger and \
+            self.action == other.action:
+                return True
+        return False
 
     def add_trigger(self,trigger):
         &#34;&#34;&#34; adds a starging trigger to the event
@@ -1381,6 +1460,14 @@ add_user_defined_action(action):
         self.initactions = {}
         self.global_actions = []
         self.user_defined_actions = []
+
+    def __eq__(self,other):
+        if isinstance(other,Init):
+            if self.initactions == other.initactions and \
+            self.global_actions == other.global_actions and \
+            self.user_defined_actions == other.user_defined_actions:
+                return True
+        return False
 
     def add_init_action(self,entityname,action):
         &#34;&#34;&#34; add_init_action adds an Private Action to the init.
@@ -1660,6 +1747,14 @@ Parameters</p>
         self.parameters = parameters
         self.name = name
         self.events = []
+
+    def __eq__(self,other):
+        if isinstance(other,Maneuver):
+            if self.get_attributes() == other.get_attributes() and \
+            self.parameters == other.parameters and \
+            self.events == other.events:
+                return True
+        return False
 
     def dump_to_catalog(self,filename,catalogtype,description,author):
         &#34;&#34;&#34; dump_to_catalog creates a new catalog and adds the Controller to it
@@ -1963,7 +2058,15 @@ selecttriggeringentities (bool): Have no idea what this does ??? TODO: check
         self.maxexecution = maxexecution
         self.actors = _Actors(selecttriggeringentities)
         self.maneuvers = []
-     
+
+    def __eq__(self,other):
+        if isinstance(other,ManeuverGroup):
+            if self.get_attributes() == other.get_attributes() and \
+            self.actors == other.actors and \
+            self.maneuvers == other.maneuvers:
+                return True
+        return False
+
     def add_maneuver(self,maneuver):
         &#34;&#34;&#34; adds a maneuver to the ManeuverGroup
             
@@ -2176,6 +2279,14 @@ parameters (ParameterDeclarations): the parameters of the Story
 
         self.parameter = parameters
 
+    def __eq__(self,other):
+        if isinstance(other,Story):
+            if self.get_attributes() == other.get_attributes() and \
+            self.parameter == other.parameter and \
+            self.acts == other.acts:
+                return True
+        return False
+
     def add_act(self,act):
         &#34;&#34;&#34; adds an act to the story
 
@@ -2368,6 +2479,16 @@ stoptrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigge
         self.init = init
         self.stoptrigger = stoptrigger
         self.stories = []
+
+    def __eq__(self,other):
+        if isinstance(other,StoryBoard):
+            if self.init == other.init and \
+            self.stoptrigger == other.stoptrigger and \
+            self.stories == other.stories:
+                 
+
+                return True
+        return False
 
     def add_story(self,story):
         &#34;&#34;&#34; adds a story to the storyboard
