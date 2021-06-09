@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.8.0" />
+<title>scenariogeneration.xodr.elevation API documentation</title>
+<meta name="description" content="" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>scenariogeneration.xodr.elevation</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import xml.etree.ElementTree as ET
+
+
+
+
+class _Poly3Profile():
+    &#34;&#34;&#34; the _Poly3Profile class describes a poly3  along s of a road, the elevation is described as a third degree polynomial
+        elev(ds) = a + b*ds + c*ds^2 * d*ds^3
+        or (if t is used)
+        shape (ds) = a + b*dt + c*dt^2 * d*dt^3
+
+        This class is used for both elevation, superElevation and shape
+
+        Parameters
+        ----------
+            s (float): s start coordinate of the elevation
+
+            a (float): a coefficient of the polynomial
+
+            b (float): b coefficient of the polynomial
+
+            c (float): c coefficient of the polynomial
+
+            d (float): d coefficient of the polynomial
+
+            t (float): t variable (used only for shape)
+                Default: None
+
+        Attributes
+        ----------
+            s (float): s start coordinate of the elevation
+
+            a (float): a coefficient of the polynomial
+
+            b (float): b coefficient of the polynomial
+
+            c (float): c coefficient of the polynomial
+
+            d (float): d coefficient of the polynomial
+
+            t (float): t variable (used only for shape)
+
+        Methods
+        -------
+            get_element(elementname)
+                Returns the full ElementTree of the class
+
+            get_attributes()
+                Returns the attributes of the class
+
+    &#34;&#34;&#34;
+    def __init__(self, s, a, b, c, d, t = None):
+        &#34;&#34;&#34; initalize the Elevation class
+
+        Parameters
+        ----------
+            s (float): s start coordinate of the elevation
+
+            a (float): a coefficient of the polynomial
+
+            b (float): b coefficient of the polynomial
+
+            c (float): c coefficient of the polynomial
+
+            d (float): d coefficient of the polynomial
+
+            t (float): t variable (used only for shape)
+                Default: None
+
+
+        &#34;&#34;&#34;
+        self.s = s
+        self.a = a
+        self.b = b
+        self.c = c
+        self.d = d
+        self.t = t
+
+    def __eq__(self, other):
+        if isinstance(other,_Poly3Profile):
+            if self.get_attributes() == other.get_attributes():         
+                return True
+        return False
+
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the Elevetion
+
+        &#34;&#34;&#34;
+    
+        retdict = {}
+        retdict[&#39;s&#39;] = str(self.s)
+        if self.t != None:
+            retdict[&#39;t&#39;] = str(self.t)
+        retdict[&#39;a&#39;] = str(self.a)
+        retdict[&#39;b&#39;] = str(self.b)
+        retdict[&#39;c&#39;] = str(self.c)
+        retdict[&#39;d&#39;] = str(self.d)
+        return retdict
+
+    def get_element(self,elementname):
+        &#34;&#34;&#34; returns the elementTree of the Elevation
+
+            Parameters
+            ----------
+                elementname (str): name of the element, can be elevation, superelevation or shape
+        &#34;&#34;&#34;
+        if elementname == &#39;shape&#39; and self.t == None:
+            raise ValueError(&#39;When shape is used, the t value has to be set.&#39;)
+        elif elementname != &#39;shape&#39; and self.t != None:
+            raise ValueError(&#39;When shape is not used, the t value should not be set.&#39;)
+
+        element = ET.Element(elementname,attrib=self.get_attributes())
+        
+        return element
+
+class ElevationProfile():
+    &#34;&#34;&#34; the ElevationProfile creates the elevationProfile element of the road in opendrive,
+
+
+        Attributes
+        ----------
+            elevations (list of _Poly3Profile):
+
+        Methods
+        -------
+            get_element(elementname)
+                Returns the full ElementTree of the class
+
+            add_elevation(elevation)
+                adds an elevation profile to the road
+    &#34;&#34;&#34;
+    def __init__(self):
+        &#34;&#34;&#34; initalize the ElevationProfile class
+
+        &#34;&#34;&#34;
+        self.elevations = []
+
+    def __eq__(self, other):
+        if isinstance(other,ElevationProfile):
+            if self.elevations == other.elevations:         
+                return True
+        return False
+
+    def add_elevation(self,elevation):
+        &#34;&#34;&#34; adds an elevation to the ElevationProfile
+
+            Parameters
+            ----------
+                elevation (_Poly3Profile): the elevation profile to add to the ElevationProfile
+
+        &#34;&#34;&#34;
+        if not isinstance(elevation,_Poly3Profile):
+            raise TypeError(&#39;add_elevation requires an _Poly3Profile as input, not &#39; + str(type(elevation)))
+        self.elevations.append(elevation)
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the ElevationProfile
+
+        &#34;&#34;&#34;
+        
+        element = ET.Element(&#39;elevationProfile&#39;)
+        for i in self.elevations:
+            element.append(i.get_element(&#39;elevation&#39;))
+        
+        return element
+
+
+
+class LateralProfile():
+    &#34;&#34;&#34; the LateralProfile creates the elevationProfile element of the road in opendrive,
+
+
+        Attributes
+        ----------
+            superelevation (list of _Poly3Profile): list of superelevations of the road
+
+            shape (list of _Poly3Profile): list of shapes for the road 
+
+        Methods
+        -------
+            get_element(elementname)
+                Returns the full ElementTree of the class
+
+            add_superelevation(superelevation)
+                adds an superelevation profile to the road
+
+            add_shape(shape)
+                adds a shape to the lateral profile
+    &#34;&#34;&#34;
+    def __init__(self):
+        &#34;&#34;&#34; initalize the LateralProfile class
+
+        &#34;&#34;&#34;
+        self.superelevations = []
+        self.shapes = []
+
+    def __eq__(self, other):
+        if isinstance(other,LateralProfile):
+            if self.superelevations == other.superelevations and self.shapes == other.shapes:         
+                return True
+        return False
+
+    def add_superelevation(self,superelevation):
+        &#34;&#34;&#34; adds an elevation to the LateralProfile
+
+            Parameters
+            ----------
+                superelevation (_Poly3Profile): the elevation profile to add to the LateralProfile
+
+        &#34;&#34;&#34;
+        if not isinstance(superelevation,_Poly3Profile):
+            raise TypeError(&#39;add_elevation requires an _Elevation as input, not &#39; + str(type(superelevation)))
+        self.superelevations.append(superelevation)
+
+    def add_shape(self,shape):
+        &#34;&#34;&#34; adds an elevation to the LateralProfile
+
+            Parameters
+            ----------
+                shape (_Poly3Profile): the elevation profile to add to the LateralProfile
+
+        &#34;&#34;&#34;
+        if not isinstance(shape,_Poly3Profile):
+            raise TypeError(&#39;add_elevation requires an _Elevation as input, not &#39; + str(type(shape)))
+        self.shapes.append(shape)
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the LateralProfile
+
+        &#34;&#34;&#34;
+        
+        element = ET.Element(&#39;lateralProfile&#39;)
+        for i in self.superelevations:
+            element.append(i.get_element(&#39;superelevation&#39;))
+        for i in self.shapes:
+            element.append(i.get_element(&#39;shape&#39;))
+        return element</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="scenariogeneration.xodr.elevation.ElevationProfile"><code class="flex name class">
+<span>class <span class="ident">ElevationProfile</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>the ElevationProfile creates the elevationProfile element of the road in opendrive,</p>
+<h2 id="attributes">Attributes</h2>
+<pre><code>elevations (list of _Poly3Profile):
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element(elementname)
+    Returns the full ElementTree of the class
+
+add_elevation(elevation)
+    adds an elevation profile to the road
+</code></pre>
+<p>initalize the ElevationProfile class</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ElevationProfile():
+    &#34;&#34;&#34; the ElevationProfile creates the elevationProfile element of the road in opendrive,
+
+
+        Attributes
+        ----------
+            elevations (list of _Poly3Profile):
+
+        Methods
+        -------
+            get_element(elementname)
+                Returns the full ElementTree of the class
+
+            add_elevation(elevation)
+                adds an elevation profile to the road
+    &#34;&#34;&#34;
+    def __init__(self):
+        &#34;&#34;&#34; initalize the ElevationProfile class
+
+        &#34;&#34;&#34;
+        self.elevations = []
+
+    def __eq__(self, other):
+        if isinstance(other,ElevationProfile):
+            if self.elevations == other.elevations:         
+                return True
+        return False
+
+    def add_elevation(self,elevation):
+        &#34;&#34;&#34; adds an elevation to the ElevationProfile
+
+            Parameters
+            ----------
+                elevation (_Poly3Profile): the elevation profile to add to the ElevationProfile
+
+        &#34;&#34;&#34;
+        if not isinstance(elevation,_Poly3Profile):
+            raise TypeError(&#39;add_elevation requires an _Poly3Profile as input, not &#39; + str(type(elevation)))
+        self.elevations.append(elevation)
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the ElevationProfile
+
+        &#34;&#34;&#34;
+        
+        element = ET.Element(&#39;elevationProfile&#39;)
+        for i in self.elevations:
+            element.append(i.get_element(&#39;elevation&#39;))
+        
+        return element</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xodr.elevation.ElevationProfile.add_elevation"><code class="name flex">
+<span>def <span class="ident">add_elevation</span></span>(<span>self, elevation)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>adds an elevation to the ElevationProfile</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>elevation (_Poly3Profile): the elevation profile to add to the ElevationProfile
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_elevation(self,elevation):
+    &#34;&#34;&#34; adds an elevation to the ElevationProfile
+
+        Parameters
+        ----------
+            elevation (_Poly3Profile): the elevation profile to add to the ElevationProfile
+
+    &#34;&#34;&#34;
+    if not isinstance(elevation,_Poly3Profile):
+        raise TypeError(&#39;add_elevation requires an _Poly3Profile as input, not &#39; + str(type(elevation)))
+    self.elevations.append(elevation)</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.elevation.ElevationProfile.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the elementTree of the ElevationProfile</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self):
+    &#34;&#34;&#34; returns the elementTree of the ElevationProfile
+
+    &#34;&#34;&#34;
+    
+    element = ET.Element(&#39;elevationProfile&#39;)
+    for i in self.elevations:
+        element.append(i.get_element(&#39;elevation&#39;))
+    
+    return element</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="scenariogeneration.xodr.elevation.LateralProfile"><code class="flex name class">
+<span>class <span class="ident">LateralProfile</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>the LateralProfile creates the elevationProfile element of the road in opendrive,</p>
+<h2 id="attributes">Attributes</h2>
+<pre><code>superelevation (list of _Poly3Profile): list of superelevations of the road
+
+shape (list of _Poly3Profile): list of shapes for the road
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element(elementname)
+    Returns the full ElementTree of the class
+
+add_superelevation(superelevation)
+    adds an superelevation profile to the road
+
+add_shape(shape)
+    adds a shape to the lateral profile
+</code></pre>
+<p>initalize the LateralProfile class</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LateralProfile():
+    &#34;&#34;&#34; the LateralProfile creates the elevationProfile element of the road in opendrive,
+
+
+        Attributes
+        ----------
+            superelevation (list of _Poly3Profile): list of superelevations of the road
+
+            shape (list of _Poly3Profile): list of shapes for the road 
+
+        Methods
+        -------
+            get_element(elementname)
+                Returns the full ElementTree of the class
+
+            add_superelevation(superelevation)
+                adds an superelevation profile to the road
+
+            add_shape(shape)
+                adds a shape to the lateral profile
+    &#34;&#34;&#34;
+    def __init__(self):
+        &#34;&#34;&#34; initalize the LateralProfile class
+
+        &#34;&#34;&#34;
+        self.superelevations = []
+        self.shapes = []
+
+    def __eq__(self, other):
+        if isinstance(other,LateralProfile):
+            if self.superelevations == other.superelevations and self.shapes == other.shapes:         
+                return True
+        return False
+
+    def add_superelevation(self,superelevation):
+        &#34;&#34;&#34; adds an elevation to the LateralProfile
+
+            Parameters
+            ----------
+                superelevation (_Poly3Profile): the elevation profile to add to the LateralProfile
+
+        &#34;&#34;&#34;
+        if not isinstance(superelevation,_Poly3Profile):
+            raise TypeError(&#39;add_elevation requires an _Elevation as input, not &#39; + str(type(superelevation)))
+        self.superelevations.append(superelevation)
+
+    def add_shape(self,shape):
+        &#34;&#34;&#34; adds an elevation to the LateralProfile
+
+            Parameters
+            ----------
+                shape (_Poly3Profile): the elevation profile to add to the LateralProfile
+
+        &#34;&#34;&#34;
+        if not isinstance(shape,_Poly3Profile):
+            raise TypeError(&#39;add_elevation requires an _Elevation as input, not &#39; + str(type(shape)))
+        self.shapes.append(shape)
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the LateralProfile
+
+        &#34;&#34;&#34;
+        
+        element = ET.Element(&#39;lateralProfile&#39;)
+        for i in self.superelevations:
+            element.append(i.get_element(&#39;superelevation&#39;))
+        for i in self.shapes:
+            element.append(i.get_element(&#39;shape&#39;))
+        return element</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xodr.elevation.LateralProfile.add_shape"><code class="name flex">
+<span>def <span class="ident">add_shape</span></span>(<span>self, shape)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>adds an elevation to the LateralProfile</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>shape (_Poly3Profile): the elevation profile to add to the LateralProfile
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_shape(self,shape):
+    &#34;&#34;&#34; adds an elevation to the LateralProfile
+
+        Parameters
+        ----------
+            shape (_Poly3Profile): the elevation profile to add to the LateralProfile
+
+    &#34;&#34;&#34;
+    if not isinstance(shape,_Poly3Profile):
+        raise TypeError(&#39;add_elevation requires an _Elevation as input, not &#39; + str(type(shape)))
+    self.shapes.append(shape)</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.elevation.LateralProfile.add_superelevation"><code class="name flex">
+<span>def <span class="ident">add_superelevation</span></span>(<span>self, superelevation)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>adds an elevation to the LateralProfile</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>superelevation (_Poly3Profile): the elevation profile to add to the LateralProfile
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_superelevation(self,superelevation):
+    &#34;&#34;&#34; adds an elevation to the LateralProfile
+
+        Parameters
+        ----------
+            superelevation (_Poly3Profile): the elevation profile to add to the LateralProfile
+
+    &#34;&#34;&#34;
+    if not isinstance(superelevation,_Poly3Profile):
+        raise TypeError(&#39;add_elevation requires an _Elevation as input, not &#39; + str(type(superelevation)))
+    self.superelevations.append(superelevation)</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.elevation.LateralProfile.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the elementTree of the LateralProfile</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self):
+    &#34;&#34;&#34; returns the elementTree of the LateralProfile
+
+    &#34;&#34;&#34;
+    
+    element = ET.Element(&#39;lateralProfile&#39;)
+    for i in self.superelevations:
+        element.append(i.get_element(&#39;superelevation&#39;))
+    for i in self.shapes:
+        element.append(i.get_element(&#39;shape&#39;))
+    return element</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="scenariogeneration.xodr" href="index.html">scenariogeneration.xodr</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="scenariogeneration.xodr.elevation.ElevationProfile" href="#scenariogeneration.xodr.elevation.ElevationProfile">ElevationProfile</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xodr.elevation.ElevationProfile.add_elevation" href="#scenariogeneration.xodr.elevation.ElevationProfile.add_elevation">add_elevation</a></code></li>
+<li><code><a title="scenariogeneration.xodr.elevation.ElevationProfile.get_element" href="#scenariogeneration.xodr.elevation.ElevationProfile.get_element">get_element</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xodr.elevation.LateralProfile" href="#scenariogeneration.xodr.elevation.LateralProfile">LateralProfile</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xodr.elevation.LateralProfile.add_shape" href="#scenariogeneration.xodr.elevation.LateralProfile.add_shape">add_shape</a></code></li>
+<li><code><a title="scenariogeneration.xodr.elevation.LateralProfile.add_superelevation" href="#scenariogeneration.xodr.elevation.LateralProfile.add_superelevation">add_superelevation</a></code></li>
+<li><code><a title="scenariogeneration.xodr.elevation.LateralProfile.get_element" href="#scenariogeneration.xodr.elevation.LateralProfile.get_element">get_element</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.0</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>

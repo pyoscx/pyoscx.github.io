@@ -1,0 +1,2528 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.8.0" />
+<title>scenariogeneration.xodr.opendrive API documentation</title>
+<meta name="description" content="thte opendrive module contains the top level opendrive class aswell as the road class" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>scenariogeneration.xodr.opendrive</code></h1>
+</header>
+<section id="section-intro">
+<p>thte opendrive module contains the top level opendrive class aswell as the road class</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34; thte opendrive module contains the top level opendrive class aswell as the road class
+
+&#34;&#34;&#34;
+import xml.etree.ElementTree as ET
+
+from .helpers import printToFile,enum2str
+from .links import _Link, _Links, create_lane_links
+from .enumerations import ElementType, ContactPoint, RoadSide
+from .exceptions import UndefinedRoadNetwork, RoadsAndLanesNotAdjusted
+from .elevation import LateralProfile, ElevationProfile, _Poly3Profile
+
+
+import datetime as dt
+import warnings
+from itertools import combinations
+import numpy as np
+import copy as cpy
+
+class _Header():
+    &#34;&#34;&#34; Header creates the header of the OpenDrive file
+        
+        Parameters
+        ----------
+            name (str): name of the road 
+            
+            revMajor (str): major revision of OpenDRIVE
+                    
+            revMinor (str): minor revision of OpenDRIVE
+
+        Attributes
+        ----------
+            name (str): name of the scenario 
+            
+            revMajor (str): major revision of OpenDRIVE
+                    
+            revMinor (str): minor revision of OpenDRIVE
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of FileHeader
+
+            get_attributes()
+                Returns a dictionary of all attributes of FileHeader
+
+    &#34;&#34;&#34;
+    def __init__(self, name, revMajor, revMinor):
+        &#34;&#34;&#34; Initalize the Header
+
+         Parameters
+        ----------
+            name (str): name of the road 
+            
+            revMajor (str): major revision of OpenDRIVE
+                    
+            revMinor (str): minor revision of OpenDRIVE
+                    
+        &#34;&#34;&#34;
+        self.name = name
+        self.revMajor = revMajor
+        self.revMinor = revMinor
+
+
+    def __eq__(self, other):
+        if isinstance(other,_Header):
+            if self.name == other.name and self.revMajor == other.revMajor and self.revMinor == other.revMinor:
+                return True
+        return False
+
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes as a dict of the FileHeader
+
+        &#34;&#34;&#34;
+        retdict = {}
+        retdict[&#39;name&#39;] = self.name
+        retdict[&#39;revMajor&#39;] = str(self.revMajor)
+        retdict[&#39;revMinor&#39;] = str(self.revMinor)
+        retdict[&#39;date&#39;] = str(dt.datetime.now())
+        retdict[&#39;north&#39;] = &#39;0.0&#39;
+        retdict[&#39;south&#39;] = &#39;0.0&#39;
+        retdict[&#39;east&#39;] = &#39;0.0&#39;
+        retdict[&#39;west&#39;] = &#39;0.0&#39;
+        return retdict
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the FileHeader
+
+        &#34;&#34;&#34;
+        element = ET.Element(&#39;header&#39;,attrib=self.get_attributes())
+
+        return element
+
+
+class Road():
+    &#34;&#34;&#34; Road defines the road element of OpenDrive
+        
+        Parameters
+        ----------
+            road_id (int): identifier of the road
+
+            planview (PlanView): the planview of the road
+
+            lanes (Lanes): the lanes of the road
+
+            road_type (int): type of road (junction)
+                Default: -1
+
+            name (str): name of the road (optional)
+
+            rule (TrafficRule): traffic rule (optional)
+
+            signals (Signals): Contains a list of signal objects (optional)
+
+        Attributes
+        ----------
+            id (int): identifier of the road
+
+            planview (PlanView): the planview of the road
+
+            lanes (Lanes): the lanes of the road
+
+            road_type (int): type of road (junction)
+                Default: -1
+
+            name (str): name of the road
+
+            rule (TrafficRule): traffic rule 
+            
+            signals (Signal): Contains a list of Signal objects 
+            
+            objects (Object): Contains a list of Object objects
+
+            types (list of _Type): contans a list or _Type objects (optional)
+
+            elevationprofile (ElevationProfile): the elevation profile of the road
+
+            lateralprofile (LateralProfile): the lateral profile of the road
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+
+            get_attributes()
+                Returns a dictionary of all attributes of the class
+
+            add_successor (element_type,element_id,contact_point,lane_offset)
+                adds a successor for the road
+
+            add_predecessor (element_type,element_id,contact_point,lane_offset)
+                adds a predecessor for the road          
+
+            add_neighbor (element_type,element_id,direction)
+                adds a neighbor for the road   
+
+            add_object (road_object)
+                adds an object to the road
+
+            add_elevation(s,a,b,c,d)
+                adds an elevation profile to the road
+
+            add_superelevation(s,a,b,c,d) 
+                adds a superelevation to the road
+
+            add_shape(s,t,a,b,c,d,e)
+                adds a lateral shape to the road
+            
+            add_object_roadside (road_object_prototype, repeatDistance, sOffset=0, tOffset=0, side=RoadSide.both)
+                adds an repeated object to the road
+
+            add_signal (signal)
+                adds a signal to the road
+
+            get_end_point ()
+                returns the x, y and heading at the end of the road
+    &#34;&#34;&#34;
+    def __init__(self,road_id,planview,lanes, road_type = -1,name=None, rule=None):
+        &#34;&#34;&#34; initalize the Road
+
+            Parameters
+            ----------
+                road_id (int): identifier of the road
+
+                planview (PlanView): the planview of the road
+
+                lanes (Lanes): the lanes of the road
+
+                road_type (int): type of road (junction)
+                    Default: -1
+
+                name (str): name of the road (optional)
+
+                rule (TrafficRule): traffic rule (optional)
+
+        &#34;&#34;&#34;
+        self.id = road_id
+        self.planview = planview
+        self.lanes = lanes
+        self.road_type = road_type
+        self.name = name
+        self.rule = rule
+        self.links = _Links()
+        self._neighbor_added = 0
+        self.successor = None
+        self.predecessor = None
+        self.lane_offset_suc = 0
+        self.lane_offset_pred = 0
+        self.adjusted = False
+        self.objects = []
+        self.signals = []
+        self.types = []
+        self.elevationprofile = ElevationProfile()
+        self.lateralprofile = LateralProfile()
+
+
+    def __eq__(self, other):
+        if isinstance(other,Road):
+            if self.get_attributes() == other.get_attributes() and \
+            self.objects == other.objects and \
+            self.signals == other.signals and \
+            self.types == other.types and \
+            self.links == other.links and \
+            self.planview == other.planview and \
+            self.lanes == other.lanes and \
+            self.elevationprofile == other.elevationprofile and \
+            self.lateralprofile == other.lateralprofile and \
+            self.predecessor == other.predecessor and \
+            self.successor == other.successor and \
+            self.lane_offset_suc == other.lane_offset_suc and \
+            self.lane_offset_pred == other.lane_offset_pred:
+                return True
+        return False
+
+    def add_successor(self,element_type,element_id,contact_point=None,lane_offset=0):
+        &#34;&#34;&#34; add_successor adds a successor link to the road
+        
+        Parameters
+        ----------
+            element_type (ElementType): type of element the linked road
+
+            element_id (str/int): name of the linked road
+
+            contact_point (ContactPoint): the contact point of the link
+
+        &#34;&#34;&#34;
+        if self.successor:
+            raise ValueError(&#39;only one successor is allowed&#39;)
+        self.successor = _Link(&#39;successor&#39;,element_id,element_type,contact_point)
+        self.links.add_link(self.successor)
+        self.lane_offset_suc = lane_offset
+
+
+    def add_predecessor(self,element_type,element_id,contact_point=None,lane_offset=0):
+        &#34;&#34;&#34; add_successor adds a successor link to the road
+        
+        Parameters
+        ----------
+            element_type (ElementType): type of element the linked road
+
+            element_id (str/int): name of the linked road
+
+            contact_point (ContactPoint): the contact point of the link
+
+        &#34;&#34;&#34;
+        if self.predecessor:
+            raise ValueError(&#39;only one predecessor is allowed&#39;)
+        self.predecessor = _Link(&#39;predecessor&#39;,element_id,element_type,contact_point)
+        self.links.add_link(self.predecessor)
+        self.lane_offset_pred = lane_offset
+        
+
+    def add_neighbor(self,element_type,element_id,direction): 
+        &#34;&#34;&#34; add_neighbor adds a neighbor to a road
+        
+        Parameters
+        ----------
+            element_type (ElementType): type of element the linked road
+
+            element_id (str/int): name of the linked road
+
+            direction (Direction): the direction of the link 
+        &#34;&#34;&#34;
+        if self._neighbor_added &gt; 1:
+            raise ValueError(&#39;only two neighbors are allowed&#39;)
+        suc = _Link(&#39;neighbor&#39;,element_id,element_type,direction=direction)
+    
+        self.links.add_link(suc)
+        self._neighbor_added += 1
+
+    def add_elevation(self,s,a,b,c,d):
+        &#34;&#34;&#34; ads an elevation profile to the road (3-degree polynomial)
+
+            Parameters
+            ----------
+                s (float): s start coordinate of the elevation
+
+                a (float): a coefficient of the polynomial
+
+                b (float): b coefficient of the polynomial
+
+                c (float): c coefficient of the polynomial
+
+                d (float): d coefficient of the polynomial
+        &#34;&#34;&#34;
+        self.elevationprofile.add_elevation(_Poly3Profile(s,a,b,c,d))
+
+    def add_superelevation(self,s,a,b,c,d):
+        &#34;&#34;&#34; ads a superelevation profile to the road (3-degree polynomial)
+
+            Parameters
+            ----------
+                s (float): s start coordinate of the superelevation
+
+                a (float): a coefficient of the polynomial
+
+                b (float): b coefficient of the polynomial
+
+                c (float): c coefficient of the polynomial
+
+                d (float): d coefficient of the polynomial
+        &#34;&#34;&#34;
+        self.lateralprofile.add_superelevation(_Poly3Profile(s,a,b,c,d))
+    
+    def add_shape(self,s,t,a,b,c,d):
+        &#34;&#34;&#34; ads a superelevation profile to the road (3-degree polynomial)
+
+            Parameters
+            ----------
+                s (float): s start coordinate of the superelevation
+
+                t (flaot): the t start coordinate of the lateral profile
+
+                a (float): a coefficient of the polynomial
+
+                b (float): b coefficient of the polynomial
+
+                c (float): c coefficient of the polynomial
+
+                d (float): d coefficient of the polynomial
+        &#34;&#34;&#34;
+        self.lateralprofile.add_shape(_Poly3Profile(s,a,b,c,d,t))
+    
+    def add_object(self,road_object):
+        &#34;&#34;&#34; add_object adds an object to a road and calls a function that ensures unique IDs
+        
+        Parameters
+        ----------
+            road_object (Object/list(Object)): object(s) to be added to road 
+        
+        &#34;&#34;&#34;
+        if isinstance(road_object,list):
+            for single_object in road_object:
+                single_object._update_id()
+            self.objects=self.objects+road_object
+        else:
+            road_object._update_id()
+            self.objects.append(road_object)
+            
+    def add_object_roadside(self, road_object_prototype, repeatDistance, sOffset=0, tOffset=0, side=RoadSide.both):
+        &#34;&#34;&#34; add_object_roadside is a convenience function to add a repeating object on side of the road,
+            which can only be used after adjust_roads_and_lanes() has been performed
+        
+        Parameters
+        ----------
+            road_object_prototype (Object): object that will be used as a basis for generation
+
+            repeatDistance (float): distance between repeated Objects, 0 for continuous
+
+            sOffset (float): start s-coordinate of repeating Objects
+            default: 0
+            
+            tOffset (float): t-offset additional to lane width, sign will be added automatically (i.e. positive if further from roadside)
+            default: 0
+            
+            side (RoadSide): add Objects on both, left or right side 
+            default: both
+        
+        &#34;&#34;&#34;
+        if not self.planview.adjusted:
+            raise RoadsAndLanesNotAdjusted(&#34;Could not add roadside object because roads and lanes need to be adjusted first. Consider calling &#39;adjust_roads_and_lanes()&#39;.&#34;)
+
+        
+        hdg_factors = []
+        total_widths = []
+        road_objects = []
+        s_lanesections = []
+        #TODO: handle width parameters apart from a
+        for lanesection in self.lanes.lanesections:
+            if side != RoadSide.right:
+                s_lanesections.append(lanesection.s)
+                hdg_factors.append(1)
+                total_widths.append(0)
+                road_objects.append(cpy.deepcopy(road_object_prototype))
+                for lane in lanesection.leftlanes:
+                    total_widths[-1] = total_widths[-1] + lane.a
+            if side != RoadSide.left:
+                s_lanesections.append(lanesection.s)
+                hdg_factors.append(-1)
+                total_widths.append(0)
+                road_objects.append(cpy.deepcopy(road_object_prototype))
+                for lane in lanesection.rightlanes:
+                    total_widths[-1] = total_widths[-1] + lane.a
+        
+        for idx, road_object in enumerate(road_objects):
+            road_object.t = (total_widths[idx] + tOffset) * hdg_factors[idx]
+            road_object.s = sOffset + s_lanesections[idx]
+            road_object.hdg = np.pi * (1 + hdg_factors[idx]) / 2
+            road_object.repeat(self.planview.get_total_length() - sOffset - s_lanesections[idx], repeatDistance)
+        print (repeatDistance)        
+        self.add_object(road_objects)
+
+    def add_signal(self,signal):
+        &#34;&#34;&#34; add_signal adds a signal to a road
+        
+        
+        &#34;&#34;&#34;
+        if isinstance(signal,list):
+            for single_signal in signal:
+                single_signal._update_id()
+            self.signals=self.signals+signal
+        else:
+            signal._update_id()
+            self.signals.append(signal)
+
+    def add_type(self,road_type,s = 0,country=None,speed=None,speed_unit=&#39;m/s&#39;):
+        &#34;&#34;&#34; adds a type to the road (not to mix with junction or not as the init)
+
+            Parameters
+            ----------
+                road_type (RoadType): the type of road
+
+                s (float): the distance where it starts
+                    Default: 0
+
+                country (str): country code (should follow ISO 3166-1,alpha-2) (optional)
+
+                speed (float/str): the maximum speed allowed
+
+                sped_unit (str): unit of the speed, can be &#39;m/s&#39;,&#39;mph,&#39;kph&#39;
+        &#34;&#34;&#34;
+        self.types.append(_Type(road_type,s,country,speed,speed_unit))
+
+        
+    def get_end_point(self):
+        &#34;&#34;&#34; get the x, y, and heading, of the end of the road
+
+            Return
+            ------
+                x (float): the end x coordinate
+                y (float): the end y coordinate
+                h (float): the end heading
+
+        &#34;&#34;&#34;
+        return self.planview.present_x, self.planview.present_y, self.planview.present_h
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes as a dict of the Road
+
+        &#34;&#34;&#34;
+        retdict = {}
+        if self.name:
+            retdict[&#39;name&#39;] = self.name
+        if self.rule:
+            retdict[&#39;rule&#39;] = self.rule
+        retdict[&#39;id&#39;] = str(self.id)
+        retdict[&#39;junction&#39;] = str(self.road_type)
+        retdict[&#39;length&#39;] = str(self.planview.get_total_length())
+        return retdict
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the FileHeader
+
+        &#34;&#34;&#34;
+        element = ET.Element(&#39;road&#39;,attrib=self.get_attributes())
+        element.append(self.links.get_element())
+        if self.types:
+            for r in self.types:
+                element.append(r.get_element())
+        element.append(self.planview.get_element())
+        element.append(self.elevationprofile.get_element())
+        element.append(self.lateralprofile.get_element())
+        element.append(self.lanes.get_element())
+        if len(self.objects) &gt; 0:
+            objectselement = ET.SubElement(element,&#39;objects&#39;)
+            for road_object in self.objects:
+                objectselement.append(road_object.get_element())        
+        if len(self.signals) &gt; 0:
+            signalselement = ET.SubElement(element,&#39;signals&#39;)
+            for signal in self.signals:
+                signalselement.append(signal.get_element())
+        return element
+
+class OpenDrive():
+    &#34;&#34;&#34; OpenDrive is the main class of the pyodrx to generate an OpenDrive road
+        
+        Parameters
+        ----------
+            name (str): name of the road
+            
+            revMajor (str): major revision of OpenDRIVE written to header
+                Default: &#39;1&#39;
+                    
+            revMinor (str): minor revision of OpenDRIVE written to header
+                Default: &#39;5&#39;
+
+        Attributes
+        ----------
+            name (str): name of the road
+            
+            revMajor (str): major revision of OpenDRIVE written to header
+                Default: &#39;1&#39;
+                    
+            revMinor (str): minor revision of OpenDRIVE written to header
+                Default: &#39;5&#39;
+
+            roads (list of Road): all roads 
+
+            junctions (list of Junction): all junctions
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of FileHeader
+
+            add_road(road)
+                Adds a road to the opendrive
+
+            add_junction(junction)
+                Adds a junction to the opendrive
+
+            adjust_roads_and_lanes()
+                Adjust starting position of all geometries of all roads and try to link lanes in neighbouring roads
+
+            adjust_startpoints()
+                Adjust starting position of all geometries of all roads 
+            
+            write_xml(filename)
+                write a open scenario xml
+                
+    &#34;&#34;&#34;
+    def __init__(self, name, revMajor=&#39;1&#39;, revMinor=&#39;5&#39;):
+        &#34;&#34;&#34; Initalize the Header
+
+            Parameters
+            ----------
+            name (str): name of the road 
+
+        &#34;&#34;&#34;
+        self.name = name
+        self.revMajor = revMajor
+        self.revMinor = revMinor
+        self._header = _Header(self.name, self.revMajor, self.revMinor)
+        self.roads = {}
+        self.junctions = []
+        #self.road_ids = []
+
+    def __eq__(self, other):
+        if isinstance(other,OpenDrive):
+            if self.roads == other.roads and \
+            self.junctions == other.junctions and \
+            self._header == other._header:
+                return True
+        return False
+
+    def add_road(self,road):
+        &#34;&#34;&#34; Adds a new road to the opendrive
+
+            Parameters
+            ----------
+                road (Road): the road to add 
+
+        &#34;&#34;&#34;
+        if (len(self.roads) == 0) and road.predecessor:
+            ValueError(&#39;No road was added and the added road has a predecessor, please add the predecessor first&#39;)
+
+        self.roads[str(road.id)] = road        
+
+    def adjust_roads_and_lanes(self): 
+        &#34;&#34;&#34; Adjust starting position of all geometries of all roads and try to link all lanes in neighbouring roads
+
+            Parameters
+            ----------
+
+        &#34;&#34;&#34;
+        #adjust roads and their geometries 
+        self.adjust_startpoints()
+
+        results = list(combinations(self.roads, 2))
+
+        for r in range(len(results)):
+            # print(&#39;Analyzing roads&#39;, results[r][0], &#39;and&#39;, results[r][1] )
+            create_lane_links(self.roads[results[r][0]],self.roads[results[r][1]])  
+
+
+    def _adjust_road_wrt_neighbour(self, road_id, neighbour_id, contact_point, neighbour_type):
+        &#34;&#34;&#34; Adjust geometries of road[road_id] taking as a successor/predecessor the neighbouring road with id neighbour_id.
+            NB Passing the type of contact_point is necessary because we call this function also on roads connecting to 
+            to a junction road (which means that the road itself do not know the contact point of the junction road it connects to)
+
+
+            Parameters
+            ----------
+            road_id (int): id of the road we want to adjust 
+
+            neighbour_id(int): id of the neighbour road we take as reference (we suppose the neighbour road is already adjusted)
+
+            contact_point(ContactPoint): type of contact point with point of view of roads[road_id]
+            
+            neighbour_type(str): &#39;successor&#39;/&#39;predecessor&#39; type of linking to the neighbouring road
+
+
+        &#34;&#34;&#34;
+
+        main_road = self.roads[str(road_id)]
+
+        if neighbour_type == &#39;predecessor&#39;:
+
+            if contact_point == ContactPoint.start :    
+                x,y,h = self.roads[str(neighbour_id)].planview.get_start_point()
+                h = h + np.pi #we are attached to the predecessor&#39;s start, so road[k] will start in its opposite direction 
+            elif contact_point == ContactPoint.end:
+                x,y,h = self.roads[str(neighbour_id)].planview.get_end_point()
+            else:
+                raise ValueError(&#39;Unknown ContactPoint&#39;)
+
+            num_lane_offsets = main_road.lane_offset_pred
+            x = -num_lane_offsets*3*np.sin(h) + x
+            y = num_lane_offsets*3*np.cos(h) + y
+
+            main_road.planview.set_start_point(x,y,h)
+            main_road.planview.adjust_geometries()
+
+        elif neighbour_type == &#39;successor&#39;:
+
+            if contact_point == ContactPoint.start:    
+                x,y,h = self.roads[str(neighbour_id)].planview.get_start_point()
+                h = h + np.pi #we are attached to the predecessor&#39;s start, so road[k] will start in its opposite direction 
+            elif contact_point == ContactPoint.end:
+                x,y,h = self.roads[str(neighbour_id)].planview.get_end_point()
+            else:
+                raise ValueError(&#39;Unknown ContactPoint&#39;)
+            num_lane_offsets = main_road.lane_offset_suc
+            x = num_lane_offsets*3*np.sin(h) + x
+            y = -num_lane_offsets*3*np.cos(h) + y
+            main_road.planview.set_start_point(x,y,h)
+            main_road.planview.adjust_geometries(True)
+
+
+    def adjust_startpoints(self): 
+        &#34;&#34;&#34; Adjust starting position of all geoemtries of all roads
+
+            Parameters
+            ----------
+
+        &#34;&#34;&#34;
+        
+        # Adjust logically connected roads, i.e. move them so they connect geometrically. 
+        # Method:
+        #    Fix a pre defined roads (if start position in planview is used), other wise fix the first road at 0
+        #    Next, in the set of remaining unconnected roads, find and adjust any roads connecting to a already fixed road
+        # Loop until all roads have been adjusted, 
+        
+        
+        # adjust the roads that have a fixed start of the planview
+        count_total_adjusted_roads = 0
+        fixed_road = False
+        for k in self.roads:
+            if self.roads[k].planview.fixed and not self.roads[k].planview.adjusted:
+                self.roads[k].planview.adjust_geometries()
+                # print(&#39;Fixing Road: &#39; + k)
+                count_total_adjusted_roads += 1
+                fixed_road = True
+            elif self.roads[k].planview.adjusted:
+                fixed_road = True
+                count_total_adjusted_roads += 1
+
+        # If no roads are fixed, select the first road is selected as the pivot-road
+        if len(self.roads) &gt; 0:
+            if fixed_road is False: 
+                self.roads[list(self.roads.keys())[0]].planview.adjust_geometries()
+                # print(&#39;Selecting and adjusting the first road {}&#39;.format(self.roads[list(self.roads.keys())[0] ].id))
+                count_total_adjusted_roads += 1
+        
+        while count_total_adjusted_roads &lt; len(self.roads):
+            
+            count_adjusted_roads = 0
+
+            for k in self.roads: # Check all 
+
+                if self.roads[k].planview.adjusted is False: 
+
+                    # check if it has a normal (road) predecessor 
+                    if self.roads[k].predecessor is not None and \
+                        self.roads[str(self.roads[k].predecessor.element_id)].planview.adjusted is True and \
+                        self.roads[k].predecessor.element_type is not ElementType.junction: 
+
+                        # print(&#39;  Adjusting {}road {} to predecessor {}&#39;.\
+                        #     format(&#39;&#39; if self.roads[k].road_type == -1 else &#39;connecting &#39;, self.roads[k].id, self.roads[k].predecessor.element_id))
+                        self._adjust_road_wrt_neighbour(k, self.roads[k].predecessor.element_id,
+                                                    self.roads[k].predecessor.contact_point, &#39;predecessor&#39;)
+                        count_adjusted_roads +=1
+
+                        if self.roads[k].road_type != -1 and self.roads[k].successor is not None and self.roads[str(self.roads[k].successor.element_id)].planview.adjusted is False:
+                            succ_id = self.roads[k].successor.element_id
+                            # print(&#39;    Adjusting successor connecting road {} in junction {} to road {} &#39;.\
+                            #     format(succ_id, self.roads[k].road_type, self.roads[k].id))
+                            if self.roads[k].successor.contact_point == ContactPoint.start:
+                                self._adjust_road_wrt_neighbour(succ_id, k, ContactPoint.end, &#39;predecessor&#39;)
+                            else:
+                                self._adjust_road_wrt_neighbour(succ_id, k, ContactPoint.end, &#39;successor&#39;)
+                            count_adjusted_roads +=1
+
+                    # check if geometry has a normal (road) successor 
+                    elif self.roads[k].successor is not None and \
+                        self.roads[str(self.roads[k].successor.element_id)].planview.adjusted is True and \
+                        self.roads[k].successor.element_type is not ElementType.junction: 
+
+                        # print(&#39;  Adjusting {}successor {} to road {}&#39;.\
+                        #     format(&#39;&#39; if self.roads[k].road_type == -1 else &#39;connecting &#39;, self.roads[k].id, self.roads[k].successor.element_id))
+                        self._adjust_road_wrt_neighbour(k, self.roads[k].successor.element_id,
+                                                    self.roads[k].successor.contact_point, &#39;successor&#39;)
+                        count_adjusted_roads +=1
+
+                        if self.roads[k].road_type != -1 and self.roads[k].predecessor is not None and self.roads[str(self.roads[k].predecessor.element_id)].planview.adjusted is False:
+                            pred_id = self.roads[k].predecessor.element_id
+                            # print(&#39;    Adjusting predecessor connecting road {} in junction {} to road {} &#39;.\
+                            #     format(pred_id, self.roads[k].road_type, self.roads[k].id))
+                            if self.roads[k].predecessor.contact_point == ContactPoint.start:
+                                self._adjust_road_wrt_neighbour(pred_id, k, ContactPoint.start, &#39;predecessor&#39;)
+                            else:
+                                self._adjust_road_wrt_neighbour(pred_id, k, ContactPoint.start, &#39;successor&#39;)
+                            count_adjusted_roads +=1
+            
+            count_total_adjusted_roads += count_adjusted_roads
+
+            if count_total_adjusted_roads != len(self.roads) and count_adjusted_roads == 0:
+                # No more connecting roads found, move to next pivot-road
+                raise UndefinedRoadNetwork(&#39;Roads are either missing successor, or predecessor to connect to the roads, \n if the roads are disconnected, please add a start position for one of the planviews.&#39;)
+
+            
+
+    
+    def add_junction(self,junction):
+        &#34;&#34;&#34; Adds a junction to the opendrive
+
+            Parameters
+            ----------
+                junction (Junction): the junction to add
+
+        &#34;&#34;&#34;
+        self.junctions.append(junction)
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the FileHeader
+
+        &#34;&#34;&#34;
+        element = ET.Element(&#39;OpenDRIVE&#39;)
+        element.append(self._header.get_element())
+        for r in self.roads:
+            element.append(self.roads[r].get_element())
+    
+        for j in self.junctions:
+            element.append(j.get_element())
+
+        return element
+
+
+    def write_xml(self,filename=None,prettyprint = True):
+        &#34;&#34;&#34; writeXml writes the open scenario xml file
+
+        Parameters
+        ----------
+            filename (str): path and filename of the wanted xml file
+                Default: name of the opendrive
+
+            prettyprint (bool): pretty print or ugly print?
+                Default: True
+
+        &#34;&#34;&#34;
+        if filename == None:
+            filename = self.name + &#39;.xodr&#39;
+        printToFile(self.get_element(),filename,prettyprint)
+        
+class _Type():
+    &#34;&#34;&#34; class to generate the type element of a road, (not the Enumeration it self).
+
+        Parameters
+        ----------
+            road_type (RoadType): the type of road
+
+            s (float): the distance where it starts
+                Default: 0
+
+            country (str): country code (should follow ISO 3166-1,alpha-2) (optional)
+
+            speed (float/str): the maximum speed allowed
+
+            speed_unit (str): unit of the speed, can be &#39;m/s&#39;,&#39;mph,&#39;kph&#39;
+
+        Attributes
+        ----------
+            road_type (RoadType): the type of road
+
+            s (float): the distance where it starts
+
+            country (str): country code (should follow ISO 3166-1,alpha-2) (optional)
+
+            speed (float/str): can either be a float or the following strings: &#34;no limit&#34; or &#34;undefined&#34;
+
+            speed_unit (str): unit of the speed
+    &#34;&#34;&#34;
+    def __init__(self,road_type,s=0,country=None,speed=None,speed_unit=&#39;m/s&#39;):
+        &#34;&#34;&#34; initalize the _Type
+
+        Parameters
+        ----------
+            road_type (RoadType): the type of road
+
+            s (float): the distance where it starts
+                Default: 0
+
+            country (str): country code (should follow ISO 3166-1,alpha-2) (optional)
+
+            speed (float/str): the maximum speed allowed
+
+            speed_unit (str): unit of the speed, can be &#39;m/s&#39;,&#39;mph,&#39;kph&#39;
+
+
+        &#34;&#34;&#34;
+        self.road_type = road_type
+        self.s = s
+        self.country = country
+        if isinstance(speed,float) or isinstance(speed,int) or speed in [&#39;no limit&#39;, &#39;undefined&#39;] or speed == None:
+            self.speed = speed
+        else:
+            if isinstance(speed,str):
+                raise ValueError(&#39;speed can only be numerical or &#34;no limit&#34; and &#34;undefined&#34;, not: &#39; + str(speed_unit))
+            
+        if speed_unit not in [&#39;m/s&#39;,&#39;mph&#39;,&#39;kph&#39;]:
+            raise ValueError(&#39;speed_unit can only be m/s, mph, or kph, not: &#39; + speed_unit)
+        self.speed_unit = speed_unit
+
+    def __eq__(self, other):
+        if isinstance(other,_Type):
+            if self.get_attributes() == other.get_attributes() and \
+            self.speed == other.speed and \
+            self.speed_unit == other.speed_unit:
+                return True
+        return False
+
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes as a dict of the _Type
+
+        &#34;&#34;&#34;
+        retdict = {}
+
+        retdict[&#39;s&#39;] = str(self.s)
+        retdict[&#39;type&#39;] = enum2str(self.road_type)
+        if self.country:
+            retdict[&#39;country&#39;] = self.country
+        return retdict
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the _Type
+
+        &#34;&#34;&#34;
+
+        element = ET.Element(&#39;type&#39;,attrib=self.get_attributes())
+        if self.speed:
+            ET.SubElement(element,&#39;speed&#39;,attrib={&#39;max&#39;:str(self.speed),&#39;unit&#39;:self.speed_unit})
+        return element</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="scenariogeneration.xodr.opendrive.OpenDrive"><code class="flex name class">
+<span>class <span class="ident">OpenDrive</span></span>
+<span>(</span><span>name, revMajor='1', revMinor='5')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>OpenDrive is the main class of the pyodrx to generate an OpenDrive road</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>name (str): name of the road
+
+revMajor (str): major revision of OpenDRIVE written to header
+    Default: '1'
+
+revMinor (str): minor revision of OpenDRIVE written to header
+    Default: '5'
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>name (str): name of the road
+
+revMajor (str): major revision of OpenDRIVE written to header
+    Default: '1'
+
+revMinor (str): minor revision of OpenDRIVE written to header
+    Default: '5'
+
+roads (list of Road): all roads
+
+junctions (list of Junction): all junctions
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element()
+    Returns the full ElementTree of FileHeader
+
+add_road(road)
+    Adds a road to the opendrive
+
+add_junction(junction)
+    Adds a junction to the opendrive
+
+adjust_roads_and_lanes()
+    Adjust starting position of all geometries of all roads and try to link lanes in neighbouring roads
+
+adjust_startpoints()
+    Adjust starting position of all geometries of all roads
+
+write_xml(filename)
+    write a open scenario xml
+</code></pre>
+<p>Initalize the Header</p>
+<h2 id="parameters_1">Parameters</h2>
+<p>name (str): name of the road</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class OpenDrive():
+    &#34;&#34;&#34; OpenDrive is the main class of the pyodrx to generate an OpenDrive road
+        
+        Parameters
+        ----------
+            name (str): name of the road
+            
+            revMajor (str): major revision of OpenDRIVE written to header
+                Default: &#39;1&#39;
+                    
+            revMinor (str): minor revision of OpenDRIVE written to header
+                Default: &#39;5&#39;
+
+        Attributes
+        ----------
+            name (str): name of the road
+            
+            revMajor (str): major revision of OpenDRIVE written to header
+                Default: &#39;1&#39;
+                    
+            revMinor (str): minor revision of OpenDRIVE written to header
+                Default: &#39;5&#39;
+
+            roads (list of Road): all roads 
+
+            junctions (list of Junction): all junctions
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of FileHeader
+
+            add_road(road)
+                Adds a road to the opendrive
+
+            add_junction(junction)
+                Adds a junction to the opendrive
+
+            adjust_roads_and_lanes()
+                Adjust starting position of all geometries of all roads and try to link lanes in neighbouring roads
+
+            adjust_startpoints()
+                Adjust starting position of all geometries of all roads 
+            
+            write_xml(filename)
+                write a open scenario xml
+                
+    &#34;&#34;&#34;
+    def __init__(self, name, revMajor=&#39;1&#39;, revMinor=&#39;5&#39;):
+        &#34;&#34;&#34; Initalize the Header
+
+            Parameters
+            ----------
+            name (str): name of the road 
+
+        &#34;&#34;&#34;
+        self.name = name
+        self.revMajor = revMajor
+        self.revMinor = revMinor
+        self._header = _Header(self.name, self.revMajor, self.revMinor)
+        self.roads = {}
+        self.junctions = []
+        #self.road_ids = []
+
+    def __eq__(self, other):
+        if isinstance(other,OpenDrive):
+            if self.roads == other.roads and \
+            self.junctions == other.junctions and \
+            self._header == other._header:
+                return True
+        return False
+
+    def add_road(self,road):
+        &#34;&#34;&#34; Adds a new road to the opendrive
+
+            Parameters
+            ----------
+                road (Road): the road to add 
+
+        &#34;&#34;&#34;
+        if (len(self.roads) == 0) and road.predecessor:
+            ValueError(&#39;No road was added and the added road has a predecessor, please add the predecessor first&#39;)
+
+        self.roads[str(road.id)] = road        
+
+    def adjust_roads_and_lanes(self): 
+        &#34;&#34;&#34; Adjust starting position of all geometries of all roads and try to link all lanes in neighbouring roads
+
+            Parameters
+            ----------
+
+        &#34;&#34;&#34;
+        #adjust roads and their geometries 
+        self.adjust_startpoints()
+
+        results = list(combinations(self.roads, 2))
+
+        for r in range(len(results)):
+            # print(&#39;Analyzing roads&#39;, results[r][0], &#39;and&#39;, results[r][1] )
+            create_lane_links(self.roads[results[r][0]],self.roads[results[r][1]])  
+
+
+    def _adjust_road_wrt_neighbour(self, road_id, neighbour_id, contact_point, neighbour_type):
+        &#34;&#34;&#34; Adjust geometries of road[road_id] taking as a successor/predecessor the neighbouring road with id neighbour_id.
+            NB Passing the type of contact_point is necessary because we call this function also on roads connecting to 
+            to a junction road (which means that the road itself do not know the contact point of the junction road it connects to)
+
+
+            Parameters
+            ----------
+            road_id (int): id of the road we want to adjust 
+
+            neighbour_id(int): id of the neighbour road we take as reference (we suppose the neighbour road is already adjusted)
+
+            contact_point(ContactPoint): type of contact point with point of view of roads[road_id]
+            
+            neighbour_type(str): &#39;successor&#39;/&#39;predecessor&#39; type of linking to the neighbouring road
+
+
+        &#34;&#34;&#34;
+
+        main_road = self.roads[str(road_id)]
+
+        if neighbour_type == &#39;predecessor&#39;:
+
+            if contact_point == ContactPoint.start :    
+                x,y,h = self.roads[str(neighbour_id)].planview.get_start_point()
+                h = h + np.pi #we are attached to the predecessor&#39;s start, so road[k] will start in its opposite direction 
+            elif contact_point == ContactPoint.end:
+                x,y,h = self.roads[str(neighbour_id)].planview.get_end_point()
+            else:
+                raise ValueError(&#39;Unknown ContactPoint&#39;)
+
+            num_lane_offsets = main_road.lane_offset_pred
+            x = -num_lane_offsets*3*np.sin(h) + x
+            y = num_lane_offsets*3*np.cos(h) + y
+
+            main_road.planview.set_start_point(x,y,h)
+            main_road.planview.adjust_geometries()
+
+        elif neighbour_type == &#39;successor&#39;:
+
+            if contact_point == ContactPoint.start:    
+                x,y,h = self.roads[str(neighbour_id)].planview.get_start_point()
+                h = h + np.pi #we are attached to the predecessor&#39;s start, so road[k] will start in its opposite direction 
+            elif contact_point == ContactPoint.end:
+                x,y,h = self.roads[str(neighbour_id)].planview.get_end_point()
+            else:
+                raise ValueError(&#39;Unknown ContactPoint&#39;)
+            num_lane_offsets = main_road.lane_offset_suc
+            x = num_lane_offsets*3*np.sin(h) + x
+            y = -num_lane_offsets*3*np.cos(h) + y
+            main_road.planview.set_start_point(x,y,h)
+            main_road.planview.adjust_geometries(True)
+
+
+    def adjust_startpoints(self): 
+        &#34;&#34;&#34; Adjust starting position of all geoemtries of all roads
+
+            Parameters
+            ----------
+
+        &#34;&#34;&#34;
+        
+        # Adjust logically connected roads, i.e. move them so they connect geometrically. 
+        # Method:
+        #    Fix a pre defined roads (if start position in planview is used), other wise fix the first road at 0
+        #    Next, in the set of remaining unconnected roads, find and adjust any roads connecting to a already fixed road
+        # Loop until all roads have been adjusted, 
+        
+        
+        # adjust the roads that have a fixed start of the planview
+        count_total_adjusted_roads = 0
+        fixed_road = False
+        for k in self.roads:
+            if self.roads[k].planview.fixed and not self.roads[k].planview.adjusted:
+                self.roads[k].planview.adjust_geometries()
+                # print(&#39;Fixing Road: &#39; + k)
+                count_total_adjusted_roads += 1
+                fixed_road = True
+            elif self.roads[k].planview.adjusted:
+                fixed_road = True
+                count_total_adjusted_roads += 1
+
+        # If no roads are fixed, select the first road is selected as the pivot-road
+        if len(self.roads) &gt; 0:
+            if fixed_road is False: 
+                self.roads[list(self.roads.keys())[0]].planview.adjust_geometries()
+                # print(&#39;Selecting and adjusting the first road {}&#39;.format(self.roads[list(self.roads.keys())[0] ].id))
+                count_total_adjusted_roads += 1
+        
+        while count_total_adjusted_roads &lt; len(self.roads):
+            
+            count_adjusted_roads = 0
+
+            for k in self.roads: # Check all 
+
+                if self.roads[k].planview.adjusted is False: 
+
+                    # check if it has a normal (road) predecessor 
+                    if self.roads[k].predecessor is not None and \
+                        self.roads[str(self.roads[k].predecessor.element_id)].planview.adjusted is True and \
+                        self.roads[k].predecessor.element_type is not ElementType.junction: 
+
+                        # print(&#39;  Adjusting {}road {} to predecessor {}&#39;.\
+                        #     format(&#39;&#39; if self.roads[k].road_type == -1 else &#39;connecting &#39;, self.roads[k].id, self.roads[k].predecessor.element_id))
+                        self._adjust_road_wrt_neighbour(k, self.roads[k].predecessor.element_id,
+                                                    self.roads[k].predecessor.contact_point, &#39;predecessor&#39;)
+                        count_adjusted_roads +=1
+
+                        if self.roads[k].road_type != -1 and self.roads[k].successor is not None and self.roads[str(self.roads[k].successor.element_id)].planview.adjusted is False:
+                            succ_id = self.roads[k].successor.element_id
+                            # print(&#39;    Adjusting successor connecting road {} in junction {} to road {} &#39;.\
+                            #     format(succ_id, self.roads[k].road_type, self.roads[k].id))
+                            if self.roads[k].successor.contact_point == ContactPoint.start:
+                                self._adjust_road_wrt_neighbour(succ_id, k, ContactPoint.end, &#39;predecessor&#39;)
+                            else:
+                                self._adjust_road_wrt_neighbour(succ_id, k, ContactPoint.end, &#39;successor&#39;)
+                            count_adjusted_roads +=1
+
+                    # check if geometry has a normal (road) successor 
+                    elif self.roads[k].successor is not None and \
+                        self.roads[str(self.roads[k].successor.element_id)].planview.adjusted is True and \
+                        self.roads[k].successor.element_type is not ElementType.junction: 
+
+                        # print(&#39;  Adjusting {}successor {} to road {}&#39;.\
+                        #     format(&#39;&#39; if self.roads[k].road_type == -1 else &#39;connecting &#39;, self.roads[k].id, self.roads[k].successor.element_id))
+                        self._adjust_road_wrt_neighbour(k, self.roads[k].successor.element_id,
+                                                    self.roads[k].successor.contact_point, &#39;successor&#39;)
+                        count_adjusted_roads +=1
+
+                        if self.roads[k].road_type != -1 and self.roads[k].predecessor is not None and self.roads[str(self.roads[k].predecessor.element_id)].planview.adjusted is False:
+                            pred_id = self.roads[k].predecessor.element_id
+                            # print(&#39;    Adjusting predecessor connecting road {} in junction {} to road {} &#39;.\
+                            #     format(pred_id, self.roads[k].road_type, self.roads[k].id))
+                            if self.roads[k].predecessor.contact_point == ContactPoint.start:
+                                self._adjust_road_wrt_neighbour(pred_id, k, ContactPoint.start, &#39;predecessor&#39;)
+                            else:
+                                self._adjust_road_wrt_neighbour(pred_id, k, ContactPoint.start, &#39;successor&#39;)
+                            count_adjusted_roads +=1
+            
+            count_total_adjusted_roads += count_adjusted_roads
+
+            if count_total_adjusted_roads != len(self.roads) and count_adjusted_roads == 0:
+                # No more connecting roads found, move to next pivot-road
+                raise UndefinedRoadNetwork(&#39;Roads are either missing successor, or predecessor to connect to the roads, \n if the roads are disconnected, please add a start position for one of the planviews.&#39;)
+
+            
+
+    
+    def add_junction(self,junction):
+        &#34;&#34;&#34; Adds a junction to the opendrive
+
+            Parameters
+            ----------
+                junction (Junction): the junction to add
+
+        &#34;&#34;&#34;
+        self.junctions.append(junction)
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the FileHeader
+
+        &#34;&#34;&#34;
+        element = ET.Element(&#39;OpenDRIVE&#39;)
+        element.append(self._header.get_element())
+        for r in self.roads:
+            element.append(self.roads[r].get_element())
+    
+        for j in self.junctions:
+            element.append(j.get_element())
+
+        return element
+
+
+    def write_xml(self,filename=None,prettyprint = True):
+        &#34;&#34;&#34; writeXml writes the open scenario xml file
+
+        Parameters
+        ----------
+            filename (str): path and filename of the wanted xml file
+                Default: name of the opendrive
+
+            prettyprint (bool): pretty print or ugly print?
+                Default: True
+
+        &#34;&#34;&#34;
+        if filename == None:
+            filename = self.name + &#39;.xodr&#39;
+        printToFile(self.get_element(),filename,prettyprint)</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xodr.opendrive.OpenDrive.add_junction"><code class="name flex">
+<span>def <span class="ident">add_junction</span></span>(<span>self, junction)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Adds a junction to the opendrive</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>junction (Junction): the junction to add
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_junction(self,junction):
+    &#34;&#34;&#34; Adds a junction to the opendrive
+
+        Parameters
+        ----------
+            junction (Junction): the junction to add
+
+    &#34;&#34;&#34;
+    self.junctions.append(junction)</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.opendrive.OpenDrive.add_road"><code class="name flex">
+<span>def <span class="ident">add_road</span></span>(<span>self, road)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Adds a new road to the opendrive</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>road (Road): the road to add
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_road(self,road):
+    &#34;&#34;&#34; Adds a new road to the opendrive
+
+        Parameters
+        ----------
+            road (Road): the road to add 
+
+    &#34;&#34;&#34;
+    if (len(self.roads) == 0) and road.predecessor:
+        ValueError(&#39;No road was added and the added road has a predecessor, please add the predecessor first&#39;)
+
+    self.roads[str(road.id)] = road        </code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.opendrive.OpenDrive.adjust_roads_and_lanes"><code class="name flex">
+<span>def <span class="ident">adjust_roads_and_lanes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Adjust starting position of all geometries of all roads and try to link all lanes in neighbouring roads</p>
+<h2 id="parameters">Parameters</h2></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def adjust_roads_and_lanes(self): 
+    &#34;&#34;&#34; Adjust starting position of all geometries of all roads and try to link all lanes in neighbouring roads
+
+        Parameters
+        ----------
+
+    &#34;&#34;&#34;
+    #adjust roads and their geometries 
+    self.adjust_startpoints()
+
+    results = list(combinations(self.roads, 2))
+
+    for r in range(len(results)):
+        # print(&#39;Analyzing roads&#39;, results[r][0], &#39;and&#39;, results[r][1] )
+        create_lane_links(self.roads[results[r][0]],self.roads[results[r][1]])  </code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.opendrive.OpenDrive.adjust_startpoints"><code class="name flex">
+<span>def <span class="ident">adjust_startpoints</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Adjust starting position of all geoemtries of all roads</p>
+<h2 id="parameters">Parameters</h2></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def adjust_startpoints(self): 
+    &#34;&#34;&#34; Adjust starting position of all geoemtries of all roads
+
+        Parameters
+        ----------
+
+    &#34;&#34;&#34;
+    
+    # Adjust logically connected roads, i.e. move them so they connect geometrically. 
+    # Method:
+    #    Fix a pre defined roads (if start position in planview is used), other wise fix the first road at 0
+    #    Next, in the set of remaining unconnected roads, find and adjust any roads connecting to a already fixed road
+    # Loop until all roads have been adjusted, 
+    
+    
+    # adjust the roads that have a fixed start of the planview
+    count_total_adjusted_roads = 0
+    fixed_road = False
+    for k in self.roads:
+        if self.roads[k].planview.fixed and not self.roads[k].planview.adjusted:
+            self.roads[k].planview.adjust_geometries()
+            # print(&#39;Fixing Road: &#39; + k)
+            count_total_adjusted_roads += 1
+            fixed_road = True
+        elif self.roads[k].planview.adjusted:
+            fixed_road = True
+            count_total_adjusted_roads += 1
+
+    # If no roads are fixed, select the first road is selected as the pivot-road
+    if len(self.roads) &gt; 0:
+        if fixed_road is False: 
+            self.roads[list(self.roads.keys())[0]].planview.adjust_geometries()
+            # print(&#39;Selecting and adjusting the first road {}&#39;.format(self.roads[list(self.roads.keys())[0] ].id))
+            count_total_adjusted_roads += 1
+    
+    while count_total_adjusted_roads &lt; len(self.roads):
+        
+        count_adjusted_roads = 0
+
+        for k in self.roads: # Check all 
+
+            if self.roads[k].planview.adjusted is False: 
+
+                # check if it has a normal (road) predecessor 
+                if self.roads[k].predecessor is not None and \
+                    self.roads[str(self.roads[k].predecessor.element_id)].planview.adjusted is True and \
+                    self.roads[k].predecessor.element_type is not ElementType.junction: 
+
+                    # print(&#39;  Adjusting {}road {} to predecessor {}&#39;.\
+                    #     format(&#39;&#39; if self.roads[k].road_type == -1 else &#39;connecting &#39;, self.roads[k].id, self.roads[k].predecessor.element_id))
+                    self._adjust_road_wrt_neighbour(k, self.roads[k].predecessor.element_id,
+                                                self.roads[k].predecessor.contact_point, &#39;predecessor&#39;)
+                    count_adjusted_roads +=1
+
+                    if self.roads[k].road_type != -1 and self.roads[k].successor is not None and self.roads[str(self.roads[k].successor.element_id)].planview.adjusted is False:
+                        succ_id = self.roads[k].successor.element_id
+                        # print(&#39;    Adjusting successor connecting road {} in junction {} to road {} &#39;.\
+                        #     format(succ_id, self.roads[k].road_type, self.roads[k].id))
+                        if self.roads[k].successor.contact_point == ContactPoint.start:
+                            self._adjust_road_wrt_neighbour(succ_id, k, ContactPoint.end, &#39;predecessor&#39;)
+                        else:
+                            self._adjust_road_wrt_neighbour(succ_id, k, ContactPoint.end, &#39;successor&#39;)
+                        count_adjusted_roads +=1
+
+                # check if geometry has a normal (road) successor 
+                elif self.roads[k].successor is not None and \
+                    self.roads[str(self.roads[k].successor.element_id)].planview.adjusted is True and \
+                    self.roads[k].successor.element_type is not ElementType.junction: 
+
+                    # print(&#39;  Adjusting {}successor {} to road {}&#39;.\
+                    #     format(&#39;&#39; if self.roads[k].road_type == -1 else &#39;connecting &#39;, self.roads[k].id, self.roads[k].successor.element_id))
+                    self._adjust_road_wrt_neighbour(k, self.roads[k].successor.element_id,
+                                                self.roads[k].successor.contact_point, &#39;successor&#39;)
+                    count_adjusted_roads +=1
+
+                    if self.roads[k].road_type != -1 and self.roads[k].predecessor is not None and self.roads[str(self.roads[k].predecessor.element_id)].planview.adjusted is False:
+                        pred_id = self.roads[k].predecessor.element_id
+                        # print(&#39;    Adjusting predecessor connecting road {} in junction {} to road {} &#39;.\
+                        #     format(pred_id, self.roads[k].road_type, self.roads[k].id))
+                        if self.roads[k].predecessor.contact_point == ContactPoint.start:
+                            self._adjust_road_wrt_neighbour(pred_id, k, ContactPoint.start, &#39;predecessor&#39;)
+                        else:
+                            self._adjust_road_wrt_neighbour(pred_id, k, ContactPoint.start, &#39;successor&#39;)
+                        count_adjusted_roads +=1
+        
+        count_total_adjusted_roads += count_adjusted_roads
+
+        if count_total_adjusted_roads != len(self.roads) and count_adjusted_roads == 0:
+            # No more connecting roads found, move to next pivot-road
+            raise UndefinedRoadNetwork(&#39;Roads are either missing successor, or predecessor to connect to the roads, \n if the roads are disconnected, please add a start position for one of the planviews.&#39;)</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.opendrive.OpenDrive.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the elementTree of the FileHeader</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self):
+    &#34;&#34;&#34; returns the elementTree of the FileHeader
+
+    &#34;&#34;&#34;
+    element = ET.Element(&#39;OpenDRIVE&#39;)
+    element.append(self._header.get_element())
+    for r in self.roads:
+        element.append(self.roads[r].get_element())
+
+    for j in self.junctions:
+        element.append(j.get_element())
+
+    return element</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.opendrive.OpenDrive.write_xml"><code class="name flex">
+<span>def <span class="ident">write_xml</span></span>(<span>self, filename=None, prettyprint=True)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>writeXml writes the open scenario xml file</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>filename (str): path and filename of the wanted xml file
+    Default: name of the opendrive
+
+prettyprint (bool): pretty print or ugly print?
+    Default: True
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def write_xml(self,filename=None,prettyprint = True):
+    &#34;&#34;&#34; writeXml writes the open scenario xml file
+
+    Parameters
+    ----------
+        filename (str): path and filename of the wanted xml file
+            Default: name of the opendrive
+
+        prettyprint (bool): pretty print or ugly print?
+            Default: True
+
+    &#34;&#34;&#34;
+    if filename == None:
+        filename = self.name + &#39;.xodr&#39;
+    printToFile(self.get_element(),filename,prettyprint)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="scenariogeneration.xodr.opendrive.Road"><code class="flex name class">
+<span>class <span class="ident">Road</span></span>
+<span>(</span><span>road_id, planview, lanes, road_type=-1, name=None, rule=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Road defines the road element of OpenDrive</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>road_id (int): identifier of the road
+
+planview (PlanView): the planview of the road
+
+lanes (Lanes): the lanes of the road
+
+road_type (int): type of road (junction)
+    Default: -1
+
+name (str): name of the road (optional)
+
+rule (TrafficRule): traffic rule (optional)
+
+signals (Signals): Contains a list of signal objects (optional)
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>id (int): identifier of the road
+
+planview (PlanView): the planview of the road
+
+lanes (Lanes): the lanes of the road
+
+road_type (int): type of road (junction)
+    Default: -1
+
+name (str): name of the road
+
+rule (TrafficRule): traffic rule
+
+signals (Signal): Contains a list of Signal objects
+
+objects (Object): Contains a list of Object objects
+
+types (list of _Type): contans a list or _Type objects (optional)
+
+elevationprofile (ElevationProfile): the elevation profile of the road
+
+lateralprofile (LateralProfile): the lateral profile of the road
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element()
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of the class
+
+add_successor (element_type,element_id,contact_point,lane_offset)
+    adds a successor for the road
+
+add_predecessor (element_type,element_id,contact_point,lane_offset)
+    adds a predecessor for the road
+
+add_neighbor (element_type,element_id,direction)
+    adds a neighbor for the road
+
+add_object (road_object)
+    adds an object to the road
+
+add_elevation(s,a,b,c,d)
+    adds an elevation profile to the road
+
+add_superelevation(s,a,b,c,d) 
+    adds a superelevation to the road
+
+add_shape(s,t,a,b,c,d,e)
+    adds a lateral shape to the road
+
+add_object_roadside (road_object_prototype, repeatDistance, sOffset=0, tOffset=0, side=RoadSide.both)
+    adds an repeated object to the road
+
+add_signal (signal)
+    adds a signal to the road
+
+get_end_point ()
+    returns the x, y and heading at the end of the road
+</code></pre>
+<p>initalize the Road</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>road_id (int): identifier of the road
+
+planview (PlanView): the planview of the road
+
+lanes (Lanes): the lanes of the road
+
+road_type (int): type of road (junction)
+    Default: -1
+
+name (str): name of the road (optional)
+
+rule (TrafficRule): traffic rule (optional)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Road():
+    &#34;&#34;&#34; Road defines the road element of OpenDrive
+        
+        Parameters
+        ----------
+            road_id (int): identifier of the road
+
+            planview (PlanView): the planview of the road
+
+            lanes (Lanes): the lanes of the road
+
+            road_type (int): type of road (junction)
+                Default: -1
+
+            name (str): name of the road (optional)
+
+            rule (TrafficRule): traffic rule (optional)
+
+            signals (Signals): Contains a list of signal objects (optional)
+
+        Attributes
+        ----------
+            id (int): identifier of the road
+
+            planview (PlanView): the planview of the road
+
+            lanes (Lanes): the lanes of the road
+
+            road_type (int): type of road (junction)
+                Default: -1
+
+            name (str): name of the road
+
+            rule (TrafficRule): traffic rule 
+            
+            signals (Signal): Contains a list of Signal objects 
+            
+            objects (Object): Contains a list of Object objects
+
+            types (list of _Type): contans a list or _Type objects (optional)
+
+            elevationprofile (ElevationProfile): the elevation profile of the road
+
+            lateralprofile (LateralProfile): the lateral profile of the road
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+
+            get_attributes()
+                Returns a dictionary of all attributes of the class
+
+            add_successor (element_type,element_id,contact_point,lane_offset)
+                adds a successor for the road
+
+            add_predecessor (element_type,element_id,contact_point,lane_offset)
+                adds a predecessor for the road          
+
+            add_neighbor (element_type,element_id,direction)
+                adds a neighbor for the road   
+
+            add_object (road_object)
+                adds an object to the road
+
+            add_elevation(s,a,b,c,d)
+                adds an elevation profile to the road
+
+            add_superelevation(s,a,b,c,d) 
+                adds a superelevation to the road
+
+            add_shape(s,t,a,b,c,d,e)
+                adds a lateral shape to the road
+            
+            add_object_roadside (road_object_prototype, repeatDistance, sOffset=0, tOffset=0, side=RoadSide.both)
+                adds an repeated object to the road
+
+            add_signal (signal)
+                adds a signal to the road
+
+            get_end_point ()
+                returns the x, y and heading at the end of the road
+    &#34;&#34;&#34;
+    def __init__(self,road_id,planview,lanes, road_type = -1,name=None, rule=None):
+        &#34;&#34;&#34; initalize the Road
+
+            Parameters
+            ----------
+                road_id (int): identifier of the road
+
+                planview (PlanView): the planview of the road
+
+                lanes (Lanes): the lanes of the road
+
+                road_type (int): type of road (junction)
+                    Default: -1
+
+                name (str): name of the road (optional)
+
+                rule (TrafficRule): traffic rule (optional)
+
+        &#34;&#34;&#34;
+        self.id = road_id
+        self.planview = planview
+        self.lanes = lanes
+        self.road_type = road_type
+        self.name = name
+        self.rule = rule
+        self.links = _Links()
+        self._neighbor_added = 0
+        self.successor = None
+        self.predecessor = None
+        self.lane_offset_suc = 0
+        self.lane_offset_pred = 0
+        self.adjusted = False
+        self.objects = []
+        self.signals = []
+        self.types = []
+        self.elevationprofile = ElevationProfile()
+        self.lateralprofile = LateralProfile()
+
+
+    def __eq__(self, other):
+        if isinstance(other,Road):
+            if self.get_attributes() == other.get_attributes() and \
+            self.objects == other.objects and \
+            self.signals == other.signals and \
+            self.types == other.types and \
+            self.links == other.links and \
+            self.planview == other.planview and \
+            self.lanes == other.lanes and \
+            self.elevationprofile == other.elevationprofile and \
+            self.lateralprofile == other.lateralprofile and \
+            self.predecessor == other.predecessor and \
+            self.successor == other.successor and \
+            self.lane_offset_suc == other.lane_offset_suc and \
+            self.lane_offset_pred == other.lane_offset_pred:
+                return True
+        return False
+
+    def add_successor(self,element_type,element_id,contact_point=None,lane_offset=0):
+        &#34;&#34;&#34; add_successor adds a successor link to the road
+        
+        Parameters
+        ----------
+            element_type (ElementType): type of element the linked road
+
+            element_id (str/int): name of the linked road
+
+            contact_point (ContactPoint): the contact point of the link
+
+        &#34;&#34;&#34;
+        if self.successor:
+            raise ValueError(&#39;only one successor is allowed&#39;)
+        self.successor = _Link(&#39;successor&#39;,element_id,element_type,contact_point)
+        self.links.add_link(self.successor)
+        self.lane_offset_suc = lane_offset
+
+
+    def add_predecessor(self,element_type,element_id,contact_point=None,lane_offset=0):
+        &#34;&#34;&#34; add_successor adds a successor link to the road
+        
+        Parameters
+        ----------
+            element_type (ElementType): type of element the linked road
+
+            element_id (str/int): name of the linked road
+
+            contact_point (ContactPoint): the contact point of the link
+
+        &#34;&#34;&#34;
+        if self.predecessor:
+            raise ValueError(&#39;only one predecessor is allowed&#39;)
+        self.predecessor = _Link(&#39;predecessor&#39;,element_id,element_type,contact_point)
+        self.links.add_link(self.predecessor)
+        self.lane_offset_pred = lane_offset
+        
+
+    def add_neighbor(self,element_type,element_id,direction): 
+        &#34;&#34;&#34; add_neighbor adds a neighbor to a road
+        
+        Parameters
+        ----------
+            element_type (ElementType): type of element the linked road
+
+            element_id (str/int): name of the linked road
+
+            direction (Direction): the direction of the link 
+        &#34;&#34;&#34;
+        if self._neighbor_added &gt; 1:
+            raise ValueError(&#39;only two neighbors are allowed&#39;)
+        suc = _Link(&#39;neighbor&#39;,element_id,element_type,direction=direction)
+    
+        self.links.add_link(suc)
+        self._neighbor_added += 1
+
+    def add_elevation(self,s,a,b,c,d):
+        &#34;&#34;&#34; ads an elevation profile to the road (3-degree polynomial)
+
+            Parameters
+            ----------
+                s (float): s start coordinate of the elevation
+
+                a (float): a coefficient of the polynomial
+
+                b (float): b coefficient of the polynomial
+
+                c (float): c coefficient of the polynomial
+
+                d (float): d coefficient of the polynomial
+        &#34;&#34;&#34;
+        self.elevationprofile.add_elevation(_Poly3Profile(s,a,b,c,d))
+
+    def add_superelevation(self,s,a,b,c,d):
+        &#34;&#34;&#34; ads a superelevation profile to the road (3-degree polynomial)
+
+            Parameters
+            ----------
+                s (float): s start coordinate of the superelevation
+
+                a (float): a coefficient of the polynomial
+
+                b (float): b coefficient of the polynomial
+
+                c (float): c coefficient of the polynomial
+
+                d (float): d coefficient of the polynomial
+        &#34;&#34;&#34;
+        self.lateralprofile.add_superelevation(_Poly3Profile(s,a,b,c,d))
+    
+    def add_shape(self,s,t,a,b,c,d):
+        &#34;&#34;&#34; ads a superelevation profile to the road (3-degree polynomial)
+
+            Parameters
+            ----------
+                s (float): s start coordinate of the superelevation
+
+                t (flaot): the t start coordinate of the lateral profile
+
+                a (float): a coefficient of the polynomial
+
+                b (float): b coefficient of the polynomial
+
+                c (float): c coefficient of the polynomial
+
+                d (float): d coefficient of the polynomial
+        &#34;&#34;&#34;
+        self.lateralprofile.add_shape(_Poly3Profile(s,a,b,c,d,t))
+    
+    def add_object(self,road_object):
+        &#34;&#34;&#34; add_object adds an object to a road and calls a function that ensures unique IDs
+        
+        Parameters
+        ----------
+            road_object (Object/list(Object)): object(s) to be added to road 
+        
+        &#34;&#34;&#34;
+        if isinstance(road_object,list):
+            for single_object in road_object:
+                single_object._update_id()
+            self.objects=self.objects+road_object
+        else:
+            road_object._update_id()
+            self.objects.append(road_object)
+            
+    def add_object_roadside(self, road_object_prototype, repeatDistance, sOffset=0, tOffset=0, side=RoadSide.both):
+        &#34;&#34;&#34; add_object_roadside is a convenience function to add a repeating object on side of the road,
+            which can only be used after adjust_roads_and_lanes() has been performed
+        
+        Parameters
+        ----------
+            road_object_prototype (Object): object that will be used as a basis for generation
+
+            repeatDistance (float): distance between repeated Objects, 0 for continuous
+
+            sOffset (float): start s-coordinate of repeating Objects
+            default: 0
+            
+            tOffset (float): t-offset additional to lane width, sign will be added automatically (i.e. positive if further from roadside)
+            default: 0
+            
+            side (RoadSide): add Objects on both, left or right side 
+            default: both
+        
+        &#34;&#34;&#34;
+        if not self.planview.adjusted:
+            raise RoadsAndLanesNotAdjusted(&#34;Could not add roadside object because roads and lanes need to be adjusted first. Consider calling &#39;adjust_roads_and_lanes()&#39;.&#34;)
+
+        
+        hdg_factors = []
+        total_widths = []
+        road_objects = []
+        s_lanesections = []
+        #TODO: handle width parameters apart from a
+        for lanesection in self.lanes.lanesections:
+            if side != RoadSide.right:
+                s_lanesections.append(lanesection.s)
+                hdg_factors.append(1)
+                total_widths.append(0)
+                road_objects.append(cpy.deepcopy(road_object_prototype))
+                for lane in lanesection.leftlanes:
+                    total_widths[-1] = total_widths[-1] + lane.a
+            if side != RoadSide.left:
+                s_lanesections.append(lanesection.s)
+                hdg_factors.append(-1)
+                total_widths.append(0)
+                road_objects.append(cpy.deepcopy(road_object_prototype))
+                for lane in lanesection.rightlanes:
+                    total_widths[-1] = total_widths[-1] + lane.a
+        
+        for idx, road_object in enumerate(road_objects):
+            road_object.t = (total_widths[idx] + tOffset) * hdg_factors[idx]
+            road_object.s = sOffset + s_lanesections[idx]
+            road_object.hdg = np.pi * (1 + hdg_factors[idx]) / 2
+            road_object.repeat(self.planview.get_total_length() - sOffset - s_lanesections[idx], repeatDistance)
+        print (repeatDistance)        
+        self.add_object(road_objects)
+
+    def add_signal(self,signal):
+        &#34;&#34;&#34; add_signal adds a signal to a road
+        
+        
+        &#34;&#34;&#34;
+        if isinstance(signal,list):
+            for single_signal in signal:
+                single_signal._update_id()
+            self.signals=self.signals+signal
+        else:
+            signal._update_id()
+            self.signals.append(signal)
+
+    def add_type(self,road_type,s = 0,country=None,speed=None,speed_unit=&#39;m/s&#39;):
+        &#34;&#34;&#34; adds a type to the road (not to mix with junction or not as the init)
+
+            Parameters
+            ----------
+                road_type (RoadType): the type of road
+
+                s (float): the distance where it starts
+                    Default: 0
+
+                country (str): country code (should follow ISO 3166-1,alpha-2) (optional)
+
+                speed (float/str): the maximum speed allowed
+
+                sped_unit (str): unit of the speed, can be &#39;m/s&#39;,&#39;mph,&#39;kph&#39;
+        &#34;&#34;&#34;
+        self.types.append(_Type(road_type,s,country,speed,speed_unit))
+
+        
+    def get_end_point(self):
+        &#34;&#34;&#34; get the x, y, and heading, of the end of the road
+
+            Return
+            ------
+                x (float): the end x coordinate
+                y (float): the end y coordinate
+                h (float): the end heading
+
+        &#34;&#34;&#34;
+        return self.planview.present_x, self.planview.present_y, self.planview.present_h
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes as a dict of the Road
+
+        &#34;&#34;&#34;
+        retdict = {}
+        if self.name:
+            retdict[&#39;name&#39;] = self.name
+        if self.rule:
+            retdict[&#39;rule&#39;] = self.rule
+        retdict[&#39;id&#39;] = str(self.id)
+        retdict[&#39;junction&#39;] = str(self.road_type)
+        retdict[&#39;length&#39;] = str(self.planview.get_total_length())
+        return retdict
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the FileHeader
+
+        &#34;&#34;&#34;
+        element = ET.Element(&#39;road&#39;,attrib=self.get_attributes())
+        element.append(self.links.get_element())
+        if self.types:
+            for r in self.types:
+                element.append(r.get_element())
+        element.append(self.planview.get_element())
+        element.append(self.elevationprofile.get_element())
+        element.append(self.lateralprofile.get_element())
+        element.append(self.lanes.get_element())
+        if len(self.objects) &gt; 0:
+            objectselement = ET.SubElement(element,&#39;objects&#39;)
+            for road_object in self.objects:
+                objectselement.append(road_object.get_element())        
+        if len(self.signals) &gt; 0:
+            signalselement = ET.SubElement(element,&#39;signals&#39;)
+            for signal in self.signals:
+                signalselement.append(signal.get_element())
+        return element</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xodr.opendrive.Road.add_elevation"><code class="name flex">
+<span>def <span class="ident">add_elevation</span></span>(<span>self, s, a, b, c, d)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>ads an elevation profile to the road (3-degree polynomial)</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>s (float): s start coordinate of the elevation
+
+a (float): a coefficient of the polynomial
+
+b (float): b coefficient of the polynomial
+
+c (float): c coefficient of the polynomial
+
+d (float): d coefficient of the polynomial
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_elevation(self,s,a,b,c,d):
+    &#34;&#34;&#34; ads an elevation profile to the road (3-degree polynomial)
+
+        Parameters
+        ----------
+            s (float): s start coordinate of the elevation
+
+            a (float): a coefficient of the polynomial
+
+            b (float): b coefficient of the polynomial
+
+            c (float): c coefficient of the polynomial
+
+            d (float): d coefficient of the polynomial
+    &#34;&#34;&#34;
+    self.elevationprofile.add_elevation(_Poly3Profile(s,a,b,c,d))</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.opendrive.Road.add_neighbor"><code class="name flex">
+<span>def <span class="ident">add_neighbor</span></span>(<span>self, element_type, element_id, direction)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>add_neighbor adds a neighbor to a road</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element_type (ElementType): type of element the linked road
+
+element_id (str/int): name of the linked road
+
+direction (Direction): the direction of the link
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_neighbor(self,element_type,element_id,direction): 
+    &#34;&#34;&#34; add_neighbor adds a neighbor to a road
+    
+    Parameters
+    ----------
+        element_type (ElementType): type of element the linked road
+
+        element_id (str/int): name of the linked road
+
+        direction (Direction): the direction of the link 
+    &#34;&#34;&#34;
+    if self._neighbor_added &gt; 1:
+        raise ValueError(&#39;only two neighbors are allowed&#39;)
+    suc = _Link(&#39;neighbor&#39;,element_id,element_type,direction=direction)
+
+    self.links.add_link(suc)
+    self._neighbor_added += 1</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.opendrive.Road.add_object"><code class="name flex">
+<span>def <span class="ident">add_object</span></span>(<span>self, road_object)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>add_object adds an object to a road and calls a function that ensures unique IDs</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>road_object (Object/list(Object)): object(s) to be added to road
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_object(self,road_object):
+    &#34;&#34;&#34; add_object adds an object to a road and calls a function that ensures unique IDs
+    
+    Parameters
+    ----------
+        road_object (Object/list(Object)): object(s) to be added to road 
+    
+    &#34;&#34;&#34;
+    if isinstance(road_object,list):
+        for single_object in road_object:
+            single_object._update_id()
+        self.objects=self.objects+road_object
+    else:
+        road_object._update_id()
+        self.objects.append(road_object)</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.opendrive.Road.add_object_roadside"><code class="name flex">
+<span>def <span class="ident">add_object_roadside</span></span>(<span>self, road_object_prototype, repeatDistance, sOffset=0, tOffset=0, side=RoadSide.both)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>add_object_roadside is a convenience function to add a repeating object on side of the road,
+which can only be used after adjust_roads_and_lanes() has been performed</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>road_object_prototype (Object): object that will be used as a basis for generation
+
+repeatDistance (float): distance between repeated Objects, 0 for continuous
+
+sOffset (float): start s-coordinate of repeating Objects
+default: 0
+
+tOffset (float): t-offset additional to lane width, sign will be added automatically (i.e. positive if further from roadside)
+default: 0
+
+side (RoadSide): add Objects on both, left or right side 
+default: both
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_object_roadside(self, road_object_prototype, repeatDistance, sOffset=0, tOffset=0, side=RoadSide.both):
+    &#34;&#34;&#34; add_object_roadside is a convenience function to add a repeating object on side of the road,
+        which can only be used after adjust_roads_and_lanes() has been performed
+    
+    Parameters
+    ----------
+        road_object_prototype (Object): object that will be used as a basis for generation
+
+        repeatDistance (float): distance between repeated Objects, 0 for continuous
+
+        sOffset (float): start s-coordinate of repeating Objects
+        default: 0
+        
+        tOffset (float): t-offset additional to lane width, sign will be added automatically (i.e. positive if further from roadside)
+        default: 0
+        
+        side (RoadSide): add Objects on both, left or right side 
+        default: both
+    
+    &#34;&#34;&#34;
+    if not self.planview.adjusted:
+        raise RoadsAndLanesNotAdjusted(&#34;Could not add roadside object because roads and lanes need to be adjusted first. Consider calling &#39;adjust_roads_and_lanes()&#39;.&#34;)
+
+    
+    hdg_factors = []
+    total_widths = []
+    road_objects = []
+    s_lanesections = []
+    #TODO: handle width parameters apart from a
+    for lanesection in self.lanes.lanesections:
+        if side != RoadSide.right:
+            s_lanesections.append(lanesection.s)
+            hdg_factors.append(1)
+            total_widths.append(0)
+            road_objects.append(cpy.deepcopy(road_object_prototype))
+            for lane in lanesection.leftlanes:
+                total_widths[-1] = total_widths[-1] + lane.a
+        if side != RoadSide.left:
+            s_lanesections.append(lanesection.s)
+            hdg_factors.append(-1)
+            total_widths.append(0)
+            road_objects.append(cpy.deepcopy(road_object_prototype))
+            for lane in lanesection.rightlanes:
+                total_widths[-1] = total_widths[-1] + lane.a
+    
+    for idx, road_object in enumerate(road_objects):
+        road_object.t = (total_widths[idx] + tOffset) * hdg_factors[idx]
+        road_object.s = sOffset + s_lanesections[idx]
+        road_object.hdg = np.pi * (1 + hdg_factors[idx]) / 2
+        road_object.repeat(self.planview.get_total_length() - sOffset - s_lanesections[idx], repeatDistance)
+    print (repeatDistance)        
+    self.add_object(road_objects)</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.opendrive.Road.add_predecessor"><code class="name flex">
+<span>def <span class="ident">add_predecessor</span></span>(<span>self, element_type, element_id, contact_point=None, lane_offset=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>add_successor adds a successor link to the road</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element_type (ElementType): type of element the linked road
+
+element_id (str/int): name of the linked road
+
+contact_point (ContactPoint): the contact point of the link
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_predecessor(self,element_type,element_id,contact_point=None,lane_offset=0):
+    &#34;&#34;&#34; add_successor adds a successor link to the road
+    
+    Parameters
+    ----------
+        element_type (ElementType): type of element the linked road
+
+        element_id (str/int): name of the linked road
+
+        contact_point (ContactPoint): the contact point of the link
+
+    &#34;&#34;&#34;
+    if self.predecessor:
+        raise ValueError(&#39;only one predecessor is allowed&#39;)
+    self.predecessor = _Link(&#39;predecessor&#39;,element_id,element_type,contact_point)
+    self.links.add_link(self.predecessor)
+    self.lane_offset_pred = lane_offset</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.opendrive.Road.add_shape"><code class="name flex">
+<span>def <span class="ident">add_shape</span></span>(<span>self, s, t, a, b, c, d)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>ads a superelevation profile to the road (3-degree polynomial)</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>s (float): s start coordinate of the superelevation
+
+t (flaot): the t start coordinate of the lateral profile
+
+a (float): a coefficient of the polynomial
+
+b (float): b coefficient of the polynomial
+
+c (float): c coefficient of the polynomial
+
+d (float): d coefficient of the polynomial
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_shape(self,s,t,a,b,c,d):
+    &#34;&#34;&#34; ads a superelevation profile to the road (3-degree polynomial)
+
+        Parameters
+        ----------
+            s (float): s start coordinate of the superelevation
+
+            t (flaot): the t start coordinate of the lateral profile
+
+            a (float): a coefficient of the polynomial
+
+            b (float): b coefficient of the polynomial
+
+            c (float): c coefficient of the polynomial
+
+            d (float): d coefficient of the polynomial
+    &#34;&#34;&#34;
+    self.lateralprofile.add_shape(_Poly3Profile(s,a,b,c,d,t))</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.opendrive.Road.add_signal"><code class="name flex">
+<span>def <span class="ident">add_signal</span></span>(<span>self, signal)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>add_signal adds a signal to a road</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_signal(self,signal):
+    &#34;&#34;&#34; add_signal adds a signal to a road
+    
+    
+    &#34;&#34;&#34;
+    if isinstance(signal,list):
+        for single_signal in signal:
+            single_signal._update_id()
+        self.signals=self.signals+signal
+    else:
+        signal._update_id()
+        self.signals.append(signal)</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.opendrive.Road.add_successor"><code class="name flex">
+<span>def <span class="ident">add_successor</span></span>(<span>self, element_type, element_id, contact_point=None, lane_offset=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>add_successor adds a successor link to the road</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element_type (ElementType): type of element the linked road
+
+element_id (str/int): name of the linked road
+
+contact_point (ContactPoint): the contact point of the link
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_successor(self,element_type,element_id,contact_point=None,lane_offset=0):
+    &#34;&#34;&#34; add_successor adds a successor link to the road
+    
+    Parameters
+    ----------
+        element_type (ElementType): type of element the linked road
+
+        element_id (str/int): name of the linked road
+
+        contact_point (ContactPoint): the contact point of the link
+
+    &#34;&#34;&#34;
+    if self.successor:
+        raise ValueError(&#39;only one successor is allowed&#39;)
+    self.successor = _Link(&#39;successor&#39;,element_id,element_type,contact_point)
+    self.links.add_link(self.successor)
+    self.lane_offset_suc = lane_offset</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.opendrive.Road.add_superelevation"><code class="name flex">
+<span>def <span class="ident">add_superelevation</span></span>(<span>self, s, a, b, c, d)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>ads a superelevation profile to the road (3-degree polynomial)</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>s (float): s start coordinate of the superelevation
+
+a (float): a coefficient of the polynomial
+
+b (float): b coefficient of the polynomial
+
+c (float): c coefficient of the polynomial
+
+d (float): d coefficient of the polynomial
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_superelevation(self,s,a,b,c,d):
+    &#34;&#34;&#34; ads a superelevation profile to the road (3-degree polynomial)
+
+        Parameters
+        ----------
+            s (float): s start coordinate of the superelevation
+
+            a (float): a coefficient of the polynomial
+
+            b (float): b coefficient of the polynomial
+
+            c (float): c coefficient of the polynomial
+
+            d (float): d coefficient of the polynomial
+    &#34;&#34;&#34;
+    self.lateralprofile.add_superelevation(_Poly3Profile(s,a,b,c,d))</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.opendrive.Road.add_type"><code class="name flex">
+<span>def <span class="ident">add_type</span></span>(<span>self, road_type, s=0, country=None, speed=None, speed_unit='m/s')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>adds a type to the road (not to mix with junction or not as the init)</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>road_type (RoadType): the type of road
+
+s (float): the distance where it starts
+    Default: 0
+
+country (str): country code (should follow ISO 3166-1,alpha-2) (optional)
+
+speed (float/str): the maximum speed allowed
+
+sped_unit (str): unit of the speed, can be 'm/s','mph,'kph'
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_type(self,road_type,s = 0,country=None,speed=None,speed_unit=&#39;m/s&#39;):
+    &#34;&#34;&#34; adds a type to the road (not to mix with junction or not as the init)
+
+        Parameters
+        ----------
+            road_type (RoadType): the type of road
+
+            s (float): the distance where it starts
+                Default: 0
+
+            country (str): country code (should follow ISO 3166-1,alpha-2) (optional)
+
+            speed (float/str): the maximum speed allowed
+
+            sped_unit (str): unit of the speed, can be &#39;m/s&#39;,&#39;mph,&#39;kph&#39;
+    &#34;&#34;&#34;
+    self.types.append(_Type(road_type,s,country,speed,speed_unit))</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.opendrive.Road.get_attributes"><code class="name flex">
+<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the attributes as a dict of the Road</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_attributes(self):
+    &#34;&#34;&#34; returns the attributes as a dict of the Road
+
+    &#34;&#34;&#34;
+    retdict = {}
+    if self.name:
+        retdict[&#39;name&#39;] = self.name
+    if self.rule:
+        retdict[&#39;rule&#39;] = self.rule
+    retdict[&#39;id&#39;] = str(self.id)
+    retdict[&#39;junction&#39;] = str(self.road_type)
+    retdict[&#39;length&#39;] = str(self.planview.get_total_length())
+    return retdict</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.opendrive.Road.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the elementTree of the FileHeader</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self):
+    &#34;&#34;&#34; returns the elementTree of the FileHeader
+
+    &#34;&#34;&#34;
+    element = ET.Element(&#39;road&#39;,attrib=self.get_attributes())
+    element.append(self.links.get_element())
+    if self.types:
+        for r in self.types:
+            element.append(r.get_element())
+    element.append(self.planview.get_element())
+    element.append(self.elevationprofile.get_element())
+    element.append(self.lateralprofile.get_element())
+    element.append(self.lanes.get_element())
+    if len(self.objects) &gt; 0:
+        objectselement = ET.SubElement(element,&#39;objects&#39;)
+        for road_object in self.objects:
+            objectselement.append(road_object.get_element())        
+    if len(self.signals) &gt; 0:
+        signalselement = ET.SubElement(element,&#39;signals&#39;)
+        for signal in self.signals:
+            signalselement.append(signal.get_element())
+    return element</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.opendrive.Road.get_end_point"><code class="name flex">
+<span>def <span class="ident">get_end_point</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>get the x, y, and heading, of the end of the road</p>
+<h2 id="return">Return</h2>
+<pre><code>x (float): the end x coordinate
+y (float): the end y coordinate
+h (float): the end heading
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_end_point(self):
+    &#34;&#34;&#34; get the x, y, and heading, of the end of the road
+
+        Return
+        ------
+            x (float): the end x coordinate
+            y (float): the end y coordinate
+            h (float): the end heading
+
+    &#34;&#34;&#34;
+    return self.planview.present_x, self.planview.present_y, self.planview.present_h</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="scenariogeneration.xodr" href="index.html">scenariogeneration.xodr</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="scenariogeneration.xodr.opendrive.OpenDrive" href="#scenariogeneration.xodr.opendrive.OpenDrive">OpenDrive</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xodr.opendrive.OpenDrive.add_junction" href="#scenariogeneration.xodr.opendrive.OpenDrive.add_junction">add_junction</a></code></li>
+<li><code><a title="scenariogeneration.xodr.opendrive.OpenDrive.add_road" href="#scenariogeneration.xodr.opendrive.OpenDrive.add_road">add_road</a></code></li>
+<li><code><a title="scenariogeneration.xodr.opendrive.OpenDrive.adjust_roads_and_lanes" href="#scenariogeneration.xodr.opendrive.OpenDrive.adjust_roads_and_lanes">adjust_roads_and_lanes</a></code></li>
+<li><code><a title="scenariogeneration.xodr.opendrive.OpenDrive.adjust_startpoints" href="#scenariogeneration.xodr.opendrive.OpenDrive.adjust_startpoints">adjust_startpoints</a></code></li>
+<li><code><a title="scenariogeneration.xodr.opendrive.OpenDrive.get_element" href="#scenariogeneration.xodr.opendrive.OpenDrive.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xodr.opendrive.OpenDrive.write_xml" href="#scenariogeneration.xodr.opendrive.OpenDrive.write_xml">write_xml</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xodr.opendrive.Road" href="#scenariogeneration.xodr.opendrive.Road">Road</a></code></h4>
+<ul class="two-column">
+<li><code><a title="scenariogeneration.xodr.opendrive.Road.add_elevation" href="#scenariogeneration.xodr.opendrive.Road.add_elevation">add_elevation</a></code></li>
+<li><code><a title="scenariogeneration.xodr.opendrive.Road.add_neighbor" href="#scenariogeneration.xodr.opendrive.Road.add_neighbor">add_neighbor</a></code></li>
+<li><code><a title="scenariogeneration.xodr.opendrive.Road.add_object" href="#scenariogeneration.xodr.opendrive.Road.add_object">add_object</a></code></li>
+<li><code><a title="scenariogeneration.xodr.opendrive.Road.add_object_roadside" href="#scenariogeneration.xodr.opendrive.Road.add_object_roadside">add_object_roadside</a></code></li>
+<li><code><a title="scenariogeneration.xodr.opendrive.Road.add_predecessor" href="#scenariogeneration.xodr.opendrive.Road.add_predecessor">add_predecessor</a></code></li>
+<li><code><a title="scenariogeneration.xodr.opendrive.Road.add_shape" href="#scenariogeneration.xodr.opendrive.Road.add_shape">add_shape</a></code></li>
+<li><code><a title="scenariogeneration.xodr.opendrive.Road.add_signal" href="#scenariogeneration.xodr.opendrive.Road.add_signal">add_signal</a></code></li>
+<li><code><a title="scenariogeneration.xodr.opendrive.Road.add_successor" href="#scenariogeneration.xodr.opendrive.Road.add_successor">add_successor</a></code></li>
+<li><code><a title="scenariogeneration.xodr.opendrive.Road.add_superelevation" href="#scenariogeneration.xodr.opendrive.Road.add_superelevation">add_superelevation</a></code></li>
+<li><code><a title="scenariogeneration.xodr.opendrive.Road.add_type" href="#scenariogeneration.xodr.opendrive.Road.add_type">add_type</a></code></li>
+<li><code><a title="scenariogeneration.xodr.opendrive.Road.get_attributes" href="#scenariogeneration.xodr.opendrive.Road.get_attributes">get_attributes</a></code></li>
+<li><code><a title="scenariogeneration.xodr.opendrive.Road.get_element" href="#scenariogeneration.xodr.opendrive.Road.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xodr.opendrive.Road.get_end_point" href="#scenariogeneration.xodr.opendrive.Road.get_end_point">get_end_point</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.0</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>
