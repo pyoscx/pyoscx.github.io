@@ -76,7 +76,13 @@ class _Links():
 
         &#34;&#34;&#34;
         if link in self.links:
-            warnings.warn(&#39;Multiple links of the same type is detected, this might cause problems. Using the first one created. &#39;,UserWarning)
+            warnings.warn(&#39;Multiple identical links is detected, this might cause problems. Using the first one created. &#39;,UserWarning)
+        elif any([link.link_type == x.link_type for x in self.links]):
+            warnings.warn(&#39;Multiple links of the same link_type: &#39; + link.link_type + &#39; is detected, this might cause problems, overwriting the old one. &#39;,UserWarning)
+            for l in self.links:
+                if l == link.link_type:
+                    self.links.remove(l)
+            self.links.append(link)
         else:
             self.links.append(link)
 

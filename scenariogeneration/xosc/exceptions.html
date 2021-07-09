@@ -38,6 +38,22 @@ class NoActionsDefinedError(Exception):
 class NoCatalogFoundError(Exception):
     &#34;&#34;&#34; Raised when no catalog is found with the given name
     &#34;&#34;&#34;
+    pass
+
+class OpenSCENARIOVersionError(Exception):
+    &#34;&#34;&#34; Raised when trying to use features from a newer version of OpenSCENARIO than the desiered version
+    &#34;&#34;&#34;
+    pass
+
+class ToManyOptionalArguments(Exception):
+    &#34;&#34;&#34; Raised when one of the needed &#34;optional&#34; inputs are not used
+    &#34;&#34;&#34;
+    pass
+
+
+class NotEnoughInputArguments(Exception):
+    &#34;&#34;&#34; Raised when one of the needed &#34;optional&#34; inputs are not used
+    &#34;&#34;&#34;
     pass</code></pre>
 </details>
 </section>
@@ -92,6 +108,69 @@ class NoCatalogFoundError(Exception):
 <li>builtins.BaseException</li>
 </ul>
 </dd>
+<dt id="scenariogeneration.xosc.exceptions.NotEnoughInputArguments"><code class="flex name class">
+<span>class <span class="ident">NotEnoughInputArguments</span></span>
+<span>(</span><span>...)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Raised when one of the needed "optional" inputs are not used</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class NotEnoughInputArguments(Exception):
+    &#34;&#34;&#34; Raised when one of the needed &#34;optional&#34; inputs are not used
+    &#34;&#34;&#34;
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="scenariogeneration.xosc.exceptions.OpenSCENARIOVersionError"><code class="flex name class">
+<span>class <span class="ident">OpenSCENARIOVersionError</span></span>
+<span>(</span><span>...)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Raised when trying to use features from a newer version of OpenSCENARIO than the desiered version</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class OpenSCENARIOVersionError(Exception):
+    &#34;&#34;&#34; Raised when trying to use features from a newer version of OpenSCENARIO than the desiered version
+    &#34;&#34;&#34;
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="scenariogeneration.xosc.exceptions.ToManyOptionalArguments"><code class="flex name class">
+<span>class <span class="ident">ToManyOptionalArguments</span></span>
+<span>(</span><span>...)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Raised when one of the needed "optional" inputs are not used</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ToManyOptionalArguments(Exception):
+    &#34;&#34;&#34; Raised when one of the needed &#34;optional&#34; inputs are not used
+    &#34;&#34;&#34;
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
 </dl>
 </section>
 </article>
@@ -113,6 +192,15 @@ class NoCatalogFoundError(Exception):
 </li>
 <li>
 <h4><code><a title="scenariogeneration.xosc.exceptions.NoCatalogFoundError" href="#scenariogeneration.xosc.exceptions.NoCatalogFoundError">NoCatalogFoundError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xosc.exceptions.NotEnoughInputArguments" href="#scenariogeneration.xosc.exceptions.NotEnoughInputArguments">NotEnoughInputArguments</a></code></h4>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xosc.exceptions.OpenSCENARIOVersionError" href="#scenariogeneration.xosc.exceptions.OpenSCENARIOVersionError">OpenSCENARIOVersionError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xosc.exceptions.ToManyOptionalArguments" href="#scenariogeneration.xosc.exceptions.ToManyOptionalArguments">ToManyOptionalArguments</a></code></h4>
 </li>
 </ul>
 </li>

@@ -25,21 +25,30 @@
 <p>This user guide is ment for the package itself, not OpenSCENARIO nor OpenDRIVE, for more in depth documentation about the standards, please visit <a href="www.asam.net">ASAM</a>. </p>
 <p>Please note that this is not an official implementation of either OpenSCENARIO or OpenDRIVE. </p>
 <h1 id="introduction">Introduction</h1>
-<p>The package consists of the two main modules, <strong>xosc</strong> (OpenSCENARIO), and <strong>xodr</strong> (OpenDRIVE), together with some support functionality for
-auto generation with parametrization (ScenarioGenerator) as well as easy viewing with <a href="https://github.com/esmini/esmini">esmini</a>.</p>
+<p>The package consists of the two main modules, <strong>xosc</strong> (OpenSCENARIO), and <strong>xodr</strong> (OpenDRIVE), together with some support functionality for auto generation with parametrization (ScenarioGenerator) as well as easy viewing with <a href="https://github.com/esmini/esmini">esmini</a>.</p>
 <p>For detailed information about the packages please see the <a href="scenariogeneration/index.html">documentation</a> page, where the submodules are described. </p>
 <p>For more indepth exampels, please see the <a href="examples/index.html">exampels</a> page. The exampels can also be found on the <a href="https://github.com/pyoscx/scenariogeneration/tree/main/examples">github</a> page.</p>
+<p>For more detailed view of the new updates, please see the <a href="https://github.com/pyoscx/scenariogeneration/blob/main/release_notes.md">release notes</a></p>
 <h1 id="the-modules">The modules</h1>
 <h2 id="xosc">xosc</h2>
-<p>The <strong>xosc</strong> module handles the parts related to OpenSCENARIO, and covers all of OpenSCENARIO (V 1.0.0). The module is a xml file generator which allows the user to easily generate a full OpenSCENARIO hierarchy without the need of explicity define all the levels of abstraction (if not needed). This has led to a couple of name changes compared to the standard (mostly adding Absolute or Relative to the name), in the description of the class, the OpenSCENARIO references are written for reference.
+<p>The <strong>xosc</strong> module handles the parts related to OpenSCENARIO, and covers all of OpenSCENARIO V 1.0.0 and most of OpenSCENARIO V 1.1.0 (except the parts related to ParameterValueDistributionDefinition). The module is a xml file generator which allows the user to easily generate a full OpenSCENARIO hierarchy without the need of explicity define all the levels of abstraction (if not needed). This has led to a couple of name changes compared to the standard (mostly adding Absolute or Relative to the name), in the description of the class, the OpenSCENARIO references are written for reference.
 </p>
 <p>The idea with this module is to create easy access to the elements of OpenSCENARIO without having to expose the user to all the xml levels that does not carry any vital information for the user. Hence, some of the xml-elements that build up OpenSCENARIO are never seen in the class structure but compressed to a level where the user can set the required data. </p>
+<p>The module can generate xmls of both V1.0.0 and V1.1.0 of OpenSCENARIO.</p>
 <p>In general the <strong>xosc</strong> module does not contain many "smart" functionality (except some default values), but the user can build up the scenario based on the classes available. </p>
 <h3 id="automatic-generation-of-story-act-and-maneuvergroup">Automatic generation of Story, Act, and ManeuverGroup</h3>
 <p>One of the few functionalities of the <strong>xosc</strong> module is for simple scenario generation and to create the <strong>StoryBoard</strong>.</p>
 <p>In short the <strong>StoryBoard</strong>, consists of alot of layers from the Story, down to the Actions and Triggers.
 For simple scenarios the multiple top level layers (like Story, Act or ManeuverGroup) are not needed, hence the <strong>StoryBoard</strong> has multiple ways of adding sub-classes (add_story, add_act, add_maneuvergroup, add_maneuver) and will generate the top levels to make the xml correct.</p>
 <p><strong>NOTE:</strong> Do not use more than one of these calls (except add_story), because each call will create a new story, and this in most cases are not what a user would like.</p>
+<h3 id="generate-different-versions-of-openscenario">Generate different versions of OpenSCENARIO</h3>
+<p>As of scenariogeneration V0.5.0, it is possible to generate different versions of the resulting OpenSCENARIO xml.
+This feature is enabled by one simple input to the Scenario class as:</p>
+<pre><code>sce = Scenario(... , osc_minor_version=0)
+</code></pre>
+<p>The default is 1 (V1.1.0), but with this V1.0.0 OpenSCENARIO xmls can be generated. </p>
+<p>The V1.1.0 will remove the depricated attributes, and have a pure V1.1.0 xml. If version specific elements are used together with the wrong version, a <strong>OpenSCENARIOVersionError</strong> will be raised. </p>
+<p>NOTE: as of V0.5.0 some interfaces had to be changed in order to fulfill the V1.1.0 standard, please see the <a href="https://github.com/pyoscx/scenariogeneration/blob/main/release_notes.md">release notes</a> for more info.</p>
 <h2 id="xodr">xodr</h2>
 <p>The xodr module handles the part related to OpenDrive, and does not (as of now) have a full coverage of the standard, please see <a href="https://github.com/pyoscx/scenariogeneration/blob/main/xodr_coverage.txt">coverage</a> for more information. </p>
 <p>The <strong>xodr</strong> module is also a xml generator, similar to the <strong>xosc</strong> module. However, since opendrive is more complicated to create a functional road-network, it includes a number of automation algorithms which allow the user to easily generate a correct OpenDRIVE hierarchy. As a matter of fact the OpenDRIVE standard contains many geometrical dependencies, indexing, and complex structures, that to create the xml directly is quite cumbersome. Hence, it is highly recommended to use the automations and "generators" included in the package. In the examples, both "generator" level (<a href="examples/xodr/full_junction.html">full_junction</a>, <a href="examples/xodr/highway_example.html">highway_example</a>, and <a href="examples/xodr/simple_road_with_objects.html">simple_road_with_objects</a>) and low level examples (as <a href="examples/xodr/junction_trippel_twoway.html">junction_trippel_twoway</a>, <a href="examples/xodr/multiple_geometries_one_road.html">multiple_geometries_one_road</a> and <a href="exampels/xodr/road_merge_w_lane_merge.html">road_merge_w_lane_merge</a> ) are presented. </p>
@@ -123,6 +132,7 @@ To connect the scenario and the generated road, create the RoadNetwork object in
 <li><a href="#the-modules">The modules</a><ul>
 <li><a href="#xosc">xosc</a><ul>
 <li><a href="#automatic-generation-of-story-act-and-maneuvergroup">Automatic generation of Story, Act, and ManeuverGroup</a></li>
+<li><a href="#generate-different-versions-of-openscenario">Generate different versions of OpenSCENARIO</a></li>
 </ul>
 </li>
 <li><a href="#xodr">xodr</a><ul>

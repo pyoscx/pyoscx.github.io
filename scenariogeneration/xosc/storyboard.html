@@ -35,7 +35,7 @@ from .actions import _Action, _ActionType, _PrivateActionType
 from .triggers import EmptyTrigger, ValueTrigger, SimulationTimeCondition
 from .utils import EntityRef, _TriggerType, _EntityTriggerType, _ValueTriggerType
 from .utils import ParameterDeclarations, CatalogFile, convert_bool
-from .enumerations import Priority, Rule, ConditionEdge
+from .enumerations import Priority, Rule, ConditionEdge, VersionBase
 
 
 
@@ -815,7 +815,7 @@ class Maneuver():
 
         return element
 
-class Event():
+class Event(VersionBase):
     &#34;&#34;&#34; the Event class creates the event of OpenScenario
         
         Parameters
@@ -856,7 +856,7 @@ class Event():
     &#34;&#34;&#34;
     def __init__(self,name,priority,maxexecution=1):
         self.name = name
-        if priority not in Priority:
+        if not hasattr(Priority,str(priority)):
             ValueError(&#39;Not a valid priority&#39;)
         self.priority = priority
         self.action = []
@@ -903,7 +903,7 @@ class Event():
         &#34;&#34;&#34; returns the attributes as a dict of the Event
 
         &#34;&#34;&#34;
-        return {&#39;name&#39;:self.name,&#39;priority&#39;:self.priority.name,&#39;maximumExecutionCount&#39;:str(self.maxexecution)}
+        return {&#39;name&#39;:self.name,&#39;priority&#39;:self.priority.get_name(),&#39;maximumExecutionCount&#39;:str(self.maxexecution)}
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the Event
@@ -911,14 +911,14 @@ class Event():
         &#34;&#34;&#34;
         if not self.action:
             raise ValueError(&#39;no action(s) set&#39;)
-        if not self.trigger:
+        if self.isVersion(minor=0) and not self.trigger:
             raise ValueError(&#39;no trigger set&#39;)
 
         element = ET.Element(&#39;Event&#39;,attrib=self.get_attributes())
         for action in self.action:
             element.append(action.get_element())
-
-        element.append(self.trigger.get_element())
+        if self.trigger:
+            element.append(self.trigger.get_element())
         return element</code></pre>
 </details>
 </section>
@@ -1195,7 +1195,7 @@ get_attributes()
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Event():
+<pre><code class="python">class Event(VersionBase):
     &#34;&#34;&#34; the Event class creates the event of OpenScenario
         
         Parameters
@@ -1236,7 +1236,7 @@ get_attributes()
     &#34;&#34;&#34;
     def __init__(self,name,priority,maxexecution=1):
         self.name = name
-        if priority not in Priority:
+        if not hasattr(Priority,str(priority)):
             ValueError(&#39;Not a valid priority&#39;)
         self.priority = priority
         self.action = []
@@ -1283,7 +1283,7 @@ get_attributes()
         &#34;&#34;&#34; returns the attributes as a dict of the Event
 
         &#34;&#34;&#34;
-        return {&#39;name&#39;:self.name,&#39;priority&#39;:self.priority.name,&#39;maximumExecutionCount&#39;:str(self.maxexecution)}
+        return {&#39;name&#39;:self.name,&#39;priority&#39;:self.priority.get_name(),&#39;maximumExecutionCount&#39;:str(self.maxexecution)}
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the Event
@@ -1291,16 +1291,20 @@ get_attributes()
         &#34;&#34;&#34;
         if not self.action:
             raise ValueError(&#39;no action(s) set&#39;)
-        if not self.trigger:
+        if self.isVersion(minor=0) and not self.trigger:
             raise ValueError(&#39;no trigger set&#39;)
 
         element = ET.Element(&#39;Event&#39;,attrib=self.get_attributes())
         for action in self.action:
             element.append(action.get_element())
-
-        element.append(self.trigger.get_element())
+        if self.trigger:
+            element.append(self.trigger.get_element())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.storyboard.Event.add_action"><code class="name flex">
@@ -1370,7 +1374,7 @@ get_attributes()
     &#34;&#34;&#34; returns the attributes as a dict of the Event
 
     &#34;&#34;&#34;
-    return {&#39;name&#39;:self.name,&#39;priority&#39;:self.priority.name,&#39;maximumExecutionCount&#39;:str(self.maxexecution)}</code></pre>
+    return {&#39;name&#39;:self.name,&#39;priority&#39;:self.priority.get_name(),&#39;maximumExecutionCount&#39;:str(self.maxexecution)}</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xosc.storyboard.Event.get_element"><code class="name flex">
@@ -1388,14 +1392,14 @@ get_attributes()
     &#34;&#34;&#34;
     if not self.action:
         raise ValueError(&#39;no action(s) set&#39;)
-    if not self.trigger:
+    if self.isVersion(minor=0) and not self.trigger:
         raise ValueError(&#39;no trigger set&#39;)
 
     element = ET.Element(&#39;Event&#39;,attrib=self.get_attributes())
     for action in self.action:
         element.append(action.get_element())
-
-    element.append(self.trigger.get_element())
+    if self.trigger:
+        element.append(self.trigger.get_element())
     return element</code></pre>
 </details>
 </dd>

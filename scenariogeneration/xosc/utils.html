@@ -29,33 +29,36 @@
 
 &#34;&#34;&#34;
 import os
+from .exceptions import OpenSCENARIOVersionError
 import xml.etree.ElementTree as ET
 from .helpers import printToFile
 
-from .enumerations import ParameterType, Rule, ReferenceContext, DynamicsShapes, DynamicsDimension, RouteStrategy,XSI,XMLNS, VehicleCategory,PrecipitationType,CloudState
+from .enumerations import ParameterType, Rule, ReferenceContext, DynamicsShapes, DynamicsDimension, RouteStrategy,XSI,XMLNS, VehicleCategory,PrecipitationType,CloudState, VersionBase
 import datetime as dt
 
-class _PositionType():
+
+
+class _PositionType(VersionBase):
     &#34;&#34;&#34; helper class for typesetting
     &#34;&#34;&#34;
     pass
 
-class _TriggerType():
+class _TriggerType(VersionBase):
     &#34;&#34;&#34; helper class for typesetting
     &#34;&#34;&#34;
     pass
 
-class _ValueTriggerType():
+class _ValueTriggerType(VersionBase):
     &#34;&#34;&#34; helper class for typesetting
     &#34;&#34;&#34;
     pass
 
-class _EntityTriggerType():
+class _EntityTriggerType(VersionBase):
     &#34;&#34;&#34; helper class for typesetting
     &#34;&#34;&#34;
     pass
 
-class ParameterDeclarations():
+class ParameterDeclarations(VersionBase):
     &#34;&#34;&#34; The ParameterDeclarations class creates the ParameterDeclaration of OpenScenario
                     
         Attributes
@@ -105,7 +108,7 @@ class ParameterDeclarations():
             element.append(p.get_element())
         return element
 
-class EntityRef():
+class EntityRef(VersionBase):
     &#34;&#34;&#34; EntityRef creates an EntityRef element of openscenario
         
         Parameters
@@ -153,7 +156,7 @@ class EntityRef():
         &#34;&#34;&#34;
         return ET.Element(&#39;EntityRef&#39;,attrib=self.get_attributes())
 
-class Parameter():
+class Parameter(VersionBase):
     &#34;&#34;&#34; Parameter is a declaration of a ParameterDeclaration for declarations
         
         Parameters
@@ -197,7 +200,7 @@ class Parameter():
 
         &#34;&#34;&#34;
         self.name = name
-        if parameter_type not in ParameterType:
+        if not hasattr(ParameterType,str(parameter_type)):
             raise ValueError(&#39;parameter_type not a valid type.&#39;)
         self.parameter_type = parameter_type
         self.value = value
@@ -212,7 +215,7 @@ class Parameter():
         &#34;&#34;&#34; returns the attributes of the Parameter as a dict
 
         &#34;&#34;&#34;
-        return {&#39;name&#39;:self.name,&#39;parameterType&#39;:self.parameter_type.name,&#39;value&#39;:str(self.value)}
+        return {&#39;name&#39;:self.name,&#39;parameterType&#39;:self.parameter_type.get_name(),&#39;value&#39;:str(self.value)}
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the Parameter
@@ -221,7 +224,7 @@ class Parameter():
         element = ET.Element(&#39;ParameterDeclaration&#39;,attrib=self.get_attributes())
         return element
 
-class Orientation():
+class Orientation(VersionBase):
     &#34;&#34;&#34; Orientation describes the angular orientation of an entity
         
         Parameters
@@ -272,7 +275,7 @@ class Orientation():
         self.h = h
         self.p = p
         self.r = r
-        if reference is not None and reference not in ReferenceContext:
+        if reference is not None and not hasattr(ReferenceContext,str(reference)):
             raise TypeError(&#39;reference input is not of type ReferenceContext&#39;)
         self.ref = reference
 
@@ -308,7 +311,7 @@ class Orientation():
             retdict[&#39;r&#39;] = str(self.r)
 
         if self.ref:
-            retdict[&#39;type&#39;] = self.ref.name
+            retdict[&#39;type&#39;] = self.ref.get_name()
         
         return retdict
     
@@ -318,7 +321,7 @@ class Orientation():
         &#34;&#34;&#34;
         return ET.Element(&#39;Orientation&#39;,attrib=self.get_attributes())
 
-class TransitionDynamics():
+class TransitionDynamics(VersionBase):
     &#34;&#34;&#34; TransitionDynamics is used to define how the dynamics of a change
         
         Parameters
@@ -358,11 +361,11 @@ class TransitionDynamics():
                 value (float): the value of the dynamics (time rate or distance)
 
         &#34;&#34;&#34;
-        if shape not in DynamicsShapes:
+        if not hasattr(DynamicsShapes,str(shape)):
             raise TypeError(shape + &#39;; is not a valid shape.&#39;)
         
         self.shape = shape
-        if dimension not in DynamicsDimension:
+        if not hasattr(DynamicsDimension,str(dimension)):
             raise ValueError(dimension + &#39; is not a valid dynamics dimension&#39;)
         self.dimension = dimension
         self.value = value
@@ -377,7 +380,7 @@ class TransitionDynamics():
         &#34;&#34;&#34; returns the attributes of the TransitionDynamics as a dict
 
         &#34;&#34;&#34;
-        return {&#39;dynamicsShape&#39;:self.shape.name,&#39;value&#39;:str(self.value),&#39;dynamicsDimension&#39;:self.dimension.name}
+        return {&#39;dynamicsShape&#39;:self.shape.get_name(),&#39;value&#39;:str(self.value),&#39;dynamicsDimension&#39;:self.dimension.get_name()}
 
     def get_element(self,name=&#39;TransitionDynamics&#39;):
         &#34;&#34;&#34; returns the elementTree of the TransitionDynamics
@@ -385,7 +388,7 @@ class TransitionDynamics():
         &#34;&#34;&#34;
         return ET.Element(name,self.get_attributes())
 
-class DynamicsConstrains():
+class DynamicsConstrains(VersionBase):
     &#34;&#34;&#34; DynamicsConstrains is used by triggers
         
         Parameters
@@ -464,7 +467,7 @@ class DynamicsConstrains():
         return ET.Element(name,attrib=self.get_attributes())
 
 
-class Route():
+class Route(VersionBase):
     &#34;&#34;&#34; the Route class creates a route, needs atleast two waypoints to be valid
         
         Parameters
@@ -610,7 +613,7 @@ class Route():
             element.append(w.get_element())
         return element
 
-class Waypoint():
+class Waypoint(VersionBase):
     &#34;&#34;&#34; the Route class creates a route, needs atleast two waypoints to be valid
         
         Parameters
@@ -648,7 +651,7 @@ class Waypoint():
         if not isinstance(position,_PositionType):
             raise TypeError(&#39;position input not a valid Position&#39;)
         self.position = position
-        if routestrategy not in RouteStrategy:
+        if not hasattr(RouteStrategy,str(routestrategy)):
             ValueError(&#39;not a valid RouteStrategy&#39;)
         self.routestrategy = routestrategy
 
@@ -662,7 +665,7 @@ class Waypoint():
         &#34;&#34;&#34; returns the attributes of the Waypoint as a dict
 
         &#34;&#34;&#34;
-        return {&#39;routeStrategy&#39;:self.routestrategy.name}
+        return {&#39;routeStrategy&#39;:self.routestrategy.get_name()}
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the Waypoint
@@ -673,7 +676,7 @@ class Waypoint():
         return element
 
 
-class Trajectory():
+class Trajectory(VersionBase):
     &#34;&#34;&#34; the Trajectory class creates a Trajectory, 
         
         Parameters
@@ -817,7 +820,7 @@ class Trajectory():
         return element
 
 
-class TimeReference():
+class TimeReference(VersionBase):
     &#34;&#34;&#34; the TimeReference class creates a TimeReference, 
         
         Parameters
@@ -866,7 +869,7 @@ class TimeReference():
             self._only_nones = False
         else:
             raise ValueError(&#39;missing inputs for time reference&#39;)
-        if reference_domain is not None and reference_domain not in ReferenceContext:
+        if reference_domain is not None and not hasattr(ReferenceContext,str(reference_domain)):
             raise TypeError(&#39;input reference_domain is not of type ReferenceContext&#39;)
         
         self.reference_domain = reference_domain
@@ -887,7 +890,7 @@ class TimeReference():
 
         &#34;&#34;&#34;
         retdict = {}
-        retdict[&#39;domainAbsoluteRelative&#39;] = self.reference_domain.name
+        retdict[&#39;domainAbsoluteRelative&#39;] = self.reference_domain.get_name()
         retdict[&#39;scale&#39;] = str(self.scale)
         retdict[&#39;offset&#39;] = str(self.offset)
         return retdict
@@ -905,7 +908,7 @@ class TimeReference():
         
         return element
 
-class Polyline():
+class Polyline(VersionBase):
     &#34;&#34;&#34; the Polyline class creates a polyline of (minimum 2) positions
         
         Parameters
@@ -932,7 +935,7 @@ class Polyline():
 
             Parameters
             ----------
-                time (list of double): a list of timings for the positions
+                time (list of double): a list of timings for the positions (as of OpenSCENARIO V1.1 this can be empty)
 
                 positions (list of positions): list of positions to create the polyline
 
@@ -960,12 +963,15 @@ class Polyline():
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;Polyline&#39;)
-        for i in range(len(self.time)):
-            vert = ET.SubElement(element,&#39;Vertex&#39;,attrib={&#39;time&#39;:str(self.time[i])})
+        for i in range(len(self.positions)):
+            time_dict = {}
+            if self.time:
+                time_dict = {&#39;time&#39;:str(self.time[i])}
+            vert = ET.SubElement(element,&#39;Vertex&#39;,attrib=time_dict)
             vert.append(self.positions[i].get_element())
         return element
 
-class Clothoid():
+class Clothoid(VersionBase):
     &#34;&#34;&#34; the Clothoid class creates a Clothoid shape
         
         Parameters
@@ -1050,7 +1056,10 @@ class Clothoid():
         &#34;&#34;&#34;
         retdict = {}
         retdict[&#39;curvature&#39;] = str(self.curvature)
-        retdict[&#39;curvatureDot&#39;] = str(self.curvature_change)
+        if self.isVersion(minor=0):
+            retdict[&#39;curvatureDot&#39;] = str(self.curvature_change)
+        else:
+            retdict[&#39;curvaturePrime&#39;] = str(self.curvature_change)
         retdict[&#39;length&#39;] = str(self.length)
         if self.starttime != None:
             retdict[&#39;startTime&#39;] = str(self.starttime)
@@ -1066,7 +1075,7 @@ class Clothoid():
 
         return element
 
-class ControlPoint():
+class ControlPoint(VersionBase):
     &#34;&#34;&#34; the ControlPoint class is used by Nurbs to define points 
         
         Parameters
@@ -1143,7 +1152,7 @@ class ControlPoint():
         element.append(self.position.get_element())
         return element
 
-class Nurbs():
+class Nurbs(VersionBase):
     &#34;&#34;&#34; the Nurbs class creates a Nurbs shape
         
         Parameters
@@ -1239,9 +1248,84 @@ class Nurbs():
         return element
 
 
+class License(VersionBase):
+    &#34;&#34;&#34; License creates the License used by FileHeader in the OpenScenario file 
+        (valid from OpenSCENARIO V1.1)
+        
+        Parameters
+        ----------
+            name (str): name of the License
 
+            resource (str): link to URL
+                Default: None
 
-class FileHeader():
+            spdxId (str): license identifier
+                Default: None
+
+        Attributes
+        ----------
+            name (str): name of the License
+
+            resource (str): link to URL
+                
+            spdxId (str): license identifier
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of FileHeader
+
+            get_attributes()
+                Returns a dictionary of all attributes of FileHeader
+
+    &#34;&#34;&#34;
+    def __init__(self,name,resource=None,spdxId=None):
+        &#34;&#34;&#34; init the License
+        
+        Parameters
+        ----------
+            name (str): name of the License
+
+            resource (str): link to URL
+                Default: None
+
+            spdxId (str): license identifier
+                Default: None
+        &#34;&#34;&#34;
+        self.name = name
+        self.resource = resource
+        self._revMajor = 1
+        self.spdxId = spdxId
+        
+    def __eq__(self,other):
+        if isinstance(other,License):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes as a dict of the License
+
+        &#34;&#34;&#34;
+        retdict = {}
+        retdict[&#39;name&#39;] = self.name
+        if self.resource:
+            retdict[&#39;resource&#39;] = self.resource
+        if self.spdxId:
+            retdict[&#39;spdxId&#39;] = self.spdxId
+        return retdict
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the License
+
+        &#34;&#34;&#34;
+        if self.isVersion(0):
+            raise OpenSCENARIOVersionError(&#39;License was introduced in OpenSCENARIO V1.1&#39;)
+        element = ET.Element(&#39;License&#39;,attrib=self.get_attributes())
+
+        return element
+
+class FileHeader(VersionBase):
     &#34;&#34;&#34; FileHeader creates the header of the OpenScenario file
         
         Parameters
@@ -1249,6 +1333,12 @@ class FileHeader():
             name (str): name of the scenario 
 
             author (str): the author of the scenario
+
+            revMinor (int): the minor revision of the standard
+                Default: 1
+
+            license (License): license (valid from OpenSCENARIO V1.1)
+                Default: None
 
         Attributes
         ----------
@@ -1265,12 +1355,15 @@ class FileHeader():
                 Returns a dictionary of all attributes of FileHeader
 
     &#34;&#34;&#34;
-    def __init__(self,name,author):
+    def __init__(self,name,author,revMinor=1,license=None):
         self.name = name
         self.author = author
         self._revMajor = 1
-        self._revMinor = 0
-        
+        self._revMinor = revMinor
+        self.version_minor = revMinor
+        if license and not isinstance(license,License):
+            raise TypeError(&#39;license is not of type License&#39;)
+        self.license = license
     def __eq__(self,other):
         if isinstance(other,FileHeader):
             if self.name == other.name and \
@@ -1292,12 +1385,13 @@ class FileHeader():
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;FileHeader&#39;,attrib=self.get_attributes())
-
+        if self.license:
+            element.append(self.license.get_element())
         return element
 
 
 
-class _TrafficSignalState():
+class _TrafficSignalState(VersionBase):
     &#34;&#34;&#34; crates a _TrafficSignalState used by Phase
         
         Parameters
@@ -1360,7 +1454,7 @@ class _TrafficSignalState():
         
 
     
-class Phase():
+class Phase(VersionBase):
     &#34;&#34;&#34; crates a Traffic light phase
         
         Parameters
@@ -1441,7 +1535,7 @@ class Phase():
         return element
 
 
-class TrafficSignalController():
+class TrafficSignalController(VersionBase):
     &#34;&#34;&#34; the TrafficSignalController class creates a polyline of (minimum 2) positions
         
         Parameters
@@ -1536,7 +1630,7 @@ class TrafficSignalController():
 
 
 
-class TrafficDefinition():
+class TrafficDefinition(VersionBase):
     &#34;&#34;&#34; the TrafficDefinition class creates a TrafficDefinition used by the different TrafficActions
         
         Parameters
@@ -1609,7 +1703,7 @@ class TrafficDefinition():
                 weight (float): the corresponding weight for the distribution of the vehicle category
 
         &#34;&#34;&#34;
-        if vehiclecategory not in VehicleCategory:
+        if not hasattr(VehicleCategory,str(vehiclecategory)):
             raise TypeError(&#39;vehcilecategory input is not of type VehcileCategory&#39;)
         self.vehiclecategories.append(vehiclecategory)
         self.vehicleweights.append(weight)
@@ -1650,7 +1744,7 @@ class TrafficDefinition():
         
         veh_element = ET.SubElement(element,&#39;VehicleCategoryDistribution&#39;)
         for i in range(len(self.vehiclecategories)):
-            ET.SubElement(veh_element,&#39;VehicleCategoryDistributionEntry&#39;,attrib={&#39;category&#39;: self.vehiclecategories[i].name,&#39;weight&#39;: str(self.vehicleweights[i])})
+            ET.SubElement(veh_element,&#39;VehicleCategoryDistributionEntry&#39;,attrib={&#39;category&#39;: self.vehiclecategories[i].get_name(),&#39;weight&#39;: str(self.vehicleweights[i])})
 
         cnt_element = ET.SubElement(element,&#39;ControllerDistribution&#39;)
         for i in range(len(self.controllers)):
@@ -1662,7 +1756,7 @@ class TrafficDefinition():
 
 
 
-class CatalogFile():
+class CatalogFile(VersionBase):
     &#34;&#34;&#34; The CatalogFile class handles any catalogs in open scenario, such as writing, and updating them
         
         Parameters
@@ -1767,7 +1861,7 @@ class CatalogFile():
         &#34;&#34;&#34;
         printToFile(self.catalog_element,self.filename,self.prettyprint)
 
-class Catalog():
+class Catalog(VersionBase):
     &#34;&#34;&#34; The Catalog class creates the CatalogLocation of the OpenScenario input
         
         Parameters
@@ -1836,7 +1930,7 @@ class Catalog():
             ET.SubElement(tmpel,&#39;Directory&#39;,{&#39;path&#39;: self.catalogs[i]})
         return catloc
 
-class CatalogReference():
+class CatalogReference(VersionBase):
     &#34;&#34;&#34; CatalogReference creates an CatalogReference element of openscenario
         
         Parameters
@@ -1916,7 +2010,7 @@ class CatalogReference():
         
     
 
-class ParameterAssignment():
+class ParameterAssignment(VersionBase):
     &#34;&#34;&#34; ParameterAssignment creates an ParameterAssignment element of openscenario
         
         Parameters
@@ -1976,7 +2070,7 @@ class ParameterAssignment():
         &#34;&#34;&#34;
         return ET.Element(&#39;ParameterAssignment&#39;,attrib=self.get_attributes())
 
-class TimeOfDay():
+class TimeOfDay(VersionBase):
     &#34;&#34;&#34; TimeOfDay creates an TimeOfDay element of openscenario
         
         Parameters
@@ -2070,46 +2164,47 @@ class TimeOfDay():
 
 
 
-class Weather():
+class Weather(VersionBase):
     &#34;&#34;&#34; Weather creates an Weather element of openscenario
         
         Parameters
         ----------
             cloudstate (CloudState): cloudstate of the weather
+                Default: None
 
-            sun_intensity (int): intensity of the sun (in lux)
+            atmosphericPressure (float): atmospheric pressure in Pa (valid from OpenSCENARIO V1.1)
+                Default: None
 
-            sun_azimuth (int): azimuth of the sun 0 north, pi/2 east, pi south, 3/2pi west
+            temperature (float): outside temperature (valid from OpenSCENARIO V1.1)
+                Default: None
 
-            sun_elevation (int): sun elevation angle 0 x/y plane, pi/2 zenith
+            sun (Sun): the sun position
+                Default: None
 
-            precipitation (precipitationType): dry, rain or snow
+            fog (Fog): fot state
+                Default: None
 
-            precipitation_intensity (double): intensity of precipitation (0...1)
+            precipitation (Precipitation): the precipitation state
+                Default: None
 
-            visual_fog_range (int): visual range of fog
-                Default: 100000
-
-            fog_bounding_box (BoundingBox): bounding box of fog
+            wind (Wind): the wind (valid from OpenSCENARIO V1.1)
                 Default: None
 
         Attributes
         ----------
             cloudstate (CloudState): cloudstate of the weather
 
-            sun_intensity (int): intensity of the sun (in lux)
+            atmosphericPressure (float): atmospheric pressure in Pa (valid from OpenSCENARIO V1.1)
 
-            sun_azimuth (int): azimuth of the sun 0 north, pi/2 east, pi south, 3/2pi west
+            temperature (float): outside temperature (valid from OpenSCENARIO V1.1)
 
-            sun_elevation (int): sun elevation angle 0 x/y plane, pi/2 zenith
+            sun (Sun): the sun position
 
-            precipitation (precipitationType): dry, rain or snow
+            fog (Fog): fot state
 
-            precipitation_intensity (double): intensity of precipitation (0...1)
+            precipitation (Precipitation): the precipitation state
 
-            visual_fog_range (int): visual range of fog
-
-            fog_bounding_box (BoundingBox): bounding box of fog
+            wind (Wind): the wind (valid from OpenSCENARIO V1.1)
 
         Methods
         -------
@@ -2121,55 +2216,60 @@ class Weather():
                 Returns a dictionary of all attributes of the class
 
     &#34;&#34;&#34;
-    def __init__(self,cloudstate,sun_intensity,sun_azimuth,sun_elevation,precipitation,precipitation_intensity,visual_fog_range = 100000,fog_bounding_box = None):
+    def __init__(self,cloudstate=None,atmosphericPressure=None,temperature=None,sun=None,fog=None,precipitation=None,wind=None):
         &#34;&#34;&#34; initalize the Weather
 
             Parameters
             ----------
                 cloudstate (CloudState): cloudstate of the weather
+                    Default: None
 
-                sun_intensity (double): intensity of the sun (in lux)
+                atmosphericPressure (float): atmospheric pressure in Pa (valid from OpenSCENARIO V1.1)
+                    Default: None
 
-                sun_azimuth (double): azimuth of the sun 0 north, pi/2 east, pi south, 3/2pi west
+                temperature (float): outside temperature (valid from OpenSCENARIO V1.1)
+                    Default: None
 
-                sun_elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
+                sun (Sun): the sun position
+                    Default: None
 
-                precipitation (PrecipitationType): dry, rain or snow
+                fog (Fog): fot state
+                    Default: None
 
-                precipitation_intensity (double): intensity of precipitation (0...1)
+                precipitation (Precipitation): the precipitation state
+                    Default: None
 
-                visual_fog_range (double): visual range of fog
-                    Default: 100000
-
-                fog_bounding_box (BoundingBox): bounding box of fog
-                    Default: None  
+                wind (Wind): the wind (valid from OpenSCENARIO V1.1)
+                    Default: None
                 
         &#34;&#34;&#34;
-        if cloudstate not in CloudState:
+        if cloudstate and not hasattr(CloudState,str(cloudstate)):
             raise TypeError(&#39;cloudstate input is not of type CloudState&#39;)
-        if precipitation not in PrecipitationType:
-            raise TypeError(&#39;precipitation input is not of type PrecipitationType&#39;)
-        if fog_bounding_box != None and not isinstance(fog_bounding_box, BoundingBox):
-            raise TypeError(&#39;fog_bounding_box input is not of type BoundingBox&#39;)
-        self.cloudstate = cloudstate 
-        self.sun_intensity = sun_intensity
-        self.sun_azimuth = sun_azimuth
-        self.sun_elevation = sun_elevation
+        if precipitation and not isinstance(precipitation,Precipitation):
+            raise TypeError(&#39;precipitation input is not of type Precipitation&#39;)
+        if fog and not isinstance(fog,Fog):
+            raise TypeError(&#39;fog input is not of type Fog&#39;)
+        if wind and not isinstance(wind,Wind):
+            raise TypeError(&#39;wind input is not of type Wind&#39;)
+        if sun and not isinstance(sun,Sun):
+            raise TypeError(&#39;sun input is not of type Sun&#39;)
+
+        self.cloudstate = cloudstate
+        self.atmosphericPressure = atmosphericPressure
+        self.temperature = temperature
+        self.fog = fog
+        self.sun = sun
+        self.wind = wind
         self.precipitation = precipitation
-        self.precipitation_intensity = precipitation_intensity
-        self.visual_fog_range = visual_fog_range
-        self.fog_bounding_box = fog_bounding_box
+        
 
     def __eq__(self,other):
         if isinstance(other,Weather):
             if self.get_attributes() == other.get_attributes() and \
-            self.sun_intensity == other.sun_intensity and \
-            self.sun_azimuth == other.sun_azimuth and \
-            self.sun_elevation == other.sun_elevation and \
-            self.precipitation == other.precipitation and \
-            self.precipitation_intensity == other.precipitation_intensity and \
-            self.visual_fog_range == other.visual_fog_range and \
-            self.fog_bounding_box == other.fog_bounding_box:                
+            self.fog == other.fog and \
+            self.wind == other.wind and \
+            self.sun == other.sun and \
+            self.precipitation == other.precipitation:                
                 return True
         return False
 
@@ -2177,22 +2277,292 @@ class Weather():
         &#34;&#34;&#34; returns the attributes of the Weather as a dict
 
         &#34;&#34;&#34;
-        return {&#39;cloudState&#39;:self.cloudstate.name}
+        retdict = {}
+        if self.cloudstate:
+            retdict[&#39;cloudState&#39;] = self.cloudstate.get_name()
+        if self.temperature and not self.isVersion(0):
+            retdict[&#39;temperature&#39;] = str(self.temperature)
+        elif self.temperature and self.isVersion(0):
+            raise OpenSCENARIOVersionError(&#39;temperature was introduced in OpenSCENARIO V1.1&#39;)
+        if self.atmosphericPressure and not self.isVersion(0):
+            retdict[&#39;atmosphericPressure&#39;] = str(self.atmosphericPressure)
+        elif self.atmosphericPressure and self.isVersion(0):
+            raise OpenSCENARIOVersionError(&#39;atmosphericPressure was introduced in OpenSCENARIO V1.1&#39;)
+        return retdict
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the Weather
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;Weather&#39;,attrib=self.get_attributes())
-        ET.SubElement(element,&#39;Sun&#39;,attrib={&#39;intensity&#39;:str(self.sun_intensity),&#39;azimuth&#39;:str(self.sun_azimuth),&#39;elevation&#39;:str(self.sun_elevation)})
-        fog = ET.SubElement(element,&#39;Fog&#39;,attrib={&#39;visualRange&#39;:str(self.visual_fog_range)})
-        if self.fog_bounding_box:
-            fog.append(self.fog_bounding_box.get_element())
-        ET.SubElement(element,&#39;Precipitation&#39;,attrib={&#39;precipitationType&#39;:self.precipitation.name,&#39;intensity&#39;:str(self.precipitation_intensity)})
+        if self.sun:
+            print(self.sun)
+            element.append(self.sun.get_element())
+        if self.fog:
+            element.append(self.fog.get_element())
+        if self.precipitation:
+            element.append(self.precipitation.get_element())
+        if self.wind and not self.isVersion(0):
+            element.append(self.wind.get_element())
+        if self.wind and self.isVersion(0):
+            raise OpenSCENARIOVersionError(&#39;Wind was introduced in OpenSCENARIO V1.1&#39;)
+        return element
+
+class Fog(VersionBase):
+    &#34;&#34;&#34; Fog creates an Fog element used by the Weather element of openscenario
+        
+        Parameters
+        ----------
+            visual_range (int): visual range of fog
+
+            bounding_box (BoundingBox): bounding box of fog
+
+        Attributes
+        ----------
+            visual_range (int): visual range of fog
+
+            bounding_box (BoundingBox): bounding box of fog
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+
+            get_attributes()
+                Returns a dictionary of all attributes of the class
+
+    &#34;&#34;&#34;
+    def __init__(self,visual_range,bounding_box):
+        &#34;&#34;&#34; initalize the Fog
+
+            Parameters
+            ----------
+            visual_range (int): visual range of fog
+
+            bounding_box (BoundingBox): bounding box of fog
+                
+        &#34;&#34;&#34;
+
+        self.visual_range = visual_range 
+        self.bounding_box = bounding_box
+
+
+    def __eq__(self,other):
+        if isinstance(other,Fog):
+            if self.get_attributes() == other.get_attributes() and \
+               self.bounding_box == other.bounding_box:
+                return True
+        return False
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the Precipitation as a dict
+
+        &#34;&#34;&#34;
+        retdict = {}
+        retdict[&#39;visualRange&#39;] = str(self.visual_range)
+
+        return retdict
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the Fog
+
+        &#34;&#34;&#34;
+        element = ET.Element(&#39;Fog&#39;,attrib=self.get_attributes())
+        element.append(self.bounding_box.get_element())
+
         return element
 
 
-class RoadCondition():
+class Sun(VersionBase):
+    &#34;&#34;&#34; Sun creates an Sun element used by the Weather element of openscenario
+        
+        Parameters
+        ----------
+            intensity (double): intensity of the sun (in lux)
+
+            azimuth (double): azimuth of the sun 0 north, pi/2 east, pi south, 3/2pi west
+
+            elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
+
+        Attributes
+        ----------
+            intensity (double): intensity of the sun (in lux)
+
+            azimuth (double): azimuth of the sun 0 north, pi/2 east, pi south, 3/2pi west
+
+            elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+
+            get_attributes()
+                Returns a dictionary of all attributes of the class
+
+    &#34;&#34;&#34;
+    def __init__(self,intensity,azimuth,elevation):
+        &#34;&#34;&#34; initalize the Sun
+
+            Parameters
+            ----------
+                intensity (double): intensity of the sun (in lux)
+
+                azimuth (double): azimuth of the sun 0 north, pi/2 east, pi south, 3/2pi west
+
+                elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
+                
+        &#34;&#34;&#34;
+
+        self.azimuth = azimuth 
+        self.intensity = intensity
+        self.elevation = elevation
+
+    def __eq__(self,other):
+        if isinstance(other,Sun):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the Precipitation as a dict
+
+        &#34;&#34;&#34;
+        retdict = {}
+        retdict[&#39;azimuth&#39;] = str(self.azimuth)
+        retdict[&#39;intensity&#39;] = str(self.intensity)
+        retdict[&#39;elevation&#39;] = str(self.elevation)
+        return retdict
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the Sun
+
+        &#34;&#34;&#34;
+        element = ET.Element(&#39;Sun&#39;,attrib=self.get_attributes())
+
+        return element
+
+
+class Precipitation(VersionBase):
+    &#34;&#34;&#34; Precipitation creates an Precipitation element used by the Weather element of openscenario
+        
+        Parameters
+        ----------
+            precipitation (PrecipitationType): dry, rain or snow
+
+            intensity (double): intensity of precipitation (0...1)
+
+        Attributes
+        ----------
+            precipitation (PrecipitationType): dry, rain or snow
+
+            intensity (double): intensity of precipitation (0...1)
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+
+            get_attributes()
+                Returns a dictionary of all attributes of the class
+
+    &#34;&#34;&#34;
+    def __init__(self,precipitation,intensity):
+        &#34;&#34;&#34; initalize the Precipitation
+
+            Parameters
+            ----------
+                precipitation (PrecipitationType): dry, rain or snow
+
+                intensity (double): intensity of precipitation (0...1)
+                
+        &#34;&#34;&#34;
+        if not hasattr(PrecipitationType,str(precipitation)):
+            raise TypeError(&#39;precipitation input is not of type PrecipitationType&#39;)
+        self.precipitation = precipitation 
+        self.intensity = intensity
+
+    def __eq__(self,other):
+        if isinstance(other,Precipitation):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the Precipitation as a dict
+
+        &#34;&#34;&#34;
+        retdict = {}
+        retdict[&#39;precipitationType&#39;] = self.precipitation.get_name()
+        if self.isVersion(0):
+            retdict[&#39;intensity&#39;] = str(self.intensity)
+        else:
+            retdict[&#39;precipitationIntensity&#39;] = str(self.intensity)
+        return retdict
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the Precipitation
+
+        &#34;&#34;&#34;
+        element = ET.Element(&#39;Precipitation&#39;,attrib=self.get_attributes())
+
+        return element
+
+
+class Wind(VersionBase):
+    &#34;&#34;&#34; Wind creates an Wind element used by the Weather element of openscenario
+        
+        Parameters
+        ----------
+            direction (float): wind direction (radians)
+
+            speed (float): wind speed (m/s)
+
+        Attributes
+        ----------
+            direction (float): wind direction (radians)
+
+            speed (float): wind speed (m/s)
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+
+            get_attributes()
+                Returns a dictionary of all attributes of the class
+
+    &#34;&#34;&#34;
+    def __init__(self,direction,speed):
+        &#34;&#34;&#34; initalize the Wind
+
+            Parameters
+            ----------
+                direction (float): wind direction (radians)
+
+                speed (float): wind speed (m/s)
+                
+        &#34;&#34;&#34;
+        self.direction = direction 
+        self.speed = speed
+
+    def __eq__(self,other):
+        if isinstance(other,Wind):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the Wind as a dict
+
+        &#34;&#34;&#34;
+        return {&#39;direction&#39;:str(self.direction),&#39;speed&#39;:str(self.speed)}
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the Wind
+
+        &#34;&#34;&#34;
+        element = ET.Element(&#39;Wind&#39;,attrib=self.get_attributes())
+
+        return element
+
+class RoadCondition(VersionBase):
     &#34;&#34;&#34; Weather creates an Weather element of openscenario
         
         Parameters
@@ -2256,7 +2626,7 @@ class RoadCondition():
 
 
 
-class Environment():
+class Environment(VersionBase):
     &#34;&#34;&#34; The Environment class creates a environment used by Environment
         
         Parameters
@@ -2372,7 +2742,7 @@ class Environment():
             element.append(self.parameters.get_element())
         return element
 
-class Controller():
+class Controller(VersionBase):
     &#34;&#34;&#34; the Controller class creates a controller of openScenario
 
         Parameters
@@ -2491,7 +2861,7 @@ class Controller():
         return element
 
 
-class BoundingBox():
+class BoundingBox(VersionBase):
     &#34;&#34;&#34; the Dimensions describes the size of an entity
 
         Parameters
@@ -2558,7 +2928,7 @@ class BoundingBox():
         element.append(self.boundingbox.get_element())
         return element
 
-class Center():
+class Center(VersionBase):
     &#34;&#34;&#34; the Center Class creates a centerpoint for a bounding box, reference point of a vehicle is the back axel
 
         Parameters
@@ -2622,7 +2992,7 @@ class Center():
         element = ET.Element(&#39;Center&#39;,attrib=self.get_attributes())
         return element
 
-class Dimensions():
+class Dimensions(VersionBase):
     &#34;&#34;&#34; the Dimensions describes the size of an entity
 
         Parameters
@@ -2686,7 +3056,7 @@ class Dimensions():
         element = ET.Element(&#39;Dimensions&#39;,attrib=self.get_attributes())
         return element
 
-class Properties():
+class Properties(VersionBase):
     &#34;&#34;&#34; the Properties contains are for user defined properties of an object               
 
         Attributes
@@ -2759,6 +3129,105 @@ class Properties():
         return element
 
 
+class TargetDistanceSteadyState(VersionBase):
+    &#34;&#34;&#34; the TargetDistanceSteadyState describes a SteadyState of type TargetDistanceSteadyState
+
+        Parameters
+        ----------
+            distance (double): distance to target for the steady state
+
+        Attributes
+        ----------
+            distance (double): distance to target for the steady state
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+
+    &#34;&#34;&#34;
+    def __init__(self,distance):
+        &#34;&#34;&#34; initalzie the TargetDistanceSteadyState
+
+        Parameters
+        ----------
+            distance (double): distance to target for the steady state
+        
+        &#34;&#34;&#34;
+        self.distance = distance
+        
+
+    def __eq__(self,other):
+        if isinstance(other,TargetDistanceSteadyState):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the TargetDistanceSteadyState
+        
+        &#34;&#34;&#34;
+        return {&#39;distance&#39;:str(self.distance)}
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the TargetDistanceSteadyState
+
+        &#34;&#34;&#34;
+        if self.isVersion(0):
+            raise OpenSCENARIOVersionError(&#39;TargetDistanceSteadyState was introduced in OpenSCENARIO V1.1&#39;)
+        element = ET.Element(&#39;SteadyState&#39;)
+        ET.SubElement(element,&#39;TargetDistanceSteadyState&#39;,attrib=self.get_attributes())
+        return element
+
+class TargetTimeSteadyState(VersionBase):
+    &#34;&#34;&#34; the TargetTimeSteadyState describes a SteadyState of type TargetTimeSteadyState
+
+        Parameters
+        ----------
+            time_gap (double): time_gap to target for the steady state
+
+        Attributes
+        ----------
+            time_gap (double): time_gap to target for the steady state
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+
+    &#34;&#34;&#34;
+    def __init__(self,time_gap):
+        &#34;&#34;&#34; initalzie the TargetTimeSteadyState
+
+        Parameters
+        ----------
+            time_gap (double): time_gap to target for the steady state
+        
+        &#34;&#34;&#34;
+        self.time_gap = time_gap
+        
+
+    def __eq__(self,other):
+        if isinstance(other,TargetTimeSteadyState):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the TargetTimeSteadyState
+        
+        &#34;&#34;&#34;
+        return {&#39;time&#39;:str(self.time_gap)}
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the TargetTimeSteadyState
+
+        &#34;&#34;&#34;
+        if self.isVersion(0):
+            raise OpenSCENARIOVersionError(&#39;TargetTimeSteadyState was introduced in OpenSCENARIO V1.1&#39;)
+        element = ET.Element(&#39;SteadyState&#39;)
+        ET.SubElement(element,&#39;TargetTimeSteadyState&#39;,attrib=self.get_attributes())
+        return element
 
 def merge_dicts(*dict_args):
     &#34;&#34;&#34; Funciton to merge dicts 
@@ -2871,7 +3340,7 @@ z_center (float): z distance from back axel to center
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class BoundingBox():
+<pre><code class="python">class BoundingBox(VersionBase):
     &#34;&#34;&#34; the Dimensions describes the size of an entity
 
         Parameters
@@ -2938,6 +3407,10 @@ z_center (float): z distance from back axel to center
         element.append(self.boundingbox.get_element())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.BoundingBox.get_element"><code class="name flex">
@@ -2982,7 +3455,7 @@ add_catalog(catalogname, path)
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Catalog():
+<pre><code class="python">class Catalog(VersionBase):
     &#34;&#34;&#34; The Catalog class creates the CatalogLocation of the OpenScenario input
         
         Parameters
@@ -3051,6 +3524,10 @@ add_catalog(catalogname, path)
             ET.SubElement(tmpel,&#39;Directory&#39;,{&#39;path&#39;: self.catalogs[i]})
         return catloc</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.Catalog.add_catalog"><code class="name flex">
@@ -3142,7 +3619,7 @@ add_catalog(catalogname, path)
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class CatalogFile():
+<pre><code class="python">class CatalogFile(VersionBase):
     &#34;&#34;&#34; The CatalogFile class handles any catalogs in open scenario, such as writing, and updating them
         
         Parameters
@@ -3247,6 +3724,10 @@ add_catalog(catalogname, path)
         &#34;&#34;&#34;
         printToFile(self.catalog_element,self.filename,self.prettyprint)</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.CatalogFile.add_to_catalog"><code class="name flex">
@@ -3428,7 +3909,7 @@ entryname (str): name of the entry in the catalog
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class CatalogReference():
+<pre><code class="python">class CatalogReference(VersionBase):
     &#34;&#34;&#34; CatalogReference creates an CatalogReference element of openscenario
         
         Parameters
@@ -3506,6 +3987,10 @@ entryname (str): name of the entry in the catalog
             parameterassigns.append(parass.get_element())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.CatalogReference.add_parameter_assignment"><code class="name flex">
@@ -3612,7 +4097,7 @@ z (float): z distance from back axel to center
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Center():
+<pre><code class="python">class Center(VersionBase):
     &#34;&#34;&#34; the Center Class creates a centerpoint for a bounding box, reference point of a vehicle is the back axel
 
         Parameters
@@ -3676,6 +4161,10 @@ z (float): z distance from back axel to center
         element = ET.Element(&#39;Center&#39;,attrib=self.get_attributes())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.Center.get_attributes"><code class="name flex">
@@ -3770,7 +4259,7 @@ stoptime (float): (optional) end time of the clothoid
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Clothoid():
+<pre><code class="python">class Clothoid(VersionBase):
     &#34;&#34;&#34; the Clothoid class creates a Clothoid shape
         
         Parameters
@@ -3855,7 +4344,10 @@ stoptime (float): (optional) end time of the clothoid
         &#34;&#34;&#34;
         retdict = {}
         retdict[&#39;curvature&#39;] = str(self.curvature)
-        retdict[&#39;curvatureDot&#39;] = str(self.curvature_change)
+        if self.isVersion(minor=0):
+            retdict[&#39;curvatureDot&#39;] = str(self.curvature_change)
+        else:
+            retdict[&#39;curvaturePrime&#39;] = str(self.curvature_change)
         retdict[&#39;length&#39;] = str(self.length)
         if self.starttime != None:
             retdict[&#39;startTime&#39;] = str(self.starttime)
@@ -3871,6 +4363,10 @@ stoptime (float): (optional) end time of the clothoid
 
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.Clothoid.get_attributes"><code class="name flex">
@@ -3888,7 +4384,10 @@ stoptime (float): (optional) end time of the clothoid
     &#34;&#34;&#34;
     retdict = {}
     retdict[&#39;curvature&#39;] = str(self.curvature)
-    retdict[&#39;curvatureDot&#39;] = str(self.curvature_change)
+    if self.isVersion(minor=0):
+        retdict[&#39;curvatureDot&#39;] = str(self.curvature_change)
+    else:
+        retdict[&#39;curvaturePrime&#39;] = str(self.curvature_change)
     retdict[&#39;length&#39;] = str(self.length)
     if self.starttime != None:
         retdict[&#39;startTime&#39;] = str(self.starttime)
@@ -3960,7 +4459,7 @@ weight (float): optional weight of the point
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class ControlPoint():
+<pre><code class="python">class ControlPoint(VersionBase):
     &#34;&#34;&#34; the ControlPoint class is used by Nurbs to define points 
         
         Parameters
@@ -4037,6 +4536,10 @@ weight (float): optional weight of the point
         element.append(self.position.get_element())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.ControlPoint.get_attributes"><code class="name flex">
@@ -4122,7 +4625,7 @@ properties (Properties): properties of the Controller
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Controller():
+<pre><code class="python">class Controller(VersionBase):
     &#34;&#34;&#34; the Controller class creates a controller of openScenario
 
         Parameters
@@ -4240,6 +4743,10 @@ properties (Properties): properties of the Controller
         
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.Controller.add_parameter"><code class="name flex">
@@ -4408,7 +4915,7 @@ height (float): the height of the entity
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Dimensions():
+<pre><code class="python">class Dimensions(VersionBase):
     &#34;&#34;&#34; the Dimensions describes the size of an entity
 
         Parameters
@@ -4472,6 +4979,10 @@ height (float): the height of the entity
         element = ET.Element(&#39;Dimensions&#39;,attrib=self.get_attributes())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.Dimensions.get_attributes"><code class="name flex">
@@ -4544,7 +5055,7 @@ get_attributes()
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class DynamicsConstrains():
+<pre><code class="python">class DynamicsConstrains(VersionBase):
     &#34;&#34;&#34; DynamicsConstrains is used by triggers
         
         Parameters
@@ -4622,6 +5133,10 @@ get_attributes()
         &#34;&#34;&#34;
         return ET.Element(name,attrib=self.get_attributes())</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.DynamicsConstrains.get_attributes"><code class="name flex">
@@ -4715,7 +5230,7 @@ get_attributes()
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class EntityRef():
+<pre><code class="python">class EntityRef(VersionBase):
     &#34;&#34;&#34; EntityRef creates an EntityRef element of openscenario
         
         Parameters
@@ -4763,6 +5278,10 @@ get_attributes()
         &#34;&#34;&#34;
         return ET.Element(&#39;EntityRef&#39;,attrib=self.get_attributes())</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.EntityRef.get_attributes"><code class="name flex">
@@ -4849,7 +5368,7 @@ parameters (ParameterDeclarations): the parameters to be used in the scenario
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Environment():
+<pre><code class="python">class Environment(VersionBase):
     &#34;&#34;&#34; The Environment class creates a environment used by Environment
         
         Parameters
@@ -4965,6 +5484,10 @@ parameters (ParameterDeclarations): the parameters to be used in the scenario
             element.append(self.parameters.get_element())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.Environment.append_to_catalog"><code class="name flex">
@@ -5057,7 +5580,7 @@ author (str): author of the catalog
 </dd>
 <dt id="scenariogeneration.xosc.utils.FileHeader"><code class="flex name class">
 <span>class <span class="ident">FileHeader</span></span>
-<span>(</span><span>name, author)</span>
+<span>(</span><span>name, author, revMinor=1, license=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>FileHeader creates the header of the OpenScenario file</p>
@@ -5065,6 +5588,12 @@ author (str): author of the catalog
 <pre><code>name (str): name of the scenario
 
 author (str): the author of the scenario
+
+revMinor (int): the minor revision of the standard
+    Default: 1
+
+license (License): license (valid from OpenSCENARIO V1.1)
+    Default: None
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>name (str): name of the scenario
@@ -5082,7 +5611,7 @@ get_attributes()
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class FileHeader():
+<pre><code class="python">class FileHeader(VersionBase):
     &#34;&#34;&#34; FileHeader creates the header of the OpenScenario file
         
         Parameters
@@ -5090,6 +5619,12 @@ get_attributes()
             name (str): name of the scenario 
 
             author (str): the author of the scenario
+
+            revMinor (int): the minor revision of the standard
+                Default: 1
+
+            license (License): license (valid from OpenSCENARIO V1.1)
+                Default: None
 
         Attributes
         ----------
@@ -5106,12 +5641,15 @@ get_attributes()
                 Returns a dictionary of all attributes of FileHeader
 
     &#34;&#34;&#34;
-    def __init__(self,name,author):
+    def __init__(self,name,author,revMinor=1,license=None):
         self.name = name
         self.author = author
         self._revMajor = 1
-        self._revMinor = 0
-        
+        self._revMinor = revMinor
+        self.version_minor = revMinor
+        if license and not isinstance(license,License):
+            raise TypeError(&#39;license is not of type License&#39;)
+        self.license = license
     def __eq__(self,other):
         if isinstance(other,FileHeader):
             if self.name == other.name and \
@@ -5133,9 +5671,14 @@ get_attributes()
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;FileHeader&#39;,attrib=self.get_attributes())
-
+        if self.license:
+            element.append(self.license.get_element())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.FileHeader.get_attributes"><code class="name flex">
@@ -5168,6 +5711,318 @@ get_attributes()
 
     &#34;&#34;&#34;
     element = ET.Element(&#39;FileHeader&#39;,attrib=self.get_attributes())
+    if self.license:
+        element.append(self.license.get_element())
+    return element</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="scenariogeneration.xosc.utils.Fog"><code class="flex name class">
+<span>class <span class="ident">Fog</span></span>
+<span>(</span><span>visual_range, bounding_box)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fog creates an Fog element used by the Weather element of openscenario</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>visual_range (int): visual range of fog
+
+bounding_box (BoundingBox): bounding box of fog
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>visual_range (int): visual range of fog
+
+bounding_box (BoundingBox): bounding box of fog
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element()
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of the class
+</code></pre>
+<p>initalize the Fog</p>
+<h2 id="parameters_1">Parameters</h2>
+<p>visual_range (int): visual range of fog</p>
+<p>bounding_box (BoundingBox): bounding box of fog</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Fog(VersionBase):
+    &#34;&#34;&#34; Fog creates an Fog element used by the Weather element of openscenario
+        
+        Parameters
+        ----------
+            visual_range (int): visual range of fog
+
+            bounding_box (BoundingBox): bounding box of fog
+
+        Attributes
+        ----------
+            visual_range (int): visual range of fog
+
+            bounding_box (BoundingBox): bounding box of fog
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+
+            get_attributes()
+                Returns a dictionary of all attributes of the class
+
+    &#34;&#34;&#34;
+    def __init__(self,visual_range,bounding_box):
+        &#34;&#34;&#34; initalize the Fog
+
+            Parameters
+            ----------
+            visual_range (int): visual range of fog
+
+            bounding_box (BoundingBox): bounding box of fog
+                
+        &#34;&#34;&#34;
+
+        self.visual_range = visual_range 
+        self.bounding_box = bounding_box
+
+
+    def __eq__(self,other):
+        if isinstance(other,Fog):
+            if self.get_attributes() == other.get_attributes() and \
+               self.bounding_box == other.bounding_box:
+                return True
+        return False
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the Precipitation as a dict
+
+        &#34;&#34;&#34;
+        retdict = {}
+        retdict[&#39;visualRange&#39;] = str(self.visual_range)
+
+        return retdict
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the Fog
+
+        &#34;&#34;&#34;
+        element = ET.Element(&#39;Fog&#39;,attrib=self.get_attributes())
+        element.append(self.bounding_box.get_element())
+
+        return element</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.utils.Fog.get_attributes"><code class="name flex">
+<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the attributes of the Precipitation as a dict</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_attributes(self):
+    &#34;&#34;&#34; returns the attributes of the Precipitation as a dict
+
+    &#34;&#34;&#34;
+    retdict = {}
+    retdict[&#39;visualRange&#39;] = str(self.visual_range)
+
+    return retdict</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xosc.utils.Fog.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the elementTree of the Fog</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self):
+    &#34;&#34;&#34; returns the elementTree of the Fog
+
+    &#34;&#34;&#34;
+    element = ET.Element(&#39;Fog&#39;,attrib=self.get_attributes())
+    element.append(self.bounding_box.get_element())
+
+    return element</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="scenariogeneration.xosc.utils.License"><code class="flex name class">
+<span>class <span class="ident">License</span></span>
+<span>(</span><span>name, resource=None, spdxId=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>License creates the License used by FileHeader in the OpenScenario file
+(valid from OpenSCENARIO V1.1)</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>name (str): name of the License
+
+resource (str): link to URL
+    Default: None
+
+spdxId (str): license identifier
+    Default: None
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>name (str): name of the License
+
+resource (str): link to URL
+
+spdxId (str): license identifier
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element()
+    Returns the full ElementTree of FileHeader
+
+get_attributes()
+    Returns a dictionary of all attributes of FileHeader
+</code></pre>
+<p>init the License</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>name (str): name of the License
+
+resource (str): link to URL
+    Default: None
+
+spdxId (str): license identifier
+    Default: None
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class License(VersionBase):
+    &#34;&#34;&#34; License creates the License used by FileHeader in the OpenScenario file 
+        (valid from OpenSCENARIO V1.1)
+        
+        Parameters
+        ----------
+            name (str): name of the License
+
+            resource (str): link to URL
+                Default: None
+
+            spdxId (str): license identifier
+                Default: None
+
+        Attributes
+        ----------
+            name (str): name of the License
+
+            resource (str): link to URL
+                
+            spdxId (str): license identifier
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of FileHeader
+
+            get_attributes()
+                Returns a dictionary of all attributes of FileHeader
+
+    &#34;&#34;&#34;
+    def __init__(self,name,resource=None,spdxId=None):
+        &#34;&#34;&#34; init the License
+        
+        Parameters
+        ----------
+            name (str): name of the License
+
+            resource (str): link to URL
+                Default: None
+
+            spdxId (str): license identifier
+                Default: None
+        &#34;&#34;&#34;
+        self.name = name
+        self.resource = resource
+        self._revMajor = 1
+        self.spdxId = spdxId
+        
+    def __eq__(self,other):
+        if isinstance(other,License):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes as a dict of the License
+
+        &#34;&#34;&#34;
+        retdict = {}
+        retdict[&#39;name&#39;] = self.name
+        if self.resource:
+            retdict[&#39;resource&#39;] = self.resource
+        if self.spdxId:
+            retdict[&#39;spdxId&#39;] = self.spdxId
+        return retdict
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the License
+
+        &#34;&#34;&#34;
+        if self.isVersion(0):
+            raise OpenSCENARIOVersionError(&#39;License was introduced in OpenSCENARIO V1.1&#39;)
+        element = ET.Element(&#39;License&#39;,attrib=self.get_attributes())
+
+        return element</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.utils.License.get_attributes"><code class="name flex">
+<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the attributes as a dict of the License</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_attributes(self):
+    &#34;&#34;&#34; returns the attributes as a dict of the License
+
+    &#34;&#34;&#34;
+    retdict = {}
+    retdict[&#39;name&#39;] = self.name
+    if self.resource:
+        retdict[&#39;resource&#39;] = self.resource
+    if self.spdxId:
+        retdict[&#39;spdxId&#39;] = self.spdxId
+    return retdict</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xosc.utils.License.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the elementTree of the License</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self):
+    &#34;&#34;&#34; returns the elementTree of the License
+
+    &#34;&#34;&#34;
+    if self.isVersion(0):
+        raise OpenSCENARIOVersionError(&#39;License was introduced in OpenSCENARIO V1.1&#39;)
+    element = ET.Element(&#39;License&#39;,attrib=self.get_attributes())
 
     return element</code></pre>
 </details>
@@ -5211,7 +6066,7 @@ get_attributes()
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Nurbs():
+<pre><code class="python">class Nurbs(VersionBase):
     &#34;&#34;&#34; the Nurbs class creates a Nurbs shape
         
         Parameters
@@ -5306,6 +6161,10 @@ get_attributes()
 
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.Nurbs.add_control_point"><code class="name flex">
@@ -5447,7 +6306,7 @@ reference (ReferenceContext): absolute or relative
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Orientation():
+<pre><code class="python">class Orientation(VersionBase):
     &#34;&#34;&#34; Orientation describes the angular orientation of an entity
         
         Parameters
@@ -5498,7 +6357,7 @@ reference (ReferenceContext): absolute or relative
         self.h = h
         self.p = p
         self.r = r
-        if reference is not None and reference not in ReferenceContext:
+        if reference is not None and not hasattr(ReferenceContext,str(reference)):
             raise TypeError(&#39;reference input is not of type ReferenceContext&#39;)
         self.ref = reference
 
@@ -5534,7 +6393,7 @@ reference (ReferenceContext): absolute or relative
             retdict[&#39;r&#39;] = str(self.r)
 
         if self.ref:
-            retdict[&#39;type&#39;] = self.ref.name
+            retdict[&#39;type&#39;] = self.ref.get_name()
         
         return retdict
     
@@ -5544,6 +6403,10 @@ reference (ReferenceContext): absolute or relative
         &#34;&#34;&#34;
         return ET.Element(&#39;Orientation&#39;,attrib=self.get_attributes())</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.Orientation.get_attributes"><code class="name flex">
@@ -5570,7 +6433,7 @@ reference (ReferenceContext): absolute or relative
         retdict[&#39;r&#39;] = str(self.r)
 
     if self.ref:
-        retdict[&#39;type&#39;] = self.ref.name
+        retdict[&#39;type&#39;] = self.ref.get_name()
     
     return retdict</code></pre>
 </details>
@@ -5657,7 +6520,7 @@ value (str): value of the parameter
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Parameter():
+<pre><code class="python">class Parameter(VersionBase):
     &#34;&#34;&#34; Parameter is a declaration of a ParameterDeclaration for declarations
         
         Parameters
@@ -5701,7 +6564,7 @@ value (str): value of the parameter
 
         &#34;&#34;&#34;
         self.name = name
-        if parameter_type not in ParameterType:
+        if not hasattr(ParameterType,str(parameter_type)):
             raise ValueError(&#39;parameter_type not a valid type.&#39;)
         self.parameter_type = parameter_type
         self.value = value
@@ -5716,7 +6579,7 @@ value (str): value of the parameter
         &#34;&#34;&#34; returns the attributes of the Parameter as a dict
 
         &#34;&#34;&#34;
-        return {&#39;name&#39;:self.name,&#39;parameterType&#39;:self.parameter_type.name,&#39;value&#39;:str(self.value)}
+        return {&#39;name&#39;:self.name,&#39;parameterType&#39;:self.parameter_type.get_name(),&#39;value&#39;:str(self.value)}
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the Parameter
@@ -5725,6 +6588,10 @@ value (str): value of the parameter
         element = ET.Element(&#39;ParameterDeclaration&#39;,attrib=self.get_attributes())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.Parameter.get_attributes"><code class="name flex">
@@ -5740,7 +6607,7 @@ value (str): value of the parameter
     &#34;&#34;&#34; returns the attributes of the Parameter as a dict
 
     &#34;&#34;&#34;
-    return {&#39;name&#39;:self.name,&#39;parameterType&#39;:self.parameter_type.name,&#39;value&#39;:str(self.value)}</code></pre>
+    return {&#39;name&#39;:self.name,&#39;parameterType&#39;:self.parameter_type.get_name(),&#39;value&#39;:str(self.value)}</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xosc.utils.Parameter.get_element"><code class="name flex">
@@ -5795,7 +6662,7 @@ value (str): assigned value of the parameter
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class ParameterAssignment():
+<pre><code class="python">class ParameterAssignment(VersionBase):
     &#34;&#34;&#34; ParameterAssignment creates an ParameterAssignment element of openscenario
         
         Parameters
@@ -5855,6 +6722,10 @@ value (str): assigned value of the parameter
         &#34;&#34;&#34;
         return ET.Element(&#39;ParameterAssignment&#39;,attrib=self.get_attributes())</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.ParameterAssignment.get_attributes"><code class="name flex">
@@ -5914,7 +6785,7 @@ add_parameter(Parameter)
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class ParameterDeclarations():
+<pre><code class="python">class ParameterDeclarations(VersionBase):
     &#34;&#34;&#34; The ParameterDeclarations class creates the ParameterDeclaration of OpenScenario
                     
         Attributes
@@ -5964,6 +6835,10 @@ add_parameter(Parameter)
             element.append(p.get_element())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.ParameterDeclarations.add_parameter"><code class="name flex">
@@ -6051,7 +6926,7 @@ duration (float): duration of the phase
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Phase():
+<pre><code class="python">class Phase(VersionBase):
     &#34;&#34;&#34; crates a Traffic light phase
         
         Parameters
@@ -6131,6 +7006,10 @@ duration (float): duration of the phase
             element.append(s.get_element())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.Phase.add_signal_state"><code class="name flex">
@@ -6222,7 +7101,7 @@ positions (str): routing strategy for this waypoint
 </code></pre>
 <p>initalize the Polyline</p>
 <h2 id="parameters_1">Parameters</h2>
-<pre><code>time (list of double): a list of timings for the positions
+<pre><code>time (list of double): a list of timings for the positions (as of OpenSCENARIO V1.1 this can be empty)
 
 positions (list of positions): list of positions to create the polyline
 </code></pre></div>
@@ -6230,7 +7109,7 @@ positions (list of positions): list of positions to create the polyline
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Polyline():
+<pre><code class="python">class Polyline(VersionBase):
     &#34;&#34;&#34; the Polyline class creates a polyline of (minimum 2) positions
         
         Parameters
@@ -6257,7 +7136,7 @@ positions (list of positions): list of positions to create the polyline
 
             Parameters
             ----------
-                time (list of double): a list of timings for the positions
+                time (list of double): a list of timings for the positions (as of OpenSCENARIO V1.1 this can be empty)
 
                 positions (list of positions): list of positions to create the polyline
 
@@ -6285,11 +7164,18 @@ positions (list of positions): list of positions to create the polyline
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;Polyline&#39;)
-        for i in range(len(self.time)):
-            vert = ET.SubElement(element,&#39;Vertex&#39;,attrib={&#39;time&#39;:str(self.time[i])})
+        for i in range(len(self.positions)):
+            time_dict = {}
+            if self.time:
+                time_dict = {&#39;time&#39;:str(self.time[i])}
+            vert = ET.SubElement(element,&#39;Vertex&#39;,attrib=time_dict)
             vert.append(self.positions[i].get_element())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.Polyline.get_element"><code class="name flex">
@@ -6306,9 +7192,157 @@ positions (list of positions): list of positions to create the polyline
 
     &#34;&#34;&#34;
     element = ET.Element(&#39;Polyline&#39;)
-    for i in range(len(self.time)):
-        vert = ET.SubElement(element,&#39;Vertex&#39;,attrib={&#39;time&#39;:str(self.time[i])})
+    for i in range(len(self.positions)):
+        time_dict = {}
+        if self.time:
+            time_dict = {&#39;time&#39;:str(self.time[i])}
+        vert = ET.SubElement(element,&#39;Vertex&#39;,attrib=time_dict)
         vert.append(self.positions[i].get_element())
+    return element</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="scenariogeneration.xosc.utils.Precipitation"><code class="flex name class">
+<span>class <span class="ident">Precipitation</span></span>
+<span>(</span><span>precipitation, intensity)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Precipitation creates an Precipitation element used by the Weather element of openscenario</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>precipitation (PrecipitationType): dry, rain or snow
+
+intensity (double): intensity of precipitation (0...1)
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>precipitation (PrecipitationType): dry, rain or snow
+
+intensity (double): intensity of precipitation (0...1)
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element()
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of the class
+</code></pre>
+<p>initalize the Precipitation</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>precipitation (PrecipitationType): dry, rain or snow
+
+intensity (double): intensity of precipitation (0...1)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Precipitation(VersionBase):
+    &#34;&#34;&#34; Precipitation creates an Precipitation element used by the Weather element of openscenario
+        
+        Parameters
+        ----------
+            precipitation (PrecipitationType): dry, rain or snow
+
+            intensity (double): intensity of precipitation (0...1)
+
+        Attributes
+        ----------
+            precipitation (PrecipitationType): dry, rain or snow
+
+            intensity (double): intensity of precipitation (0...1)
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+
+            get_attributes()
+                Returns a dictionary of all attributes of the class
+
+    &#34;&#34;&#34;
+    def __init__(self,precipitation,intensity):
+        &#34;&#34;&#34; initalize the Precipitation
+
+            Parameters
+            ----------
+                precipitation (PrecipitationType): dry, rain or snow
+
+                intensity (double): intensity of precipitation (0...1)
+                
+        &#34;&#34;&#34;
+        if not hasattr(PrecipitationType,str(precipitation)):
+            raise TypeError(&#39;precipitation input is not of type PrecipitationType&#39;)
+        self.precipitation = precipitation 
+        self.intensity = intensity
+
+    def __eq__(self,other):
+        if isinstance(other,Precipitation):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the Precipitation as a dict
+
+        &#34;&#34;&#34;
+        retdict = {}
+        retdict[&#39;precipitationType&#39;] = self.precipitation.get_name()
+        if self.isVersion(0):
+            retdict[&#39;intensity&#39;] = str(self.intensity)
+        else:
+            retdict[&#39;precipitationIntensity&#39;] = str(self.intensity)
+        return retdict
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the Precipitation
+
+        &#34;&#34;&#34;
+        element = ET.Element(&#39;Precipitation&#39;,attrib=self.get_attributes())
+
+        return element</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.utils.Precipitation.get_attributes"><code class="name flex">
+<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the attributes of the Precipitation as a dict</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_attributes(self):
+    &#34;&#34;&#34; returns the attributes of the Precipitation as a dict
+
+    &#34;&#34;&#34;
+    retdict = {}
+    retdict[&#39;precipitationType&#39;] = self.precipitation.get_name()
+    if self.isVersion(0):
+        retdict[&#39;intensity&#39;] = str(self.intensity)
+    else:
+        retdict[&#39;precipitationIntensity&#39;] = str(self.intensity)
+    return retdict</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xosc.utils.Precipitation.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the elementTree of the Precipitation</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self):
+    &#34;&#34;&#34; returns the elementTree of the Precipitation
+
+    &#34;&#34;&#34;
+    element = ET.Element(&#39;Precipitation&#39;,attrib=self.get_attributes())
+
     return element</code></pre>
 </details>
 </dd>
@@ -6340,7 +7374,7 @@ get_element()
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Properties():
+<pre><code class="python">class Properties(VersionBase):
     &#34;&#34;&#34; the Properties contains are for user defined properties of an object               
 
         Attributes
@@ -6412,6 +7446,10 @@ get_element()
         
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.Properties.add_file"><code class="name flex">
@@ -6525,7 +7563,7 @@ properties (Properties): properties of the roadcondition
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class RoadCondition():
+<pre><code class="python">class RoadCondition(VersionBase):
     &#34;&#34;&#34; Weather creates an Weather element of openscenario
         
         Parameters
@@ -6586,6 +7624,10 @@ properties (Properties): properties of the roadcondition
             element.append(self.properties.get_element())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.RoadCondition.get_attributes"><code class="name flex">
@@ -6676,7 +7718,7 @@ closed (boolean): if the waypoints forms a loop
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Route():
+<pre><code class="python">class Route(VersionBase):
     &#34;&#34;&#34; the Route class creates a route, needs atleast two waypoints to be valid
         
         Parameters
@@ -6822,6 +7864,10 @@ closed (boolean): if the waypoints forms a loop
             element.append(w.get_element())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.Route.add_parameter"><code class="name flex">
@@ -6984,6 +8030,395 @@ author (str): author of the catalog
 </dd>
 </dl>
 </dd>
+<dt id="scenariogeneration.xosc.utils.Sun"><code class="flex name class">
+<span>class <span class="ident">Sun</span></span>
+<span>(</span><span>intensity, azimuth, elevation)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Sun creates an Sun element used by the Weather element of openscenario</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>intensity (double): intensity of the sun (in lux)
+
+azimuth (double): azimuth of the sun 0 north, pi/2 east, pi south, 3/2pi west
+
+elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>intensity (double): intensity of the sun (in lux)
+
+azimuth (double): azimuth of the sun 0 north, pi/2 east, pi south, 3/2pi west
+
+elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element()
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of the class
+</code></pre>
+<p>initalize the Sun</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>intensity (double): intensity of the sun (in lux)
+
+azimuth (double): azimuth of the sun 0 north, pi/2 east, pi south, 3/2pi west
+
+elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Sun(VersionBase):
+    &#34;&#34;&#34; Sun creates an Sun element used by the Weather element of openscenario
+        
+        Parameters
+        ----------
+            intensity (double): intensity of the sun (in lux)
+
+            azimuth (double): azimuth of the sun 0 north, pi/2 east, pi south, 3/2pi west
+
+            elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
+
+        Attributes
+        ----------
+            intensity (double): intensity of the sun (in lux)
+
+            azimuth (double): azimuth of the sun 0 north, pi/2 east, pi south, 3/2pi west
+
+            elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+
+            get_attributes()
+                Returns a dictionary of all attributes of the class
+
+    &#34;&#34;&#34;
+    def __init__(self,intensity,azimuth,elevation):
+        &#34;&#34;&#34; initalize the Sun
+
+            Parameters
+            ----------
+                intensity (double): intensity of the sun (in lux)
+
+                azimuth (double): azimuth of the sun 0 north, pi/2 east, pi south, 3/2pi west
+
+                elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
+                
+        &#34;&#34;&#34;
+
+        self.azimuth = azimuth 
+        self.intensity = intensity
+        self.elevation = elevation
+
+    def __eq__(self,other):
+        if isinstance(other,Sun):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the Precipitation as a dict
+
+        &#34;&#34;&#34;
+        retdict = {}
+        retdict[&#39;azimuth&#39;] = str(self.azimuth)
+        retdict[&#39;intensity&#39;] = str(self.intensity)
+        retdict[&#39;elevation&#39;] = str(self.elevation)
+        return retdict
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the Sun
+
+        &#34;&#34;&#34;
+        element = ET.Element(&#39;Sun&#39;,attrib=self.get_attributes())
+
+        return element</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.utils.Sun.get_attributes"><code class="name flex">
+<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the attributes of the Precipitation as a dict</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_attributes(self):
+    &#34;&#34;&#34; returns the attributes of the Precipitation as a dict
+
+    &#34;&#34;&#34;
+    retdict = {}
+    retdict[&#39;azimuth&#39;] = str(self.azimuth)
+    retdict[&#39;intensity&#39;] = str(self.intensity)
+    retdict[&#39;elevation&#39;] = str(self.elevation)
+    return retdict</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xosc.utils.Sun.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the elementTree of the Sun</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self):
+    &#34;&#34;&#34; returns the elementTree of the Sun
+
+    &#34;&#34;&#34;
+    element = ET.Element(&#39;Sun&#39;,attrib=self.get_attributes())
+
+    return element</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="scenariogeneration.xosc.utils.TargetDistanceSteadyState"><code class="flex name class">
+<span>class <span class="ident">TargetDistanceSteadyState</span></span>
+<span>(</span><span>distance)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>the TargetDistanceSteadyState describes a SteadyState of type TargetDistanceSteadyState</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>distance (double): distance to target for the steady state
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>distance (double): distance to target for the steady state
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element()
+    Returns the full ElementTree of the class
+</code></pre>
+<p>initalzie the TargetDistanceSteadyState</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>distance (double): distance to target for the steady state
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TargetDistanceSteadyState(VersionBase):
+    &#34;&#34;&#34; the TargetDistanceSteadyState describes a SteadyState of type TargetDistanceSteadyState
+
+        Parameters
+        ----------
+            distance (double): distance to target for the steady state
+
+        Attributes
+        ----------
+            distance (double): distance to target for the steady state
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+
+    &#34;&#34;&#34;
+    def __init__(self,distance):
+        &#34;&#34;&#34; initalzie the TargetDistanceSteadyState
+
+        Parameters
+        ----------
+            distance (double): distance to target for the steady state
+        
+        &#34;&#34;&#34;
+        self.distance = distance
+        
+
+    def __eq__(self,other):
+        if isinstance(other,TargetDistanceSteadyState):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the TargetDistanceSteadyState
+        
+        &#34;&#34;&#34;
+        return {&#39;distance&#39;:str(self.distance)}
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the TargetDistanceSteadyState
+
+        &#34;&#34;&#34;
+        if self.isVersion(0):
+            raise OpenSCENARIOVersionError(&#39;TargetDistanceSteadyState was introduced in OpenSCENARIO V1.1&#39;)
+        element = ET.Element(&#39;SteadyState&#39;)
+        ET.SubElement(element,&#39;TargetDistanceSteadyState&#39;,attrib=self.get_attributes())
+        return element</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.utils.TargetDistanceSteadyState.get_attributes"><code class="name flex">
+<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the attributes of the TargetDistanceSteadyState</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_attributes(self):
+    &#34;&#34;&#34; returns the attributes of the TargetDistanceSteadyState
+    
+    &#34;&#34;&#34;
+    return {&#39;distance&#39;:str(self.distance)}</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xosc.utils.TargetDistanceSteadyState.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the elementTree of the TargetDistanceSteadyState</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self):
+    &#34;&#34;&#34; returns the elementTree of the TargetDistanceSteadyState
+
+    &#34;&#34;&#34;
+    if self.isVersion(0):
+        raise OpenSCENARIOVersionError(&#39;TargetDistanceSteadyState was introduced in OpenSCENARIO V1.1&#39;)
+    element = ET.Element(&#39;SteadyState&#39;)
+    ET.SubElement(element,&#39;TargetDistanceSteadyState&#39;,attrib=self.get_attributes())
+    return element</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="scenariogeneration.xosc.utils.TargetTimeSteadyState"><code class="flex name class">
+<span>class <span class="ident">TargetTimeSteadyState</span></span>
+<span>(</span><span>time_gap)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>the TargetTimeSteadyState describes a SteadyState of type TargetTimeSteadyState</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>time_gap (double): time_gap to target for the steady state
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>time_gap (double): time_gap to target for the steady state
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element()
+    Returns the full ElementTree of the class
+</code></pre>
+<p>initalzie the TargetTimeSteadyState</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>time_gap (double): time_gap to target for the steady state
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TargetTimeSteadyState(VersionBase):
+    &#34;&#34;&#34; the TargetTimeSteadyState describes a SteadyState of type TargetTimeSteadyState
+
+        Parameters
+        ----------
+            time_gap (double): time_gap to target for the steady state
+
+        Attributes
+        ----------
+            time_gap (double): time_gap to target for the steady state
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+
+    &#34;&#34;&#34;
+    def __init__(self,time_gap):
+        &#34;&#34;&#34; initalzie the TargetTimeSteadyState
+
+        Parameters
+        ----------
+            time_gap (double): time_gap to target for the steady state
+        
+        &#34;&#34;&#34;
+        self.time_gap = time_gap
+        
+
+    def __eq__(self,other):
+        if isinstance(other,TargetTimeSteadyState):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the TargetTimeSteadyState
+        
+        &#34;&#34;&#34;
+        return {&#39;time&#39;:str(self.time_gap)}
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the TargetTimeSteadyState
+
+        &#34;&#34;&#34;
+        if self.isVersion(0):
+            raise OpenSCENARIOVersionError(&#39;TargetTimeSteadyState was introduced in OpenSCENARIO V1.1&#39;)
+        element = ET.Element(&#39;SteadyState&#39;)
+        ET.SubElement(element,&#39;TargetTimeSteadyState&#39;,attrib=self.get_attributes())
+        return element</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.utils.TargetTimeSteadyState.get_attributes"><code class="name flex">
+<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the attributes of the TargetTimeSteadyState</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_attributes(self):
+    &#34;&#34;&#34; returns the attributes of the TargetTimeSteadyState
+    
+    &#34;&#34;&#34;
+    return {&#39;time&#39;:str(self.time_gap)}</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xosc.utils.TargetTimeSteadyState.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the elementTree of the TargetTimeSteadyState</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self):
+    &#34;&#34;&#34; returns the elementTree of the TargetTimeSteadyState
+
+    &#34;&#34;&#34;
+    if self.isVersion(0):
+        raise OpenSCENARIOVersionError(&#39;TargetTimeSteadyState was introduced in OpenSCENARIO V1.1&#39;)
+    element = ET.Element(&#39;SteadyState&#39;)
+    ET.SubElement(element,&#39;TargetTimeSteadyState&#39;,attrib=self.get_attributes())
+    return element</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
 <dt id="scenariogeneration.xosc.utils.TimeOfDay"><code class="flex name class">
 <span>class <span class="ident">TimeOfDay</span></span>
 <span>(</span><span>animation, year, month, day, hour, minute, second)</span>
@@ -7047,7 +8482,7 @@ second (int): second
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class TimeOfDay():
+<pre><code class="python">class TimeOfDay(VersionBase):
     &#34;&#34;&#34; TimeOfDay creates an TimeOfDay element of openscenario
         
         Parameters
@@ -7139,6 +8574,10 @@ second (int): second
         &#34;&#34;&#34;
         return ET.Element(&#39;TimeOfDay&#39;,attrib=self.get_attributes())</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.TimeOfDay.get_attributes"><code class="name flex">
@@ -7216,7 +8655,7 @@ Default: None</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class TimeReference():
+<pre><code class="python">class TimeReference(VersionBase):
     &#34;&#34;&#34; the TimeReference class creates a TimeReference, 
         
         Parameters
@@ -7265,7 +8704,7 @@ Default: None</p></div>
             self._only_nones = False
         else:
             raise ValueError(&#39;missing inputs for time reference&#39;)
-        if reference_domain is not None and reference_domain not in ReferenceContext:
+        if reference_domain is not None and not hasattr(ReferenceContext,str(reference_domain)):
             raise TypeError(&#39;input reference_domain is not of type ReferenceContext&#39;)
         
         self.reference_domain = reference_domain
@@ -7286,7 +8725,7 @@ Default: None</p></div>
 
         &#34;&#34;&#34;
         retdict = {}
-        retdict[&#39;domainAbsoluteRelative&#39;] = self.reference_domain.name
+        retdict[&#39;domainAbsoluteRelative&#39;] = self.reference_domain.get_name()
         retdict[&#39;scale&#39;] = str(self.scale)
         retdict[&#39;offset&#39;] = str(self.offset)
         return retdict
@@ -7304,6 +8743,10 @@ Default: None</p></div>
         
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.TimeReference.get_attributes"><code class="name flex">
@@ -7320,7 +8763,7 @@ Default: None</p></div>
 
     &#34;&#34;&#34;
     retdict = {}
-    retdict[&#39;domainAbsoluteRelative&#39;] = self.reference_domain.name
+    retdict[&#39;domainAbsoluteRelative&#39;] = self.reference_domain.get_name()
     retdict[&#39;scale&#39;] = str(self.scale)
     retdict[&#39;offset&#39;] = str(self.offset)
     return retdict</code></pre>
@@ -7392,7 +8835,7 @@ add_controller(controller,weight)
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class TrafficDefinition():
+<pre><code class="python">class TrafficDefinition(VersionBase):
     &#34;&#34;&#34; the TrafficDefinition class creates a TrafficDefinition used by the different TrafficActions
         
         Parameters
@@ -7465,7 +8908,7 @@ add_controller(controller,weight)
                 weight (float): the corresponding weight for the distribution of the vehicle category
 
         &#34;&#34;&#34;
-        if vehiclecategory not in VehicleCategory:
+        if not hasattr(VehicleCategory,str(vehiclecategory)):
             raise TypeError(&#39;vehcilecategory input is not of type VehcileCategory&#39;)
         self.vehiclecategories.append(vehiclecategory)
         self.vehicleweights.append(weight)
@@ -7506,7 +8949,7 @@ add_controller(controller,weight)
         
         veh_element = ET.SubElement(element,&#39;VehicleCategoryDistribution&#39;)
         for i in range(len(self.vehiclecategories)):
-            ET.SubElement(veh_element,&#39;VehicleCategoryDistributionEntry&#39;,attrib={&#39;category&#39;: self.vehiclecategories[i].name,&#39;weight&#39;: str(self.vehicleweights[i])})
+            ET.SubElement(veh_element,&#39;VehicleCategoryDistributionEntry&#39;,attrib={&#39;category&#39;: self.vehiclecategories[i].get_name(),&#39;weight&#39;: str(self.vehicleweights[i])})
 
         cnt_element = ET.SubElement(element,&#39;ControllerDistribution&#39;)
         for i in range(len(self.controllers)):
@@ -7515,6 +8958,10 @@ add_controller(controller,weight)
 
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.TrafficDefinition.add_controller"><code class="name flex">
@@ -7571,7 +9018,7 @@ weight (float): the corresponding weight for the distribution of the vehicle cat
             weight (float): the corresponding weight for the distribution of the vehicle category
 
     &#34;&#34;&#34;
-    if vehiclecategory not in VehicleCategory:
+    if not hasattr(VehicleCategory,str(vehiclecategory)):
         raise TypeError(&#39;vehcilecategory input is not of type VehcileCategory&#39;)
     self.vehiclecategories.append(vehiclecategory)
     self.vehicleweights.append(weight)</code></pre>
@@ -7617,7 +9064,7 @@ weight (float): the corresponding weight for the distribution of the vehicle cat
     
     veh_element = ET.SubElement(element,&#39;VehicleCategoryDistribution&#39;)
     for i in range(len(self.vehiclecategories)):
-        ET.SubElement(veh_element,&#39;VehicleCategoryDistributionEntry&#39;,attrib={&#39;category&#39;: self.vehiclecategories[i].name,&#39;weight&#39;: str(self.vehicleweights[i])})
+        ET.SubElement(veh_element,&#39;VehicleCategoryDistributionEntry&#39;,attrib={&#39;category&#39;: self.vehiclecategories[i].get_name(),&#39;weight&#39;: str(self.vehicleweights[i])})
 
     cnt_element = ET.SubElement(element,&#39;ControllerDistribution&#39;)
     for i in range(len(self.controllers)):
@@ -7676,7 +9123,7 @@ reference (string): id to the controller in the RoadNetwork
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class TrafficSignalController():
+<pre><code class="python">class TrafficSignalController(VersionBase):
     &#34;&#34;&#34; the TrafficSignalController class creates a polyline of (minimum 2) positions
         
         Parameters
@@ -7769,6 +9216,10 @@ reference (string): id to the controller in the RoadNetwork
             element.append(ph.get_element())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.TrafficSignalController.add_phase"><code class="name flex">
@@ -7886,7 +9337,7 @@ get_attributes()
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Trajectory():
+<pre><code class="python">class Trajectory(VersionBase):
     &#34;&#34;&#34; the Trajectory class creates a Trajectory, 
         
         Parameters
@@ -8029,6 +9480,10 @@ get_attributes()
             shape.append(sh.get_element())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.Trajectory.add_parameter"><code class="name flex">
@@ -8224,7 +9679,7 @@ value (float): the value of the dynamics (time rate or distance)
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class TransitionDynamics():
+<pre><code class="python">class TransitionDynamics(VersionBase):
     &#34;&#34;&#34; TransitionDynamics is used to define how the dynamics of a change
         
         Parameters
@@ -8264,11 +9719,11 @@ value (float): the value of the dynamics (time rate or distance)
                 value (float): the value of the dynamics (time rate or distance)
 
         &#34;&#34;&#34;
-        if shape not in DynamicsShapes:
+        if not hasattr(DynamicsShapes,str(shape)):
             raise TypeError(shape + &#39;; is not a valid shape.&#39;)
         
         self.shape = shape
-        if dimension not in DynamicsDimension:
+        if not hasattr(DynamicsDimension,str(dimension)):
             raise ValueError(dimension + &#39; is not a valid dynamics dimension&#39;)
         self.dimension = dimension
         self.value = value
@@ -8283,7 +9738,7 @@ value (float): the value of the dynamics (time rate or distance)
         &#34;&#34;&#34; returns the attributes of the TransitionDynamics as a dict
 
         &#34;&#34;&#34;
-        return {&#39;dynamicsShape&#39;:self.shape.name,&#39;value&#39;:str(self.value),&#39;dynamicsDimension&#39;:self.dimension.name}
+        return {&#39;dynamicsShape&#39;:self.shape.get_name(),&#39;value&#39;:str(self.value),&#39;dynamicsDimension&#39;:self.dimension.get_name()}
 
     def get_element(self,name=&#39;TransitionDynamics&#39;):
         &#34;&#34;&#34; returns the elementTree of the TransitionDynamics
@@ -8291,6 +9746,10 @@ value (float): the value of the dynamics (time rate or distance)
         &#34;&#34;&#34;
         return ET.Element(name,self.get_attributes())</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.TransitionDynamics.get_attributes"><code class="name flex">
@@ -8306,7 +9765,7 @@ value (float): the value of the dynamics (time rate or distance)
     &#34;&#34;&#34; returns the attributes of the TransitionDynamics as a dict
 
     &#34;&#34;&#34;
-    return {&#39;dynamicsShape&#39;:self.shape.name,&#39;value&#39;:str(self.value),&#39;dynamicsDimension&#39;:self.dimension.name}</code></pre>
+    return {&#39;dynamicsShape&#39;:self.shape.get_name(),&#39;value&#39;:str(self.value),&#39;dynamicsDimension&#39;:self.dimension.get_name()}</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xosc.utils.TransitionDynamics.get_element"><code class="name flex">
@@ -8360,7 +9819,7 @@ routestrategy (RouteStrategy): routing strategy for this waypoint
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Waypoint():
+<pre><code class="python">class Waypoint(VersionBase):
     &#34;&#34;&#34; the Route class creates a route, needs atleast two waypoints to be valid
         
         Parameters
@@ -8398,7 +9857,7 @@ routestrategy (RouteStrategy): routing strategy for this waypoint
         if not isinstance(position,_PositionType):
             raise TypeError(&#39;position input not a valid Position&#39;)
         self.position = position
-        if routestrategy not in RouteStrategy:
+        if not hasattr(RouteStrategy,str(routestrategy)):
             ValueError(&#39;not a valid RouteStrategy&#39;)
         self.routestrategy = routestrategy
 
@@ -8412,7 +9871,7 @@ routestrategy (RouteStrategy): routing strategy for this waypoint
         &#34;&#34;&#34; returns the attributes of the Waypoint as a dict
 
         &#34;&#34;&#34;
-        return {&#39;routeStrategy&#39;:self.routestrategy.name}
+        return {&#39;routeStrategy&#39;:self.routestrategy.get_name()}
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the Waypoint
@@ -8422,6 +9881,10 @@ routestrategy (RouteStrategy): routing strategy for this waypoint
         element.append(self.position.get_element())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.Waypoint.get_attributes"><code class="name flex">
@@ -8437,7 +9900,7 @@ routestrategy (RouteStrategy): routing strategy for this waypoint
     &#34;&#34;&#34; returns the attributes of the Waypoint as a dict
 
     &#34;&#34;&#34;
-    return {&#39;routeStrategy&#39;:self.routestrategy.name}</code></pre>
+    return {&#39;routeStrategy&#39;:self.routestrategy.get_name()}</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xosc.utils.Waypoint.get_element"><code class="name flex">
@@ -8462,45 +9925,46 @@ routestrategy (RouteStrategy): routing strategy for this waypoint
 </dd>
 <dt id="scenariogeneration.xosc.utils.Weather"><code class="flex name class">
 <span>class <span class="ident">Weather</span></span>
-<span>(</span><span>cloudstate, sun_intensity, sun_azimuth, sun_elevation, precipitation, precipitation_intensity, visual_fog_range=100000, fog_bounding_box=None)</span>
+<span>(</span><span>cloudstate=None, atmosphericPressure=None, temperature=None, sun=None, fog=None, precipitation=None, wind=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Weather creates an Weather element of openscenario</p>
 <h2 id="parameters">Parameters</h2>
 <pre><code>cloudstate (CloudState): cloudstate of the weather
+    Default: None
 
-sun_intensity (int): intensity of the sun (in lux)
+atmosphericPressure (float): atmospheric pressure in Pa (valid from OpenSCENARIO V1.1)
+    Default: None
 
-sun_azimuth (int): azimuth of the sun 0 north, pi/2 east, pi south, 3/2pi west
+temperature (float): outside temperature (valid from OpenSCENARIO V1.1)
+    Default: None
 
-sun_elevation (int): sun elevation angle 0 x/y plane, pi/2 zenith
+sun (Sun): the sun position
+    Default: None
 
-precipitation (precipitationType): dry, rain or snow
+fog (Fog): fot state
+    Default: None
 
-precipitation_intensity (double): intensity of precipitation (0...1)
+precipitation (Precipitation): the precipitation state
+    Default: None
 
-visual_fog_range (int): visual range of fog
-    Default: 100000
-
-fog_bounding_box (BoundingBox): bounding box of fog
+wind (Wind): the wind (valid from OpenSCENARIO V1.1)
     Default: None
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>cloudstate (CloudState): cloudstate of the weather
 
-sun_intensity (int): intensity of the sun (in lux)
+atmosphericPressure (float): atmospheric pressure in Pa (valid from OpenSCENARIO V1.1)
 
-sun_azimuth (int): azimuth of the sun 0 north, pi/2 east, pi south, 3/2pi west
+temperature (float): outside temperature (valid from OpenSCENARIO V1.1)
 
-sun_elevation (int): sun elevation angle 0 x/y plane, pi/2 zenith
+sun (Sun): the sun position
 
-precipitation (precipitationType): dry, rain or snow
+fog (Fog): fot state
 
-precipitation_intensity (double): intensity of precipitation (0...1)
+precipitation (Precipitation): the precipitation state
 
-visual_fog_range (int): visual range of fog
-
-fog_bounding_box (BoundingBox): bounding box of fog
+wind (Wind): the wind (valid from OpenSCENARIO V1.1)
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>get_element()
@@ -8512,67 +9976,71 @@ get_attributes()
 <p>initalize the Weather</p>
 <h2 id="parameters_1">Parameters</h2>
 <pre><code>cloudstate (CloudState): cloudstate of the weather
+    Default: None
 
-sun_intensity (double): intensity of the sun (in lux)
+atmosphericPressure (float): atmospheric pressure in Pa (valid from OpenSCENARIO V1.1)
+    Default: None
 
-sun_azimuth (double): azimuth of the sun 0 north, pi/2 east, pi south, 3/2pi west
+temperature (float): outside temperature (valid from OpenSCENARIO V1.1)
+    Default: None
 
-sun_elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
+sun (Sun): the sun position
+    Default: None
 
-precipitation (PrecipitationType): dry, rain or snow
+fog (Fog): fot state
+    Default: None
 
-precipitation_intensity (double): intensity of precipitation (0...1)
+precipitation (Precipitation): the precipitation state
+    Default: None
 
-visual_fog_range (double): visual range of fog
-    Default: 100000
-
-fog_bounding_box (BoundingBox): bounding box of fog
+wind (Wind): the wind (valid from OpenSCENARIO V1.1)
     Default: None
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Weather():
+<pre><code class="python">class Weather(VersionBase):
     &#34;&#34;&#34; Weather creates an Weather element of openscenario
         
         Parameters
         ----------
             cloudstate (CloudState): cloudstate of the weather
+                Default: None
 
-            sun_intensity (int): intensity of the sun (in lux)
+            atmosphericPressure (float): atmospheric pressure in Pa (valid from OpenSCENARIO V1.1)
+                Default: None
 
-            sun_azimuth (int): azimuth of the sun 0 north, pi/2 east, pi south, 3/2pi west
+            temperature (float): outside temperature (valid from OpenSCENARIO V1.1)
+                Default: None
 
-            sun_elevation (int): sun elevation angle 0 x/y plane, pi/2 zenith
+            sun (Sun): the sun position
+                Default: None
 
-            precipitation (precipitationType): dry, rain or snow
+            fog (Fog): fot state
+                Default: None
 
-            precipitation_intensity (double): intensity of precipitation (0...1)
+            precipitation (Precipitation): the precipitation state
+                Default: None
 
-            visual_fog_range (int): visual range of fog
-                Default: 100000
-
-            fog_bounding_box (BoundingBox): bounding box of fog
+            wind (Wind): the wind (valid from OpenSCENARIO V1.1)
                 Default: None
 
         Attributes
         ----------
             cloudstate (CloudState): cloudstate of the weather
 
-            sun_intensity (int): intensity of the sun (in lux)
+            atmosphericPressure (float): atmospheric pressure in Pa (valid from OpenSCENARIO V1.1)
 
-            sun_azimuth (int): azimuth of the sun 0 north, pi/2 east, pi south, 3/2pi west
+            temperature (float): outside temperature (valid from OpenSCENARIO V1.1)
 
-            sun_elevation (int): sun elevation angle 0 x/y plane, pi/2 zenith
+            sun (Sun): the sun position
 
-            precipitation (precipitationType): dry, rain or snow
+            fog (Fog): fot state
 
-            precipitation_intensity (double): intensity of precipitation (0...1)
+            precipitation (Precipitation): the precipitation state
 
-            visual_fog_range (int): visual range of fog
-
-            fog_bounding_box (BoundingBox): bounding box of fog
+            wind (Wind): the wind (valid from OpenSCENARIO V1.1)
 
         Methods
         -------
@@ -8584,55 +10052,60 @@ fog_bounding_box (BoundingBox): bounding box of fog
                 Returns a dictionary of all attributes of the class
 
     &#34;&#34;&#34;
-    def __init__(self,cloudstate,sun_intensity,sun_azimuth,sun_elevation,precipitation,precipitation_intensity,visual_fog_range = 100000,fog_bounding_box = None):
+    def __init__(self,cloudstate=None,atmosphericPressure=None,temperature=None,sun=None,fog=None,precipitation=None,wind=None):
         &#34;&#34;&#34; initalize the Weather
 
             Parameters
             ----------
                 cloudstate (CloudState): cloudstate of the weather
+                    Default: None
 
-                sun_intensity (double): intensity of the sun (in lux)
+                atmosphericPressure (float): atmospheric pressure in Pa (valid from OpenSCENARIO V1.1)
+                    Default: None
 
-                sun_azimuth (double): azimuth of the sun 0 north, pi/2 east, pi south, 3/2pi west
+                temperature (float): outside temperature (valid from OpenSCENARIO V1.1)
+                    Default: None
 
-                sun_elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
+                sun (Sun): the sun position
+                    Default: None
 
-                precipitation (PrecipitationType): dry, rain or snow
+                fog (Fog): fot state
+                    Default: None
 
-                precipitation_intensity (double): intensity of precipitation (0...1)
+                precipitation (Precipitation): the precipitation state
+                    Default: None
 
-                visual_fog_range (double): visual range of fog
-                    Default: 100000
-
-                fog_bounding_box (BoundingBox): bounding box of fog
-                    Default: None  
+                wind (Wind): the wind (valid from OpenSCENARIO V1.1)
+                    Default: None
                 
         &#34;&#34;&#34;
-        if cloudstate not in CloudState:
+        if cloudstate and not hasattr(CloudState,str(cloudstate)):
             raise TypeError(&#39;cloudstate input is not of type CloudState&#39;)
-        if precipitation not in PrecipitationType:
-            raise TypeError(&#39;precipitation input is not of type PrecipitationType&#39;)
-        if fog_bounding_box != None and not isinstance(fog_bounding_box, BoundingBox):
-            raise TypeError(&#39;fog_bounding_box input is not of type BoundingBox&#39;)
-        self.cloudstate = cloudstate 
-        self.sun_intensity = sun_intensity
-        self.sun_azimuth = sun_azimuth
-        self.sun_elevation = sun_elevation
+        if precipitation and not isinstance(precipitation,Precipitation):
+            raise TypeError(&#39;precipitation input is not of type Precipitation&#39;)
+        if fog and not isinstance(fog,Fog):
+            raise TypeError(&#39;fog input is not of type Fog&#39;)
+        if wind and not isinstance(wind,Wind):
+            raise TypeError(&#39;wind input is not of type Wind&#39;)
+        if sun and not isinstance(sun,Sun):
+            raise TypeError(&#39;sun input is not of type Sun&#39;)
+
+        self.cloudstate = cloudstate
+        self.atmosphericPressure = atmosphericPressure
+        self.temperature = temperature
+        self.fog = fog
+        self.sun = sun
+        self.wind = wind
         self.precipitation = precipitation
-        self.precipitation_intensity = precipitation_intensity
-        self.visual_fog_range = visual_fog_range
-        self.fog_bounding_box = fog_bounding_box
+        
 
     def __eq__(self,other):
         if isinstance(other,Weather):
             if self.get_attributes() == other.get_attributes() and \
-            self.sun_intensity == other.sun_intensity and \
-            self.sun_azimuth == other.sun_azimuth and \
-            self.sun_elevation == other.sun_elevation and \
-            self.precipitation == other.precipitation and \
-            self.precipitation_intensity == other.precipitation_intensity and \
-            self.visual_fog_range == other.visual_fog_range and \
-            self.fog_bounding_box == other.fog_bounding_box:                
+            self.fog == other.fog and \
+            self.wind == other.wind and \
+            self.sun == other.sun and \
+            self.precipitation == other.precipitation:                
                 return True
         return False
 
@@ -8640,20 +10113,41 @@ fog_bounding_box (BoundingBox): bounding box of fog
         &#34;&#34;&#34; returns the attributes of the Weather as a dict
 
         &#34;&#34;&#34;
-        return {&#39;cloudState&#39;:self.cloudstate.name}
+        retdict = {}
+        if self.cloudstate:
+            retdict[&#39;cloudState&#39;] = self.cloudstate.get_name()
+        if self.temperature and not self.isVersion(0):
+            retdict[&#39;temperature&#39;] = str(self.temperature)
+        elif self.temperature and self.isVersion(0):
+            raise OpenSCENARIOVersionError(&#39;temperature was introduced in OpenSCENARIO V1.1&#39;)
+        if self.atmosphericPressure and not self.isVersion(0):
+            retdict[&#39;atmosphericPressure&#39;] = str(self.atmosphericPressure)
+        elif self.atmosphericPressure and self.isVersion(0):
+            raise OpenSCENARIOVersionError(&#39;atmosphericPressure was introduced in OpenSCENARIO V1.1&#39;)
+        return retdict
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the Weather
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;Weather&#39;,attrib=self.get_attributes())
-        ET.SubElement(element,&#39;Sun&#39;,attrib={&#39;intensity&#39;:str(self.sun_intensity),&#39;azimuth&#39;:str(self.sun_azimuth),&#39;elevation&#39;:str(self.sun_elevation)})
-        fog = ET.SubElement(element,&#39;Fog&#39;,attrib={&#39;visualRange&#39;:str(self.visual_fog_range)})
-        if self.fog_bounding_box:
-            fog.append(self.fog_bounding_box.get_element())
-        ET.SubElement(element,&#39;Precipitation&#39;,attrib={&#39;precipitationType&#39;:self.precipitation.name,&#39;intensity&#39;:str(self.precipitation_intensity)})
+        if self.sun:
+            print(self.sun)
+            element.append(self.sun.get_element())
+        if self.fog:
+            element.append(self.fog.get_element())
+        if self.precipitation:
+            element.append(self.precipitation.get_element())
+        if self.wind and not self.isVersion(0):
+            element.append(self.wind.get_element())
+        if self.wind and self.isVersion(0):
+            raise OpenSCENARIOVersionError(&#39;Wind was introduced in OpenSCENARIO V1.1&#39;)
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.Weather.get_attributes"><code class="name flex">
@@ -8669,7 +10163,18 @@ fog_bounding_box (BoundingBox): bounding box of fog
     &#34;&#34;&#34; returns the attributes of the Weather as a dict
 
     &#34;&#34;&#34;
-    return {&#39;cloudState&#39;:self.cloudstate.name}</code></pre>
+    retdict = {}
+    if self.cloudstate:
+        retdict[&#39;cloudState&#39;] = self.cloudstate.get_name()
+    if self.temperature and not self.isVersion(0):
+        retdict[&#39;temperature&#39;] = str(self.temperature)
+    elif self.temperature and self.isVersion(0):
+        raise OpenSCENARIOVersionError(&#39;temperature was introduced in OpenSCENARIO V1.1&#39;)
+    if self.atmosphericPressure and not self.isVersion(0):
+        retdict[&#39;atmosphericPressure&#39;] = str(self.atmosphericPressure)
+    elif self.atmosphericPressure and self.isVersion(0):
+        raise OpenSCENARIOVersionError(&#39;atmosphericPressure was introduced in OpenSCENARIO V1.1&#39;)
+    return retdict</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xosc.utils.Weather.get_element"><code class="name flex">
@@ -8686,11 +10191,148 @@ fog_bounding_box (BoundingBox): bounding box of fog
 
     &#34;&#34;&#34;
     element = ET.Element(&#39;Weather&#39;,attrib=self.get_attributes())
-    ET.SubElement(element,&#39;Sun&#39;,attrib={&#39;intensity&#39;:str(self.sun_intensity),&#39;azimuth&#39;:str(self.sun_azimuth),&#39;elevation&#39;:str(self.sun_elevation)})
-    fog = ET.SubElement(element,&#39;Fog&#39;,attrib={&#39;visualRange&#39;:str(self.visual_fog_range)})
-    if self.fog_bounding_box:
-        fog.append(self.fog_bounding_box.get_element())
-    ET.SubElement(element,&#39;Precipitation&#39;,attrib={&#39;precipitationType&#39;:self.precipitation.name,&#39;intensity&#39;:str(self.precipitation_intensity)})
+    if self.sun:
+        print(self.sun)
+        element.append(self.sun.get_element())
+    if self.fog:
+        element.append(self.fog.get_element())
+    if self.precipitation:
+        element.append(self.precipitation.get_element())
+    if self.wind and not self.isVersion(0):
+        element.append(self.wind.get_element())
+    if self.wind and self.isVersion(0):
+        raise OpenSCENARIOVersionError(&#39;Wind was introduced in OpenSCENARIO V1.1&#39;)
+    return element</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="scenariogeneration.xosc.utils.Wind"><code class="flex name class">
+<span>class <span class="ident">Wind</span></span>
+<span>(</span><span>direction, speed)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Wind creates an Wind element used by the Weather element of openscenario</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>direction (float): wind direction (radians)
+
+speed (float): wind speed (m/s)
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>direction (float): wind direction (radians)
+
+speed (float): wind speed (m/s)
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element()
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of the class
+</code></pre>
+<p>initalize the Wind</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>direction (float): wind direction (radians)
+
+speed (float): wind speed (m/s)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Wind(VersionBase):
+    &#34;&#34;&#34; Wind creates an Wind element used by the Weather element of openscenario
+        
+        Parameters
+        ----------
+            direction (float): wind direction (radians)
+
+            speed (float): wind speed (m/s)
+
+        Attributes
+        ----------
+            direction (float): wind direction (radians)
+
+            speed (float): wind speed (m/s)
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+
+            get_attributes()
+                Returns a dictionary of all attributes of the class
+
+    &#34;&#34;&#34;
+    def __init__(self,direction,speed):
+        &#34;&#34;&#34; initalize the Wind
+
+            Parameters
+            ----------
+                direction (float): wind direction (radians)
+
+                speed (float): wind speed (m/s)
+                
+        &#34;&#34;&#34;
+        self.direction = direction 
+        self.speed = speed
+
+    def __eq__(self,other):
+        if isinstance(other,Wind):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the Wind as a dict
+
+        &#34;&#34;&#34;
+        return {&#39;direction&#39;:str(self.direction),&#39;speed&#39;:str(self.speed)}
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the Wind
+
+        &#34;&#34;&#34;
+        element = ET.Element(&#39;Wind&#39;,attrib=self.get_attributes())
+
+        return element</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.utils.Wind.get_attributes"><code class="name flex">
+<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the attributes of the Wind as a dict</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_attributes(self):
+    &#34;&#34;&#34; returns the attributes of the Wind as a dict
+
+    &#34;&#34;&#34;
+    return {&#39;direction&#39;:str(self.direction),&#39;speed&#39;:str(self.speed)}</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xosc.utils.Wind.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the elementTree of the Wind</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self):
+    &#34;&#34;&#34; returns the elementTree of the Wind
+
+    &#34;&#34;&#34;
+    element = ET.Element(&#39;Wind&#39;,attrib=self.get_attributes())
+
     return element</code></pre>
 </details>
 </dd>
@@ -8818,6 +10460,20 @@ fog_bounding_box (BoundingBox): bounding box of fog
 </ul>
 </li>
 <li>
+<h4><code><a title="scenariogeneration.xosc.utils.Fog" href="#scenariogeneration.xosc.utils.Fog">Fog</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xosc.utils.Fog.get_attributes" href="#scenariogeneration.xosc.utils.Fog.get_attributes">get_attributes</a></code></li>
+<li><code><a title="scenariogeneration.xosc.utils.Fog.get_element" href="#scenariogeneration.xosc.utils.Fog.get_element">get_element</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xosc.utils.License" href="#scenariogeneration.xosc.utils.License">License</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xosc.utils.License.get_attributes" href="#scenariogeneration.xosc.utils.License.get_attributes">get_attributes</a></code></li>
+<li><code><a title="scenariogeneration.xosc.utils.License.get_element" href="#scenariogeneration.xosc.utils.License.get_element">get_element</a></code></li>
+</ul>
+</li>
+<li>
 <h4><code><a title="scenariogeneration.xosc.utils.Nurbs" href="#scenariogeneration.xosc.utils.Nurbs">Nurbs</a></code></h4>
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.utils.Nurbs.add_control_point" href="#scenariogeneration.xosc.utils.Nurbs.add_control_point">add_control_point</a></code></li>
@@ -8870,6 +10526,13 @@ fog_bounding_box (BoundingBox): bounding box of fog
 </ul>
 </li>
 <li>
+<h4><code><a title="scenariogeneration.xosc.utils.Precipitation" href="#scenariogeneration.xosc.utils.Precipitation">Precipitation</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xosc.utils.Precipitation.get_attributes" href="#scenariogeneration.xosc.utils.Precipitation.get_attributes">get_attributes</a></code></li>
+<li><code><a title="scenariogeneration.xosc.utils.Precipitation.get_element" href="#scenariogeneration.xosc.utils.Precipitation.get_element">get_element</a></code></li>
+</ul>
+</li>
+<li>
 <h4><code><a title="scenariogeneration.xosc.utils.Properties" href="#scenariogeneration.xosc.utils.Properties">Properties</a></code></h4>
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.utils.Properties.add_file" href="#scenariogeneration.xosc.utils.Properties.add_file">add_file</a></code></li>
@@ -8893,6 +10556,27 @@ fog_bounding_box (BoundingBox): bounding box of fog
 <li><code><a title="scenariogeneration.xosc.utils.Route.dump_to_catalog" href="#scenariogeneration.xosc.utils.Route.dump_to_catalog">dump_to_catalog</a></code></li>
 <li><code><a title="scenariogeneration.xosc.utils.Route.get_attributes" href="#scenariogeneration.xosc.utils.Route.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.utils.Route.get_element" href="#scenariogeneration.xosc.utils.Route.get_element">get_element</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xosc.utils.Sun" href="#scenariogeneration.xosc.utils.Sun">Sun</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xosc.utils.Sun.get_attributes" href="#scenariogeneration.xosc.utils.Sun.get_attributes">get_attributes</a></code></li>
+<li><code><a title="scenariogeneration.xosc.utils.Sun.get_element" href="#scenariogeneration.xosc.utils.Sun.get_element">get_element</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xosc.utils.TargetDistanceSteadyState" href="#scenariogeneration.xosc.utils.TargetDistanceSteadyState">TargetDistanceSteadyState</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xosc.utils.TargetDistanceSteadyState.get_attributes" href="#scenariogeneration.xosc.utils.TargetDistanceSteadyState.get_attributes">get_attributes</a></code></li>
+<li><code><a title="scenariogeneration.xosc.utils.TargetDistanceSteadyState.get_element" href="#scenariogeneration.xosc.utils.TargetDistanceSteadyState.get_element">get_element</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xosc.utils.TargetTimeSteadyState" href="#scenariogeneration.xosc.utils.TargetTimeSteadyState">TargetTimeSteadyState</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xosc.utils.TargetTimeSteadyState.get_attributes" href="#scenariogeneration.xosc.utils.TargetTimeSteadyState.get_attributes">get_attributes</a></code></li>
+<li><code><a title="scenariogeneration.xosc.utils.TargetTimeSteadyState.get_element" href="#scenariogeneration.xosc.utils.TargetTimeSteadyState.get_element">get_element</a></code></li>
 </ul>
 </li>
 <li>
@@ -8956,6 +10640,13 @@ fog_bounding_box (BoundingBox): bounding box of fog
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.utils.Weather.get_attributes" href="#scenariogeneration.xosc.utils.Weather.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.utils.Weather.get_element" href="#scenariogeneration.xosc.utils.Weather.get_element">get_element</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xosc.utils.Wind" href="#scenariogeneration.xosc.utils.Wind">Wind</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xosc.utils.Wind.get_attributes" href="#scenariogeneration.xosc.utils.Wind.get_attributes">get_attributes</a></code></li>
+<li><code><a title="scenariogeneration.xosc.utils.Wind.get_element" href="#scenariogeneration.xosc.utils.Wind.get_element">get_element</a></code></li>
 </ul>
 </li>
 </ul>

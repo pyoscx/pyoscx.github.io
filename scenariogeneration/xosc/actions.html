@@ -30,13 +30,17 @@
 &#34;&#34;&#34;
 import xml.etree.ElementTree as ET
 
-from .utils import DynamicsConstrains, TimeReference, convert_bool, TransitionDynamics, CatalogReference, Route, Trajectory, TrafficDefinition, Environment
+from numpy.lib.function_base import disp
+
+from .utils import DynamicsConstrains, TimeReference, convert_bool, TransitionDynamics, CatalogReference, Route, Trajectory, TrafficDefinition, Environment, TargetTimeSteadyState, TargetDistanceSteadyState
 from .utils import Controller
-from .enumerations import DynamicsShapes, SpeedTargetValueType, FollowMode, ReferenceContext
-from .exceptions import NoActionsDefinedError
+from .enumerations import CoordinateSystem, DynamicsShapes, LateralDisplacement, SpeedTargetValueType, FollowMode, ReferenceContext, VersionBase, LongitudinalDisplacement
+from .exceptions import NoActionsDefinedError, OpenSCENARIOVersionError
 from .position import _PositionType
 
-class _ActionType():
+
+
+class _ActionType(VersionBase):
     &#34;&#34;&#34; helper class for typesetting
     &#34;&#34;&#34;
     pass
@@ -44,7 +48,7 @@ class _PrivateActionType(_ActionType):
     &#34;&#34;&#34; helper class for typesetting
     &#34;&#34;&#34;
     pass
-class _Action():
+class _Action(VersionBase):
     &#34;&#34;&#34; Private class used to define an action, should not be used by the user.
         Used as a wrapper to create the extra elements needed
         
@@ -289,6 +293,12 @@ class LongitudinalDistanceAction(_PrivateActionType):
             max_speed (float): maximum speed allowed
                 Default: None
 
+            coordinate_system (CoordinateSystem): the coordinate system for the distance calculation
+                Default CoordinateSystem.entity
+
+            displacement (LongitudinalDisplacement): type of displacement wanted
+                Default LongitudinalDisplacement.any
+                
         Attributes
         ----------
             entity (str): the target name
@@ -301,6 +311,10 @@ class LongitudinalDistanceAction(_PrivateActionType):
 
             dynamic_constraint (DynamicsConstrains): Dynamics constraints of the action
 
+            coordinate_system (CoordinateSystem): the coordinate system for the distance calculation
+
+            displacement (LongitudinalDisplacement): type of displacement wanted
+                
         Methods
         -------
             get_element()
@@ -310,7 +324,7 @@ class LongitudinalDistanceAction(_PrivateActionType):
                 Returns a dictionary of all attributes of the class
 
     &#34;&#34;&#34;
-    def __init__(self,distance,entity,freespace=True,continuous=True,max_acceleration = None,max_deceleration = None,max_speed = None):
+    def __init__(self,distance,entity,freespace=True,continuous=True,max_acceleration = None,max_deceleration = None,max_speed = None, coordinate_system=CoordinateSystem.entity, displacement=LongitudinalDisplacement.any):
         &#34;&#34;&#34; initalize the LongitudinalDistanceAction
         
         Parameters
@@ -334,6 +348,11 @@ class LongitudinalDistanceAction(_PrivateActionType):
             max_speed (float): maximum speed allowed
                 Default: None
 
+            coordinate_system (CoordinateSystem): the coordinate system for the distance calculation
+                Default CoordinateSystem.entity
+
+            displacement (LongitudinalDisplacement): type of displacement wanted
+                Default LongitudinalDisplacement.any
         &#34;&#34;&#34;
         self.target = entity
         if not isinstance(continuous,bool):
@@ -342,11 +361,16 @@ class LongitudinalDistanceAction(_PrivateActionType):
         if not isinstance(freespace,bool):
             raise TypeError(&#39;freespace input not of type bool&#39;)
 
-
         self.freespace = freespace
         self.continuous = continuous
         self.dynamic_constraint = DynamicsConstrains(max_acceleration,max_deceleration,max_speed)
         self.distance = distance
+        if not hasattr(CoordinateSystem,str(coordinate_system)):
+            raise ValueError(coordinate_system + &#39;; is not a valid CoordinateSystem.&#39;)
+        if not hasattr(LongitudinalDisplacement,str(displacement)):
+            raise ValueError(displacement + &#39;; is not a valid LongitudinalDisplacement.&#39;)
+        self.coordinate_system = coordinate_system
+        self.displacement = displacement
 
     def __eq__(self,other):
         if isinstance(other,LongitudinalDistanceAction):
@@ -363,6 +387,9 @@ class LongitudinalDistanceAction(_PrivateActionType):
         retdict[&#39;freespace&#39;] = convert_bool(self.freespace)
         retdict[&#39;continuous&#39;] = convert_bool(self.continuous)
         retdict[&#39;distance&#39;] = str(self.distance)
+        if not self.isVersion(minor=0):
+            retdict[&#39;coordinateSystem&#39;] = self.coordinate_system.get_name()
+            retdict[&#39;displacement&#39;] = self.displacement.get_name()
         return retdict
 
     def get_element(self):
@@ -719,7 +746,7 @@ class AbsoluteLaneOffsetAction(_PrivateActionType):
 
         self.continuous = continuous
         self.value = value
-        if shape not in DynamicsShapes:
+        if not hasattr(DynamicsShapes,str(shape)):
             raise ValueError(shape + &#39;; is not a valid shape.&#39;)
         self.dynshape = shape
         self.maxlatacc = maxlatacc
@@ -748,7 +775,7 @@ class AbsoluteLaneOffsetAction(_PrivateActionType):
         element = ET.Element(&#39;PrivateAction&#39;)
         lataction = ET.SubElement(element,&#39;LateralAction&#39;)
         laneoffsetaction = ET.SubElement(lataction,&#39;LaneOffsetAction&#39;,attrib={&#39;continuous&#39;:convert_bool(self.continuous)})
-        ET.SubElement(laneoffsetaction,&#39;LaneOffsetActionDynamics&#39;,{&#39;maxLateralAcc&#39;:str(self.maxlatacc),&#39;dynamicsShape&#39;:self.dynshape.name})
+        ET.SubElement(laneoffsetaction,&#39;LaneOffsetActionDynamics&#39;,{&#39;maxLateralAcc&#39;:str(self.maxlatacc),&#39;dynamicsShape&#39;:self.dynshape.get_name()})
         laneoftarget = ET.SubElement(laneoffsetaction,&#39;LaneOffsetTarget&#39;)
         ET.SubElement(laneoftarget,&#39;AbsoluteTargetLaneOffset&#39;,self.get_attributes())
 
@@ -813,7 +840,7 @@ class RelativeLaneOffsetAction(_PrivateActionType):
         self.continuous = continuous
         self.value = value
         self.target = entity
-        if shape not in DynamicsShapes:
+        if not hasattr(DynamicsShapes,str(shape)):
             raise ValueError(shape + &#39;; is not a valid shape.&#39;)
         self.dynshape = shape
         self.maxlatacc = maxlatacc
@@ -844,7 +871,7 @@ class RelativeLaneOffsetAction(_PrivateActionType):
         element = ET.Element(&#39;PrivateAction&#39;)
         lataction = ET.SubElement(element,&#39;LateralAction&#39;)
         laneoffsetaction = ET.SubElement(lataction,&#39;LaneOffsetAction&#39;,attrib={&#39;continuous&#39;:convert_bool(self.continuous)})
-        ET.SubElement(laneoffsetaction,&#39;LaneOffsetActionDynamics&#39;,{&#39;maxLateralAcc&#39;:str(self.maxlatacc),&#39;dynamicsShape&#39;:self.dynshape.name})
+        ET.SubElement(laneoffsetaction,&#39;LaneOffsetActionDynamics&#39;,{&#39;maxLateralAcc&#39;:str(self.maxlatacc),&#39;dynamicsShape&#39;:self.dynshape.get_name()})
         laneoftarget = ET.SubElement(laneoffsetaction,&#39;LaneOffsetTarget&#39;)
         ET.SubElement(laneoftarget,&#39;RelativeTargetLaneOffset&#39;,attrib=self.get_attributes())
 
@@ -874,7 +901,12 @@ class LateralDistanceAction(_PrivateActionType):
 
             max_speed (float): maximum speed allowed
                 Default: None
-            
+
+            coordinate_system (CoordinateSystem): the coordinate system for the distance calculation
+                Default CoordinateSystem.entity
+
+            displacement (LateralDisplacement): type of displacement wanted
+                Default LateralDisplacement.any
         Attributes
         ----------
             entity (str): the target name
@@ -891,6 +923,9 @@ class LateralDistanceAction(_PrivateActionType):
 
             dynamic_constraint (DynamicsConstrains): Dynamics constraints of the action
 
+            coordinate_system (CoordinateSystem): the coordinate system for the distance calculation
+
+            displacement (LateralDisplacement): type of displacement wanted
 
         Methods
         -------
@@ -901,7 +936,7 @@ class LateralDistanceAction(_PrivateActionType):
                 Returns a dictionary of all attributes of the class
 
     &#34;&#34;&#34;
-    def __init__(self,entity,distance=None,freespace=True,continuous=True,max_acceleration = None,max_deceleration = None,max_speed = None):
+    def __init__(self,entity,distance=None,freespace=True,continuous=True,max_acceleration = None,max_deceleration = None,max_speed = None,coordinate_system=CoordinateSystem.entity,displacement=LateralDisplacement.any):
         &#34;&#34;&#34; initalizes the LateralDistanceAction
 
         Parameters
@@ -924,6 +959,12 @@ class LateralDistanceAction(_PrivateActionType):
 
             max_speed (float): maximum speed allowed
                 Default: None
+            
+            coordinate_system (CoordinateSystem): the coordinate system for the distance calculation
+                Default CoordinateSystem.entity
+
+            displacement (LateralDisplacement): type of displacement wanted
+                Default LateralDisplacement.any
         &#34;&#34;&#34;
         self.distance = distance
         self.target = entity
@@ -936,6 +977,12 @@ class LateralDistanceAction(_PrivateActionType):
         self.freespace = freespace
         self.continuous = continuous
         self.dynamic_constraint = DynamicsConstrains(max_acceleration,max_deceleration,max_speed)
+        if not hasattr(CoordinateSystem,str(coordinate_system)):
+            raise ValueError(coordinate_system + &#39;; is not a valid CoordinateSystem.&#39;)
+        if not hasattr(LateralDisplacement,str(displacement)):
+            raise ValueError(displacement + &#39;; is not a valid LateralDisplacement.&#39;)
+        self.coordinate_system = coordinate_system
+        self.displacement = displacement
 
     def __eq__(self,other):
         if isinstance(other,LateralDistanceAction):
@@ -954,6 +1001,9 @@ class LateralDistanceAction(_PrivateActionType):
         retdict[&#39;continuous&#39;] = convert_bool(self.continuous)
         if self.distance != None:
             retdict[&#39;distance&#39;] = str(self.distance)
+        if not self.isVersion(minor=0):
+            retdict[&#39;coordinateSystem&#39;] = self.coordinate_system.get_name()
+            retdict[&#39;displacement&#39;] = self.displacement.get_name()
         return retdict
 
     def get_element(self):
@@ -1208,9 +1258,13 @@ class FollowTrajectoryAction(_PrivateActionType):
         element = ET.Element(&#39;PrivateAction&#39;)
         routeaction = ET.SubElement(element,&#39;RoutingAction&#39;)
         trajaction = ET.SubElement(routeaction,&#39;FollowTrajectoryAction&#39;,attrib=self.get_attributes())
-        trajaction.append(self.trajectory.get_element())
+        if self.isVersion(minor=0):
+            trajaction.append(self.trajectory.get_element())
+        else:
+            trajref = ET.SubElement(trajaction,&#39;TrajectoryRef&#39;)
+            trajref.append(self.trajectory.get_element())
         trajaction.append(self.timeref.get_element())
-        ET.SubElement(trajaction,&#39;TrajectoryFollowingMode&#39;,attrib={&#39;followingMode&#39;:self.following_mode.name})
+        ET.SubElement(trajaction,&#39;TrajectoryFollowingMode&#39;,attrib={&#39;followingMode&#39;:self.following_mode.get_name()})
 
         return element
 
@@ -1276,8 +1330,11 @@ class ActivateControllerAction(_PrivateActionType):
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;PrivateAction&#39;)
-        ET.SubElement(element,&#39;ActivateControllerAction&#39;,attrib=self.get_attributes())
-
+        if self.isVersion(minor=0):
+            ET.SubElement(element,&#39;ActivateControllerAction&#39;,attrib=self.get_attributes())
+        else:
+            subelem = ET.SubElement(element,&#39;ControllerAction&#39;)
+            ET.SubElement(subelem,&#39;ActivateControllerAction&#39;,attrib=self.get_attributes())
         return element
 
 
@@ -1288,33 +1345,59 @@ class AssignControllerAction(_PrivateActionType):
         ----------
             controller (Controller or Catalogreference): a controller to assign
 
+            activateLateral (bool): if the lateral control should be activated (valid from V1.1)
+                Default: True
+
+            activateLongitudinal (bool): if the longitudinal control should be activated (valid from V1.1)
+                Default: True
         Attributes
         ----------
             controller (boolController or Catalogreferenceean): a controller to assign
 
+            activateLateral (bool): if the lateral control should be activated (valid from V1.1)
+
+            activateLongitudinal (bool): if the longitudinal control should be activated (valid from V1.1)
+                
         Methods
         -------
             get_element()
                 Returns the full ElementTree of the class
 
     &#34;&#34;&#34;
-    def __init__(self,controller):
+    def __init__(self,controller,activateLateral=True,activateLongitudinal=True):
         &#34;&#34;&#34; initalizes the AssignControllerAction
 
             Parameters
             ----------
                 controller (Controller or Catalogreference): a controller to assign
 
+                activateLateral (bool): if the lateral control should be activated (valid from V1.1)
+                    Default: True
+
+                activateLongitudinal (bool): if the longitudinal control should be activated (valid from V1.1)
+                    Default: True
         &#34;&#34;&#34;
         if not ( isinstance(controller,Controller) or isinstance(controller,CatalogReference)):
             raise TypeError(&#39;route input not of type Route or CatalogReference&#39;) 
         self.controller = controller
+        self.activateLateral = activateLateral
+        self.activateLongitudinal = activateLongitudinal
 
     def __eq__(self,other):
         if isinstance(other,AssignControllerAction):
             if self.controller == other.controller:
                 return True
         return False
+
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the VisibilityAction as a dict
+
+        &#34;&#34;&#34;
+        if self.isVersion(minor=0):
+            return {}
+        else:
+            return {&#39;activateLateral&#39;:convert_bool(self.activateLateral),&#39;activateLongitudinal&#39;:convert_bool(self.activateLongitudinal)}
+
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the AssignControllerAction
@@ -1610,10 +1693,12 @@ class AbsoluteSynchronizeAction(_PrivateActionType):
 
             speed (double): the absolute speed of the target that should syncronize
 
-            target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. Not officially part of OpenSCENARIO but supported in esmini
+            target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
-            target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. Not officially part of OpenSCENARIO but supported in esmini
+            target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
+            steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
+                Default: None
         Attributes
         ----------
             entity (str): entity to syncronize with
@@ -1624,9 +1709,11 @@ class AbsoluteSynchronizeAction(_PrivateActionType):
 
             speed (double): the absolute speed of the target that should syncronize
 
-            target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. Not officially part of OpenSCENARIO but supported in esmini
+            target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
-            target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. Not officially part of OpenSCENARIO but supported in esmini
+            target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
+
+            steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
 
         Methods
         -------
@@ -1637,7 +1724,7 @@ class AbsoluteSynchronizeAction(_PrivateActionType):
                 Returns the the attributes of the class
 
     &#34;&#34;&#34;
-    def __init__(self,entity,entity_PositionType,target_PositionType,speed,target_tolerance_master=None,target_tolerance=None):
+    def __init__(self,entity,entity_PositionType,target_PositionType,speed,target_tolerance_master=None,target_tolerance=None,steady_state=None):
         &#34;&#34;&#34; initalize the AbsoluteSynchronizeAction
 
             Parameters
@@ -1650,9 +1737,12 @@ class AbsoluteSynchronizeAction(_PrivateActionType):
 
                 speed (double): the absolute speed of the target that should syncronize
 
-                target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. Not officially part of OpenSCENARIO but supported in esmini
+                target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
-                target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. Not officially part of OpenSCENARIO but supported in esmini
+                target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
+
+                steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
+                Default: None
         &#34;&#34;&#34;
 
         self.entity = entity
@@ -1666,13 +1756,16 @@ class AbsoluteSynchronizeAction(_PrivateActionType):
         self.speed = speed
         self.target_tolerance_master = target_tolerance_master
         self.target_tolerance = target_tolerance
-
+        if steady_state and not (isinstance(steady_state,TargetTimeSteadyState) or isinstance(steady_state,TargetDistanceSteadyState)):
+            raise TypeError(&#39;steady_state input is not TargetTimeSteadyState or TargetDistanceSteadyState&#39;)
+        self.steady_state = steady_state
     def __eq__(self,other):
         if isinstance(other,AbsoluteSynchronizeAction):
             if self.get_attributes() == other.get_attributes() and \
             self.entity_PositionType == other.entity_PositionType and \
             self.target_PositionType == other.target_PositionType and \
-            self.speed == other.speed:
+            self.speed == other.speed and \
+            self.steady_state == other.steady_state:
                 return True
         return False
 
@@ -1697,7 +1790,8 @@ class AbsoluteSynchronizeAction(_PrivateActionType):
         syncaction.append(self.target_PositionType.get_element(&#39;TargetPosition&#39;))
         finalspeed = ET.SubElement(syncaction,&#39;FinalSpeed&#39;)
         ET.SubElement(finalspeed,&#39;AbsoluteSpeed&#39;,attrib={&#39;value&#39;:str(self.speed)})
-        
+        if self.steady_state and not self.isVersion(0):
+            finalspeed.append(self.steady_state.get_element())
         return element
 
 
@@ -1716,10 +1810,12 @@ class RelativeSynchronizeAction(_PrivateActionType):
 
             speed_target_type (str): the semantics of the value (delta, factor)
 
-            target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. Not officially part of OpenSCENARIO but supported in esmini
+            target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
-            target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. Not officially part of OpenSCENARIO but supported in esmini
+            target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
+            steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
+                Default: None
         Attributes
         ----------
             entity (str): entity to syncronize with
@@ -1732,10 +1828,12 @@ class RelativeSynchronizeAction(_PrivateActionType):
 
             speed_target_type (str): the semantics of the value (delta, factor)
 
-            target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. Not officially part of OpenSCENARIO but supported in esmini
+            target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
-            target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. Not officially part of OpenSCENARIO but supported in esmini
+            target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
+            steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
+                
         Methods
         -------
             get_element()
@@ -1745,7 +1843,7 @@ class RelativeSynchronizeAction(_PrivateActionType):
                 Returns the the attributes of the class
 
     &#34;&#34;&#34;
-    def __init__(self,entity,entity_PositionType,target_PositionType,speed,speed_target_type,target_tolerance_master=None,target_tolerance=None):
+    def __init__(self,entity,entity_PositionType,target_PositionType,speed,speed_target_type,target_tolerance_master=None,target_tolerance=None,steady_state=None):
         &#34;&#34;&#34; initalize the RelativeSynchronizeAction
     
             Parameters
@@ -1760,9 +1858,12 @@ class RelativeSynchronizeAction(_PrivateActionType):
 
                 speed_target_type (str): the semantics of the value (delta, factor)
 
-                target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. Not officially part of OpenSCENARIO but supported in esmini
+                target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
-                target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. Not officially part of OpenSCENARIO but supported in esmini
+                target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
+
+                steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
+                    Default: None
         &#34;&#34;&#34;
 
         self.entity = entity
@@ -1779,6 +1880,9 @@ class RelativeSynchronizeAction(_PrivateActionType):
         self.speed_target_type = speed_target_type
         self.target_tolerance_master = target_tolerance_master
         self.target_tolerance = target_tolerance
+        if steady_state and not (isinstance(steady_state,TargetTimeSteadyState) or isinstance(steady_state,TargetDistanceSteadyState)):
+            raise TypeError(&#39;steady_state input is not TargetTimeSteadyState or TargetDistanceSteadyState&#39;)
+        self.steady_state = steady_state
 
     def __eq__(self,other):
         if isinstance(other,RelativeSynchronizeAction):
@@ -1786,7 +1890,8 @@ class RelativeSynchronizeAction(_PrivateActionType):
             self.entity_PositionType == other.entity_PositionType and \
             self.target_PositionType == other.target_PositionType and \
             self.speed_target_type == other.speed_target_type and \
-            self.speed == other.speed:
+            self.speed == other.speed and \
+            self.steady_state == other.steady_state:
                 return True
         return False
 
@@ -1795,9 +1900,9 @@ class RelativeSynchronizeAction(_PrivateActionType):
 
         &#34;&#34;&#34;
         attr = {&#39;masterEntityRef&#39;:self.entity}
-        if self.target_tolerance_master is not None:
+        if self.target_tolerance_master:
             attr.update({&#39;targetToleranceMaster&#39;: str(self.target_tolerance_master)})
-        if self.target_tolerance is not None:
+        if self.target_tolerance:
             attr.update({&#39;targetTolerance&#39;: str(self.target_tolerance)})
         return attr
 
@@ -1810,6 +1915,8 @@ class RelativeSynchronizeAction(_PrivateActionType):
         syncaction.append(self.entity_PositionType.get_element(&#39;TargetPositionMaster&#39;))
         syncaction.append(self.target_PositionType.get_element(&#39;TargetPosition&#39;))
         finalspeed = ET.SubElement(syncaction,&#39;FinalSpeed&#39;)
+        if self.steady_state and not self.isVersion(0):
+            finalspeed.append(self.steady_state.get_element())
         ET.SubElement(finalspeed,&#39;RelativeSpeedToMaster&#39;,attrib={&#39;value&#39;:str(self.speed),&#39;speedTargetValueType&#39;:self.speed_target_type})
         
         return element
@@ -2273,6 +2380,9 @@ class TrafficSourceAction(_ActionType):
             velocity (float): optional starting velocity of the traffic
                 Default: None
 
+            name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
+                Default: None
+
         Attributes
         ----------
 
@@ -2287,6 +2397,7 @@ class TrafficSourceAction(_ActionType):
             velocity (float): optional starting velocity of the traffic
                 Default: None
 
+            name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
 
         Methods
         -------
@@ -2297,7 +2408,7 @@ class TrafficSourceAction(_ActionType):
                 Returns a dictionary of all attributes of the class
     &#34;&#34;&#34;
 
-    def __init__(self,rate,radius,position,trafficdefinition,velocity = None):
+    def __init__(self,rate,radius,position,trafficdefinition,velocity = None,name=None):
         &#34;&#34;&#34; initalize the TrafficSourceAction
 
         Parameters
@@ -2313,6 +2424,8 @@ class TrafficSourceAction(_ActionType):
             velocity (float): optional starting velocity of the traffic
                 Default: None
 
+            name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
+                Default: None
         &#34;&#34;&#34;
         self.rate = rate
         self.radius = radius
@@ -2324,12 +2437,14 @@ class TrafficSourceAction(_ActionType):
         self.position = position
         self.trafficdefinition = trafficdefinition
         self.velocity = velocity
+        self.name = name
 
     def __eq__(self,other):
         if isinstance(other,TrafficSourceAction):
             if self.get_attributes() == other.get_attributes() and \
             self.position == other.position and \
-            self.trafficdefinition == other.trafficdefinition:
+            self.trafficdefinition == other.trafficdefinition and \
+            self.name == other.name:
                 return True
         return False
 
@@ -2342,6 +2457,8 @@ class TrafficSourceAction(_ActionType):
         retdict[&#39;radius&#39;] = str(self.radius)
         if self.velocity:
             retdict[&#39;velocity&#39;] = str(self.velocity)
+        
+
         return retdict
 
     def get_element(self):
@@ -2349,7 +2466,11 @@ class TrafficSourceAction(_ActionType):
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;GlobalAction&#39;)
-        trafficaction = ET.SubElement(element, &#39;TrafficAction&#39;)
+        traffic_attrib = {}
+        if self.name and not self.isVersion(minor=0):
+            traffic_attrib = {&#39;trafficName&#39;:self.name}
+        
+        trafficaction = ET.SubElement(element, &#39;TrafficAction&#39;,attrib=traffic_attrib)
         sourceaction = ET.SubElement(trafficaction,&#39;TrafficSourceAction&#39;,attrib=self.get_attributes())
         sourceaction.append(self.position.get_element())
         sourceaction.append(self.trafficdefinition.get_element())
@@ -2372,6 +2493,9 @@ class TrafficSinkAction(_ActionType):
 
             trafficdefinition (TrafficDefinition): definition of the traffic
 
+            name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
+                Default: None
+
         Attributes
         ----------
 
@@ -2383,6 +2507,8 @@ class TrafficSinkAction(_ActionType):
 
             trafficdefinition (TrafficDefinition): definition of the traffic
 
+            name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
+                
         Methods
         -------
             get_element()
@@ -2392,7 +2518,7 @@ class TrafficSinkAction(_ActionType):
                 Returns a dictionary of all attributes of the class
     &#34;&#34;&#34;
 
-    def __init__(self,rate,radius,position,trafficdefinition):
+    def __init__(self,rate,radius,position,trafficdefinition,name=None):
         &#34;&#34;&#34; initalize the TrafficSinkAction
 
         Parameters
@@ -2405,6 +2531,8 @@ class TrafficSinkAction(_ActionType):
 
             trafficdefinition (TrafficDefinition): definition of the traffic
 
+            name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
+
         &#34;&#34;&#34;
         self.rate = rate
         self.radius = radius
@@ -2415,6 +2543,7 @@ class TrafficSinkAction(_ActionType):
             raise TypeError(&#39;trafficdefinition input is not of type TrafficDefinition&#39;)
         self.position = position
         self.trafficdefinition = trafficdefinition
+        self.name = name
 
     def __eq__(self,other):
         if isinstance(other,TrafficSinkAction):
@@ -2429,6 +2558,7 @@ class TrafficSinkAction(_ActionType):
 
         &#34;&#34;&#34;
         retdict = {}
+
         retdict[&#39;rate&#39;] = str(self.rate)
         retdict[&#39;radius&#39;] = str(self.radius)
         return retdict
@@ -2439,7 +2569,10 @@ class TrafficSinkAction(_ActionType):
         &#34;&#34;&#34;
 
         element = ET.Element(&#39;GlobalAction&#39;)
-        trafficaction = ET.SubElement(element, &#39;TrafficAction&#39;)
+        traffic_attrib = {}
+        if self.name and not self.isVersion(minor=0):
+            traffic_attrib = {&#39;trafficName&#39;:self.name}
+        trafficaction = ET.SubElement(element, &#39;TrafficAction&#39;,attrib=traffic_attrib)
         sinkaction = ET.SubElement(trafficaction,&#39;TrafficSinkAction&#39;,attrib=self.get_attributes())
         sinkaction.append(self.position.get_element())
         sinkaction.append(self.trafficdefinition.get_element())
@@ -2468,6 +2601,9 @@ class TrafficSwarmAction(_ActionType):
 
             velocity (float): optional starting velocity
                 Default: None
+            
+            name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
+                Default: None
         Attributes
         ----------
 
@@ -2488,6 +2624,8 @@ class TrafficSwarmAction(_ActionType):
             velocity (float): optional starting velocity
                 Default: None
 
+            name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
+                
         Methods
         -------
             get_element()
@@ -2497,7 +2635,7 @@ class TrafficSwarmAction(_ActionType):
                 Returns a dictionary of all attributes of the class
     &#34;&#34;&#34;
 
-    def __init__(self,semimajoraxis,semiminoraxis,innerradius,offset,numberofvehicles,centralobject,trafficdefinition,velocity = None):
+    def __init__(self,semimajoraxis,semiminoraxis,innerradius,offset,numberofvehicles,centralobject,trafficdefinition,velocity = None,name = None):
         &#34;&#34;&#34; initalize the TrafficSwarmAction
 
         Parameters
@@ -2518,6 +2656,9 @@ class TrafficSwarmAction(_ActionType):
 
             velocity (float): optional starting velocity
                 Default: None
+            
+            name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
+                Default: None
         &#34;&#34;&#34;
         self.semimajoraxis = semimajoraxis
         self.semiminoraxis = semiminoraxis
@@ -2529,12 +2670,14 @@ class TrafficSwarmAction(_ActionType):
             raise TypeError(&#39;trafficdefinition input is not of type TrafficDefinition&#39;)
         self.trafficdefinition = trafficdefinition
         self.velocity = velocity
+        self.name = name
 
     def __eq__(self,other):
         if isinstance(other,TrafficSwarmAction):
             if self.get_attributes() == other.get_attributes() and \
             self.centralobject == other.centralobject and \
-            self.trafficdefinition == other.trafficdefinition:
+            self.trafficdefinition == other.trafficdefinition and \
+            self.name == other.name:
                 return True
         return False
 
@@ -2557,10 +2700,76 @@ class TrafficSwarmAction(_ActionType):
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;GlobalAction&#39;)
-        trafficaction = ET.SubElement(element, &#39;TrafficAction&#39;)
+        traffic_attrib = {}
+        if self.name and not self.isVersion(minor=0):
+            traffic_attrib = {&#39;trafficName&#39;:self.name}
+        trafficaction = ET.SubElement(element, &#39;TrafficAction&#39;,attrib=traffic_attrib)
+        
         swarmaction = ET.SubElement(trafficaction,&#39;TrafficSwarmAction&#39;,attrib=self.get_attributes())
         swarmaction.append(self.trafficdefinition.get_element())
         ET.SubElement(swarmaction,&#39;CentralSwarmObject&#39;,attrib={&#39;entityRef&#39;:self.centralobject})
+
+        return element
+
+
+
+class TrafficStopAction(_ActionType):
+    &#34;&#34;&#34; The TrafficStopAction class creates a TrafficAction of the typ TrafficStopAction 
+        
+        Parameters
+        ----------
+            name (str): name of the Traffic to stop
+                Default: None
+
+        Attributes
+        ----------
+
+            name (str): name of the Traffic to stop
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+
+            get_attributes()
+                Returns a dictionary of all attributes of the class
+    &#34;&#34;&#34;
+
+    def __init__(self,name = None):
+        &#34;&#34;&#34; initalize the TrafficSwarmAction
+
+        Parameters
+        ----------
+            name (str): name of the Traffic to stop
+                Default: None
+        &#34;&#34;&#34;
+        self.name = name
+
+    def __eq__(self,other):
+        if isinstance(other,TrafficStopAction):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the TrafficStopAction as a dict
+
+        &#34;&#34;&#34;
+        retdict = {}
+        if self.name and not self.isVersion(0):
+            retdict[&#39;trafficName&#39;] = str(self.name)
+        elif self.isVersion(0):
+            raise OpenSCENARIOVersionError(&#39;TrafficStopAction was introduced in OpenSCENARIO V1.1&#39;)
+
+        return retdict
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the TrafficStopAction
+
+        &#34;&#34;&#34;
+        element = ET.Element(&#39;GlobalAction&#39;)
+        trafficaction = ET.SubElement(element, &#39;TrafficAction&#39;,attrib=self.get_attributes())
+        ET.SubElement(trafficaction,&#39;TrafficStopAction&#39;)      
 
         return element
 
@@ -2818,6 +3027,7 @@ target_lane_offset (float): if a offset in the target lane is wanted
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._PrivateActionType</li>
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -2972,7 +3182,7 @@ continuous (bool): if the controller tries to keep the relative speed
 
         self.continuous = continuous
         self.value = value
-        if shape not in DynamicsShapes:
+        if not hasattr(DynamicsShapes,str(shape)):
             raise ValueError(shape + &#39;; is not a valid shape.&#39;)
         self.dynshape = shape
         self.maxlatacc = maxlatacc
@@ -3001,7 +3211,7 @@ continuous (bool): if the controller tries to keep the relative speed
         element = ET.Element(&#39;PrivateAction&#39;)
         lataction = ET.SubElement(element,&#39;LateralAction&#39;)
         laneoffsetaction = ET.SubElement(lataction,&#39;LaneOffsetAction&#39;,attrib={&#39;continuous&#39;:convert_bool(self.continuous)})
-        ET.SubElement(laneoffsetaction,&#39;LaneOffsetActionDynamics&#39;,{&#39;maxLateralAcc&#39;:str(self.maxlatacc),&#39;dynamicsShape&#39;:self.dynshape.name})
+        ET.SubElement(laneoffsetaction,&#39;LaneOffsetActionDynamics&#39;,{&#39;maxLateralAcc&#39;:str(self.maxlatacc),&#39;dynamicsShape&#39;:self.dynshape.get_name()})
         laneoftarget = ET.SubElement(laneoffsetaction,&#39;LaneOffsetTarget&#39;)
         ET.SubElement(laneoftarget,&#39;AbsoluteTargetLaneOffset&#39;,self.get_attributes())
 
@@ -3011,6 +3221,7 @@ continuous (bool): if the controller tries to keep the relative speed
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._PrivateActionType</li>
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -3048,7 +3259,7 @@ continuous (bool): if the controller tries to keep the relative speed
     element = ET.Element(&#39;PrivateAction&#39;)
     lataction = ET.SubElement(element,&#39;LateralAction&#39;)
     laneoffsetaction = ET.SubElement(lataction,&#39;LaneOffsetAction&#39;,attrib={&#39;continuous&#39;:convert_bool(self.continuous)})
-    ET.SubElement(laneoffsetaction,&#39;LaneOffsetActionDynamics&#39;,{&#39;maxLateralAcc&#39;:str(self.maxlatacc),&#39;dynamicsShape&#39;:self.dynshape.name})
+    ET.SubElement(laneoffsetaction,&#39;LaneOffsetActionDynamics&#39;,{&#39;maxLateralAcc&#39;:str(self.maxlatacc),&#39;dynamicsShape&#39;:self.dynshape.get_name()})
     laneoftarget = ET.SubElement(laneoffsetaction,&#39;LaneOffsetTarget&#39;)
     ET.SubElement(laneoftarget,&#39;AbsoluteTargetLaneOffset&#39;,self.get_attributes())
 
@@ -3161,6 +3372,7 @@ transition_dynamics (TransitionDynamics): how the change should be made
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._PrivateActionType</li>
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -3209,7 +3421,7 @@ transition_dynamics (TransitionDynamics): how the change should be made
 </dd>
 <dt id="scenariogeneration.xosc.actions.AbsoluteSynchronizeAction"><code class="flex name class">
 <span>class <span class="ident">AbsoluteSynchronizeAction</span></span>
-<span>(</span><span>entity, entity_PositionType, target_PositionType, speed, target_tolerance_master=None, target_tolerance=None)</span>
+<span>(</span><span>entity, entity_PositionType, target_PositionType, speed, target_tolerance_master=None, target_tolerance=None, steady_state=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>creates a SynchronizeAction with an absolute speed as target speed</p>
@@ -3222,9 +3434,12 @@ target_PositionType (*Position): the position of the target that should syncroni
 
 speed (double): the absolute speed of the target that should syncronize
 
-target_tolerance_master (optional) (double): tolerance offset of the master's position [m]. Not officially part of OpenSCENARIO but supported in esmini
+target_tolerance_master (optional) (double): tolerance offset of the master's position [m]. (Valid from OpenSCENARIO V1.1)
 
-target_tolerance (optional) (double): tolerance offset of the target's position [m]. Not officially part of OpenSCENARIO but supported in esmini
+target_tolerance (optional) (double): tolerance offset of the target's position [m]. (Valid from OpenSCENARIO V1.1)
+
+steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
+    Default: None
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>entity (str): entity to syncronize with
@@ -3235,9 +3450,11 @@ target_PositionType (*Position): the position of the target that should syncroni
 
 speed (double): the absolute speed of the target that should syncronize
 
-target_tolerance_master (optional) (double): tolerance offset of the master's position [m]. Not officially part of OpenSCENARIO but supported in esmini
+target_tolerance_master (optional) (double): tolerance offset of the master's position [m]. (Valid from OpenSCENARIO V1.1)
 
-target_tolerance (optional) (double): tolerance offset of the target's position [m]. Not officially part of OpenSCENARIO but supported in esmini
+target_tolerance (optional) (double): tolerance offset of the target's position [m]. (Valid from OpenSCENARIO V1.1)
+
+steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>get_element()
@@ -3256,9 +3473,12 @@ target_PositionType (*Position): the position of the target that should syncroni
 
 speed (double): the absolute speed of the target that should syncronize
 
-target_tolerance_master (optional) (double): tolerance offset of the master's position [m]. Not officially part of OpenSCENARIO but supported in esmini
+target_tolerance_master (optional) (double): tolerance offset of the master's position [m]. (Valid from OpenSCENARIO V1.1)
 
-target_tolerance (optional) (double): tolerance offset of the target's position [m]. Not officially part of OpenSCENARIO but supported in esmini
+target_tolerance (optional) (double): tolerance offset of the target's position [m]. (Valid from OpenSCENARIO V1.1)
+
+steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
+Default: None
 </code></pre></div>
 <details class="source">
 <summary>
@@ -3277,10 +3497,12 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
 
             speed (double): the absolute speed of the target that should syncronize
 
-            target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. Not officially part of OpenSCENARIO but supported in esmini
+            target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
-            target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. Not officially part of OpenSCENARIO but supported in esmini
+            target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
+            steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
+                Default: None
         Attributes
         ----------
             entity (str): entity to syncronize with
@@ -3291,9 +3513,11 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
 
             speed (double): the absolute speed of the target that should syncronize
 
-            target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. Not officially part of OpenSCENARIO but supported in esmini
+            target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
-            target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. Not officially part of OpenSCENARIO but supported in esmini
+            target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
+
+            steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
 
         Methods
         -------
@@ -3304,7 +3528,7 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
                 Returns the the attributes of the class
 
     &#34;&#34;&#34;
-    def __init__(self,entity,entity_PositionType,target_PositionType,speed,target_tolerance_master=None,target_tolerance=None):
+    def __init__(self,entity,entity_PositionType,target_PositionType,speed,target_tolerance_master=None,target_tolerance=None,steady_state=None):
         &#34;&#34;&#34; initalize the AbsoluteSynchronizeAction
 
             Parameters
@@ -3317,9 +3541,12 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
 
                 speed (double): the absolute speed of the target that should syncronize
 
-                target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. Not officially part of OpenSCENARIO but supported in esmini
+                target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
-                target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. Not officially part of OpenSCENARIO but supported in esmini
+                target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
+
+                steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
+                Default: None
         &#34;&#34;&#34;
 
         self.entity = entity
@@ -3333,13 +3560,16 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
         self.speed = speed
         self.target_tolerance_master = target_tolerance_master
         self.target_tolerance = target_tolerance
-
+        if steady_state and not (isinstance(steady_state,TargetTimeSteadyState) or isinstance(steady_state,TargetDistanceSteadyState)):
+            raise TypeError(&#39;steady_state input is not TargetTimeSteadyState or TargetDistanceSteadyState&#39;)
+        self.steady_state = steady_state
     def __eq__(self,other):
         if isinstance(other,AbsoluteSynchronizeAction):
             if self.get_attributes() == other.get_attributes() and \
             self.entity_PositionType == other.entity_PositionType and \
             self.target_PositionType == other.target_PositionType and \
-            self.speed == other.speed:
+            self.speed == other.speed and \
+            self.steady_state == other.steady_state:
                 return True
         return False
 
@@ -3364,13 +3594,15 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
         syncaction.append(self.target_PositionType.get_element(&#39;TargetPosition&#39;))
         finalspeed = ET.SubElement(syncaction,&#39;FinalSpeed&#39;)
         ET.SubElement(finalspeed,&#39;AbsoluteSpeed&#39;,attrib={&#39;value&#39;:str(self.speed)})
-        
+        if self.steady_state and not self.isVersion(0):
+            finalspeed.append(self.steady_state.get_element())
         return element</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._PrivateActionType</li>
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -3414,7 +3646,8 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
     syncaction.append(self.target_PositionType.get_element(&#39;TargetPosition&#39;))
     finalspeed = ET.SubElement(syncaction,&#39;FinalSpeed&#39;)
     ET.SubElement(finalspeed,&#39;AbsoluteSpeed&#39;,attrib={&#39;value&#39;:str(self.speed)})
-    
+    if self.steady_state and not self.isVersion(0):
+        finalspeed.append(self.steady_state.get_element())
     return element</code></pre>
 </details>
 </dd>
@@ -3495,6 +3728,7 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._PrivateActionType</li>
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -3612,14 +3846,18 @@ longitudinal (boolean): activate or deactivate the controller
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;PrivateAction&#39;)
-        ET.SubElement(element,&#39;ActivateControllerAction&#39;,attrib=self.get_attributes())
-
+        if self.isVersion(minor=0):
+            ET.SubElement(element,&#39;ActivateControllerAction&#39;,attrib=self.get_attributes())
+        else:
+            subelem = ET.SubElement(element,&#39;ControllerAction&#39;)
+            ET.SubElement(subelem,&#39;ActivateControllerAction&#39;,attrib=self.get_attributes())
         return element</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._PrivateActionType</li>
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -3653,8 +3891,11 @@ longitudinal (boolean): activate or deactivate the controller
 
     &#34;&#34;&#34;
     element = ET.Element(&#39;PrivateAction&#39;)
-    ET.SubElement(element,&#39;ActivateControllerAction&#39;,attrib=self.get_attributes())
-
+    if self.isVersion(minor=0):
+        ET.SubElement(element,&#39;ActivateControllerAction&#39;,attrib=self.get_attributes())
+    else:
+        subelem = ET.SubElement(element,&#39;ControllerAction&#39;)
+        ET.SubElement(subelem,&#39;ActivateControllerAction&#39;,attrib=self.get_attributes())
     return element</code></pre>
 </details>
 </dd>
@@ -3759,6 +4000,7 @@ position (*Position): position where the vehicle should be added
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -3804,15 +4046,25 @@ position (*Position): position where the vehicle should be added
 </dd>
 <dt id="scenariogeneration.xosc.actions.AssignControllerAction"><code class="flex name class">
 <span>class <span class="ident">AssignControllerAction</span></span>
-<span>(</span><span>controller)</span>
+<span>(</span><span>controller, activateLateral=True, activateLongitudinal=True)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>AssignControllerAction creates a ControllerAction of type AssignControllerAction</p>
 <h2 id="parameters">Parameters</h2>
 <pre><code>controller (Controller or Catalogreference): a controller to assign
+
+activateLateral (bool): if the lateral control should be activated (valid from V1.1)
+    Default: True
+
+activateLongitudinal (bool): if the longitudinal control should be activated (valid from V1.1)
+    Default: True
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>controller (boolController or Catalogreferenceean): a controller to assign
+
+activateLateral (bool): if the lateral control should be activated (valid from V1.1)
+
+activateLongitudinal (bool): if the longitudinal control should be activated (valid from V1.1)
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>get_element()
@@ -3821,6 +4073,12 @@ position (*Position): position where the vehicle should be added
 <p>initalizes the AssignControllerAction</p>
 <h2 id="parameters_1">Parameters</h2>
 <pre><code>controller (Controller or Catalogreference): a controller to assign
+
+activateLateral (bool): if the lateral control should be activated (valid from V1.1)
+    Default: True
+
+activateLongitudinal (bool): if the longitudinal control should be activated (valid from V1.1)
+    Default: True
 </code></pre></div>
 <details class="source">
 <summary>
@@ -3833,33 +4091,59 @@ position (*Position): position where the vehicle should be added
         ----------
             controller (Controller or Catalogreference): a controller to assign
 
+            activateLateral (bool): if the lateral control should be activated (valid from V1.1)
+                Default: True
+
+            activateLongitudinal (bool): if the longitudinal control should be activated (valid from V1.1)
+                Default: True
         Attributes
         ----------
             controller (boolController or Catalogreferenceean): a controller to assign
 
+            activateLateral (bool): if the lateral control should be activated (valid from V1.1)
+
+            activateLongitudinal (bool): if the longitudinal control should be activated (valid from V1.1)
+                
         Methods
         -------
             get_element()
                 Returns the full ElementTree of the class
 
     &#34;&#34;&#34;
-    def __init__(self,controller):
+    def __init__(self,controller,activateLateral=True,activateLongitudinal=True):
         &#34;&#34;&#34; initalizes the AssignControllerAction
 
             Parameters
             ----------
                 controller (Controller or Catalogreference): a controller to assign
 
+                activateLateral (bool): if the lateral control should be activated (valid from V1.1)
+                    Default: True
+
+                activateLongitudinal (bool): if the longitudinal control should be activated (valid from V1.1)
+                    Default: True
         &#34;&#34;&#34;
         if not ( isinstance(controller,Controller) or isinstance(controller,CatalogReference)):
             raise TypeError(&#39;route input not of type Route or CatalogReference&#39;) 
         self.controller = controller
+        self.activateLateral = activateLateral
+        self.activateLongitudinal = activateLongitudinal
 
     def __eq__(self,other):
         if isinstance(other,AssignControllerAction):
             if self.controller == other.controller:
                 return True
         return False
+
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the VisibilityAction as a dict
+
+        &#34;&#34;&#34;
+        if self.isVersion(minor=0):
+            return {}
+        else:
+            return {&#39;activateLateral&#39;:convert_bool(self.activateLateral),&#39;activateLongitudinal&#39;:convert_bool(self.activateLongitudinal)}
+
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the AssignControllerAction
@@ -3875,9 +4159,29 @@ position (*Position): position where the vehicle should be added
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._PrivateActionType</li>
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
+<dt id="scenariogeneration.xosc.actions.AssignControllerAction.get_attributes"><code class="name flex">
+<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the attributes of the VisibilityAction as a dict</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_attributes(self):
+    &#34;&#34;&#34; returns the attributes of the VisibilityAction as a dict
+
+    &#34;&#34;&#34;
+    if self.isVersion(minor=0):
+        return {}
+    else:
+        return {&#39;activateLateral&#39;:convert_bool(self.activateLateral),&#39;activateLongitudinal&#39;:convert_bool(self.activateLongitudinal)}</code></pre>
+</details>
+</dd>
 <dt id="scenariogeneration.xosc.actions.AssignControllerAction.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
@@ -3976,6 +4280,7 @@ position (*Position): position where the vehicle should be added
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._PrivateActionType</li>
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -4078,6 +4383,7 @@ get_element()
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -4212,6 +4518,7 @@ get_attributes()
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -4355,6 +4662,7 @@ environment (Environment or CatalogReference): the environment to change to
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -4539,9 +4847,13 @@ initialDistanceOffset (double): start at this offset into the trajectory (v1.1)
         element = ET.Element(&#39;PrivateAction&#39;)
         routeaction = ET.SubElement(element,&#39;RoutingAction&#39;)
         trajaction = ET.SubElement(routeaction,&#39;FollowTrajectoryAction&#39;,attrib=self.get_attributes())
-        trajaction.append(self.trajectory.get_element())
+        if self.isVersion(minor=0):
+            trajaction.append(self.trajectory.get_element())
+        else:
+            trajref = ET.SubElement(trajaction,&#39;TrajectoryRef&#39;)
+            trajref.append(self.trajectory.get_element())
         trajaction.append(self.timeref.get_element())
-        ET.SubElement(trajaction,&#39;TrajectoryFollowingMode&#39;,attrib={&#39;followingMode&#39;:self.following_mode.name})
+        ET.SubElement(trajaction,&#39;TrajectoryFollowingMode&#39;,attrib={&#39;followingMode&#39;:self.following_mode.get_name()})
 
         return element</code></pre>
 </details>
@@ -4549,6 +4861,7 @@ initialDistanceOffset (double): start at this offset into the trajectory (v1.1)
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._PrivateActionType</li>
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -4588,9 +4901,13 @@ initialDistanceOffset (double): start at this offset into the trajectory (v1.1)
     element = ET.Element(&#39;PrivateAction&#39;)
     routeaction = ET.SubElement(element,&#39;RoutingAction&#39;)
     trajaction = ET.SubElement(routeaction,&#39;FollowTrajectoryAction&#39;,attrib=self.get_attributes())
-    trajaction.append(self.trajectory.get_element())
+    if self.isVersion(minor=0):
+        trajaction.append(self.trajectory.get_element())
+    else:
+        trajref = ET.SubElement(trajaction,&#39;TrajectoryRef&#39;)
+        trajref.append(self.trajectory.get_element())
     trajaction.append(self.timeref.get_element())
-    ET.SubElement(trajaction,&#39;TrajectoryFollowingMode&#39;,attrib={&#39;followingMode&#39;:self.following_mode.name})
+    ET.SubElement(trajaction,&#39;TrajectoryFollowingMode&#39;,attrib={&#39;followingMode&#39;:self.following_mode.get_name()})
 
     return element</code></pre>
 </details>
@@ -4599,7 +4916,7 @@ initialDistanceOffset (double): start at this offset into the trajectory (v1.1)
 </dd>
 <dt id="scenariogeneration.xosc.actions.LateralDistanceAction"><code class="flex name class">
 <span>class <span class="ident">LateralDistanceAction</span></span>
-<span>(</span><span>entity, distance=None, freespace=True, continuous=True, max_acceleration=None, max_deceleration=None, max_speed=None)</span>
+<span>(</span><span>entity, distance=None, freespace=True, continuous=True, max_acceleration=None, max_deceleration=None, max_speed=None, coordinate_system=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;, displacement=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;)</span>
 </code></dt>
 <dd>
 <div class="desc"><h2 id="parameters">Parameters</h2>
@@ -4621,6 +4938,12 @@ max_deceleration (float): maximum deceleration allowed
 
 max_speed (float): maximum speed allowed
     Default: None
+
+coordinate_system (CoordinateSystem): the coordinate system for the distance calculation
+    Default CoordinateSystem.entity
+
+displacement (LateralDisplacement): type of displacement wanted
+    Default LateralDisplacement.any
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>entity (str): the target name
@@ -4636,6 +4959,10 @@ distance (float): if the distance metric is used
 timegap (float): if timegap metric is used
 
 dynamic_constraint (DynamicsConstrains): Dynamics constraints of the action
+
+coordinate_system (CoordinateSystem): the coordinate system for the distance calculation
+
+displacement (LateralDisplacement): type of displacement wanted
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>get_element()
@@ -4664,6 +4991,12 @@ max_deceleration (float): maximum deceleration allowed
 
 max_speed (float): maximum speed allowed
     Default: None
+
+coordinate_system (CoordinateSystem): the coordinate system for the distance calculation
+    Default CoordinateSystem.entity
+
+displacement (LateralDisplacement): type of displacement wanted
+    Default LateralDisplacement.any
 </code></pre></div>
 <details class="source">
 <summary>
@@ -4692,7 +5025,12 @@ max_speed (float): maximum speed allowed
 
             max_speed (float): maximum speed allowed
                 Default: None
-            
+
+            coordinate_system (CoordinateSystem): the coordinate system for the distance calculation
+                Default CoordinateSystem.entity
+
+            displacement (LateralDisplacement): type of displacement wanted
+                Default LateralDisplacement.any
         Attributes
         ----------
             entity (str): the target name
@@ -4709,6 +5047,9 @@ max_speed (float): maximum speed allowed
 
             dynamic_constraint (DynamicsConstrains): Dynamics constraints of the action
 
+            coordinate_system (CoordinateSystem): the coordinate system for the distance calculation
+
+            displacement (LateralDisplacement): type of displacement wanted
 
         Methods
         -------
@@ -4719,7 +5060,7 @@ max_speed (float): maximum speed allowed
                 Returns a dictionary of all attributes of the class
 
     &#34;&#34;&#34;
-    def __init__(self,entity,distance=None,freespace=True,continuous=True,max_acceleration = None,max_deceleration = None,max_speed = None):
+    def __init__(self,entity,distance=None,freespace=True,continuous=True,max_acceleration = None,max_deceleration = None,max_speed = None,coordinate_system=CoordinateSystem.entity,displacement=LateralDisplacement.any):
         &#34;&#34;&#34; initalizes the LateralDistanceAction
 
         Parameters
@@ -4742,6 +5083,12 @@ max_speed (float): maximum speed allowed
 
             max_speed (float): maximum speed allowed
                 Default: None
+            
+            coordinate_system (CoordinateSystem): the coordinate system for the distance calculation
+                Default CoordinateSystem.entity
+
+            displacement (LateralDisplacement): type of displacement wanted
+                Default LateralDisplacement.any
         &#34;&#34;&#34;
         self.distance = distance
         self.target = entity
@@ -4754,6 +5101,12 @@ max_speed (float): maximum speed allowed
         self.freespace = freespace
         self.continuous = continuous
         self.dynamic_constraint = DynamicsConstrains(max_acceleration,max_deceleration,max_speed)
+        if not hasattr(CoordinateSystem,str(coordinate_system)):
+            raise ValueError(coordinate_system + &#39;; is not a valid CoordinateSystem.&#39;)
+        if not hasattr(LateralDisplacement,str(displacement)):
+            raise ValueError(displacement + &#39;; is not a valid LateralDisplacement.&#39;)
+        self.coordinate_system = coordinate_system
+        self.displacement = displacement
 
     def __eq__(self,other):
         if isinstance(other,LateralDistanceAction):
@@ -4772,6 +5125,9 @@ max_speed (float): maximum speed allowed
         retdict[&#39;continuous&#39;] = convert_bool(self.continuous)
         if self.distance != None:
             retdict[&#39;distance&#39;] = str(self.distance)
+        if not self.isVersion(minor=0):
+            retdict[&#39;coordinateSystem&#39;] = self.coordinate_system.get_name()
+            retdict[&#39;displacement&#39;] = self.displacement.get_name()
         return retdict
 
     def get_element(self):
@@ -4790,6 +5146,7 @@ max_speed (float): maximum speed allowed
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._PrivateActionType</li>
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -4812,6 +5169,9 @@ max_speed (float): maximum speed allowed
     retdict[&#39;continuous&#39;] = convert_bool(self.continuous)
     if self.distance != None:
         retdict[&#39;distance&#39;] = str(self.distance)
+    if not self.isVersion(minor=0):
+        retdict[&#39;coordinateSystem&#39;] = self.coordinate_system.get_name()
+        retdict[&#39;displacement&#39;] = self.displacement.get_name()
     return retdict</code></pre>
 </details>
 </dd>
@@ -4841,7 +5201,7 @@ max_speed (float): maximum speed allowed
 </dd>
 <dt id="scenariogeneration.xosc.actions.LongitudinalDistanceAction"><code class="flex name class">
 <span>class <span class="ident">LongitudinalDistanceAction</span></span>
-<span>(</span><span>distance, entity, freespace=True, continuous=True, max_acceleration=None, max_deceleration=None, max_speed=None)</span>
+<span>(</span><span>distance, entity, freespace=True, continuous=True, max_acceleration=None, max_deceleration=None, max_speed=None, coordinate_system=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;, displacement=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>The LongitudinalDistanceAction creates a LongitudinalAction of type LongitudinalDistanceAction with a distance target</p>
@@ -4864,6 +5224,12 @@ max_deceleration (float): maximum deceleration allowed
 
 max_speed (float): maximum speed allowed
     Default: None
+
+coordinate_system (CoordinateSystem): the coordinate system for the distance calculation
+    Default CoordinateSystem.entity
+
+displacement (LongitudinalDisplacement): type of displacement wanted
+    Default LongitudinalDisplacement.any
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>entity (str): the target name
@@ -4875,6 +5241,10 @@ continuous (bool): if the controller tries to keep the relative speed
 distance (float): the distance to the entity
 
 dynamic_constraint (DynamicsConstrains): Dynamics constraints of the action
+
+coordinate_system (CoordinateSystem): the coordinate system for the distance calculation
+
+displacement (LongitudinalDisplacement): type of displacement wanted
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>get_element()
@@ -4903,6 +5273,12 @@ max_deceleration (float): maximum deceleration allowed
 
 max_speed (float): maximum speed allowed
     Default: None
+
+coordinate_system (CoordinateSystem): the coordinate system for the distance calculation
+    Default CoordinateSystem.entity
+
+displacement (LongitudinalDisplacement): type of displacement wanted
+    Default LongitudinalDisplacement.any
 </code></pre></div>
 <details class="source">
 <summary>
@@ -4932,6 +5308,12 @@ max_speed (float): maximum speed allowed
             max_speed (float): maximum speed allowed
                 Default: None
 
+            coordinate_system (CoordinateSystem): the coordinate system for the distance calculation
+                Default CoordinateSystem.entity
+
+            displacement (LongitudinalDisplacement): type of displacement wanted
+                Default LongitudinalDisplacement.any
+                
         Attributes
         ----------
             entity (str): the target name
@@ -4944,6 +5326,10 @@ max_speed (float): maximum speed allowed
 
             dynamic_constraint (DynamicsConstrains): Dynamics constraints of the action
 
+            coordinate_system (CoordinateSystem): the coordinate system for the distance calculation
+
+            displacement (LongitudinalDisplacement): type of displacement wanted
+                
         Methods
         -------
             get_element()
@@ -4953,7 +5339,7 @@ max_speed (float): maximum speed allowed
                 Returns a dictionary of all attributes of the class
 
     &#34;&#34;&#34;
-    def __init__(self,distance,entity,freespace=True,continuous=True,max_acceleration = None,max_deceleration = None,max_speed = None):
+    def __init__(self,distance,entity,freespace=True,continuous=True,max_acceleration = None,max_deceleration = None,max_speed = None, coordinate_system=CoordinateSystem.entity, displacement=LongitudinalDisplacement.any):
         &#34;&#34;&#34; initalize the LongitudinalDistanceAction
         
         Parameters
@@ -4977,6 +5363,11 @@ max_speed (float): maximum speed allowed
             max_speed (float): maximum speed allowed
                 Default: None
 
+            coordinate_system (CoordinateSystem): the coordinate system for the distance calculation
+                Default CoordinateSystem.entity
+
+            displacement (LongitudinalDisplacement): type of displacement wanted
+                Default LongitudinalDisplacement.any
         &#34;&#34;&#34;
         self.target = entity
         if not isinstance(continuous,bool):
@@ -4985,11 +5376,16 @@ max_speed (float): maximum speed allowed
         if not isinstance(freespace,bool):
             raise TypeError(&#39;freespace input not of type bool&#39;)
 
-
         self.freespace = freespace
         self.continuous = continuous
         self.dynamic_constraint = DynamicsConstrains(max_acceleration,max_deceleration,max_speed)
         self.distance = distance
+        if not hasattr(CoordinateSystem,str(coordinate_system)):
+            raise ValueError(coordinate_system + &#39;; is not a valid CoordinateSystem.&#39;)
+        if not hasattr(LongitudinalDisplacement,str(displacement)):
+            raise ValueError(displacement + &#39;; is not a valid LongitudinalDisplacement.&#39;)
+        self.coordinate_system = coordinate_system
+        self.displacement = displacement
 
     def __eq__(self,other):
         if isinstance(other,LongitudinalDistanceAction):
@@ -5006,6 +5402,9 @@ max_speed (float): maximum speed allowed
         retdict[&#39;freespace&#39;] = convert_bool(self.freespace)
         retdict[&#39;continuous&#39;] = convert_bool(self.continuous)
         retdict[&#39;distance&#39;] = str(self.distance)
+        if not self.isVersion(minor=0):
+            retdict[&#39;coordinateSystem&#39;] = self.coordinate_system.get_name()
+            retdict[&#39;displacement&#39;] = self.displacement.get_name()
         return retdict
 
     def get_element(self):
@@ -5024,6 +5423,7 @@ max_speed (float): maximum speed allowed
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._PrivateActionType</li>
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -5045,6 +5445,9 @@ max_speed (float): maximum speed allowed
     retdict[&#39;freespace&#39;] = convert_bool(self.freespace)
     retdict[&#39;continuous&#39;] = convert_bool(self.continuous)
     retdict[&#39;distance&#39;] = str(self.distance)
+    if not self.isVersion(minor=0):
+        retdict[&#39;coordinateSystem&#39;] = self.coordinate_system.get_name()
+        retdict[&#39;displacement&#39;] = self.displacement.get_name()
     return retdict</code></pre>
 </details>
 </dd>
@@ -5258,6 +5661,7 @@ max_speed (float): maximum speed allowed
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._PrivateActionType</li>
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -5577,6 +5981,7 @@ set_parkingbrake(active,value)
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._PrivateActionType</li>
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -5894,6 +6299,7 @@ value (double): the value that should be added to the parameter
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -6037,6 +6443,7 @@ value (double): the value that should be added to the parameter
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -6177,6 +6584,7 @@ value (double): the value that should be added to the parameter
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -6359,6 +6767,7 @@ target_lane_offset (float): if a offset in the target lane is wanted
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._PrivateActionType</li>
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -6522,7 +6931,7 @@ continuous (bool): if the controller tries to keep the relative speed
         self.continuous = continuous
         self.value = value
         self.target = entity
-        if shape not in DynamicsShapes:
+        if not hasattr(DynamicsShapes,str(shape)):
             raise ValueError(shape + &#39;; is not a valid shape.&#39;)
         self.dynshape = shape
         self.maxlatacc = maxlatacc
@@ -6553,7 +6962,7 @@ continuous (bool): if the controller tries to keep the relative speed
         element = ET.Element(&#39;PrivateAction&#39;)
         lataction = ET.SubElement(element,&#39;LateralAction&#39;)
         laneoffsetaction = ET.SubElement(lataction,&#39;LaneOffsetAction&#39;,attrib={&#39;continuous&#39;:convert_bool(self.continuous)})
-        ET.SubElement(laneoffsetaction,&#39;LaneOffsetActionDynamics&#39;,{&#39;maxLateralAcc&#39;:str(self.maxlatacc),&#39;dynamicsShape&#39;:self.dynshape.name})
+        ET.SubElement(laneoffsetaction,&#39;LaneOffsetActionDynamics&#39;,{&#39;maxLateralAcc&#39;:str(self.maxlatacc),&#39;dynamicsShape&#39;:self.dynshape.get_name()})
         laneoftarget = ET.SubElement(laneoffsetaction,&#39;LaneOffsetTarget&#39;)
         ET.SubElement(laneoftarget,&#39;RelativeTargetLaneOffset&#39;,attrib=self.get_attributes())
 
@@ -6563,6 +6972,7 @@ continuous (bool): if the controller tries to keep the relative speed
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._PrivateActionType</li>
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -6601,7 +7011,7 @@ continuous (bool): if the controller tries to keep the relative speed
     element = ET.Element(&#39;PrivateAction&#39;)
     lataction = ET.SubElement(element,&#39;LateralAction&#39;)
     laneoffsetaction = ET.SubElement(lataction,&#39;LaneOffsetAction&#39;,attrib={&#39;continuous&#39;:convert_bool(self.continuous)})
-    ET.SubElement(laneoffsetaction,&#39;LaneOffsetActionDynamics&#39;,{&#39;maxLateralAcc&#39;:str(self.maxlatacc),&#39;dynamicsShape&#39;:self.dynshape.name})
+    ET.SubElement(laneoffsetaction,&#39;LaneOffsetActionDynamics&#39;,{&#39;maxLateralAcc&#39;:str(self.maxlatacc),&#39;dynamicsShape&#39;:self.dynshape.get_name()})
     laneoftarget = ET.SubElement(laneoffsetaction,&#39;LaneOffsetTarget&#39;)
     ET.SubElement(laneoftarget,&#39;RelativeTargetLaneOffset&#39;,attrib=self.get_attributes())
 
@@ -6754,6 +7164,7 @@ continuous (bool): if the controller tries to keep the relative speed
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._PrivateActionType</li>
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -6801,7 +7212,7 @@ continuous (bool): if the controller tries to keep the relative speed
 </dd>
 <dt id="scenariogeneration.xosc.actions.RelativeSynchronizeAction"><code class="flex name class">
 <span>class <span class="ident">RelativeSynchronizeAction</span></span>
-<span>(</span><span>entity, entity_PositionType, target_PositionType, speed, speed_target_type, target_tolerance_master=None, target_tolerance=None)</span>
+<span>(</span><span>entity, entity_PositionType, target_PositionType, speed, speed_target_type, target_tolerance_master=None, target_tolerance=None, steady_state=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>creates a SynchronizeAction with a relative speed target</p>
@@ -6816,9 +7227,12 @@ speed (double): the relative speed of the target that should syncronize
 
 speed_target_type (str): the semantics of the value (delta, factor)
 
-target_tolerance_master (optional) (double): tolerance offset of the master's position [m]. Not officially part of OpenSCENARIO but supported in esmini
+target_tolerance_master (optional) (double): tolerance offset of the master's position [m]. (Valid from OpenSCENARIO V1.1)
 
-target_tolerance (optional) (double): tolerance offset of the target's position [m]. Not officially part of OpenSCENARIO but supported in esmini
+target_tolerance (optional) (double): tolerance offset of the target's position [m]. (Valid from OpenSCENARIO V1.1)
+
+steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
+    Default: None
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>entity (str): entity to syncronize with
@@ -6831,9 +7245,11 @@ speed (double): the relative speed of the target that should syncronize
 
 speed_target_type (str): the semantics of the value (delta, factor)
 
-target_tolerance_master (optional) (double): tolerance offset of the master's position [m]. Not officially part of OpenSCENARIO but supported in esmini
+target_tolerance_master (optional) (double): tolerance offset of the master's position [m]. (Valid from OpenSCENARIO V1.1)
 
-target_tolerance (optional) (double): tolerance offset of the target's position [m]. Not officially part of OpenSCENARIO but supported in esmini
+target_tolerance (optional) (double): tolerance offset of the target's position [m]. (Valid from OpenSCENARIO V1.1)
+
+steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>get_element()
@@ -6854,9 +7270,12 @@ speed (double): the absolute speed of the target that should syncronize
 
 speed_target_type (str): the semantics of the value (delta, factor)
 
-target_tolerance_master (optional) (double): tolerance offset of the master's position [m]. Not officially part of OpenSCENARIO but supported in esmini
+target_tolerance_master (optional) (double): tolerance offset of the master's position [m]. (Valid from OpenSCENARIO V1.1)
 
-target_tolerance (optional) (double): tolerance offset of the target's position [m]. Not officially part of OpenSCENARIO but supported in esmini
+target_tolerance (optional) (double): tolerance offset of the target's position [m]. (Valid from OpenSCENARIO V1.1)
+
+steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
+    Default: None
 </code></pre></div>
 <details class="source">
 <summary>
@@ -6877,10 +7296,12 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
 
             speed_target_type (str): the semantics of the value (delta, factor)
 
-            target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. Not officially part of OpenSCENARIO but supported in esmini
+            target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
-            target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. Not officially part of OpenSCENARIO but supported in esmini
+            target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
+            steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
+                Default: None
         Attributes
         ----------
             entity (str): entity to syncronize with
@@ -6893,10 +7314,12 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
 
             speed_target_type (str): the semantics of the value (delta, factor)
 
-            target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. Not officially part of OpenSCENARIO but supported in esmini
+            target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
-            target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. Not officially part of OpenSCENARIO but supported in esmini
+            target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
+            steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
+                
         Methods
         -------
             get_element()
@@ -6906,7 +7329,7 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
                 Returns the the attributes of the class
 
     &#34;&#34;&#34;
-    def __init__(self,entity,entity_PositionType,target_PositionType,speed,speed_target_type,target_tolerance_master=None,target_tolerance=None):
+    def __init__(self,entity,entity_PositionType,target_PositionType,speed,speed_target_type,target_tolerance_master=None,target_tolerance=None,steady_state=None):
         &#34;&#34;&#34; initalize the RelativeSynchronizeAction
     
             Parameters
@@ -6921,9 +7344,12 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
 
                 speed_target_type (str): the semantics of the value (delta, factor)
 
-                target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. Not officially part of OpenSCENARIO but supported in esmini
+                target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
-                target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. Not officially part of OpenSCENARIO but supported in esmini
+                target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
+
+                steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
+                    Default: None
         &#34;&#34;&#34;
 
         self.entity = entity
@@ -6940,6 +7366,9 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
         self.speed_target_type = speed_target_type
         self.target_tolerance_master = target_tolerance_master
         self.target_tolerance = target_tolerance
+        if steady_state and not (isinstance(steady_state,TargetTimeSteadyState) or isinstance(steady_state,TargetDistanceSteadyState)):
+            raise TypeError(&#39;steady_state input is not TargetTimeSteadyState or TargetDistanceSteadyState&#39;)
+        self.steady_state = steady_state
 
     def __eq__(self,other):
         if isinstance(other,RelativeSynchronizeAction):
@@ -6947,7 +7376,8 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
             self.entity_PositionType == other.entity_PositionType and \
             self.target_PositionType == other.target_PositionType and \
             self.speed_target_type == other.speed_target_type and \
-            self.speed == other.speed:
+            self.speed == other.speed and \
+            self.steady_state == other.steady_state:
                 return True
         return False
 
@@ -6956,9 +7386,9 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
 
         &#34;&#34;&#34;
         attr = {&#39;masterEntityRef&#39;:self.entity}
-        if self.target_tolerance_master is not None:
+        if self.target_tolerance_master:
             attr.update({&#39;targetToleranceMaster&#39;: str(self.target_tolerance_master)})
-        if self.target_tolerance is not None:
+        if self.target_tolerance:
             attr.update({&#39;targetTolerance&#39;: str(self.target_tolerance)})
         return attr
 
@@ -6971,6 +7401,8 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
         syncaction.append(self.entity_PositionType.get_element(&#39;TargetPositionMaster&#39;))
         syncaction.append(self.target_PositionType.get_element(&#39;TargetPosition&#39;))
         finalspeed = ET.SubElement(syncaction,&#39;FinalSpeed&#39;)
+        if self.steady_state and not self.isVersion(0):
+            finalspeed.append(self.steady_state.get_element())
         ET.SubElement(finalspeed,&#39;RelativeSpeedToMaster&#39;,attrib={&#39;value&#39;:str(self.speed),&#39;speedTargetValueType&#39;:self.speed_target_type})
         
         return element</code></pre>
@@ -6979,6 +7411,7 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._PrivateActionType</li>
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -6996,9 +7429,9 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
 
     &#34;&#34;&#34;
     attr = {&#39;masterEntityRef&#39;:self.entity}
-    if self.target_tolerance_master is not None:
+    if self.target_tolerance_master:
         attr.update({&#39;targetToleranceMaster&#39;: str(self.target_tolerance_master)})
-    if self.target_tolerance is not None:
+    if self.target_tolerance:
         attr.update({&#39;targetTolerance&#39;: str(self.target_tolerance)})
     return attr</code></pre>
 </details>
@@ -7021,6 +7454,8 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
     syncaction.append(self.entity_PositionType.get_element(&#39;TargetPositionMaster&#39;))
     syncaction.append(self.target_PositionType.get_element(&#39;TargetPosition&#39;))
     finalspeed = ET.SubElement(syncaction,&#39;FinalSpeed&#39;)
+    if self.steady_state and not self.isVersion(0):
+        finalspeed.append(self.steady_state.get_element())
     ET.SubElement(finalspeed,&#39;RelativeSpeedToMaster&#39;,attrib={&#39;value&#39;:str(self.speed),&#39;speedTargetValueType&#39;:self.speed_target_type})
     
     return element</code></pre>
@@ -7102,6 +7537,7 @@ target_tolerance (optional) (double): tolerance offset of the target's position 
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._PrivateActionType</li>
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -7223,6 +7659,7 @@ traffic_signalcontroller_ref (str): reference to traffic signal controller
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -7362,6 +7799,7 @@ state (str): the state to set to the traffic light
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -7406,7 +7844,7 @@ state (str): the state to set to the traffic light
 </dd>
 <dt id="scenariogeneration.xosc.actions.TrafficSinkAction"><code class="flex name class">
 <span>class <span class="ident">TrafficSinkAction</span></span>
-<span>(</span><span>rate, radius, position, trafficdefinition)</span>
+<span>(</span><span>rate, radius, position, trafficdefinition, name=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>The TrafficSinkAction class creates a TrafficAction of the typ TrafficSinkAction</p>
@@ -7418,6 +7856,9 @@ radius (float): the radius of the sink around the position
 position (*Position): any Position to define the sink
 
 trafficdefinition (TrafficDefinition): definition of the traffic
+
+name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
+    Default: None
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>rate (float): rate of appearing traffic
@@ -7427,6 +7868,8 @@ radius (float): the radius of the source around the position
 position (*Position): any Position to define the source
 
 trafficdefinition (TrafficDefinition): definition of the traffic
+
+name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>get_element()
@@ -7444,6 +7887,8 @@ radius (float): the radius of the source around the position
 position (*Position): any Position to define the source
 
 trafficdefinition (TrafficDefinition): definition of the traffic
+
+name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
 </code></pre></div>
 <details class="source">
 <summary>
@@ -7462,6 +7907,9 @@ trafficdefinition (TrafficDefinition): definition of the traffic
 
             trafficdefinition (TrafficDefinition): definition of the traffic
 
+            name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
+                Default: None
+
         Attributes
         ----------
 
@@ -7473,6 +7921,8 @@ trafficdefinition (TrafficDefinition): definition of the traffic
 
             trafficdefinition (TrafficDefinition): definition of the traffic
 
+            name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
+                
         Methods
         -------
             get_element()
@@ -7482,7 +7932,7 @@ trafficdefinition (TrafficDefinition): definition of the traffic
                 Returns a dictionary of all attributes of the class
     &#34;&#34;&#34;
 
-    def __init__(self,rate,radius,position,trafficdefinition):
+    def __init__(self,rate,radius,position,trafficdefinition,name=None):
         &#34;&#34;&#34; initalize the TrafficSinkAction
 
         Parameters
@@ -7495,6 +7945,8 @@ trafficdefinition (TrafficDefinition): definition of the traffic
 
             trafficdefinition (TrafficDefinition): definition of the traffic
 
+            name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
+
         &#34;&#34;&#34;
         self.rate = rate
         self.radius = radius
@@ -7505,6 +7957,7 @@ trafficdefinition (TrafficDefinition): definition of the traffic
             raise TypeError(&#39;trafficdefinition input is not of type TrafficDefinition&#39;)
         self.position = position
         self.trafficdefinition = trafficdefinition
+        self.name = name
 
     def __eq__(self,other):
         if isinstance(other,TrafficSinkAction):
@@ -7519,6 +7972,7 @@ trafficdefinition (TrafficDefinition): definition of the traffic
 
         &#34;&#34;&#34;
         retdict = {}
+
         retdict[&#39;rate&#39;] = str(self.rate)
         retdict[&#39;radius&#39;] = str(self.radius)
         return retdict
@@ -7529,7 +7983,10 @@ trafficdefinition (TrafficDefinition): definition of the traffic
         &#34;&#34;&#34;
 
         element = ET.Element(&#39;GlobalAction&#39;)
-        trafficaction = ET.SubElement(element, &#39;TrafficAction&#39;)
+        traffic_attrib = {}
+        if self.name and not self.isVersion(minor=0):
+            traffic_attrib = {&#39;trafficName&#39;:self.name}
+        trafficaction = ET.SubElement(element, &#39;TrafficAction&#39;,attrib=traffic_attrib)
         sinkaction = ET.SubElement(trafficaction,&#39;TrafficSinkAction&#39;,attrib=self.get_attributes())
         sinkaction.append(self.position.get_element())
         sinkaction.append(self.trafficdefinition.get_element())
@@ -7539,6 +7996,7 @@ trafficdefinition (TrafficDefinition): definition of the traffic
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -7556,6 +8014,7 @@ trafficdefinition (TrafficDefinition): definition of the traffic
 
     &#34;&#34;&#34;
     retdict = {}
+
     retdict[&#39;rate&#39;] = str(self.rate)
     retdict[&#39;radius&#39;] = str(self.radius)
     return retdict</code></pre>
@@ -7576,7 +8035,10 @@ trafficdefinition (TrafficDefinition): definition of the traffic
     &#34;&#34;&#34;
 
     element = ET.Element(&#39;GlobalAction&#39;)
-    trafficaction = ET.SubElement(element, &#39;TrafficAction&#39;)
+    traffic_attrib = {}
+    if self.name and not self.isVersion(minor=0):
+        traffic_attrib = {&#39;trafficName&#39;:self.name}
+    trafficaction = ET.SubElement(element, &#39;TrafficAction&#39;,attrib=traffic_attrib)
     sinkaction = ET.SubElement(trafficaction,&#39;TrafficSinkAction&#39;,attrib=self.get_attributes())
     sinkaction.append(self.position.get_element())
     sinkaction.append(self.trafficdefinition.get_element())
@@ -7588,7 +8050,7 @@ trafficdefinition (TrafficDefinition): definition of the traffic
 </dd>
 <dt id="scenariogeneration.xosc.actions.TrafficSourceAction"><code class="flex name class">
 <span>class <span class="ident">TrafficSourceAction</span></span>
-<span>(</span><span>rate, radius, position, trafficdefinition, velocity=None)</span>
+<span>(</span><span>rate, radius, position, trafficdefinition, velocity=None, name=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>The TrafficSourceAction class creates a TrafficAction of the typ TrafficSourceAction</p>
@@ -7603,6 +8065,9 @@ trafficdefinition (TrafficDefinition): definition of the traffic
 
 velocity (float): optional starting velocity of the traffic
     Default: None
+
+name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
+    Default: None
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>rate (float): rate of appearing traffic
@@ -7615,6 +8080,8 @@ trafficdefinition (TrafficDefinition): definition of the traffic
 
 velocity (float): optional starting velocity of the traffic
     Default: None
+
+name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>get_element()
@@ -7634,6 +8101,9 @@ position (*Position): any Position to define the source
 trafficdefinition (TrafficDefinition): definition of the traffic
 
 velocity (float): optional starting velocity of the traffic
+    Default: None
+
+name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
     Default: None
 </code></pre></div>
 <details class="source">
@@ -7656,6 +8126,9 @@ velocity (float): optional starting velocity of the traffic
             velocity (float): optional starting velocity of the traffic
                 Default: None
 
+            name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
+                Default: None
+
         Attributes
         ----------
 
@@ -7670,6 +8143,7 @@ velocity (float): optional starting velocity of the traffic
             velocity (float): optional starting velocity of the traffic
                 Default: None
 
+            name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
 
         Methods
         -------
@@ -7680,7 +8154,7 @@ velocity (float): optional starting velocity of the traffic
                 Returns a dictionary of all attributes of the class
     &#34;&#34;&#34;
 
-    def __init__(self,rate,radius,position,trafficdefinition,velocity = None):
+    def __init__(self,rate,radius,position,trafficdefinition,velocity = None,name=None):
         &#34;&#34;&#34; initalize the TrafficSourceAction
 
         Parameters
@@ -7696,6 +8170,8 @@ velocity (float): optional starting velocity of the traffic
             velocity (float): optional starting velocity of the traffic
                 Default: None
 
+            name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
+                Default: None
         &#34;&#34;&#34;
         self.rate = rate
         self.radius = radius
@@ -7707,12 +8183,14 @@ velocity (float): optional starting velocity of the traffic
         self.position = position
         self.trafficdefinition = trafficdefinition
         self.velocity = velocity
+        self.name = name
 
     def __eq__(self,other):
         if isinstance(other,TrafficSourceAction):
             if self.get_attributes() == other.get_attributes() and \
             self.position == other.position and \
-            self.trafficdefinition == other.trafficdefinition:
+            self.trafficdefinition == other.trafficdefinition and \
+            self.name == other.name:
                 return True
         return False
 
@@ -7725,6 +8203,8 @@ velocity (float): optional starting velocity of the traffic
         retdict[&#39;radius&#39;] = str(self.radius)
         if self.velocity:
             retdict[&#39;velocity&#39;] = str(self.velocity)
+        
+
         return retdict
 
     def get_element(self):
@@ -7732,7 +8212,11 @@ velocity (float): optional starting velocity of the traffic
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;GlobalAction&#39;)
-        trafficaction = ET.SubElement(element, &#39;TrafficAction&#39;)
+        traffic_attrib = {}
+        if self.name and not self.isVersion(minor=0):
+            traffic_attrib = {&#39;trafficName&#39;:self.name}
+        
+        trafficaction = ET.SubElement(element, &#39;TrafficAction&#39;,attrib=traffic_attrib)
         sourceaction = ET.SubElement(trafficaction,&#39;TrafficSourceAction&#39;,attrib=self.get_attributes())
         sourceaction.append(self.position.get_element())
         sourceaction.append(self.trafficdefinition.get_element())
@@ -7744,6 +8228,7 @@ velocity (float): optional starting velocity of the traffic
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -7765,6 +8250,8 @@ velocity (float): optional starting velocity of the traffic
     retdict[&#39;radius&#39;] = str(self.radius)
     if self.velocity:
         retdict[&#39;velocity&#39;] = str(self.velocity)
+    
+
     return retdict</code></pre>
 </details>
 </dd>
@@ -7782,7 +8269,11 @@ velocity (float): optional starting velocity of the traffic
 
     &#34;&#34;&#34;
     element = ET.Element(&#39;GlobalAction&#39;)
-    trafficaction = ET.SubElement(element, &#39;TrafficAction&#39;)
+    traffic_attrib = {}
+    if self.name and not self.isVersion(minor=0):
+        traffic_attrib = {&#39;trafficName&#39;:self.name}
+    
+    trafficaction = ET.SubElement(element, &#39;TrafficAction&#39;,attrib=traffic_attrib)
     sourceaction = ET.SubElement(trafficaction,&#39;TrafficSourceAction&#39;,attrib=self.get_attributes())
     sourceaction.append(self.position.get_element())
     sourceaction.append(self.trafficdefinition.get_element())
@@ -7794,9 +8285,149 @@ velocity (float): optional starting velocity of the traffic
 </dd>
 </dl>
 </dd>
+<dt id="scenariogeneration.xosc.actions.TrafficStopAction"><code class="flex name class">
+<span>class <span class="ident">TrafficStopAction</span></span>
+<span>(</span><span>name=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>The TrafficStopAction class creates a TrafficAction of the typ TrafficStopAction </p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>name (str): name of the Traffic to stop
+    Default: None
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>name (str): name of the Traffic to stop
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element()
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of the class
+</code></pre>
+<p>initalize the TrafficSwarmAction</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>name (str): name of the Traffic to stop
+    Default: None
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TrafficStopAction(_ActionType):
+    &#34;&#34;&#34; The TrafficStopAction class creates a TrafficAction of the typ TrafficStopAction 
+        
+        Parameters
+        ----------
+            name (str): name of the Traffic to stop
+                Default: None
+
+        Attributes
+        ----------
+
+            name (str): name of the Traffic to stop
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+
+            get_attributes()
+                Returns a dictionary of all attributes of the class
+    &#34;&#34;&#34;
+
+    def __init__(self,name = None):
+        &#34;&#34;&#34; initalize the TrafficSwarmAction
+
+        Parameters
+        ----------
+            name (str): name of the Traffic to stop
+                Default: None
+        &#34;&#34;&#34;
+        self.name = name
+
+    def __eq__(self,other):
+        if isinstance(other,TrafficStopAction):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the TrafficStopAction as a dict
+
+        &#34;&#34;&#34;
+        retdict = {}
+        if self.name and not self.isVersion(0):
+            retdict[&#39;trafficName&#39;] = str(self.name)
+        elif self.isVersion(0):
+            raise OpenSCENARIOVersionError(&#39;TrafficStopAction was introduced in OpenSCENARIO V1.1&#39;)
+
+        return retdict
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the TrafficStopAction
+
+        &#34;&#34;&#34;
+        element = ET.Element(&#39;GlobalAction&#39;)
+        trafficaction = ET.SubElement(element, &#39;TrafficAction&#39;,attrib=self.get_attributes())
+        ET.SubElement(trafficaction,&#39;TrafficStopAction&#39;)      
+
+        return element</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.actions.TrafficStopAction.get_attributes"><code class="name flex">
+<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the attributes of the TrafficStopAction as a dict</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_attributes(self):
+    &#34;&#34;&#34; returns the attributes of the TrafficStopAction as a dict
+
+    &#34;&#34;&#34;
+    retdict = {}
+    if self.name and not self.isVersion(0):
+        retdict[&#39;trafficName&#39;] = str(self.name)
+    elif self.isVersion(0):
+        raise OpenSCENARIOVersionError(&#39;TrafficStopAction was introduced in OpenSCENARIO V1.1&#39;)
+
+    return retdict</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xosc.actions.TrafficStopAction.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the elementTree of the TrafficStopAction</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self):
+    &#34;&#34;&#34; returns the elementTree of the TrafficStopAction
+
+    &#34;&#34;&#34;
+    element = ET.Element(&#39;GlobalAction&#39;)
+    trafficaction = ET.SubElement(element, &#39;TrafficAction&#39;,attrib=self.get_attributes())
+    ET.SubElement(trafficaction,&#39;TrafficStopAction&#39;)      
+
+    return element</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
 <dt id="scenariogeneration.xosc.actions.TrafficSwarmAction"><code class="flex name class">
 <span>class <span class="ident">TrafficSwarmAction</span></span>
-<span>(</span><span>semimajoraxis, semiminoraxis, innerradius, offset, numberofvehicles, centralobject, trafficdefinition, velocity=None)</span>
+<span>(</span><span>semimajoraxis, semiminoraxis, innerradius, offset, numberofvehicles, centralobject, trafficdefinition, velocity=None, name=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>The TrafficSwarmAction class creates a TrafficAction of the typ TrafficSwarmAction</p>
@@ -7817,6 +8448,9 @@ trafficdefinition (TrafficDefinition): definition of the traffic
 
 velocity (float): optional starting velocity
     Default: None
+
+name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
+    Default: None
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>semimajoraxis (float): half length of major axis of ellipsis around target
@@ -7835,6 +8469,8 @@ trafficdefinition (TrafficDefinition): definition of the traffic
 
 velocity (float): optional starting velocity
     Default: None
+
+name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>get_element()
@@ -7860,6 +8496,9 @@ centralobject (str): entity to swarm around
 trafficdefinition (TrafficDefinition): definition of the traffic
 
 velocity (float): optional starting velocity
+    Default: None
+
+name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
     Default: None
 </code></pre></div>
 <details class="source">
@@ -7887,6 +8526,9 @@ velocity (float): optional starting velocity
 
             velocity (float): optional starting velocity
                 Default: None
+            
+            name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
+                Default: None
         Attributes
         ----------
 
@@ -7907,6 +8549,8 @@ velocity (float): optional starting velocity
             velocity (float): optional starting velocity
                 Default: None
 
+            name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
+                
         Methods
         -------
             get_element()
@@ -7916,7 +8560,7 @@ velocity (float): optional starting velocity
                 Returns a dictionary of all attributes of the class
     &#34;&#34;&#34;
 
-    def __init__(self,semimajoraxis,semiminoraxis,innerradius,offset,numberofvehicles,centralobject,trafficdefinition,velocity = None):
+    def __init__(self,semimajoraxis,semiminoraxis,innerradius,offset,numberofvehicles,centralobject,trafficdefinition,velocity = None,name = None):
         &#34;&#34;&#34; initalize the TrafficSwarmAction
 
         Parameters
@@ -7937,6 +8581,9 @@ velocity (float): optional starting velocity
 
             velocity (float): optional starting velocity
                 Default: None
+            
+            name (str): name of the TrafficAction, can be used to stop the TrafficAction, (valid from V1.1)
+                Default: None
         &#34;&#34;&#34;
         self.semimajoraxis = semimajoraxis
         self.semiminoraxis = semiminoraxis
@@ -7948,12 +8595,14 @@ velocity (float): optional starting velocity
             raise TypeError(&#39;trafficdefinition input is not of type TrafficDefinition&#39;)
         self.trafficdefinition = trafficdefinition
         self.velocity = velocity
+        self.name = name
 
     def __eq__(self,other):
         if isinstance(other,TrafficSwarmAction):
             if self.get_attributes() == other.get_attributes() and \
             self.centralobject == other.centralobject and \
-            self.trafficdefinition == other.trafficdefinition:
+            self.trafficdefinition == other.trafficdefinition and \
+            self.name == other.name:
                 return True
         return False
 
@@ -7976,7 +8625,11 @@ velocity (float): optional starting velocity
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;GlobalAction&#39;)
-        trafficaction = ET.SubElement(element, &#39;TrafficAction&#39;)
+        traffic_attrib = {}
+        if self.name and not self.isVersion(minor=0):
+            traffic_attrib = {&#39;trafficName&#39;:self.name}
+        trafficaction = ET.SubElement(element, &#39;TrafficAction&#39;,attrib=traffic_attrib)
+        
         swarmaction = ET.SubElement(trafficaction,&#39;TrafficSwarmAction&#39;,attrib=self.get_attributes())
         swarmaction.append(self.trafficdefinition.get_element())
         ET.SubElement(swarmaction,&#39;CentralSwarmObject&#39;,attrib={&#39;entityRef&#39;:self.centralobject})
@@ -7986,6 +8639,7 @@ velocity (float): optional starting velocity
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -8027,7 +8681,11 @@ velocity (float): optional starting velocity
 
     &#34;&#34;&#34;
     element = ET.Element(&#39;GlobalAction&#39;)
-    trafficaction = ET.SubElement(element, &#39;TrafficAction&#39;)
+    traffic_attrib = {}
+    if self.name and not self.isVersion(minor=0):
+        traffic_attrib = {&#39;trafficName&#39;:self.name}
+    trafficaction = ET.SubElement(element, &#39;TrafficAction&#39;,attrib=traffic_attrib)
+    
     swarmaction = ET.SubElement(trafficaction,&#39;TrafficSwarmAction&#39;,attrib=self.get_attributes())
     swarmaction.append(self.trafficdefinition.get_element())
     ET.SubElement(swarmaction,&#39;CentralSwarmObject&#39;,attrib={&#39;entityRef&#39;:self.centralobject})
@@ -8147,6 +8805,7 @@ get_attributes()
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._PrivateActionType</li>
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -8253,6 +8912,7 @@ get_attributes()
 <li>
 <h4><code><a title="scenariogeneration.xosc.actions.AssignControllerAction" href="#scenariogeneration.xosc.actions.AssignControllerAction">AssignControllerAction</a></code></h4>
 <ul class="">
+<li><code><a title="scenariogeneration.xosc.actions.AssignControllerAction.get_attributes" href="#scenariogeneration.xosc.actions.AssignControllerAction.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.actions.AssignControllerAction.get_element" href="#scenariogeneration.xosc.actions.AssignControllerAction.get_element">get_element</a></code></li>
 </ul>
 </li>
@@ -8404,6 +9064,13 @@ get_attributes()
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.actions.TrafficSourceAction.get_attributes" href="#scenariogeneration.xosc.actions.TrafficSourceAction.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.actions.TrafficSourceAction.get_element" href="#scenariogeneration.xosc.actions.TrafficSourceAction.get_element">get_element</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xosc.actions.TrafficStopAction" href="#scenariogeneration.xosc.actions.TrafficStopAction">TrafficStopAction</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xosc.actions.TrafficStopAction.get_attributes" href="#scenariogeneration.xosc.actions.TrafficStopAction.get_attributes">get_attributes</a></code></li>
+<li><code><a title="scenariogeneration.xosc.actions.TrafficStopAction.get_element" href="#scenariogeneration.xosc.actions.TrafficStopAction.get_element">get_element</a></code></li>
 </ul>
 </li>
 <li>

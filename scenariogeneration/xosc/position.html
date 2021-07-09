@@ -30,7 +30,9 @@
 &#34;&#34;&#34;
 import xml.etree.ElementTree as ET
 
-from .utils import Orientation, CatalogReference, Route, _PositionType
+from .utils import Orientation, CatalogReference, Route, Trajectory, _PositionType
+from .exceptions import OpenSCENARIOVersionError, ToManyOptionalArguments, NotEnoughInputArguments
+
 
 class WorldPosition(_PositionType):
     &#34;&#34;&#34; the WorldPostion creates a worldposition of openScenario
@@ -601,20 +603,27 @@ class RelativeLanePosition(_PositionType):
         
         Parameters
         ----------
-            s (float): length along road
-
-            offset (float): offset from center of lane
-
             lane_id (str): lane of the road
 
-            entity (str): id of the entity    
+            entity (str): id of the entity  
+
+            offset (float): offset from center of lane             
+                Default: 0
+
+            ds (float): length along road (use this or dsLane)
+                Default: None
+
+            dsLane (double): relative offset along the lane (valid from V1.1) (use this or ds)
+                Default: None
 
             orientation (Orientation): the angular orientation of the entity
                 Default: Orientation()    
 
         Attributes
         ----------
-            s (float): length along road
+            ds (float): length along road
+
+            dsLane (double): relative offset along the lane (valid from V1.1)
 
             offset (float): offset from center of lane
 
@@ -634,27 +643,38 @@ class RelativeLanePosition(_PositionType):
                 Returns a dictionary of all attributes of the class
 
     &#34;&#34;&#34;
-    def __init__(self,s,offset,lane_id,entity,orientation=Orientation()):
+    def __init__(self,lane_id,entity,offset=0,ds=None,dsLane=None,orientation=Orientation()):
         &#34;&#34;&#34; initalizes the RelativeLanePosition
         
         Parameters
         ----------
-            s (float): length along road
-
-            offset (float): offset from center of lane
-
             lane_id (str): lane of the road
 
-            entity (str): id of the entity           
+            entity (str): id of the entity  
+
+            offset (float): offset from center of lane             
+                Default: 0
+
+            ds (float): length along road (use this or dsLane)
+                Default: None
+
+            dsLane (double): relative offset along the lane (valid from V1.1) (use this or ds)
+                Default: None
 
             orientation (Orientation): the angular orientation of the entity
-                Default: Orientation()  
+                Default: Orientation()    
         
         &#34;&#34;&#34; 
-        self.s = s
+        if ds != None and dsLane != None:
+            raise ToManyOptionalArguments(&#39;Not both of ds and dsLane can be used.&#39;)
+        if ds == None and dsLane == None:
+            raise NotEnoughInputArguments(&#39;Either ds or dsLane is needed as input.&#39;)
+        self.ds = ds
+        self.dsLane = dsLane
         self.lane_id = lane_id
         self.offset = offset
         self.entity = entity
+        
         if not isinstance(orientation,Orientation):
             raise TypeError(&#39;input orientation is not of type Orientation&#39;)
         self.orient = orientation
@@ -671,7 +691,12 @@ class RelativeLanePosition(_PositionType):
         &#34;&#34;&#34;
         retdict = {}
         retdict[&#39;entityRef&#39;] = self.entity
-        retdict[&#39;ds&#39;] = str(self.s)
+        if self.ds:
+            retdict[&#39;ds&#39;] = str(self.ds)
+        if self.dsLane and not self.isVersion(minor=0):
+            retdict[&#39;dsLane&#39;] = str(self.dsLane)
+        elif self.dsLane and self.isVersion(minor=0):
+            OpenSCENARIOVersionError(&#39;dsLane was introduced in OpenSCENARIO V1.1, not in 1.0&#39;)
         retdict[&#39;offset&#39;] = str(self.offset)
         retdict[&#39;dLane&#39;] = str(self.lane_id)
         return retdict
@@ -913,6 +938,181 @@ class RoutePositionInLaneCoordinates(_PositionType):
         relement.append(self.orientation.get_element())
         inroute = ET.SubElement(relement,&#39;InRoutePosition&#39;)
         ET.SubElement(inroute,&#39;PositionInLaneCoordinates&#39;,attrib={&#39;pathS&#39;:str(self.s),&#39;laneId&#39;:self.laneid,&#39;laneOffset&#39;:str(self.offset)})
+        return element
+
+
+class TrajectoryPosition(_PositionType):
+    &#34;&#34;&#34; TrajectoryPosition creates a TrajectoryPosition of OpenSCENARIO
+        
+        Parameters
+        ----------
+            trajectory (Trajector, or CatalogRef): t coordinate of the road
+
+            s (double): s coordinate of the trajector
+
+            t (double): s coordinate of the road (optional)
+                Default: None
+            orientation (Orientation): Oritation of the entity
+                Default: Orientation()
+
+        Attributes
+        ----------
+            trajectory (Trajector, or CatalogRef): t coordinate of the road
+
+            s (double): s coordinate of the trajector
+
+            t (double): s coordinate of the road (optional)
+                Default: None
+            orientation (Orientation): Oritation of the entity
+                Default: Orientation()
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+
+    &#34;&#34;&#34;
+    def __init__(self, trajectory, s, t = None, orientation = Orientation()):
+        &#34;&#34;&#34; Initalize the TrajectoryPosition class
+        
+            Parameters
+            ----------
+                trajectory (Trajector, or CatalogRef): t coordinate of the road
+
+                s (double): s coordinate of the trajector
+
+                t (double): s coordinate of the road (optional)
+                    Default: None
+                orientation (Orientation): Oritation of the entity
+                    Default: Orientation()
+        &#34;&#34;&#34;
+        if not ( isinstance(trajectory,Trajectory) or isinstance(trajectory,CatalogReference)):
+            raise TypeError(&#39;trajectory input not of type Trajectory or CatalogReference&#39;) 
+        self.trajectory = trajectory
+        self.s = s
+        self.t = t
+        if not isinstance(orientation,Orientation):
+            raise TypeError(&#39;input orientation is not of type Orientation&#39;)
+        self.orientation = orientation
+
+    def __eq__(self,other):
+        if isinstance(other,TrajectoryPosition):
+            if self.get_attributes() == other.get_attributes() and\
+            self.orientation == other.orientation and self.trajectory == other.trajectory:
+                return True
+        return False
+    
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the TrajectoryPosition as a dict
+
+        &#34;&#34;&#34;
+        retdict = {}
+        retdict[&#39;s&#39;] = str(self.s)
+        if self.t:
+            retdict[&#39;t&#39;] = str(self.t)
+        return retdict
+
+    def get_element(self,elementname = &#39;Position&#39;):
+        &#34;&#34;&#34; returns the elementTree of the TrajectoryPosition
+
+        &#34;&#34;&#34;
+        if self.isVersion(minor=0):
+            raise OpenSCENARIOVersionError(&#39;TrajectoryPosition was introduced in OpenSCENARIO V1.1&#39;)
+
+        element = ET.Element(elementname)
+        traj_element = ET.SubElement(element,&#39;TrajectoryPosition&#39;,attrib=self.get_attributes())
+        trajref_element = ET.SubElement(traj_element,&#39;TrajectoryRef&#39;)
+        trajref_element.append(self.trajectory.get_element())
+        traj_element.append(self.orientation.get_element())
+        
+        return element
+
+
+class GeoPosition(_PositionType):
+    &#34;&#34;&#34; GeoPosition creates a GeoPosition of OpenSCENARIO 
+        
+        Parameters
+        ----------
+            latitue (double): latitude point on earth
+
+            longitude (double): longitude point on earth
+
+            height (double): height above surcae
+                Default: None
+
+            orientation (Orientation): Oritation of the entity
+                Default: Orientation()
+
+        Attributes
+        ----------
+            latitue (double): latitude point on earth
+
+            longitude (double): longitude point on earth
+
+            height (double): height above surcae
+                Default: None
+
+            orientation (Orientation): Oritation of the entity
+                Default: Orientation()
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+
+    &#34;&#34;&#34;
+    def __init__(self, latitude, longitude, height = None, orientation = Orientation()):
+        &#34;&#34;&#34; Initalize the GeoPosition class
+        
+            Parameters
+            ----------
+                latitue (double): latitude point on earth
+
+                longitude (double): longitude point on earth
+
+                height (double): height above surcae
+                    Default: None
+
+                orientation (Orientation): Oritation of the entity
+                    Default: Orientation()
+        &#34;&#34;&#34;
+
+        self.longitude = longitude
+        self.latitude = latitude
+        self.height = height
+        if not isinstance(orientation,Orientation):
+            raise TypeError(&#39;input orientation is not of type Orientation&#39;)
+        self.orientation = orientation
+
+    def __eq__(self,other):
+        if isinstance(other,GeoPosition):
+            if self.get_attributes() == other.get_attributes() and\
+            self.orientation == other.orientation:
+                return True
+        return False
+    
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the GeoPosition as a dict
+
+        &#34;&#34;&#34;
+        retdict = {}
+        retdict[&#39;longitude&#39;] = str(self.longitude)
+        retdict[&#39;latitude&#39;] = str(self.latitude)
+        if self.height:
+            retdict[&#39;height&#39;] = str(self.height)
+        return retdict
+
+    def get_element(self,elementname = &#39;Position&#39;):
+        &#34;&#34;&#34; returns the elementTree of the GeoPosition
+
+        &#34;&#34;&#34;
+        if self.isVersion(minor=0):
+            raise OpenSCENARIOVersionError(&#39;GeoPosition was introduced in OpenSCENARIO V1.1&#39;)
+
+        element = ET.Element(elementname)
+        traj_element = ET.SubElement(element,&#39;GeoPosition&#39;,self.get_attributes())
+        traj_element.append(self.orientation.get_element())
+        
         return element</code></pre>
 </details>
 </section>
@@ -925,6 +1125,194 @@ class RoutePositionInLaneCoordinates(_PositionType):
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="scenariogeneration.xosc.position.GeoPosition"><code class="flex name class">
+<span>class <span class="ident">GeoPosition</span></span>
+<span>(</span><span>latitude, longitude, height=None, orientation=&lt;scenariogeneration.xosc.utils.Orientation object&gt;)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>GeoPosition creates a GeoPosition of OpenSCENARIO </p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>latitue (double): latitude point on earth
+
+longitude (double): longitude point on earth
+
+height (double): height above surcae
+    Default: None
+
+orientation (Orientation): Oritation of the entity
+    Default: Orientation()
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>latitue (double): latitude point on earth
+
+longitude (double): longitude point on earth
+
+height (double): height above surcae
+    Default: None
+
+orientation (Orientation): Oritation of the entity
+    Default: Orientation()
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element()
+    Returns the full ElementTree of the class
+</code></pre>
+<p>Initalize the GeoPosition class</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>latitue (double): latitude point on earth
+
+longitude (double): longitude point on earth
+
+height (double): height above surcae
+    Default: None
+
+orientation (Orientation): Oritation of the entity
+    Default: Orientation()
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class GeoPosition(_PositionType):
+    &#34;&#34;&#34; GeoPosition creates a GeoPosition of OpenSCENARIO 
+        
+        Parameters
+        ----------
+            latitue (double): latitude point on earth
+
+            longitude (double): longitude point on earth
+
+            height (double): height above surcae
+                Default: None
+
+            orientation (Orientation): Oritation of the entity
+                Default: Orientation()
+
+        Attributes
+        ----------
+            latitue (double): latitude point on earth
+
+            longitude (double): longitude point on earth
+
+            height (double): height above surcae
+                Default: None
+
+            orientation (Orientation): Oritation of the entity
+                Default: Orientation()
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+
+    &#34;&#34;&#34;
+    def __init__(self, latitude, longitude, height = None, orientation = Orientation()):
+        &#34;&#34;&#34; Initalize the GeoPosition class
+        
+            Parameters
+            ----------
+                latitue (double): latitude point on earth
+
+                longitude (double): longitude point on earth
+
+                height (double): height above surcae
+                    Default: None
+
+                orientation (Orientation): Oritation of the entity
+                    Default: Orientation()
+        &#34;&#34;&#34;
+
+        self.longitude = longitude
+        self.latitude = latitude
+        self.height = height
+        if not isinstance(orientation,Orientation):
+            raise TypeError(&#39;input orientation is not of type Orientation&#39;)
+        self.orientation = orientation
+
+    def __eq__(self,other):
+        if isinstance(other,GeoPosition):
+            if self.get_attributes() == other.get_attributes() and\
+            self.orientation == other.orientation:
+                return True
+        return False
+    
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the GeoPosition as a dict
+
+        &#34;&#34;&#34;
+        retdict = {}
+        retdict[&#39;longitude&#39;] = str(self.longitude)
+        retdict[&#39;latitude&#39;] = str(self.latitude)
+        if self.height:
+            retdict[&#39;height&#39;] = str(self.height)
+        return retdict
+
+    def get_element(self,elementname = &#39;Position&#39;):
+        &#34;&#34;&#34; returns the elementTree of the GeoPosition
+
+        &#34;&#34;&#34;
+        if self.isVersion(minor=0):
+            raise OpenSCENARIOVersionError(&#39;GeoPosition was introduced in OpenSCENARIO V1.1&#39;)
+
+        element = ET.Element(elementname)
+        traj_element = ET.SubElement(element,&#39;GeoPosition&#39;,self.get_attributes())
+        traj_element.append(self.orientation.get_element())
+        
+        return element</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>scenariogeneration.xosc.utils._PositionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.position.GeoPosition.get_attributes"><code class="name flex">
+<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the attributes of the GeoPosition as a dict</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_attributes(self):
+    &#34;&#34;&#34; returns the attributes of the GeoPosition as a dict
+
+    &#34;&#34;&#34;
+    retdict = {}
+    retdict[&#39;longitude&#39;] = str(self.longitude)
+    retdict[&#39;latitude&#39;] = str(self.latitude)
+    if self.height:
+        retdict[&#39;height&#39;] = str(self.height)
+    return retdict</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xosc.position.GeoPosition.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self, elementname='Position')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the elementTree of the GeoPosition</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self,elementname = &#39;Position&#39;):
+    &#34;&#34;&#34; returns the elementTree of the GeoPosition
+
+    &#34;&#34;&#34;
+    if self.isVersion(minor=0):
+        raise OpenSCENARIOVersionError(&#39;GeoPosition was introduced in OpenSCENARIO V1.1&#39;)
+
+    element = ET.Element(elementname)
+    traj_element = ET.SubElement(element,&#39;GeoPosition&#39;,self.get_attributes())
+    traj_element.append(self.orientation.get_element())
+    
+    return element</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
 <dt id="scenariogeneration.xosc.position.LanePosition"><code class="flex name class">
 <span>class <span class="ident">LanePosition</span></span>
 <span>(</span><span>s, offset, lane_id, road_id, orientation=&lt;scenariogeneration.xosc.utils.Orientation object&gt;)</span>
@@ -1078,6 +1466,7 @@ orientation (Orientation): the angular orientation of the entity
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._PositionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -1136,24 +1525,31 @@ orientation (Orientation): the angular orientation of the entity
 </dd>
 <dt id="scenariogeneration.xosc.position.RelativeLanePosition"><code class="flex name class">
 <span>class <span class="ident">RelativeLanePosition</span></span>
-<span>(</span><span>s, offset, lane_id, entity, orientation=&lt;scenariogeneration.xosc.utils.Orientation object&gt;)</span>
+<span>(</span><span>lane_id, entity, offset=0, ds=None, dsLane=None, orientation=&lt;scenariogeneration.xosc.utils.Orientation object&gt;)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>the RelativeLanePosition creates a RelativeLanePosition of openScenario</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>s (float): length along road
-
-offset (float): offset from center of lane
-
-lane_id (str): lane of the road
+<pre><code>lane_id (str): lane of the road
 
 entity (str): id of the entity
+
+offset (float): offset from center of lane             
+    Default: 0
+
+ds (float): length along road (use this or dsLane)
+    Default: None
+
+dsLane (double): relative offset along the lane (valid from V1.1) (use this or ds)
+    Default: None
 
 orientation (Orientation): the angular orientation of the entity
     Default: Orientation()
 </code></pre>
 <h2 id="attributes">Attributes</h2>
-<pre><code>s (float): length along road
+<pre><code>ds (float): length along road
+
+dsLane (double): relative offset along the lane (valid from V1.1)
 
 offset (float): offset from center of lane
 
@@ -1173,13 +1569,18 @@ get_attributes()
 </code></pre>
 <p>initalizes the RelativeLanePosition</p>
 <h2 id="parameters_1">Parameters</h2>
-<pre><code>s (float): length along road
-
-offset (float): offset from center of lane
-
-lane_id (str): lane of the road
+<pre><code>lane_id (str): lane of the road
 
 entity (str): id of the entity
+
+offset (float): offset from center of lane             
+    Default: 0
+
+ds (float): length along road (use this or dsLane)
+    Default: None
+
+dsLane (double): relative offset along the lane (valid from V1.1) (use this or ds)
+    Default: None
 
 orientation (Orientation): the angular orientation of the entity
     Default: Orientation()
@@ -1193,20 +1594,27 @@ orientation (Orientation): the angular orientation of the entity
         
         Parameters
         ----------
-            s (float): length along road
-
-            offset (float): offset from center of lane
-
             lane_id (str): lane of the road
 
-            entity (str): id of the entity    
+            entity (str): id of the entity  
+
+            offset (float): offset from center of lane             
+                Default: 0
+
+            ds (float): length along road (use this or dsLane)
+                Default: None
+
+            dsLane (double): relative offset along the lane (valid from V1.1) (use this or ds)
+                Default: None
 
             orientation (Orientation): the angular orientation of the entity
                 Default: Orientation()    
 
         Attributes
         ----------
-            s (float): length along road
+            ds (float): length along road
+
+            dsLane (double): relative offset along the lane (valid from V1.1)
 
             offset (float): offset from center of lane
 
@@ -1226,27 +1634,38 @@ orientation (Orientation): the angular orientation of the entity
                 Returns a dictionary of all attributes of the class
 
     &#34;&#34;&#34;
-    def __init__(self,s,offset,lane_id,entity,orientation=Orientation()):
+    def __init__(self,lane_id,entity,offset=0,ds=None,dsLane=None,orientation=Orientation()):
         &#34;&#34;&#34; initalizes the RelativeLanePosition
         
         Parameters
         ----------
-            s (float): length along road
-
-            offset (float): offset from center of lane
-
             lane_id (str): lane of the road
 
-            entity (str): id of the entity           
+            entity (str): id of the entity  
+
+            offset (float): offset from center of lane             
+                Default: 0
+
+            ds (float): length along road (use this or dsLane)
+                Default: None
+
+            dsLane (double): relative offset along the lane (valid from V1.1) (use this or ds)
+                Default: None
 
             orientation (Orientation): the angular orientation of the entity
-                Default: Orientation()  
+                Default: Orientation()    
         
         &#34;&#34;&#34; 
-        self.s = s
+        if ds != None and dsLane != None:
+            raise ToManyOptionalArguments(&#39;Not both of ds and dsLane can be used.&#39;)
+        if ds == None and dsLane == None:
+            raise NotEnoughInputArguments(&#39;Either ds or dsLane is needed as input.&#39;)
+        self.ds = ds
+        self.dsLane = dsLane
         self.lane_id = lane_id
         self.offset = offset
         self.entity = entity
+        
         if not isinstance(orientation,Orientation):
             raise TypeError(&#39;input orientation is not of type Orientation&#39;)
         self.orient = orientation
@@ -1263,7 +1682,12 @@ orientation (Orientation): the angular orientation of the entity
         &#34;&#34;&#34;
         retdict = {}
         retdict[&#39;entityRef&#39;] = self.entity
-        retdict[&#39;ds&#39;] = str(self.s)
+        if self.ds:
+            retdict[&#39;ds&#39;] = str(self.ds)
+        if self.dsLane and not self.isVersion(minor=0):
+            retdict[&#39;dsLane&#39;] = str(self.dsLane)
+        elif self.dsLane and self.isVersion(minor=0):
+            OpenSCENARIOVersionError(&#39;dsLane was introduced in OpenSCENARIO V1.1, not in 1.0&#39;)
         retdict[&#39;offset&#39;] = str(self.offset)
         retdict[&#39;dLane&#39;] = str(self.lane_id)
         return retdict
@@ -1286,6 +1710,7 @@ orientation (Orientation): the angular orientation of the entity
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._PositionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -1304,7 +1729,12 @@ orientation (Orientation): the angular orientation of the entity
     &#34;&#34;&#34;
     retdict = {}
     retdict[&#39;entityRef&#39;] = self.entity
-    retdict[&#39;ds&#39;] = str(self.s)
+    if self.ds:
+        retdict[&#39;ds&#39;] = str(self.ds)
+    if self.dsLane and not self.isVersion(minor=0):
+        retdict[&#39;dsLane&#39;] = str(self.dsLane)
+    elif self.dsLane and self.isVersion(minor=0):
+        OpenSCENARIOVersionError(&#39;dsLane was introduced in OpenSCENARIO V1.1, not in 1.0&#39;)
     retdict[&#39;offset&#39;] = str(self.offset)
     retdict[&#39;dLane&#39;] = str(self.lane_id)
     return retdict</code></pre>
@@ -1497,6 +1927,7 @@ orientation (Orientation): the angular orientation of the entity
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._PositionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -1691,6 +2122,7 @@ orientation (Orientation): the angular orientation of the entity
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._PositionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -1896,6 +2328,7 @@ orientation (Orientation): the angular orientation of the entity
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._PositionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -2089,6 +2522,7 @@ orientation (Orientation): the angular orientation of the entity
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._PositionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -2282,6 +2716,7 @@ orientation (Orientation): Oritation of the entity
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._PositionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -2429,6 +2864,7 @@ orientation (Orientation): Oritation of the entity
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._PositionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -2563,6 +2999,7 @@ orientation (Orientation): Oritation of the entity
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._PositionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -2586,6 +3023,191 @@ orientation (Orientation): Oritation of the entity
     relement.append(self.orientation.get_element())
     inroute = ET.SubElement(relement,&#39;InRoutePosition&#39;)
     ET.SubElement(inroute,&#39;PositionOfCurrentEntity&#39;,attrib={&#39;entityRef&#39;:self.entity})
+    return element</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="scenariogeneration.xosc.position.TrajectoryPosition"><code class="flex name class">
+<span>class <span class="ident">TrajectoryPosition</span></span>
+<span>(</span><span>trajectory, s, t=None, orientation=&lt;scenariogeneration.xosc.utils.Orientation object&gt;)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>TrajectoryPosition creates a TrajectoryPosition of OpenSCENARIO</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>trajectory (Trajector, or CatalogRef): t coordinate of the road
+
+s (double): s coordinate of the trajector
+
+t (double): s coordinate of the road (optional)
+    Default: None
+orientation (Orientation): Oritation of the entity
+    Default: Orientation()
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>trajectory (Trajector, or CatalogRef): t coordinate of the road
+
+s (double): s coordinate of the trajector
+
+t (double): s coordinate of the road (optional)
+    Default: None
+orientation (Orientation): Oritation of the entity
+    Default: Orientation()
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element()
+    Returns the full ElementTree of the class
+</code></pre>
+<p>Initalize the TrajectoryPosition class</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>trajectory (Trajector, or CatalogRef): t coordinate of the road
+
+s (double): s coordinate of the trajector
+
+t (double): s coordinate of the road (optional)
+    Default: None
+orientation (Orientation): Oritation of the entity
+    Default: Orientation()
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TrajectoryPosition(_PositionType):
+    &#34;&#34;&#34; TrajectoryPosition creates a TrajectoryPosition of OpenSCENARIO
+        
+        Parameters
+        ----------
+            trajectory (Trajector, or CatalogRef): t coordinate of the road
+
+            s (double): s coordinate of the trajector
+
+            t (double): s coordinate of the road (optional)
+                Default: None
+            orientation (Orientation): Oritation of the entity
+                Default: Orientation()
+
+        Attributes
+        ----------
+            trajectory (Trajector, or CatalogRef): t coordinate of the road
+
+            s (double): s coordinate of the trajector
+
+            t (double): s coordinate of the road (optional)
+                Default: None
+            orientation (Orientation): Oritation of the entity
+                Default: Orientation()
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+
+    &#34;&#34;&#34;
+    def __init__(self, trajectory, s, t = None, orientation = Orientation()):
+        &#34;&#34;&#34; Initalize the TrajectoryPosition class
+        
+            Parameters
+            ----------
+                trajectory (Trajector, or CatalogRef): t coordinate of the road
+
+                s (double): s coordinate of the trajector
+
+                t (double): s coordinate of the road (optional)
+                    Default: None
+                orientation (Orientation): Oritation of the entity
+                    Default: Orientation()
+        &#34;&#34;&#34;
+        if not ( isinstance(trajectory,Trajectory) or isinstance(trajectory,CatalogReference)):
+            raise TypeError(&#39;trajectory input not of type Trajectory or CatalogReference&#39;) 
+        self.trajectory = trajectory
+        self.s = s
+        self.t = t
+        if not isinstance(orientation,Orientation):
+            raise TypeError(&#39;input orientation is not of type Orientation&#39;)
+        self.orientation = orientation
+
+    def __eq__(self,other):
+        if isinstance(other,TrajectoryPosition):
+            if self.get_attributes() == other.get_attributes() and\
+            self.orientation == other.orientation and self.trajectory == other.trajectory:
+                return True
+        return False
+    
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the TrajectoryPosition as a dict
+
+        &#34;&#34;&#34;
+        retdict = {}
+        retdict[&#39;s&#39;] = str(self.s)
+        if self.t:
+            retdict[&#39;t&#39;] = str(self.t)
+        return retdict
+
+    def get_element(self,elementname = &#39;Position&#39;):
+        &#34;&#34;&#34; returns the elementTree of the TrajectoryPosition
+
+        &#34;&#34;&#34;
+        if self.isVersion(minor=0):
+            raise OpenSCENARIOVersionError(&#39;TrajectoryPosition was introduced in OpenSCENARIO V1.1&#39;)
+
+        element = ET.Element(elementname)
+        traj_element = ET.SubElement(element,&#39;TrajectoryPosition&#39;,attrib=self.get_attributes())
+        trajref_element = ET.SubElement(traj_element,&#39;TrajectoryRef&#39;)
+        trajref_element.append(self.trajectory.get_element())
+        traj_element.append(self.orientation.get_element())
+        
+        return element</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>scenariogeneration.xosc.utils._PositionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.position.TrajectoryPosition.get_attributes"><code class="name flex">
+<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the attributes of the TrajectoryPosition as a dict</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_attributes(self):
+    &#34;&#34;&#34; returns the attributes of the TrajectoryPosition as a dict
+
+    &#34;&#34;&#34;
+    retdict = {}
+    retdict[&#39;s&#39;] = str(self.s)
+    if self.t:
+        retdict[&#39;t&#39;] = str(self.t)
+    return retdict</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xosc.position.TrajectoryPosition.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self, elementname='Position')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the elementTree of the TrajectoryPosition</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self,elementname = &#39;Position&#39;):
+    &#34;&#34;&#34; returns the elementTree of the TrajectoryPosition
+
+    &#34;&#34;&#34;
+    if self.isVersion(minor=0):
+        raise OpenSCENARIOVersionError(&#39;TrajectoryPosition was introduced in OpenSCENARIO V1.1&#39;)
+
+    element = ET.Element(elementname)
+    traj_element = ET.SubElement(element,&#39;TrajectoryPosition&#39;,attrib=self.get_attributes())
+    trajref_element = ET.SubElement(traj_element,&#39;TrajectoryRef&#39;)
+    trajref_element.append(self.trajectory.get_element())
+    traj_element.append(self.orientation.get_element())
+    
     return element</code></pre>
 </details>
 </dd>
@@ -2746,6 +3368,7 @@ r (float): roll of the entity
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._PositionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -2819,6 +3442,13 @@ r (float): roll of the entity
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
+<h4><code><a title="scenariogeneration.xosc.position.GeoPosition" href="#scenariogeneration.xosc.position.GeoPosition">GeoPosition</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xosc.position.GeoPosition.get_attributes" href="#scenariogeneration.xosc.position.GeoPosition.get_attributes">get_attributes</a></code></li>
+<li><code><a title="scenariogeneration.xosc.position.GeoPosition.get_element" href="#scenariogeneration.xosc.position.GeoPosition.get_element">get_element</a></code></li>
+</ul>
+</li>
+<li>
 <h4><code><a title="scenariogeneration.xosc.position.LanePosition" href="#scenariogeneration.xosc.position.LanePosition">LanePosition</a></code></h4>
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.position.LanePosition.get_attributes" href="#scenariogeneration.xosc.position.LanePosition.get_attributes">get_attributes</a></code></li>
@@ -2876,6 +3506,13 @@ r (float): roll of the entity
 <h4><code><a title="scenariogeneration.xosc.position.RoutePositionOfCurrentEntity" href="#scenariogeneration.xosc.position.RoutePositionOfCurrentEntity">RoutePositionOfCurrentEntity</a></code></h4>
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.position.RoutePositionOfCurrentEntity.get_element" href="#scenariogeneration.xosc.position.RoutePositionOfCurrentEntity.get_element">get_element</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xosc.position.TrajectoryPosition" href="#scenariogeneration.xosc.position.TrajectoryPosition">TrajectoryPosition</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xosc.position.TrajectoryPosition.get_attributes" href="#scenariogeneration.xosc.position.TrajectoryPosition.get_attributes">get_attributes</a></code></li>
+<li><code><a title="scenariogeneration.xosc.position.TrajectoryPosition.get_element" href="#scenariogeneration.xosc.position.TrajectoryPosition.get_element">get_element</a></code></li>
 </ul>
 </li>
 <li>

@@ -28,11 +28,12 @@
 <pre><code class="python">&#34;&#34;&#34; the trigger module contains the classes related to the triggers and conditions of OpenSCENARIO.
 
 &#34;&#34;&#34;
+
 import xml.etree.ElementTree as ET
 
 from .utils import EntityRef, convert_bool, _PositionType, _ValueTriggerType, _EntityTriggerType, _TriggerType
-from .enumerations import Rule, ConditionEdge, TriggeringEntitiesRule, RelativeDistanceType, StoryboardElementType, StoryboardElementState
-
+from .enumerations import CoordinateSystem, Rule, ConditionEdge, TriggeringEntitiesRule, RelativeDistanceType, StoryboardElementType, StoryboardElementState, VersionBase
+from .exceptions import ToManyOptionalArguments
 
 
 
@@ -309,7 +310,7 @@ class EntityTrigger(_TriggerType):
             self._triggerpoint = &#39;StopTrigger&#39;
             
         self.delay = delay
-        if conditionedge not in ConditionEdge:
+        if not hasattr(ConditionEdge,str(conditionedge)):
             raise ValueError(&#39;not a valid condition edge&#39;)
         self.conditionedge = conditionedge
         if not isinstance(entitycondition,_EntityTriggerType):
@@ -347,7 +348,7 @@ class EntityTrigger(_TriggerType):
         &#34;&#34;&#34; returns the attributes of the LaneOffsetAction as a dict
 
         &#34;&#34;&#34;
-        return {&#39;name&#39;:self.name,&#39;delay&#39;:str(self.delay),&#39;conditionEdge&#39;:self.conditionedge.name}
+        return {&#39;name&#39;:self.name,&#39;delay&#39;:str(self.delay),&#39;conditionEdge&#39;:self.conditionedge.get_name()}
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the LaneOffsetAction
@@ -442,7 +443,7 @@ class ValueTrigger(_TriggerType):
             self._triggerpoint = &#39;StopTrigger&#39;
             
         self.delay = delay
-        if conditionedge not in ConditionEdge:
+        if not hasattr(ConditionEdge,str(conditionedge)):
             raise ValueError(&#39;not a valid condition edge&#39;)
         self.conditionedge = conditionedge
         if not isinstance(valuecondition,_ValueTriggerType):
@@ -468,7 +469,7 @@ class ValueTrigger(_TriggerType):
         &#34;&#34;&#34; returns the attributes of the LaneOffsetAction as a dict
 
         &#34;&#34;&#34;
-        return {&#39;name&#39;:self.name,&#39;delay&#39;:str(self.delay),&#39;conditionEdge&#39;:self.conditionedge.name}
+        return {&#39;name&#39;:self.name,&#39;delay&#39;:str(self.delay),&#39;conditionEdge&#39;:self.conditionedge.get_name()}
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the LaneOffsetAction
@@ -487,7 +488,7 @@ class ValueTrigger(_TriggerType):
             return element
 
 
-class TriggeringEntities():
+class TriggeringEntities(VersionBase):
     &#34;&#34;&#34; the TriggeringEntities class is used by Value and Entity Triggers to defined the trigger entity
         
         Parameters
@@ -522,7 +523,7 @@ class TriggeringEntities():
             triggeringrule (str): all or any
 
         &#34;&#34;&#34;
-        if triggeringrule not in TriggeringEntitiesRule:
+        if not hasattr(TriggeringEntitiesRule,str(triggeringrule)):
             raise ValueError(&#39;not a vaild triggering rule&#39;)
         self.entity = [] 
         self.triggeringrule = triggeringrule
@@ -548,7 +549,7 @@ class TriggeringEntities():
         &#34;&#34;&#34; returns the attributes of the LaneOffsetAction as a dict
 
         &#34;&#34;&#34;
-        return {&#39;triggeringEntitiesRule&#39;:self.triggeringrule.name}
+        return {&#39;triggeringEntitiesRule&#39;:self.triggeringrule.get_name()}
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the LaneOffsetAction
@@ -662,7 +663,7 @@ class CollisionCondition(_EntityTriggerType):
         if isinstance(self.entity,str):
             colcond.append(EntityRef(self.entity).get_element())
         else:
-            ET.SubElement(colcond,&#39;ByType&#39;,{&#39;type&#39;:self.entity.name})
+            ET.SubElement(colcond,&#39;ByType&#39;,{&#39;type&#39;:self.entity.get_name()})
         return element
 
 class OffroadCondition(_EntityTriggerType):
@@ -732,6 +733,11 @@ class TimeHeadwayCondition(_EntityTriggerType):
             freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
                 Default: True
 
+            distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
+                Default: RelativeDistanceType.longitudinal
+
+            coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+                Default: CoordinateSystem.road 
         Attributes
         ----------
             entity (str): name of the entity for the headway
@@ -744,6 +750,10 @@ class TimeHeadwayCondition(_EntityTriggerType):
 
             freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
 
+            distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
+
+            coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+                
         Methods
         -------
             get_element()
@@ -753,7 +763,7 @@ class TimeHeadwayCondition(_EntityTriggerType):
                 Returns a dictionary of all attributes of the class
 
     &#34;&#34;&#34;
-    def __init__(self,entity,value,rule,alongroute=True,freespace=True):
+    def __init__(self,entity,value,rule,alongroute=True,freespace=True,distance_type=RelativeDistanceType.longitudinal,coordinate_system=CoordinateSystem.road):
         &#34;&#34;&#34; initalize the TimeHeadwayCondition
         
         Parameters
@@ -770,6 +780,11 @@ class TimeHeadwayCondition(_EntityTriggerType):
             freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
                 Default: True
 
+            distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
+                Default: RelativeDistanceType.longitudinal
+
+            coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+                Default: CoordinateSystem.road 
         &#34;&#34;&#34;
         self.entity = entity
         self.value = value
@@ -779,9 +794,15 @@ class TimeHeadwayCondition(_EntityTriggerType):
             raise TypeError(&#39;freespace input not of type bool&#39;)
         self.alongroute = alongroute
         self.freespace = freespace
-        if rule not in Rule:
+        if not hasattr(Rule,str(rule)):
             raise ValueError(rule + &#39;; is not a valid rule.&#39;)
         self.rule = rule
+        if not hasattr(RelativeDistanceType,str(distance_type)):
+            raise ValueError(distance_type + &#39;; is not a valid RelativeDistanceType.&#39;)
+        if not hasattr(CoordinateSystem,str(coordinate_system)):
+            raise ValueError(coordinate_system + &#39;; is not a valid CoordinateSystem.&#39;)
+        self.relative_distance_type = distance_type
+        self.coordinate_system = coordinate_system
 
     def __eq__(self,other):
         if isinstance(other,TimeHeadwayCondition):
@@ -796,9 +817,13 @@ class TimeHeadwayCondition(_EntityTriggerType):
         basedict = {}
         basedict[&#39;entityRef&#39;] = self.entity
         basedict[&#39;value&#39;] = str(self.value)
-        basedict[&#39;alongRoute&#39;] = convert_bool(self.alongroute)
+        if self.isVersion(minor=0):
+            basedict[&#39;alongRoute&#39;] = convert_bool(self.alongroute)
+        else:
+            basedict[&#39;relativeDistanceType&#39;] = self.relative_distance_type.name
+            basedict[&#39;coordinateSystem&#39;] = self.coordinate_system.name
         basedict[&#39;freespace&#39;] = convert_bool(self.freespace)
-        basedict[&#39;rule&#39;] = self.rule.name
+        basedict[&#39;rule&#39;] = self.rule.get_name()
         return basedict
 
     def get_element(self):
@@ -831,6 +856,12 @@ class TimeToCollisionCondition(_EntityTriggerType):
 
                 position (*Position): a position for collision
 
+            distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
+                Default: RelativeDistanceType.longitudinal
+
+            coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+                Default: CoordinateSystem.road 
+
         Attributes
         ----------
             value (float): time before collision
@@ -847,6 +878,10 @@ class TimeToCollisionCondition(_EntityTriggerType):
 
                 position (*Position): a position for collision
 
+            distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
+
+            coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+                
         Methods
         -------
             get_element()
@@ -856,7 +891,7 @@ class TimeToCollisionCondition(_EntityTriggerType):
                 Returns a dictionary of all attributes of the class
 
     &#34;&#34;&#34;
-    def __init__(self,value,rule,alongroute=True,freespace=True,entity=None,position=None):
+    def __init__(self,value,rule,alongroute=True,freespace=True,entity=None,position=None,distance_type=RelativeDistanceType.longitudinal,coordinate_system=CoordinateSystem.road):
         &#34;&#34;&#34; initalize the TimeToCollisionCondition
         
         Parameters
@@ -877,6 +912,11 @@ class TimeToCollisionCondition(_EntityTriggerType):
 
                 position (*Position): a position for collision
         
+            distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
+                Default: RelativeDistanceType.longitudinal
+
+            coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+                Default: CoordinateSystem.road 
         &#34;&#34;&#34;
         self.value = value
         if not isinstance(alongroute,bool):
@@ -885,12 +925,12 @@ class TimeToCollisionCondition(_EntityTriggerType):
             raise TypeError(&#39;freespace input not of type bool&#39;)
         self.freespace = freespace
         self.alongroute = alongroute
-        if rule not in Rule:
+        if not hasattr(Rule,str(rule)):
             raise ValueError(rule + &#39;; is not a valid rule.&#39;)
         self.rule = rule
         self.use_entity = None
         if (entity !=None) and (position !=None):
-            raise ValueError(&#39;Can only have either entity of position, not both&#39;)
+            raise ToManyOptionalArguments(&#39;Can only have either entity of position, not both&#39;)
         if entity:
             self.entity = EntityRef(entity)
             self.use_entity = True
@@ -899,6 +939,12 @@ class TimeToCollisionCondition(_EntityTriggerType):
                 raise TypeError(&#39;input position is not a valid Position&#39;)
             self.position = position
             self.use_entity = False
+        if not hasattr(RelativeDistanceType,str(distance_type)):
+            raise ValueError(distance_type + &#39;; is not a valid RelativeDistanceType.&#39;)
+        if not hasattr(CoordinateSystem,str(coordinate_system)):
+            raise ValueError(coordinate_system + &#39;; is not a valid CoordinateSystem.&#39;)
+        self.relative_distance_type = distance_type
+        self.coordinate_system = coordinate_system
 
     def __eq__(self,other):
         if isinstance(other,TimeToCollisionCondition):
@@ -914,9 +960,13 @@ class TimeToCollisionCondition(_EntityTriggerType):
         &#34;&#34;&#34;
         basedict = {}
         basedict[&#39;value&#39;] = str(self.value)
-        basedict[&#39;alongRoute&#39;] = convert_bool(self.alongroute)
+        if self.isVersion(minor=0):
+            basedict[&#39;alongRoute&#39;] = convert_bool(self.alongroute)
+        else:
+            basedict[&#39;relativeDistanceType&#39;] = self.relative_distance_type.name
+            basedict[&#39;coordinateSystem&#39;] = self.coordinate_system.name
         basedict[&#39;freespace&#39;] = convert_bool(self.freespace)
-        basedict[&#39;rule&#39;] = self.rule.name
+        basedict[&#39;rule&#39;] = self.rule.get_name()
         return basedict
         
 
@@ -975,7 +1025,7 @@ class AccelerationCondition(_EntityTriggerType):
             rule (Rule): condition rule of triggering 
         &#34;&#34;&#34;
         self.value = value
-        if rule not in Rule:
+        if not hasattr(Rule,str(rule)):
             raise ValueError(rule + &#39;; is not a valid rule.&#39;)
         self.rule = rule
 
@@ -989,7 +1039,7 @@ class AccelerationCondition(_EntityTriggerType):
         &#34;&#34;&#34; returns the attributes of the AccelerationCondition as a dict
 
         &#34;&#34;&#34;
-        return {&#39;value&#39;:str(self.value),&#39;rule&#39;:self.rule.name}
+        return {&#39;value&#39;:str(self.value),&#39;rule&#39;:self.rule.get_name()}
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the AccelerationCondition
@@ -1082,7 +1132,7 @@ class SpeedCondition(_EntityTriggerType):
             rule (Rule): condition rule of triggering 
         &#34;&#34;&#34;
         self.value = value
-        if rule not in Rule:
+        if not hasattr(Rule,str(rule)):
             raise ValueError(rule + &#39;; is not a valid rule.&#39;)
         self.rule = rule
 
@@ -1098,7 +1148,7 @@ class SpeedCondition(_EntityTriggerType):
         &#34;&#34;&#34;
         basedict = {}
         basedict[&#39;value&#39;] = str(self.value)
-        basedict[&#39;rule&#39;] = self.rule.name
+        basedict[&#39;rule&#39;] = self.rule.get_name()
         return basedict
         # return merge_dicts({&#39;value&#39;:str(self.value)},self.rule.get_attributes())
 
@@ -1151,7 +1201,7 @@ class RelativeSpeedCondition(_EntityTriggerType):
             
         &#34;&#34;&#34;
         self.value = value
-        if rule not in Rule:
+        if not hasattr(Rule,str(rule)):
             raise ValueError(rule + &#39;; is not a valid rule.&#39;)
         self.rule = rule
         self.entity = entity
@@ -1168,7 +1218,7 @@ class RelativeSpeedCondition(_EntityTriggerType):
         &#34;&#34;&#34;
         basedict = {}
         basedict[&#39;value&#39;] = str(self.value)
-        basedict[&#39;rule&#39;] = self.rule.name
+        basedict[&#39;rule&#39;] = self.rule.get_name()
         basedict[&#39;entityRef&#39;] = self.entity
         return basedict
         # return merge_dicts({&#39;value&#39;:str(self.value),&#39;entityRef&#39;:self.entity},self.rule.get_attributes())
@@ -1304,11 +1354,17 @@ class DistanceCondition(_EntityTriggerType):
 
             position (*Position): any position to reach
 
-            alongroute (bool): if the route should count
+            alongroute (bool): if the route should count (depricated in V.1.0)
                 Default: True
 
             freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
                 Default: True
+
+            distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
+                Default: RelativeDistanceType.longitudinal
+
+            coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+                Default: CoordinateSystem.road 
 
         Attributes
         ----------
@@ -1322,6 +1378,10 @@ class DistanceCondition(_EntityTriggerType):
 
             freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
 
+            distance_type (RelativeDistanceType): how the relative distance should be calculated
+
+            coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance
+
         Methods
         -------
             get_element()
@@ -1331,16 +1391,22 @@ class DistanceCondition(_EntityTriggerType):
                 Returns a dictionary of all attributes of the class
 
     &#34;&#34;&#34;
-    def __init__(self,value,rule,position,alongroute=True,freespace=True):
+    def __init__(self,value,rule,position,alongroute=True,freespace=True,distance_type=RelativeDistanceType.longitudinal,coordinate_system=CoordinateSystem.road):
         self.value = value
         self.alongroute = alongroute
         self.freespace = freespace
-        if rule not in Rule:
+        if not hasattr(Rule,str(rule)):
             raise ValueError(rule + &#39;; is not a valid rule.&#39;)
         self.rule = rule
         if not (isinstance(position,_PositionType)):
             raise TypeError(&#39;position input is not a valid Position&#39;)
         self.position = position
+        if not hasattr(RelativeDistanceType,str(distance_type)):
+            raise ValueError(distance_type + &#39;; is not a valid RelativeDistanceType.&#39;)
+        if not hasattr(CoordinateSystem,str(coordinate_system)):
+            raise ValueError(coordinate_system + &#39;; is not a valid CoordinateSystem.&#39;)
+        self.relative_distance_type = distance_type
+        self.coordinate_system = coordinate_system
 
     def __eq__(self,other):
         if isinstance(other,DistanceCondition):
@@ -1355,15 +1421,22 @@ class DistanceCondition(_EntityTriggerType):
         &#34;&#34;&#34;
         basedict = {}
         basedict[&#39;value&#39;] = str(self.value)
-        basedict[&#39;alongRoute&#39;] = convert_bool(self.alongroute)
+        
         basedict[&#39;freespace&#39;] = convert_bool(self.freespace)
-        basedict[&#39;rule&#39;] = self.rule.name
+        basedict[&#39;rule&#39;] = self.rule.get_name()
+        if self.isVersion(minor=0):
+            basedict[&#39;alongRoute&#39;] = convert_bool(self.alongroute)
+        else:
+            basedict[&#39;relativeDistanceType&#39;] = self.relative_distance_type.name
+            basedict[&#39;coordinateSystem&#39;] = self.coordinate_system.name
+
         return basedict
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the DistanceCondition
 
         &#34;&#34;&#34;
+        
         element = ET.Element(&#39;EntityCondition&#39;)
         distancecond = ET.SubElement(element,&#39;DistanceCondition&#39;,attrib=self.get_attributes())
         distancecond.append(self.position.get_element())
@@ -1385,6 +1458,9 @@ class RelativeDistanceCondition(_EntityTriggerType):
             freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
                 Default: True
 
+            coordinate_system (CoordinateSystem): what coordinate system to use (valid from V1.1)
+                Default: CoordinateSystem.entity
+
         Attributes
         ----------
             value (float): distance to position
@@ -1397,6 +1473,8 @@ class RelativeDistanceCondition(_EntityTriggerType):
 
             freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
 
+            coordinate_system (CoordinateSystem): what coordinate system to use (valid from V1.1)
+
         Methods
         -------
             get_element()
@@ -1406,7 +1484,7 @@ class RelativeDistanceCondition(_EntityTriggerType):
                 Returns a dictionary of all attributes of the class
 
     &#34;&#34;&#34;
-    def __init__(self,value,rule,dist_type,entity,alongroute=True,freespace=True):
+    def __init__(self,value,rule,dist_type,entity,alongroute=True,freespace=True,coordinate_system=CoordinateSystem.entity):
         &#34;&#34;&#34; initalize the RelativeDistanceCondition
         
         Parameters
@@ -1422,19 +1500,22 @@ class RelativeDistanceCondition(_EntityTriggerType):
             freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
                 Default: True
 
+            coordinate_system (CoordinateSystem): what coordinate system to use (valid from V1.1)
+                Default: CoordinateSystem.entity
         &#34;&#34;&#34;
         self.value = value
         if not isinstance(freespace,bool):
             raise TypeError(&#39;freespace input not of type bool&#39;)
         self.alongroute = alongroute
         self.freespace = freespace
-        if dist_type not in RelativeDistanceType:
+        if not hasattr(RelativeDistanceType,str(dist_type)):
             raise TypeError(&#39;dist_type is not of type RelativeDistanceType&#39;)
         self.dist_type = dist_type
-        if rule not in Rule:
+        if not hasattr(Rule,str(rule)):
             raise ValueError(rule + &#39;; is not a valid rule.&#39;)
         self.rule = rule
         self.entity = entity
+        self.coordinate_system = coordinate_system
 
     def __eq__(self,other):
         if isinstance(other,RelativeDistanceCondition):
@@ -1450,8 +1531,10 @@ class RelativeDistanceCondition(_EntityTriggerType):
         basedict[&#39;value&#39;] = str(self.value)
         basedict[&#39;freespace&#39;] = convert_bool(self.freespace)
         basedict[&#39;entityRef&#39;] = self.entity
-        basedict[&#39;rule&#39;] = self.rule.name
-        basedict[&#39;relativeDistanceType&#39;] = self.dist_type.name
+        basedict[&#39;rule&#39;] = self.rule.get_name()
+        basedict[&#39;relativeDistanceType&#39;] = self.dist_type.get_name()
+        if not self.isVersion(minor=0):
+            basedict[&#39;coordinateSystem&#39;] = self.coordinate_system.get_name()
         return basedict
 
     def get_element(self):
@@ -1511,7 +1594,7 @@ class ParameterCondition(_ValueTriggerType):
         &#34;&#34;&#34;
         self.parameter = parameter
         self.value = value
-        if rule not in Rule:
+        if not hasattr(Rule,str(rule)):
             raise ValueError(rule + &#39;; is not a valid rule.&#39;)
         self.rule = rule
 
@@ -1526,7 +1609,7 @@ class ParameterCondition(_ValueTriggerType):
 
         &#34;&#34;&#34;
         basedict = {&#39;parameterRef&#39;:self.parameter,&#39;value&#39;:str(self.value)}
-        basedict[&#39;rule&#39;] = self.rule.name
+        basedict[&#39;rule&#39;] = self.rule.get_name()
         return basedict
 
     def get_element(self):
@@ -1568,7 +1651,7 @@ class TimeOfDayCondition(_ValueTriggerType):
                 time of day (str): datetime ??? format unknown
             
         &#34;&#34;&#34;
-        if rule not in Rule:
+        if not hasattr(Rule,str(rule)):
             raise ValueError(rule + &#39;; is not a valid rule.&#39;)
         self.rule = rule
         self.datetime = datetime
@@ -1585,7 +1668,7 @@ class TimeOfDayCondition(_ValueTriggerType):
         &#34;&#34;&#34;
         basedict = {}
         basedict[&#39;datetime&#39;] = self.datetime
-        basedict[&#39;rule&#39;] = self.rule.name
+        basedict[&#39;rule&#39;] = self.rule.get_name()
         return basedict
 
     def get_element(self):
@@ -1629,7 +1712,7 @@ class SimulationTimeCondition(_ValueTriggerType):
                 rule (Rule): condition rule of triggering 
         &#34;&#34;&#34;
         self.value = value
-        if rule not in Rule:
+        if not hasattr(Rule,str(rule)):
             raise ValueError(rule + &#39;; is not a valid rule.&#39;)
         self.rule = rule
 
@@ -1645,7 +1728,7 @@ class SimulationTimeCondition(_ValueTriggerType):
         &#34;&#34;&#34;
         basedict = {}
         basedict[&#39;value&#39;] = str(self.value)
-        basedict[&#39;rule&#39;] = self.rule.name
+        basedict[&#39;rule&#39;] = self.rule.get_name()
         return basedict
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the SimulationTimeCondition
@@ -1692,9 +1775,9 @@ class StoryboardElementStateCondition(_ValueTriggerType):
 
                 state (StoryboardElementType): state to trigger on
         &#34;&#34;&#34;
-        if element not in StoryboardElementType:
+        if not hasattr(StoryboardElementType,str(element)):
             raise TypeError(&#39;element input is not of type StoryBoardElementType&#39;)
-        if state not in StoryboardElementState:
+        if not hasattr(StoryboardElementState,str(state)):
             raise TypeError(&#39;state input is not of type StoryBoardElementState&#39;)
         self.element = element
         self.reference = reference
@@ -1710,7 +1793,7 @@ class StoryboardElementStateCondition(_ValueTriggerType):
         &#34;&#34;&#34; returns the attributes of the StoryboardElementStateCondition as a dict
 
         &#34;&#34;&#34;
-        return {&#39;storyboardElementType&#39;:self.element.name,&#39;storyboardElementRef&#39;:self.reference,&#39;state&#39;:self.state.name}
+        return {&#39;storyboardElementType&#39;:self.element.get_name(),&#39;storyboardElementRef&#39;:self.reference,&#39;state&#39;:self.state.get_name()}
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the StoryboardElementStateCondition
@@ -1759,7 +1842,7 @@ class UserDefinedValueCondition(_ValueTriggerType):
         &#34;&#34;&#34;
         self.name = name
         self.value = value
-        if rule not in Rule:
+        if not hasattr(Rule,str(rule)):
             raise ValueError(rule + &#39;; is not a valid rule.&#39;)
         self.rule = rule
 
@@ -1774,7 +1857,7 @@ class UserDefinedValueCondition(_ValueTriggerType):
 
         &#34;&#34;&#34;
         basedict = {&#39;name&#39;:self.name,&#39;value&#39;:str(self.value)}
-        basedict[&#39;rule&#39;] = self.rule.name
+        basedict[&#39;rule&#39;] = self.rule.get_name()
         return basedict
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the UserDefinedValueCondition
@@ -1970,7 +2053,7 @@ rule (Rule): condition rule of triggering
             rule (Rule): condition rule of triggering 
         &#34;&#34;&#34;
         self.value = value
-        if rule not in Rule:
+        if not hasattr(Rule,str(rule)):
             raise ValueError(rule + &#39;; is not a valid rule.&#39;)
         self.rule = rule
 
@@ -1984,7 +2067,7 @@ rule (Rule): condition rule of triggering
         &#34;&#34;&#34; returns the attributes of the AccelerationCondition as a dict
 
         &#34;&#34;&#34;
-        return {&#39;value&#39;:str(self.value),&#39;rule&#39;:self.rule.name}
+        return {&#39;value&#39;:str(self.value),&#39;rule&#39;:self.rule.get_name()}
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the AccelerationCondition
@@ -1997,6 +2080,7 @@ rule (Rule): condition rule of triggering
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -2013,7 +2097,7 @@ rule (Rule): condition rule of triggering
     &#34;&#34;&#34; returns the attributes of the AccelerationCondition as a dict
 
     &#34;&#34;&#34;
-    return {&#39;value&#39;:str(self.value),&#39;rule&#39;:self.rule.name}</code></pre>
+    return {&#39;value&#39;:str(self.value),&#39;rule&#39;:self.rule.get_name()}</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xosc.triggers.AccelerationCondition.get_element"><code class="name flex">
@@ -2109,12 +2193,13 @@ get_attributes()
         if isinstance(self.entity,str):
             colcond.append(EntityRef(self.entity).get_element())
         else:
-            ET.SubElement(colcond,&#39;ByType&#39;,{&#39;type&#39;:self.entity.name})
+            ET.SubElement(colcond,&#39;ByType&#39;,{&#39;type&#39;:self.entity.get_name()})
         return element</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -2136,7 +2221,7 @@ get_attributes()
     if isinstance(self.entity,str):
         colcond.append(EntityRef(self.entity).get_element())
     else:
-        ET.SubElement(colcond,&#39;ByType&#39;,{&#39;type&#39;:self.entity.name})
+        ET.SubElement(colcond,&#39;ByType&#39;,{&#39;type&#39;:self.entity.get_name()})
     return element</code></pre>
 </details>
 </dd>
@@ -2260,6 +2345,7 @@ add_condition(condition)
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._TriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -2323,7 +2409,7 @@ add_condition(condition)
 </dd>
 <dt id="scenariogeneration.xosc.triggers.DistanceCondition"><code class="flex name class">
 <span>class <span class="ident">DistanceCondition</span></span>
-<span>(</span><span>value, rule, position, alongroute=True, freespace=True)</span>
+<span>(</span><span>value, rule, position, alongroute=True, freespace=True, distance_type=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;, coordinate_system=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>the DistanceCondition class is an Entity Condition used by the EntityTrigger</p>
@@ -2334,11 +2420,17 @@ rule (Rule): condition rule of triggering
 
 position (*Position): any position to reach
 
-alongroute (bool): if the route should count
+alongroute (bool): if the route should count (depricated in V.1.0)
     Default: True
 
 freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
     Default: True
+
+distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
+    Default: RelativeDistanceType.longitudinal
+
+coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+    Default: CoordinateSystem.road
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>value (float): distance to position
@@ -2350,6 +2442,10 @@ position (*Position): any position to reach
 alongroute (bool): if the route should count
 
 freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
+
+distance_type (RelativeDistanceType): how the relative distance should be calculated
+
+coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>get_element()
@@ -2373,11 +2469,17 @@ get_attributes()
 
             position (*Position): any position to reach
 
-            alongroute (bool): if the route should count
+            alongroute (bool): if the route should count (depricated in V.1.0)
                 Default: True
 
             freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
                 Default: True
+
+            distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
+                Default: RelativeDistanceType.longitudinal
+
+            coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+                Default: CoordinateSystem.road 
 
         Attributes
         ----------
@@ -2391,6 +2493,10 @@ get_attributes()
 
             freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
 
+            distance_type (RelativeDistanceType): how the relative distance should be calculated
+
+            coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance
+
         Methods
         -------
             get_element()
@@ -2400,16 +2506,22 @@ get_attributes()
                 Returns a dictionary of all attributes of the class
 
     &#34;&#34;&#34;
-    def __init__(self,value,rule,position,alongroute=True,freespace=True):
+    def __init__(self,value,rule,position,alongroute=True,freespace=True,distance_type=RelativeDistanceType.longitudinal,coordinate_system=CoordinateSystem.road):
         self.value = value
         self.alongroute = alongroute
         self.freespace = freespace
-        if rule not in Rule:
+        if not hasattr(Rule,str(rule)):
             raise ValueError(rule + &#39;; is not a valid rule.&#39;)
         self.rule = rule
         if not (isinstance(position,_PositionType)):
             raise TypeError(&#39;position input is not a valid Position&#39;)
         self.position = position
+        if not hasattr(RelativeDistanceType,str(distance_type)):
+            raise ValueError(distance_type + &#39;; is not a valid RelativeDistanceType.&#39;)
+        if not hasattr(CoordinateSystem,str(coordinate_system)):
+            raise ValueError(coordinate_system + &#39;; is not a valid CoordinateSystem.&#39;)
+        self.relative_distance_type = distance_type
+        self.coordinate_system = coordinate_system
 
     def __eq__(self,other):
         if isinstance(other,DistanceCondition):
@@ -2424,15 +2536,22 @@ get_attributes()
         &#34;&#34;&#34;
         basedict = {}
         basedict[&#39;value&#39;] = str(self.value)
-        basedict[&#39;alongRoute&#39;] = convert_bool(self.alongroute)
+        
         basedict[&#39;freespace&#39;] = convert_bool(self.freespace)
-        basedict[&#39;rule&#39;] = self.rule.name
+        basedict[&#39;rule&#39;] = self.rule.get_name()
+        if self.isVersion(minor=0):
+            basedict[&#39;alongRoute&#39;] = convert_bool(self.alongroute)
+        else:
+            basedict[&#39;relativeDistanceType&#39;] = self.relative_distance_type.name
+            basedict[&#39;coordinateSystem&#39;] = self.coordinate_system.name
+
         return basedict
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the DistanceCondition
 
         &#34;&#34;&#34;
+        
         element = ET.Element(&#39;EntityCondition&#39;)
         distancecond = ET.SubElement(element,&#39;DistanceCondition&#39;,attrib=self.get_attributes())
         distancecond.append(self.position.get_element())
@@ -2441,6 +2560,7 @@ get_attributes()
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -2459,9 +2579,15 @@ get_attributes()
     &#34;&#34;&#34;
     basedict = {}
     basedict[&#39;value&#39;] = str(self.value)
-    basedict[&#39;alongRoute&#39;] = convert_bool(self.alongroute)
+    
     basedict[&#39;freespace&#39;] = convert_bool(self.freespace)
-    basedict[&#39;rule&#39;] = self.rule.name
+    basedict[&#39;rule&#39;] = self.rule.get_name()
+    if self.isVersion(minor=0):
+        basedict[&#39;alongRoute&#39;] = convert_bool(self.alongroute)
+    else:
+        basedict[&#39;relativeDistanceType&#39;] = self.relative_distance_type.name
+        basedict[&#39;coordinateSystem&#39;] = self.coordinate_system.name
+
     return basedict</code></pre>
 </details>
 </dd>
@@ -2478,6 +2604,7 @@ get_attributes()
     &#34;&#34;&#34; returns the elementTree of the DistanceCondition
 
     &#34;&#34;&#34;
+    
     element = ET.Element(&#39;EntityCondition&#39;)
     distancecond = ET.SubElement(element,&#39;DistanceCondition&#39;,attrib=self.get_attributes())
     distancecond.append(self.position.get_element())
@@ -2553,6 +2680,7 @@ get_attributes()
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._TriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -2654,6 +2782,7 @@ get_attributes()
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -2695,7 +2824,7 @@ get_attributes()
 </dd>
 <dt id="scenariogeneration.xosc.triggers.EntityTrigger"><code class="flex name class">
 <span>class <span class="ident">EntityTrigger</span></span>
-<span>(</span><span>name, delay, conditionedge, entitycondition, triggerentity, triggeringrule=TriggeringEntitiesRule.any, triggeringpoint='start')</span>
+<span>(</span><span>name, delay, conditionedge, entitycondition, triggerentity, triggeringrule=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;, triggeringpoint='start')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>the EntityTrigger creates an Trigger containing an EntityTrigger </p>
@@ -2825,7 +2954,7 @@ triggeringpoint (str): start or stop
             self._triggerpoint = &#39;StopTrigger&#39;
             
         self.delay = delay
-        if conditionedge not in ConditionEdge:
+        if not hasattr(ConditionEdge,str(conditionedge)):
             raise ValueError(&#39;not a valid condition edge&#39;)
         self.conditionedge = conditionedge
         if not isinstance(entitycondition,_EntityTriggerType):
@@ -2863,7 +2992,7 @@ triggeringpoint (str): start or stop
         &#34;&#34;&#34; returns the attributes of the LaneOffsetAction as a dict
 
         &#34;&#34;&#34;
-        return {&#39;name&#39;:self.name,&#39;delay&#39;:str(self.delay),&#39;conditionEdge&#39;:self.conditionedge.name}
+        return {&#39;name&#39;:self.name,&#39;delay&#39;:str(self.delay),&#39;conditionEdge&#39;:self.conditionedge.get_name()}
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the LaneOffsetAction
@@ -2887,6 +3016,7 @@ triggeringpoint (str): start or stop
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._TriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -2925,7 +3055,7 @@ triggeringpoint (str): start or stop
     &#34;&#34;&#34; returns the attributes of the LaneOffsetAction as a dict
 
     &#34;&#34;&#34;
-    return {&#39;name&#39;:self.name,&#39;delay&#39;:str(self.delay),&#39;conditionEdge&#39;:self.conditionedge.name}</code></pre>
+    return {&#39;name&#39;:self.name,&#39;delay&#39;:str(self.delay),&#39;conditionEdge&#39;:self.conditionedge.get_name()}</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xosc.triggers.EntityTrigger.get_element"><code class="name flex">
@@ -3039,6 +3169,7 @@ get_attributes()
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -3159,7 +3290,7 @@ rule (Rule): condition rule of triggering
         &#34;&#34;&#34;
         self.parameter = parameter
         self.value = value
-        if rule not in Rule:
+        if not hasattr(Rule,str(rule)):
             raise ValueError(rule + &#39;; is not a valid rule.&#39;)
         self.rule = rule
 
@@ -3174,7 +3305,7 @@ rule (Rule): condition rule of triggering
 
         &#34;&#34;&#34;
         basedict = {&#39;parameterRef&#39;:self.parameter,&#39;value&#39;:str(self.value)}
-        basedict[&#39;rule&#39;] = self.rule.name
+        basedict[&#39;rule&#39;] = self.rule.get_name()
         return basedict
 
     def get_element(self):
@@ -3186,6 +3317,7 @@ rule (Rule): condition rule of triggering
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._ValueTriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -3203,7 +3335,7 @@ rule (Rule): condition rule of triggering
 
     &#34;&#34;&#34;
     basedict = {&#39;parameterRef&#39;:self.parameter,&#39;value&#39;:str(self.value)}
-    basedict[&#39;rule&#39;] = self.rule.name
+    basedict[&#39;rule&#39;] = self.rule.get_name()
     return basedict</code></pre>
 </details>
 </dd>
@@ -3323,6 +3455,7 @@ tolerance (float): tolerance of the position
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -3365,7 +3498,7 @@ tolerance (float): tolerance of the position
 </dd>
 <dt id="scenariogeneration.xosc.triggers.RelativeDistanceCondition"><code class="flex name class">
 <span>class <span class="ident">RelativeDistanceCondition</span></span>
-<span>(</span><span>value, rule, dist_type, entity, alongroute=True, freespace=True)</span>
+<span>(</span><span>value, rule, dist_type, entity, alongroute=True, freespace=True, coordinate_system=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>the RelativeDistanceCondition class is an Entity Condition used by the EntityTrigger</p>
@@ -3380,6 +3513,9 @@ entity (str): name of the entity fore relative distance
 
 freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
     Default: True
+
+coordinate_system (CoordinateSystem): what coordinate system to use (valid from V1.1)
+    Default: CoordinateSystem.entity
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>value (float): distance to position
@@ -3391,6 +3527,8 @@ entity (str): name of the entity fore relative distance
 dist_type (RelativeDistanceType): type of relative distance
 
 freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
+
+coordinate_system (CoordinateSystem): what coordinate system to use (valid from V1.1)
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>get_element()
@@ -3411,6 +3549,9 @@ entity (str): name of the entity fore relative distance
 
 freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
     Default: True
+
+coordinate_system (CoordinateSystem): what coordinate system to use (valid from V1.1)
+    Default: CoordinateSystem.entity
 </code></pre></div>
 <details class="source">
 <summary>
@@ -3432,6 +3573,9 @@ freespace (bool): (True) distance between bounding boxes, (False) distance betwe
             freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
                 Default: True
 
+            coordinate_system (CoordinateSystem): what coordinate system to use (valid from V1.1)
+                Default: CoordinateSystem.entity
+
         Attributes
         ----------
             value (float): distance to position
@@ -3444,6 +3588,8 @@ freespace (bool): (True) distance between bounding boxes, (False) distance betwe
 
             freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
 
+            coordinate_system (CoordinateSystem): what coordinate system to use (valid from V1.1)
+
         Methods
         -------
             get_element()
@@ -3453,7 +3599,7 @@ freespace (bool): (True) distance between bounding boxes, (False) distance betwe
                 Returns a dictionary of all attributes of the class
 
     &#34;&#34;&#34;
-    def __init__(self,value,rule,dist_type,entity,alongroute=True,freespace=True):
+    def __init__(self,value,rule,dist_type,entity,alongroute=True,freespace=True,coordinate_system=CoordinateSystem.entity):
         &#34;&#34;&#34; initalize the RelativeDistanceCondition
         
         Parameters
@@ -3469,19 +3615,22 @@ freespace (bool): (True) distance between bounding boxes, (False) distance betwe
             freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
                 Default: True
 
+            coordinate_system (CoordinateSystem): what coordinate system to use (valid from V1.1)
+                Default: CoordinateSystem.entity
         &#34;&#34;&#34;
         self.value = value
         if not isinstance(freespace,bool):
             raise TypeError(&#39;freespace input not of type bool&#39;)
         self.alongroute = alongroute
         self.freespace = freespace
-        if dist_type not in RelativeDistanceType:
+        if not hasattr(RelativeDistanceType,str(dist_type)):
             raise TypeError(&#39;dist_type is not of type RelativeDistanceType&#39;)
         self.dist_type = dist_type
-        if rule not in Rule:
+        if not hasattr(Rule,str(rule)):
             raise ValueError(rule + &#39;; is not a valid rule.&#39;)
         self.rule = rule
         self.entity = entity
+        self.coordinate_system = coordinate_system
 
     def __eq__(self,other):
         if isinstance(other,RelativeDistanceCondition):
@@ -3497,8 +3646,10 @@ freespace (bool): (True) distance between bounding boxes, (False) distance betwe
         basedict[&#39;value&#39;] = str(self.value)
         basedict[&#39;freespace&#39;] = convert_bool(self.freespace)
         basedict[&#39;entityRef&#39;] = self.entity
-        basedict[&#39;rule&#39;] = self.rule.name
-        basedict[&#39;relativeDistanceType&#39;] = self.dist_type.name
+        basedict[&#39;rule&#39;] = self.rule.get_name()
+        basedict[&#39;relativeDistanceType&#39;] = self.dist_type.get_name()
+        if not self.isVersion(minor=0):
+            basedict[&#39;coordinateSystem&#39;] = self.coordinate_system.get_name()
         return basedict
 
     def get_element(self):
@@ -3512,6 +3663,7 @@ freespace (bool): (True) distance between bounding boxes, (False) distance betwe
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -3532,8 +3684,10 @@ freespace (bool): (True) distance between bounding boxes, (False) distance betwe
     basedict[&#39;value&#39;] = str(self.value)
     basedict[&#39;freespace&#39;] = convert_bool(self.freespace)
     basedict[&#39;entityRef&#39;] = self.entity
-    basedict[&#39;rule&#39;] = self.rule.name
-    basedict[&#39;relativeDistanceType&#39;] = self.dist_type.name
+    basedict[&#39;rule&#39;] = self.rule.get_name()
+    basedict[&#39;relativeDistanceType&#39;] = self.dist_type.get_name()
+    if not self.isVersion(minor=0):
+        basedict[&#39;coordinateSystem&#39;] = self.coordinate_system.get_name()
     return basedict</code></pre>
 </details>
 </dd>
@@ -3637,7 +3791,7 @@ entity (str): name of the entity to be relative to
             
         &#34;&#34;&#34;
         self.value = value
-        if rule not in Rule:
+        if not hasattr(Rule,str(rule)):
             raise ValueError(rule + &#39;; is not a valid rule.&#39;)
         self.rule = rule
         self.entity = entity
@@ -3654,7 +3808,7 @@ entity (str): name of the entity to be relative to
         &#34;&#34;&#34;
         basedict = {}
         basedict[&#39;value&#39;] = str(self.value)
-        basedict[&#39;rule&#39;] = self.rule.name
+        basedict[&#39;rule&#39;] = self.rule.get_name()
         basedict[&#39;entityRef&#39;] = self.entity
         return basedict
         # return merge_dicts({&#39;value&#39;:str(self.value),&#39;entityRef&#39;:self.entity},self.rule.get_attributes())
@@ -3670,6 +3824,7 @@ entity (str): name of the entity to be relative to
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -3688,7 +3843,7 @@ entity (str): name of the entity to be relative to
     &#34;&#34;&#34;
     basedict = {}
     basedict[&#39;value&#39;] = str(self.value)
-    basedict[&#39;rule&#39;] = self.rule.name
+    basedict[&#39;rule&#39;] = self.rule.get_name()
     basedict[&#39;entityRef&#39;] = self.entity
     return basedict</code></pre>
 </details>
@@ -3780,7 +3935,7 @@ rule (Rule): condition rule of triggering
                 rule (Rule): condition rule of triggering 
         &#34;&#34;&#34;
         self.value = value
-        if rule not in Rule:
+        if not hasattr(Rule,str(rule)):
             raise ValueError(rule + &#39;; is not a valid rule.&#39;)
         self.rule = rule
 
@@ -3796,7 +3951,7 @@ rule (Rule): condition rule of triggering
         &#34;&#34;&#34;
         basedict = {}
         basedict[&#39;value&#39;] = str(self.value)
-        basedict[&#39;rule&#39;] = self.rule.name
+        basedict[&#39;rule&#39;] = self.rule.get_name()
         return basedict
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the SimulationTimeCondition
@@ -3807,6 +3962,7 @@ rule (Rule): condition rule of triggering
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._ValueTriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -3825,7 +3981,7 @@ rule (Rule): condition rule of triggering
     &#34;&#34;&#34;
     basedict = {}
     basedict[&#39;value&#39;] = str(self.value)
-    basedict[&#39;rule&#39;] = self.rule.name
+    basedict[&#39;rule&#39;] = self.rule.get_name()
     return basedict</code></pre>
 </details>
 </dd>
@@ -3914,7 +4070,7 @@ rule (Rule): condition rule of triggering
             rule (Rule): condition rule of triggering 
         &#34;&#34;&#34;
         self.value = value
-        if rule not in Rule:
+        if not hasattr(Rule,str(rule)):
             raise ValueError(rule + &#39;; is not a valid rule.&#39;)
         self.rule = rule
 
@@ -3930,7 +4086,7 @@ rule (Rule): condition rule of triggering
         &#34;&#34;&#34;
         basedict = {}
         basedict[&#39;value&#39;] = str(self.value)
-        basedict[&#39;rule&#39;] = self.rule.name
+        basedict[&#39;rule&#39;] = self.rule.get_name()
         return basedict
         # return merge_dicts({&#39;value&#39;:str(self.value)},self.rule.get_attributes())
 
@@ -3945,6 +4101,7 @@ rule (Rule): condition rule of triggering
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -3963,7 +4120,7 @@ rule (Rule): condition rule of triggering
     &#34;&#34;&#34;
     basedict = {}
     basedict[&#39;value&#39;] = str(self.value)
-    basedict[&#39;rule&#39;] = self.rule.name
+    basedict[&#39;rule&#39;] = self.rule.get_name()
     return basedict</code></pre>
 </details>
 </dd>
@@ -4066,6 +4223,7 @@ get_attributes()
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -4183,9 +4341,9 @@ state (StoryboardElementType): state to trigger on
 
                 state (StoryboardElementType): state to trigger on
         &#34;&#34;&#34;
-        if element not in StoryboardElementType:
+        if not hasattr(StoryboardElementType,str(element)):
             raise TypeError(&#39;element input is not of type StoryBoardElementType&#39;)
-        if state not in StoryboardElementState:
+        if not hasattr(StoryboardElementState,str(state)):
             raise TypeError(&#39;state input is not of type StoryBoardElementState&#39;)
         self.element = element
         self.reference = reference
@@ -4201,7 +4359,7 @@ state (StoryboardElementType): state to trigger on
         &#34;&#34;&#34; returns the attributes of the StoryboardElementStateCondition as a dict
 
         &#34;&#34;&#34;
-        return {&#39;storyboardElementType&#39;:self.element.name,&#39;storyboardElementRef&#39;:self.reference,&#39;state&#39;:self.state.name}
+        return {&#39;storyboardElementType&#39;:self.element.get_name(),&#39;storyboardElementRef&#39;:self.reference,&#39;state&#39;:self.state.get_name()}
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the StoryboardElementStateCondition
@@ -4212,6 +4370,7 @@ state (StoryboardElementType): state to trigger on
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._ValueTriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -4228,7 +4387,7 @@ state (StoryboardElementType): state to trigger on
     &#34;&#34;&#34; returns the attributes of the StoryboardElementStateCondition as a dict
 
     &#34;&#34;&#34;
-    return {&#39;storyboardElementType&#39;:self.element.name,&#39;storyboardElementRef&#39;:self.reference,&#39;state&#39;:self.state.name}</code></pre>
+    return {&#39;storyboardElementType&#39;:self.element.get_name(),&#39;storyboardElementRef&#39;:self.reference,&#39;state&#39;:self.state.get_name()}</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xosc.triggers.StoryboardElementStateCondition.get_element"><code class="name flex">
@@ -4251,7 +4410,7 @@ state (StoryboardElementType): state to trigger on
 </dd>
 <dt id="scenariogeneration.xosc.triggers.TimeHeadwayCondition"><code class="flex name class">
 <span>class <span class="ident">TimeHeadwayCondition</span></span>
-<span>(</span><span>entity, value, rule, alongroute=True, freespace=True)</span>
+<span>(</span><span>entity, value, rule, alongroute=True, freespace=True, distance_type=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;, coordinate_system=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>the TimeHeadwayCondition class is an Entity Condition used by the EntityTrigger</p>
@@ -4267,6 +4426,12 @@ alongroute (bool): if the route should count
 
 freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
     Default: True
+
+distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
+    Default: RelativeDistanceType.longitudinal
+
+coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+    Default: CoordinateSystem.road
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>entity (str): name of the entity for the headway
@@ -4278,6 +4443,10 @@ rule (Rule): condition rule of triggering
 alongroute (bool): if the route should count
 
 freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
+
+distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
+
+coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>get_element()
@@ -4299,6 +4468,12 @@ alongroute (bool): if the route should count
 
 freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
     Default: True
+
+distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
+    Default: RelativeDistanceType.longitudinal
+
+coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+    Default: CoordinateSystem.road
 </code></pre></div>
 <details class="source">
 <summary>
@@ -4321,6 +4496,11 @@ freespace (bool): (True) distance between bounding boxes, (False) distance betwe
             freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
                 Default: True
 
+            distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
+                Default: RelativeDistanceType.longitudinal
+
+            coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+                Default: CoordinateSystem.road 
         Attributes
         ----------
             entity (str): name of the entity for the headway
@@ -4333,6 +4513,10 @@ freespace (bool): (True) distance between bounding boxes, (False) distance betwe
 
             freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
 
+            distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
+
+            coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+                
         Methods
         -------
             get_element()
@@ -4342,7 +4526,7 @@ freespace (bool): (True) distance between bounding boxes, (False) distance betwe
                 Returns a dictionary of all attributes of the class
 
     &#34;&#34;&#34;
-    def __init__(self,entity,value,rule,alongroute=True,freespace=True):
+    def __init__(self,entity,value,rule,alongroute=True,freespace=True,distance_type=RelativeDistanceType.longitudinal,coordinate_system=CoordinateSystem.road):
         &#34;&#34;&#34; initalize the TimeHeadwayCondition
         
         Parameters
@@ -4359,6 +4543,11 @@ freespace (bool): (True) distance between bounding boxes, (False) distance betwe
             freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
                 Default: True
 
+            distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
+                Default: RelativeDistanceType.longitudinal
+
+            coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+                Default: CoordinateSystem.road 
         &#34;&#34;&#34;
         self.entity = entity
         self.value = value
@@ -4368,9 +4557,15 @@ freespace (bool): (True) distance between bounding boxes, (False) distance betwe
             raise TypeError(&#39;freespace input not of type bool&#39;)
         self.alongroute = alongroute
         self.freespace = freespace
-        if rule not in Rule:
+        if not hasattr(Rule,str(rule)):
             raise ValueError(rule + &#39;; is not a valid rule.&#39;)
         self.rule = rule
+        if not hasattr(RelativeDistanceType,str(distance_type)):
+            raise ValueError(distance_type + &#39;; is not a valid RelativeDistanceType.&#39;)
+        if not hasattr(CoordinateSystem,str(coordinate_system)):
+            raise ValueError(coordinate_system + &#39;; is not a valid CoordinateSystem.&#39;)
+        self.relative_distance_type = distance_type
+        self.coordinate_system = coordinate_system
 
     def __eq__(self,other):
         if isinstance(other,TimeHeadwayCondition):
@@ -4385,9 +4580,13 @@ freespace (bool): (True) distance between bounding boxes, (False) distance betwe
         basedict = {}
         basedict[&#39;entityRef&#39;] = self.entity
         basedict[&#39;value&#39;] = str(self.value)
-        basedict[&#39;alongRoute&#39;] = convert_bool(self.alongroute)
+        if self.isVersion(minor=0):
+            basedict[&#39;alongRoute&#39;] = convert_bool(self.alongroute)
+        else:
+            basedict[&#39;relativeDistanceType&#39;] = self.relative_distance_type.name
+            basedict[&#39;coordinateSystem&#39;] = self.coordinate_system.name
         basedict[&#39;freespace&#39;] = convert_bool(self.freespace)
-        basedict[&#39;rule&#39;] = self.rule.name
+        basedict[&#39;rule&#39;] = self.rule.get_name()
         return basedict
 
     def get_element(self):
@@ -4401,6 +4600,7 @@ freespace (bool): (True) distance between bounding boxes, (False) distance betwe
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -4420,9 +4620,13 @@ freespace (bool): (True) distance between bounding boxes, (False) distance betwe
     basedict = {}
     basedict[&#39;entityRef&#39;] = self.entity
     basedict[&#39;value&#39;] = str(self.value)
-    basedict[&#39;alongRoute&#39;] = convert_bool(self.alongroute)
+    if self.isVersion(minor=0):
+        basedict[&#39;alongRoute&#39;] = convert_bool(self.alongroute)
+    else:
+        basedict[&#39;relativeDistanceType&#39;] = self.relative_distance_type.name
+        basedict[&#39;coordinateSystem&#39;] = self.coordinate_system.name
     basedict[&#39;freespace&#39;] = convert_bool(self.freespace)
-    basedict[&#39;rule&#39;] = self.rule.name
+    basedict[&#39;rule&#39;] = self.rule.get_name()
     return basedict</code></pre>
 </details>
 </dd>
@@ -4513,7 +4717,7 @@ time of day (str): datetime ??? format unknown
                 time of day (str): datetime ??? format unknown
             
         &#34;&#34;&#34;
-        if rule not in Rule:
+        if not hasattr(Rule,str(rule)):
             raise ValueError(rule + &#39;; is not a valid rule.&#39;)
         self.rule = rule
         self.datetime = datetime
@@ -4530,7 +4734,7 @@ time of day (str): datetime ??? format unknown
         &#34;&#34;&#34;
         basedict = {}
         basedict[&#39;datetime&#39;] = self.datetime
-        basedict[&#39;rule&#39;] = self.rule.name
+        basedict[&#39;rule&#39;] = self.rule.get_name()
         return basedict
 
     def get_element(self):
@@ -4542,6 +4746,7 @@ time of day (str): datetime ??? format unknown
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._ValueTriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -4560,7 +4765,7 @@ time of day (str): datetime ??? format unknown
     &#34;&#34;&#34;
     basedict = {}
     basedict[&#39;datetime&#39;] = self.datetime
-    basedict[&#39;rule&#39;] = self.rule.name
+    basedict[&#39;rule&#39;] = self.rule.get_name()
     return basedict</code></pre>
 </details>
 </dd>
@@ -4584,7 +4789,7 @@ time of day (str): datetime ??? format unknown
 </dd>
 <dt id="scenariogeneration.xosc.triggers.TimeToCollisionCondition"><code class="flex name class">
 <span>class <span class="ident">TimeToCollisionCondition</span></span>
-<span>(</span><span>value, rule, alongroute=True, freespace=True, entity=None, position=None)</span>
+<span>(</span><span>value, rule, alongroute=True, freespace=True, entity=None, position=None, distance_type=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;, coordinate_system=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>the TimeToCollisionCondition class is an Entity Condition used by the EntityTrigger</p>
@@ -4603,6 +4808,12 @@ optionals:
     entity (str): the entity to trigger collision on
 
     position (*Position): a position for collision
+
+distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
+    Default: RelativeDistanceType.longitudinal
+
+coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+    Default: CoordinateSystem.road
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>value (float): time before collision
@@ -4618,6 +4829,10 @@ optionals:
     entity (EntityRef):  entity for the collision
 
     position (*Position): a position for collision
+
+distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
+
+coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>get_element()
@@ -4642,6 +4857,12 @@ optionals:
     entity (str): the entity to trigger collision on
 
     position (*Position): a position for collision
+
+distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
+    Default: RelativeDistanceType.longitudinal
+
+coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+    Default: CoordinateSystem.road
 </code></pre></div>
 <details class="source">
 <summary>
@@ -4668,6 +4889,12 @@ optionals:
 
                 position (*Position): a position for collision
 
+            distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
+                Default: RelativeDistanceType.longitudinal
+
+            coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+                Default: CoordinateSystem.road 
+
         Attributes
         ----------
             value (float): time before collision
@@ -4684,6 +4911,10 @@ optionals:
 
                 position (*Position): a position for collision
 
+            distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
+
+            coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+                
         Methods
         -------
             get_element()
@@ -4693,7 +4924,7 @@ optionals:
                 Returns a dictionary of all attributes of the class
 
     &#34;&#34;&#34;
-    def __init__(self,value,rule,alongroute=True,freespace=True,entity=None,position=None):
+    def __init__(self,value,rule,alongroute=True,freespace=True,entity=None,position=None,distance_type=RelativeDistanceType.longitudinal,coordinate_system=CoordinateSystem.road):
         &#34;&#34;&#34; initalize the TimeToCollisionCondition
         
         Parameters
@@ -4714,6 +4945,11 @@ optionals:
 
                 position (*Position): a position for collision
         
+            distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
+                Default: RelativeDistanceType.longitudinal
+
+            coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+                Default: CoordinateSystem.road 
         &#34;&#34;&#34;
         self.value = value
         if not isinstance(alongroute,bool):
@@ -4722,12 +4958,12 @@ optionals:
             raise TypeError(&#39;freespace input not of type bool&#39;)
         self.freespace = freespace
         self.alongroute = alongroute
-        if rule not in Rule:
+        if not hasattr(Rule,str(rule)):
             raise ValueError(rule + &#39;; is not a valid rule.&#39;)
         self.rule = rule
         self.use_entity = None
         if (entity !=None) and (position !=None):
-            raise ValueError(&#39;Can only have either entity of position, not both&#39;)
+            raise ToManyOptionalArguments(&#39;Can only have either entity of position, not both&#39;)
         if entity:
             self.entity = EntityRef(entity)
             self.use_entity = True
@@ -4736,6 +4972,12 @@ optionals:
                 raise TypeError(&#39;input position is not a valid Position&#39;)
             self.position = position
             self.use_entity = False
+        if not hasattr(RelativeDistanceType,str(distance_type)):
+            raise ValueError(distance_type + &#39;; is not a valid RelativeDistanceType.&#39;)
+        if not hasattr(CoordinateSystem,str(coordinate_system)):
+            raise ValueError(coordinate_system + &#39;; is not a valid CoordinateSystem.&#39;)
+        self.relative_distance_type = distance_type
+        self.coordinate_system = coordinate_system
 
     def __eq__(self,other):
         if isinstance(other,TimeToCollisionCondition):
@@ -4751,9 +4993,13 @@ optionals:
         &#34;&#34;&#34;
         basedict = {}
         basedict[&#39;value&#39;] = str(self.value)
-        basedict[&#39;alongRoute&#39;] = convert_bool(self.alongroute)
+        if self.isVersion(minor=0):
+            basedict[&#39;alongRoute&#39;] = convert_bool(self.alongroute)
+        else:
+            basedict[&#39;relativeDistanceType&#39;] = self.relative_distance_type.name
+            basedict[&#39;coordinateSystem&#39;] = self.coordinate_system.name
         basedict[&#39;freespace&#39;] = convert_bool(self.freespace)
-        basedict[&#39;rule&#39;] = self.rule.name
+        basedict[&#39;rule&#39;] = self.rule.get_name()
         return basedict
         
 
@@ -4778,6 +5024,7 @@ optionals:
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -4796,9 +5043,13 @@ optionals:
     &#34;&#34;&#34;
     basedict = {}
     basedict[&#39;value&#39;] = str(self.value)
-    basedict[&#39;alongRoute&#39;] = convert_bool(self.alongroute)
+    if self.isVersion(minor=0):
+        basedict[&#39;alongRoute&#39;] = convert_bool(self.alongroute)
+    else:
+        basedict[&#39;relativeDistanceType&#39;] = self.relative_distance_type.name
+        basedict[&#39;coordinateSystem&#39;] = self.coordinate_system.name
     basedict[&#39;freespace&#39;] = convert_bool(self.freespace)
-    basedict[&#39;rule&#39;] = self.rule.name
+    basedict[&#39;rule&#39;] = self.rule.get_name()
     return basedict</code></pre>
 </details>
 </dd>
@@ -4923,6 +5174,7 @@ state (str): state of the signal
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._ValueTriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -5051,6 +5303,7 @@ phase (str): ???
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._ValueTriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -5168,6 +5421,7 @@ get_attributes()
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -5310,6 +5564,7 @@ add_conditiongroup(conditiongroup)
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._TriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -5396,7 +5651,7 @@ triggeringrule (str): all or any
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class TriggeringEntities():
+<pre><code class="python">class TriggeringEntities(VersionBase):
     &#34;&#34;&#34; the TriggeringEntities class is used by Value and Entity Triggers to defined the trigger entity
         
         Parameters
@@ -5431,7 +5686,7 @@ triggeringrule (str): all or any
             triggeringrule (str): all or any
 
         &#34;&#34;&#34;
-        if triggeringrule not in TriggeringEntitiesRule:
+        if not hasattr(TriggeringEntitiesRule,str(triggeringrule)):
             raise ValueError(&#39;not a vaild triggering rule&#39;)
         self.entity = [] 
         self.triggeringrule = triggeringrule
@@ -5457,7 +5712,7 @@ triggeringrule (str): all or any
         &#34;&#34;&#34; returns the attributes of the LaneOffsetAction as a dict
 
         &#34;&#34;&#34;
-        return {&#39;triggeringEntitiesRule&#39;:self.triggeringrule.name}
+        return {&#39;triggeringEntitiesRule&#39;:self.triggeringrule.get_name()}
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the LaneOffsetAction
@@ -5468,6 +5723,10 @@ triggeringrule (str): all or any
             element.append(ent.get_element())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.TriggeringEntities.add_entity"><code class="name flex">
@@ -5506,7 +5765,7 @@ triggeringrule (str): all or any
     &#34;&#34;&#34; returns the attributes of the LaneOffsetAction as a dict
 
     &#34;&#34;&#34;
-    return {&#39;triggeringEntitiesRule&#39;:self.triggeringrule.name}</code></pre>
+    return {&#39;triggeringEntitiesRule&#39;:self.triggeringrule.get_name()}</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xosc.triggers.TriggeringEntities.get_element"><code class="name flex">
@@ -5610,7 +5869,7 @@ rule (Rule): condition rule of triggering
         &#34;&#34;&#34;
         self.name = name
         self.value = value
-        if rule not in Rule:
+        if not hasattr(Rule,str(rule)):
             raise ValueError(rule + &#39;; is not a valid rule.&#39;)
         self.rule = rule
 
@@ -5625,7 +5884,7 @@ rule (Rule): condition rule of triggering
 
         &#34;&#34;&#34;
         basedict = {&#39;name&#39;:self.name,&#39;value&#39;:str(self.value)}
-        basedict[&#39;rule&#39;] = self.rule.name
+        basedict[&#39;rule&#39;] = self.rule.get_name()
         return basedict
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the UserDefinedValueCondition
@@ -5636,6 +5895,7 @@ rule (Rule): condition rule of triggering
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._ValueTriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -5653,7 +5913,7 @@ rule (Rule): condition rule of triggering
 
     &#34;&#34;&#34;
     basedict = {&#39;name&#39;:self.name,&#39;value&#39;:str(self.value)}
-    basedict[&#39;rule&#39;] = self.rule.name
+    basedict[&#39;rule&#39;] = self.rule.get_name()
     return basedict</code></pre>
 </details>
 </dd>
@@ -5807,7 +6067,7 @@ triggeringpoint (str): start or stop
             self._triggerpoint = &#39;StopTrigger&#39;
             
         self.delay = delay
-        if conditionedge not in ConditionEdge:
+        if not hasattr(ConditionEdge,str(conditionedge)):
             raise ValueError(&#39;not a valid condition edge&#39;)
         self.conditionedge = conditionedge
         if not isinstance(valuecondition,_ValueTriggerType):
@@ -5833,7 +6093,7 @@ triggeringpoint (str): start or stop
         &#34;&#34;&#34; returns the attributes of the LaneOffsetAction as a dict
 
         &#34;&#34;&#34;
-        return {&#39;name&#39;:self.name,&#39;delay&#39;:str(self.delay),&#39;conditionEdge&#39;:self.conditionedge.name}
+        return {&#39;name&#39;:self.name,&#39;delay&#39;:str(self.delay),&#39;conditionEdge&#39;:self.conditionedge.get_name()}
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the LaneOffsetAction
@@ -5854,6 +6114,7 @@ triggeringpoint (str): start or stop
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._TriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -5870,7 +6131,7 @@ triggeringpoint (str): start or stop
     &#34;&#34;&#34; returns the attributes of the LaneOffsetAction as a dict
 
     &#34;&#34;&#34;
-    return {&#39;name&#39;:self.name,&#39;delay&#39;:str(self.delay),&#39;conditionEdge&#39;:self.conditionedge.name}</code></pre>
+    return {&#39;name&#39;:self.name,&#39;delay&#39;:str(self.delay),&#39;conditionEdge&#39;:self.conditionedge.get_name()}</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xosc.triggers.ValueTrigger.get_element"><code class="name flex">

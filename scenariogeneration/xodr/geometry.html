@@ -36,110 +36,6 @@ from .exceptions import NotEnoughInputArguments, ToManyOptionalArguments, MixOfG
 from scipy.integrate import quad
 from scipy.special import fresnel
 
-class _Geometry():
-    &#34;&#34;&#34; the _Geometry describes the geometry entry of open drive
-        
-        Parameters
-        ----------
-            s (float): the start s value (along road) of the geometry
-               
-            x (float): start x coordinate of the geometry
-                
-            y (float):  start y coordinate of the geometry
-                
-            heading (float): heading of the geometry
-
-            geom_type (Line, Spiral,ParamPoly3, or Arc): the type of geometry
-
-        Attributes
-        ----------
-            s (float): the start s value (along road) of the geometry
-               
-            x (float): start x coordinate of the geometry
-                
-            y (float):  start y coordinate of the geometry
-                
-            heading (float): heading of the geometry
-
-            geom_type (Line, Spiral,ParamPoly3, or Arc): the type of geometry
-
-        Methods
-        -------
-            get_element()
-                Returns the full ElementTree of the class
-
-            get_attributes()
-                Returns a dictionary of all attributes of the class
-    &#34;&#34;&#34;
-
-    def __init__(self,s,x,y,heading,geom_type):
-        &#34;&#34;&#34; initalizes the PlanView
-
-        Parameters
-        ----------
-            s (float): the start s value (along road) of the geometry
-               
-            x (float): start x coordinate of the geometry
-                
-            y (float):  start y coordinate of the geometry
-                
-            heading (float): heading of the geometry
-
-            geom_type (Line, Spiral,ParamPoly3, or Arc): the type of geometry
-
-        &#34;&#34;&#34; 
-        self.s = s
-        self.x = x
-        self.y = y
-  
-        
-        self.heading = heading
-        self.geom_type = geom_type
-        _,_,_,self.length = self.geom_type.get_end_data(self.x,self.y,self.heading)
-
-    def __eq__(self, other):
-        if isinstance(other,_Geometry):
-            if self.get_attributes() == other.get_attributes() and \
-               self.geom_type == other.geom_type:         
-                return True
-        return False
-
-    def get_end_data(self):
-        return self.geom_type.get_end_data(self.x,self.y,self.heading)
-        
-    def get_start_data(self):
-        x,y,heading,self.length = self.geom_type.get_start_data(self.x,self.y,self.heading)
-        self.x = x
-        self.y = y
-        self.heading = heading + np.pi
-        self.s = None
-        return x,y,heading,self.length
-
-    def set_s(self,s):
-        self.s = s
-
-    def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes of the _Geometry as a dict
-
-        &#34;&#34;&#34;
-        retdict = {}
-        retdict[&#39;s&#39;] = str(self.s)
-        retdict[&#39;x&#39;] = str(self.x)
-        retdict[&#39;y&#39;] = str(self.y)
-        retdict[&#39;hdg&#39;] = str(self.heading)
-        retdict[&#39;length&#39;] = str(self.length)
-        return retdict
-
-
-    def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the _Geometry
-
-        &#34;&#34;&#34;
-        element = ET.Element(&#39;geometry&#39;,attrib=self.get_attributes())
-        element.append(self.geom_type.get_element())
-        return element
-
-
 
 class PlanView():
     &#34;&#34;&#34; the PlanView is the geometrical description of a road, 
@@ -414,7 +310,108 @@ class PlanView():
             element.append(geom.get_element())
         return element
 
+class _Geometry():
+    &#34;&#34;&#34; the _Geometry describes the geometry entry of open drive
+        
+        Parameters
+        ----------
+            s (float): the start s value (along road) of the geometry
+               
+            x (float): start x coordinate of the geometry
+                
+            y (float):  start y coordinate of the geometry
+                
+            heading (float): heading of the geometry
 
+            geom_type (Line, Spiral,ParamPoly3, or Arc): the type of geometry
+
+        Attributes
+        ----------
+            s (float): the start s value (along road) of the geometry
+               
+            x (float): start x coordinate of the geometry
+                
+            y (float):  start y coordinate of the geometry
+                
+            heading (float): heading of the geometry
+
+            geom_type (Line, Spiral,ParamPoly3, or Arc): the type of geometry
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+
+            get_attributes()
+                Returns a dictionary of all attributes of the class
+    &#34;&#34;&#34;
+
+    def __init__(self,s,x,y,heading,geom_type):
+        &#34;&#34;&#34; initalizes the PlanView
+
+        Parameters
+        ----------
+            s (float): the start s value (along road) of the geometry
+               
+            x (float): start x coordinate of the geometry
+                
+            y (float):  start y coordinate of the geometry
+                
+            heading (float): heading of the geometry
+
+            geom_type (Line, Spiral,ParamPoly3, or Arc): the type of geometry
+
+        &#34;&#34;&#34; 
+        self.s = s
+        self.x = x
+        self.y = y
+  
+        
+        self.heading = heading
+        self.geom_type = geom_type
+        _,_,_,self.length = self.geom_type.get_end_data(self.x,self.y,self.heading)
+
+    def __eq__(self, other):
+        if isinstance(other,_Geometry):
+            if self.get_attributes() == other.get_attributes() and \
+               self.geom_type == other.geom_type:         
+                return True
+        return False
+
+    def get_end_data(self):
+        return self.geom_type.get_end_data(self.x,self.y,self.heading)
+        
+    def get_start_data(self):
+        x,y,heading,self.length = self.geom_type.get_start_data(self.x,self.y,self.heading)
+        self.x = x
+        self.y = y
+        self.heading = heading + np.pi
+        self.s = None
+        return x,y,heading,self.length
+
+    def set_s(self,s):
+        self.s = s
+
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the _Geometry as a dict
+
+        &#34;&#34;&#34;
+        retdict = {}
+        retdict[&#39;s&#39;] = str(self.s)
+        retdict[&#39;x&#39;] = str(self.x)
+        retdict[&#39;y&#39;] = str(self.y)
+        retdict[&#39;hdg&#39;] = str(self.heading)
+        retdict[&#39;length&#39;] = str(self.length)
+        return retdict
+
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the _Geometry
+
+        &#34;&#34;&#34;
+        element = ET.Element(&#39;geometry&#39;,attrib=self.get_attributes())
+        element.append(self.geom_type.get_element())
+        return element
 
 class Line():
     &#34;&#34;&#34; the line class creates a line type of geometry
