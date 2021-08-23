@@ -71,12 +71,14 @@ Some example usage of this can be seen in: </p>
 <h4 id="create_cloth_arc_cloth">create_cloth_arc_cloth</h4>
 <p>The
 <em>create_cloth_arc_cloth</em> function creates road with a smooth curve based on a clothoid + arc + clothoid. This is often used since the curvature of the road will change continiously (and resulting in nice steering wheel changes for a driver).</p>
+<h4 id="create_3cloths">create_3cloths</h4>
+<p>Similarly to <em>create_cloth_arc_cloth</em>, the <em>create_3cloths</em> function creates a smooth curve based on 3 consecutive spiral geoemtries. </p>
 <h4 id="create_junction_roads">create_junction_roads</h4>
 <ul>
-<li>The <em>create_junction_roads</em> generates all the roads for a simple intersection. <em>create_junction_roads</em> assumes a circle with the outgoing roads at different angles. The resulting roads are of the "clothoid + arc + clothoid" type. </li>
+<li>The <em>create_junction_roads</em> generates all the roads for a simple intersection. The position of roads around a junction is defined by <em>R</em>, the distance of each road form the center of the junction, and by <em>angles</em>, defining how the roads around the junction are spanned. With these inputs, <em>create_junction_roads</em> generates all the roads in the junction, which are connecting the surrounding roads. </li>
 </ul>
 <h4 id="create_junction">create_junction</h4>
-<p>The <em>create_junction</em> function creates the junction element of OpenDRIVE, based on a list of "roads in the junction" (that can be generated from <em>create_junction_roads</em>) and a list of "roads going into the junction" </p>
+<p>The <em>create_junction</em> function creates the "junction" element of OpenDRIVE, based on a list of "roads in the junction" (that can be generated from <em>create_junction_roads</em>) and a list of "roads going into the junction" </p>
 <h4 id="lanedef">LaneDef</h4>
 <p>LaneDef is a helper class that enables simple lane merge/split roads to be created, this definition can be used together with the create_road generator (see <a href="examples/xodr/highway_example_with_merge_and_split.html">highway_example_with_merge_and_split</a>).</p>
 <h2 id="scenariogenerator">ScenarioGenerator</h2>
@@ -106,6 +108,18 @@ To connect the scenario and the generated road, create the RoadNetwork object in
 </ul>
 </li>
 </ul>
+<h1 id="useful-links">Useful Links</h1>
+<p>Useful links related to scenariogeneration
+- <a href="scenariogeneration/index.html">API documentation</a>
+- <a href="examples/index.html">Exampels</a>
+- <a href="https://github.com/pyoscx/scenariogeneration/blob/main/release_notes.md">release notes</a>
+- <a href="https://github.com/pyoscx/scenariogeneration">github</a>
+- <a href="https://pypi.org/project/scenariogeneration/">pypi</a></p>
+<p>Useful links for related projects and other information
+- <a href="www.asam.net">ASAM</a>
+- <a href="https://github.com/esmini/esmini">esmini</a>
+- <a href="https://github.com/phillipd94/pyclothoids">pyclothoids</a>
+- <a href="https://github.com/johschmitz/blender-driving-scenario-creator">blender scenariogenerator</a></p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -140,6 +154,7 @@ To connect the scenario and the generated road, create the RoadNetwork object in
 <li><a href="#generators">Generators</a><ul>
 <li><a href="#create_road">create_road</a></li>
 <li><a href="#create_cloth_arc_cloth">create_cloth_arc_cloth</a></li>
+<li><a href="#create_3cloths">create_3cloths</a></li>
 <li><a href="#create_junction_roads">create_junction_roads</a></li>
 <li><a href="#create_junction">create_junction</a></li>
 <li><a href="#lanedef">LaneDef</a></li>
@@ -153,6 +168,7 @@ To connect the scenario and the generated road, create the RoadNetwork object in
 </li>
 </ul>
 </li>
+<li><a href="#useful-links">Useful Links</a></li>
 </ul>
 </div>
 <ul id="index">

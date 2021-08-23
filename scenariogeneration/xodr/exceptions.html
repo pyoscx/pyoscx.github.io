@@ -58,6 +58,11 @@ class RoadsAndLanesNotAdjusted(Exception):
 class MixOfGeometryAddition(Exception):
     &#34;&#34;&#34; Raise when the wrong way of adding geometires are used for the planview
     &#34;&#34;&#34;
+    pass
+
+class GeneralIssueInputArguments(Exception):
+    &#34;&#34;&#34; Raise when there is something wrong in the input arguments 
+    &#34;&#34;&#34;
     pass</code></pre>
 </details>
 </section>
@@ -70,6 +75,27 @@ class MixOfGeometryAddition(Exception):
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="scenariogeneration.xodr.exceptions.GeneralIssueInputArguments"><code class="flex name class">
+<span>class <span class="ident">GeneralIssueInputArguments</span></span>
+<span>(</span><span>...)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Raise when there is something wrong in the input arguments</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class GeneralIssueInputArguments(Exception):
+    &#34;&#34;&#34; Raise when there is something wrong in the input arguments 
+    &#34;&#34;&#34;
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
 <dt id="scenariogeneration.xodr.exceptions.MixOfGeometryAddition"><code class="flex name class">
 <span>class <span class="ident">MixOfGeometryAddition</span></span>
 <span>(</span><span>...)</span>
@@ -212,6 +238,9 @@ class MixOfGeometryAddition(Exception):
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
+<li>
+<h4><code><a title="scenariogeneration.xodr.exceptions.GeneralIssueInputArguments" href="#scenariogeneration.xodr.exceptions.GeneralIssueInputArguments">GeneralIssueInputArguments</a></code></h4>
+</li>
 <li>
 <h4><code><a title="scenariogeneration.xodr.exceptions.MixOfGeometryAddition" href="#scenariogeneration.xodr.exceptions.MixOfGeometryAddition">MixOfGeometryAddition</a></code></h4>
 </li>

@@ -84,6 +84,7 @@ class EmptyTrigger(_TriggerType):
 
 class Trigger(_TriggerType):
     &#34;&#34;&#34; The Trigger class creates a Trigger that can be used if multiple ConditionGroups are wanted
+        The Trigger acts like an &#34;OR&#34; logic for all added ConditionGroups
         
         Parameters
         ----------
@@ -154,6 +155,7 @@ class Trigger(_TriggerType):
 
 class ConditionGroup(_TriggerType):
     &#34;&#34;&#34; The ConditionGroup class creates a Trigger that can be used if multiple Conditions are wanted
+        The ConditionGroups acts like an &#34;AND&#34; logic for all added conditions
         
         Parameters
         ----------
@@ -1773,7 +1775,7 @@ class StoryboardElementStateCondition(_ValueTriggerType):
 
                 reference (str): reference of the parameter
 
-                state (StoryboardElementType): state to trigger on
+                state (StoryBoardElementState): state to trigger on
         &#34;&#34;&#34;
         if not hasattr(StoryboardElementType,str(element)):
             raise TypeError(&#39;element input is not of type StoryBoardElementType&#39;)
@@ -2232,7 +2234,8 @@ get_attributes()
 <span>(</span><span>triggeringpoint='start')</span>
 </code></dt>
 <dd>
-<div class="desc"><p>The ConditionGroup class creates a Trigger that can be used if multiple Conditions are wanted</p>
+<div class="desc"><p>The ConditionGroup class creates a Trigger that can be used if multiple Conditions are wanted
+The ConditionGroups acts like an "AND" logic for all added conditions</p>
 <h2 id="parameters">Parameters</h2>
 <pre><code>triggeringpoint (str): start or stop (not needed if used with the Trigger class)
     Default: start
@@ -2259,6 +2262,7 @@ add_condition(condition)
 </summary>
 <pre><code class="python">class ConditionGroup(_TriggerType):
     &#34;&#34;&#34; The ConditionGroup class creates a Trigger that can be used if multiple Conditions are wanted
+        The ConditionGroups acts like an &#34;AND&#34; logic for all added conditions
         
         Parameters
         ----------
@@ -4296,7 +4300,7 @@ get_attributes()
 
 reference (str): reference of the parameter
 
-state (StoryboardElementType): state to trigger on
+state (StoryBoardElementState): state to trigger on
 </code></pre></div>
 <details class="source">
 <summary>
@@ -4339,7 +4343,7 @@ state (StoryboardElementType): state to trigger on
 
                 reference (str): reference of the parameter
 
-                state (StoryboardElementType): state to trigger on
+                state (StoryBoardElementState): state to trigger on
         &#34;&#34;&#34;
         if not hasattr(StoryboardElementType,str(element)):
             raise TypeError(&#39;element input is not of type StoryBoardElementType&#39;)
@@ -5466,7 +5470,8 @@ get_attributes()
 <span>(</span><span>triggeringpoint='start')</span>
 </code></dt>
 <dd>
-<div class="desc"><p>The Trigger class creates a Trigger that can be used if multiple ConditionGroups are wanted</p>
+<div class="desc"><p>The Trigger class creates a Trigger that can be used if multiple ConditionGroups are wanted
+The Trigger acts like an "OR" logic for all added ConditionGroups</p>
 <h2 id="parameters">Parameters</h2>
 <pre><code>triggeringpoint (str): start or stop 
     Default: start
@@ -5493,6 +5498,7 @@ add_conditiongroup(conditiongroup)
 </summary>
 <pre><code class="python">class Trigger(_TriggerType):
     &#34;&#34;&#34; The Trigger class creates a Trigger that can be used if multiple ConditionGroups are wanted
+        The Trigger acts like an &#34;OR&#34; logic for all added ConditionGroups
         
         Parameters
         ----------

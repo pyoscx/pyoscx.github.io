@@ -1326,7 +1326,7 @@ class License(VersionBase):
         return element
 
 class FileHeader(VersionBase):
-    &#34;&#34;&#34; FileHeader creates the header of the OpenScenario file
+    &#34;&#34;&#34; FileHeader creates the header of the OpenScenario file1
         
         Parameters
         ----------
@@ -1793,16 +1793,22 @@ class CatalogFile(VersionBase):
         self.catalog_element = None
         self.filename = &#39;&#39;
 
-    def add_to_catalog(self,obj):
+    def add_to_catalog(self,obj,osc_minor_version=1):
         &#34;&#34;&#34; add_to_catalog adds an element to the catalog
             
             Parameters
             ----------
                 obj (*pyoscx): any pyoscx object (should be matching with the catalog)
-        
+                
+                osc_minor_version (int): the minor version of OpenSCENARIO to write to the catalog
+                    Default: 1
         &#34;&#34;&#34;
         if self.catalog_element == None:
             OSError(&#39;No file has been created or opened&#39;)
+        fileheader = self.catalog_element.find(&#39;FileHeader&#39;)
+        self.version_minor = osc_minor_version
+        if fileheader.attrib[&#39;revMinor&#39;] != osc_minor_version:
+            Warning(&#39;The Catalog and the added object does not have the same OpenSCENARIO version.&#39;)
         catalogs = self.catalog_element.find(&#39;Catalog&#39;)
         catalogs.append(obj.get_element())
 
@@ -3656,16 +3662,22 @@ add_catalog(catalogname, path)
         self.catalog_element = None
         self.filename = &#39;&#39;
 
-    def add_to_catalog(self,obj):
+    def add_to_catalog(self,obj,osc_minor_version=1):
         &#34;&#34;&#34; add_to_catalog adds an element to the catalog
             
             Parameters
             ----------
                 obj (*pyoscx): any pyoscx object (should be matching with the catalog)
-        
+                
+                osc_minor_version (int): the minor version of OpenSCENARIO to write to the catalog
+                    Default: 1
         &#34;&#34;&#34;
         if self.catalog_element == None:
             OSError(&#39;No file has been created or opened&#39;)
+        fileheader = self.catalog_element.find(&#39;FileHeader&#39;)
+        self.version_minor = osc_minor_version
+        if fileheader.attrib[&#39;revMinor&#39;] != osc_minor_version:
+            Warning(&#39;The Catalog and the added object does not have the same OpenSCENARIO version.&#39;)
         catalogs = self.catalog_element.find(&#39;Catalog&#39;)
         catalogs.append(obj.get_element())
 
@@ -3731,27 +3743,36 @@ add_catalog(catalogname, path)
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.CatalogFile.add_to_catalog"><code class="name flex">
-<span>def <span class="ident">add_to_catalog</span></span>(<span>self, obj)</span>
+<span>def <span class="ident">add_to_catalog</span></span>(<span>self, obj, osc_minor_version=1)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>add_to_catalog adds an element to the catalog</p>
 <h2 id="parameters">Parameters</h2>
 <pre><code>obj (*pyoscx): any pyoscx object (should be matching with the catalog)
+
+osc_minor_version (int): the minor version of OpenSCENARIO to write to the catalog
+    Default: 1
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_to_catalog(self,obj):
+<pre><code class="python">def add_to_catalog(self,obj,osc_minor_version=1):
     &#34;&#34;&#34; add_to_catalog adds an element to the catalog
         
         Parameters
         ----------
             obj (*pyoscx): any pyoscx object (should be matching with the catalog)
-    
+            
+            osc_minor_version (int): the minor version of OpenSCENARIO to write to the catalog
+                Default: 1
     &#34;&#34;&#34;
     if self.catalog_element == None:
         OSError(&#39;No file has been created or opened&#39;)
+    fileheader = self.catalog_element.find(&#39;FileHeader&#39;)
+    self.version_minor = osc_minor_version
+    if fileheader.attrib[&#39;revMinor&#39;] != osc_minor_version:
+        Warning(&#39;The Catalog and the added object does not have the same OpenSCENARIO version.&#39;)
     catalogs = self.catalog_element.find(&#39;Catalog&#39;)
     catalogs.append(obj.get_element())</code></pre>
 </details>
@@ -5583,7 +5604,7 @@ author (str): author of the catalog
 <span>(</span><span>name, author, revMinor=1, license=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>FileHeader creates the header of the OpenScenario file</p>
+<div class="desc"><p>FileHeader creates the header of the OpenScenario file1</p>
 <h2 id="parameters">Parameters</h2>
 <pre><code>name (str): name of the scenario
 
@@ -5612,7 +5633,7 @@ get_attributes()
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class FileHeader(VersionBase):
-    &#34;&#34;&#34; FileHeader creates the header of the OpenScenario file
+    &#34;&#34;&#34; FileHeader creates the header of the OpenScenario file1
         
         Parameters
         ----------
