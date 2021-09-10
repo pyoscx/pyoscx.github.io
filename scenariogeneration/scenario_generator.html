@@ -60,6 +60,7 @@ class ScenarioGenerator():
         
         self.generate_all_roads = True
         self._created_roads = {}
+        self._name_separator = &#39;_&#39;
     def road(self,**kwargs):
         &#34;&#34;&#34; Dummy method for generating an OpenDRIVE road
 
@@ -190,14 +191,14 @@ class ScenarioGenerator():
             self._it += 1
         elif self.naming == &#39;parameter&#39;:
             for  key, value in permutation.items():
-                name_prefix += &#39;_&#39; + key.replace(&#39;\\&#39;,&#39;-&#39;).replace(&#39;/&#39;,&#39;-&#39;) + &#39;-&#39; + str(value).replace(&#39;\\&#39;,&#39;-&#39;).replace(&#39;/&#39;,&#39;-&#39;)
+                name_prefix += self._name_separator + key.replace(&#39;\\&#39;,&#39;-&#39;).replace(&#39;/&#39;,&#39;-&#39;) + &#39;-&#39; + str(value).replace(&#39;\\&#39;,&#39;-&#39;).replace(&#39;/&#39;,&#39;-&#39;)
         else:
             raise NameError(&#39;Attribute naming, can only be &#34;numerical&#34; or &#34;parameter&#34;, not &#39; + self.naming)
 
         return os.path.basename(sys.modules[self.__class__.__module__].__file__).split(&#39;.&#39;)[0]+name_prefix
 
 
-    def generate_single(self,generation_folder, order = &#39;first&#39;,override_parameters = None, write_relative_road_path = True):
+    def generate_single(self,generation_folder, order = &#39;first&#39;,override_parameters = None, write_relative_road_path = True, name_separator=None):
         &#34;&#34;&#34; generate_single will generate only one scenario
 
             Parameters
@@ -216,7 +217,12 @@ class ScenarioGenerator():
                 write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true), 
                                                  or the absolute path to the xodr (false)
                     Default: True
+
+                name_separator (str): for generation with multiple parameters, this will change the separator between the variables
+                    Default: &#39;_&#39;
         &#34;&#34;&#34;
+        if name_separator:
+            self._name_separator = name_separator
         self.write_relative_road_path = write_relative_road_path
         self._create_folder_structure(generation_folder)
         if override_parameters:
@@ -236,7 +242,7 @@ class ScenarioGenerator():
         return self._generate_road_and_scenario(self.all_permutations[it])
 
 
-    def generate(self,generation_folder,override_parameters = None, write_relative_road_path = True):
+    def generate(self,generation_folder,override_parameters = None, write_relative_road_path = True, name_separator = None):
         &#34;&#34;&#34; generate uses the xosc.Scenario defined in the method scenario and the xodr.OpenDrive (optional) in the road method
             together with the parameters attribute to generate scenarios and roads for all permutations defined and save those files
             in the generation_folder.
@@ -249,7 +255,13 @@ class ScenarioGenerator():
 
                 write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true), or the absolute path to the xodr (false)
                     Default: True
+                
+                name_separator (str): for generation with multiple parameters, this will change the separator between the variables
+                    Default: &#39;_&#39;
         &#34;&#34;&#34;
+        if name_separator:
+            self._name_separator = name_separator
+
         self.write_relative_road_path = write_relative_road_path
         scenario_files = []
         road_files = []
@@ -343,6 +355,7 @@ generate_all_roads (bool): will only generate unique roads
         
         self.generate_all_roads = True
         self._created_roads = {}
+        self._name_separator = &#39;_&#39;
     def road(self,**kwargs):
         &#34;&#34;&#34; Dummy method for generating an OpenDRIVE road
 
@@ -473,14 +486,14 @@ generate_all_roads (bool): will only generate unique roads
             self._it += 1
         elif self.naming == &#39;parameter&#39;:
             for  key, value in permutation.items():
-                name_prefix += &#39;_&#39; + key.replace(&#39;\\&#39;,&#39;-&#39;).replace(&#39;/&#39;,&#39;-&#39;) + &#39;-&#39; + str(value).replace(&#39;\\&#39;,&#39;-&#39;).replace(&#39;/&#39;,&#39;-&#39;)
+                name_prefix += self._name_separator + key.replace(&#39;\\&#39;,&#39;-&#39;).replace(&#39;/&#39;,&#39;-&#39;) + &#39;-&#39; + str(value).replace(&#39;\\&#39;,&#39;-&#39;).replace(&#39;/&#39;,&#39;-&#39;)
         else:
             raise NameError(&#39;Attribute naming, can only be &#34;numerical&#34; or &#34;parameter&#34;, not &#39; + self.naming)
 
         return os.path.basename(sys.modules[self.__class__.__module__].__file__).split(&#39;.&#39;)[0]+name_prefix
 
 
-    def generate_single(self,generation_folder, order = &#39;first&#39;,override_parameters = None, write_relative_road_path = True):
+    def generate_single(self,generation_folder, order = &#39;first&#39;,override_parameters = None, write_relative_road_path = True, name_separator=None):
         &#34;&#34;&#34; generate_single will generate only one scenario
 
             Parameters
@@ -499,7 +512,12 @@ generate_all_roads (bool): will only generate unique roads
                 write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true), 
                                                  or the absolute path to the xodr (false)
                     Default: True
+
+                name_separator (str): for generation with multiple parameters, this will change the separator between the variables
+                    Default: &#39;_&#39;
         &#34;&#34;&#34;
+        if name_separator:
+            self._name_separator = name_separator
         self.write_relative_road_path = write_relative_road_path
         self._create_folder_structure(generation_folder)
         if override_parameters:
@@ -519,7 +537,7 @@ generate_all_roads (bool): will only generate unique roads
         return self._generate_road_and_scenario(self.all_permutations[it])
 
 
-    def generate(self,generation_folder,override_parameters = None, write_relative_road_path = True):
+    def generate(self,generation_folder,override_parameters = None, write_relative_road_path = True, name_separator = None):
         &#34;&#34;&#34; generate uses the xosc.Scenario defined in the method scenario and the xodr.OpenDrive (optional) in the road method
             together with the parameters attribute to generate scenarios and roads for all permutations defined and save those files
             in the generation_folder.
@@ -532,7 +550,13 @@ generate_all_roads (bool): will only generate unique roads
 
                 write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true), or the absolute path to the xodr (false)
                     Default: True
+                
+                name_separator (str): for generation with multiple parameters, this will change the separator between the variables
+                    Default: &#39;_&#39;
         &#34;&#34;&#34;
+        if name_separator:
+            self._name_separator = name_separator
+
         self.write_relative_road_path = write_relative_road_path
         scenario_files = []
         road_files = []
@@ -581,7 +605,7 @@ generate_all_roads (bool): will only generate unique roads
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.scenario_generator.ScenarioGenerator.generate"><code class="name flex">
-<span>def <span class="ident">generate</span></span>(<span>self, generation_folder, override_parameters=None, write_relative_road_path=True)</span>
+<span>def <span class="ident">generate</span></span>(<span>self, generation_folder, override_parameters=None, write_relative_road_path=True, name_separator=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>generate uses the xosc.Scenario defined in the method scenario and the xodr.OpenDrive (optional) in the road method
@@ -594,12 +618,15 @@ override_parameters (list of dicts, or dict of lists): overrides the self.parame
 
 write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true), or the absolute path to the xodr (false)
     Default: True
+
+name_separator (str): for generation with multiple parameters, this will change the separator between the variables
+    Default: '_'
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def generate(self,generation_folder,override_parameters = None, write_relative_road_path = True):
+<pre><code class="python">def generate(self,generation_folder,override_parameters = None, write_relative_road_path = True, name_separator = None):
     &#34;&#34;&#34; generate uses the xosc.Scenario defined in the method scenario and the xodr.OpenDrive (optional) in the road method
         together with the parameters attribute to generate scenarios and roads for all permutations defined and save those files
         in the generation_folder.
@@ -612,7 +639,13 @@ write_relative_road_path (bool): if the generator will write the path to a gener
 
             write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true), or the absolute path to the xodr (false)
                 Default: True
+            
+            name_separator (str): for generation with multiple parameters, this will change the separator between the variables
+                Default: &#39;_&#39;
     &#34;&#34;&#34;
+    if name_separator:
+        self._name_separator = name_separator
+
     self.write_relative_road_path = write_relative_road_path
     scenario_files = []
     road_files = []
@@ -631,7 +664,7 @@ write_relative_road_path (bool): if the generator will write the path to a gener
 </details>
 </dd>
 <dt id="scenariogeneration.scenario_generator.ScenarioGenerator.generate_single"><code class="name flex">
-<span>def <span class="ident">generate_single</span></span>(<span>self, generation_folder, order='first', override_parameters=None, write_relative_road_path=True)</span>
+<span>def <span class="ident">generate_single</span></span>(<span>self, generation_folder, order='first', override_parameters=None, write_relative_road_path=True, name_separator=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>generate_single will generate only one scenario</p>
@@ -650,12 +683,15 @@ override_parameters (list of dicts, or dict of lists): overrides the self.parame
 write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true), 
                                  or the absolute path to the xodr (false)
     Default: True
+
+name_separator (str): for generation with multiple parameters, this will change the separator between the variables
+    Default: '_'
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def generate_single(self,generation_folder, order = &#39;first&#39;,override_parameters = None, write_relative_road_path = True):
+<pre><code class="python">def generate_single(self,generation_folder, order = &#39;first&#39;,override_parameters = None, write_relative_road_path = True, name_separator=None):
     &#34;&#34;&#34; generate_single will generate only one scenario
 
         Parameters
@@ -674,7 +710,12 @@ write_relative_road_path (bool): if the generator will write the path to a gener
             write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true), 
                                              or the absolute path to the xodr (false)
                 Default: True
+
+            name_separator (str): for generation with multiple parameters, this will change the separator between the variables
+                Default: &#39;_&#39;
     &#34;&#34;&#34;
+    if name_separator:
+        self._name_separator = name_separator
     self.write_relative_road_path = write_relative_road_path
     self._create_folder_structure(generation_folder)
     if override_parameters:

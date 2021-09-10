@@ -31,6 +31,12 @@
 from enum import Enum, auto
 
 
+class TrafficRule(Enum):
+    &#34;&#34;&#34; Enum for MarkRule
+    &#34;&#34;&#34;
+    RHT = auto()
+    LHT = auto()
+    none = auto()
 
 class MarkRule(Enum):
     &#34;&#34;&#34; Enum for MarkRule
@@ -1041,6 +1047,43 @@ class JunctionGroupType(Enum):
 </dd>
 </dl>
 </dd>
+<dt id="scenariogeneration.xodr.enumerations.TrafficRule"><code class="flex name class">
+<span>class <span class="ident">TrafficRule</span></span>
+<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enum for MarkRule</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TrafficRule(Enum):
+    &#34;&#34;&#34; Enum for MarkRule
+    &#34;&#34;&#34;
+    RHT = auto()
+    LHT = auto()
+    none = auto()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="scenariogeneration.xodr.enumerations.TrafficRule.LHT"><code class="name">var <span class="ident">LHT</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xodr.enumerations.TrafficRule.RHT"><code class="name">var <span class="ident">RHT</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xodr.enumerations.TrafficRule.none"><code class="name">var <span class="ident">none</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
 </dl>
 </section>
 </article>
@@ -1231,6 +1274,14 @@ class JunctionGroupType(Enum):
 <li><code><a title="scenariogeneration.xodr.enumerations.RoadType.townPlayStreet" href="#scenariogeneration.xodr.enumerations.RoadType.townPlayStreet">townPlayStreet</a></code></li>
 <li><code><a title="scenariogeneration.xodr.enumerations.RoadType.townPrivate" href="#scenariogeneration.xodr.enumerations.RoadType.townPrivate">townPrivate</a></code></li>
 <li><code><a title="scenariogeneration.xodr.enumerations.RoadType.unknown" href="#scenariogeneration.xodr.enumerations.RoadType.unknown">unknown</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xodr.enumerations.TrafficRule" href="#scenariogeneration.xodr.enumerations.TrafficRule">TrafficRule</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xodr.enumerations.TrafficRule.LHT" href="#scenariogeneration.xodr.enumerations.TrafficRule.LHT">LHT</a></code></li>
+<li><code><a title="scenariogeneration.xodr.enumerations.TrafficRule.RHT" href="#scenariogeneration.xodr.enumerations.TrafficRule.RHT">RHT</a></code></li>
+<li><code><a title="scenariogeneration.xodr.enumerations.TrafficRule.none" href="#scenariogeneration.xodr.enumerations.TrafficRule.none">none</a></code></li>
 </ul>
 </li>
 </ul>

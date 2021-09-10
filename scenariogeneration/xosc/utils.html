@@ -36,7 +36,10 @@ from .helpers import printToFile
 from .enumerations import ParameterType, Rule, ReferenceContext, DynamicsShapes, DynamicsDimension, RouteStrategy,XSI,XMLNS, VehicleCategory,PrecipitationType,CloudState, VersionBase
 import datetime as dt
 
-
+class _StochasticDistributionType(VersionBase):
+    &#34;&#34;&#34; helper class for typesetting
+    &#34;&#34;&#34;
+    pass
 
 class _PositionType(VersionBase):
     &#34;&#34;&#34; helper class for typesetting
@@ -940,11 +943,11 @@ class Polyline(VersionBase):
                 positions (list of positions): list of positions to create the polyline
 
         &#34;&#34;&#34;
-        if len(time) &lt; 2:
+        if time and len(time) &lt; 2:
             raise ValueError(&#39;not enough time inputs&#39;)
         if len(positions)&lt;2:
             raise ValueError(&#39;not enough position inputs&#39;)
-        if len(time) != len(positions):
+        if time and (len(time) != len(positions)):
             raise ValueError(&#39;time and positions are not the same lenght&#39;)
         for p in positions:
             if not isinstance(p,_PositionType):
@@ -7162,11 +7165,11 @@ positions (list of positions): list of positions to create the polyline
                 positions (list of positions): list of positions to create the polyline
 
         &#34;&#34;&#34;
-        if len(time) &lt; 2:
+        if time and len(time) &lt; 2:
             raise ValueError(&#39;not enough time inputs&#39;)
         if len(positions)&lt;2:
             raise ValueError(&#39;not enough position inputs&#39;)
-        if len(time) != len(positions):
+        if time and (len(time) != len(positions)):
             raise ValueError(&#39;time and positions are not the same lenght&#39;)
         for p in positions:
             if not isinstance(p,_PositionType):
