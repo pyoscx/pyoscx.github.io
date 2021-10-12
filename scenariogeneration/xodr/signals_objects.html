@@ -167,9 +167,9 @@ class _SignalObjectBase():
             retdict[&#39;subtype&#39;] = str(self.subtype)
             retdict[&#39;dynamic&#39;] = enum2str(self.dynamic)
             retdict[&#39;zOffset&#39;] = str(self.zOffset)
-            if self.pitch:
+            if self.pitch is not None:
                 retdict[&#39;pitch&#39;] = str(self.pitch)
-            if self.roll:
+            if self.roll is not None:
                 retdict[&#39;roll&#39;] = str(self.roll)
             if self.width is not None:
                 retdict[&#39;width&#39;] = str(self.width)
@@ -312,7 +312,7 @@ class Signal(_SignalObjectBase):
         retdict[&#34;country&#34;] = str(self.country).upper()
         retdict[&#34;type&#34;] = str(self.type)
         retdict[&#34;subtype&#34;] = str(self.subtype)
-        if self.hOffset:
+        if self.hOffset is not None:
             retdict[&#34;hOffset&#34;] = str(self.hOffset)    
         #TODO check if value is supplied --&gt; unit is mandatory in that case   
         if self.value is not None:
@@ -1465,7 +1465,7 @@ height (float): height of Signal (init in base class)
         retdict[&#34;country&#34;] = str(self.country).upper()
         retdict[&#34;type&#34;] = str(self.type)
         retdict[&#34;subtype&#34;] = str(self.subtype)
-        if self.hOffset:
+        if self.hOffset is not None:
             retdict[&#34;hOffset&#34;] = str(self.hOffset)    
         #TODO check if value is supplied --&gt; unit is mandatory in that case   
         if self.value is not None:
@@ -1519,7 +1519,7 @@ height (float): height of Signal (init in base class)
     retdict[&#34;country&#34;] = str(self.country).upper()
     retdict[&#34;type&#34;] = str(self.type)
     retdict[&#34;subtype&#34;] = str(self.subtype)
-    if self.hOffset:
+    if self.hOffset is not None:
         retdict[&#34;hOffset&#34;] = str(self.hOffset)    
     #TODO check if value is supplied --&gt; unit is mandatory in that case   
     if self.value is not None:

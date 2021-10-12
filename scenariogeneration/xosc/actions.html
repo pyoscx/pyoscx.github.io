@@ -32,7 +32,7 @@ import xml.etree.ElementTree as ET
 
 from numpy.lib.function_base import disp
 
-from .utils import DynamicsConstrains, TimeReference, convert_bool, TransitionDynamics, CatalogReference, Route, Trajectory, TrafficDefinition, Environment, TargetTimeSteadyState, TargetDistanceSteadyState
+from .utils import DynamicsConstrains, TimeReference, convert_bool, TransitionDynamics, CatalogReference, Route, Trajectory, TrafficDefinition, Environment, AbsoluteSpeed, RelativeSpeedToMaster
 from .utils import Controller
 from .enumerations import CoordinateSystem, DynamicsShapes, LateralDisplacement, SpeedTargetValueType, FollowMode, ReferenceContext, VersionBase, LongitudinalDisplacement
 from .exceptions import NoActionsDefinedError, OpenSCENARIOVersionError
@@ -683,7 +683,7 @@ class RelativeLaneChangeAction(_PrivateActionType):
         element = ET.Element(&#39;PrivateAction&#39;)
         laneoffset = {}
         lataction = ET.SubElement(element,&#39;LateralAction&#39;)
-        if self.target_lane_offset:
+        if self.target_lane_offset is not None:
             laneoffset = {&#39;targetLaneOffset&#39;:str(self.target_lane_offset)}
         lanechangeaction = ET.SubElement(lataction,&#39;LaneChangeAction&#39;,attrib=laneoffset)
         
@@ -1680,8 +1680,9 @@ class VisibilityAction(_PrivateActionType):
         ET.SubElement(element,&#39;VisibilityAction&#39;,self.get_attributes())
         return element
 
-class AbsoluteSynchronizeAction(_PrivateActionType):
-    &#34;&#34;&#34; creates a SynchronizeAction with an absolute speed as target speed
+
+class SynchronizeAction(_PrivateActionType):
+    &#34;&#34;&#34; Synchronizes an entity&#39;s arrival at a destination with a master entity. Both entities are provided with their own reference position which shall be reached at the same time. Final speed can be specified. Note that the reference positions can be different or identical.
         
         Parameters
         ----------
@@ -1697,7 +1698,7 @@ class AbsoluteSynchronizeAction(_PrivateActionType):
 
             target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
-            steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
+            final_speed (AbsoluteSpeed or RelativeSpeedToMaster): The speed that the synchronized entity should have at its target position. (Valid from OpenSCENARIO V1.1)
                 Default: None
         Attributes
         ----------
@@ -1713,7 +1714,7 @@ class AbsoluteSynchronizeAction(_PrivateActionType):
 
             target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
-            steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
+            final_speed (AbsoluteSpeed or RelativeSpeedToMaster): The speed that the synchronized entity should have at its target position. (Valid from OpenSCENARIO V1.1)
 
         Methods
         -------
@@ -1724,8 +1725,8 @@ class AbsoluteSynchronizeAction(_PrivateActionType):
                 Returns the the attributes of the class
 
     &#34;&#34;&#34;
-    def __init__(self,entity,entity_PositionType,target_PositionType,speed,target_tolerance_master=None,target_tolerance=None,steady_state=None):
-        &#34;&#34;&#34; initalize the AbsoluteSynchronizeAction
+    def __init__(self, entity, entity_PositionType:_PositionType, target_PositionType:_PositionType,target_tolerance_master=None,target_tolerance=None,final_speed=None):
+        &#34;&#34;&#34; initalize the SynchronizeAction
 
             Parameters
             ----------
@@ -1741,10 +1742,10 @@ class AbsoluteSynchronizeAction(_PrivateActionType):
 
                 target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
-                steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
+                final_speed (AbsoluteSpeed or RelativeSpeedToMaster): The speed that the synchronized entity should have at its target position. (Valid from OpenSCENARIO V1.1)
                 Default: None
         &#34;&#34;&#34;
-
+        
         self.entity = entity
         if not isinstance(entity_PositionType,_PositionType):
             raise TypeError(&#39;entity_PositionType input is not a valid Position&#39;)
@@ -1753,19 +1754,19 @@ class AbsoluteSynchronizeAction(_PrivateActionType):
             raise TypeError(&#39;target_PositionType input is not a valid Position&#39;)
         self.entity_PositionType = entity_PositionType
         self.target_PositionType = target_PositionType
-        self.speed = speed
         self.target_tolerance_master = target_tolerance_master
         self.target_tolerance = target_tolerance
-        if steady_state and not (isinstance(steady_state,TargetTimeSteadyState) or isinstance(steady_state,TargetDistanceSteadyState)):
-            raise TypeError(&#39;steady_state input is not TargetTimeSteadyState or TargetDistanceSteadyState&#39;)
-        self.steady_state = steady_state
+        if final_speed and not (isinstance(final_speed,AbsoluteSpeed) or isinstance(final_speed,RelativeSpeedToMaster)):
+            raise TypeError(&#39;final_speed input is not AbsoluteSpeed or RelativeSpeedToMaster type&#39;)
+        else:
+            self.final_speed = final_speed
+
     def __eq__(self,other):
-        if isinstance(other,AbsoluteSynchronizeAction):
+        if isinstance(other,SynchronizeAction):
             if self.get_attributes() == other.get_attributes() and \
             self.entity_PositionType == other.entity_PositionType and \
             self.target_PositionType == other.target_PositionType and \
-            self.speed == other.speed and \
-            self.steady_state == other.steady_state:
+            self.final_speed == other.final_speed:
                 return True
         return False
 
@@ -1774,6 +1775,8 @@ class AbsoluteSynchronizeAction(_PrivateActionType):
 
         &#34;&#34;&#34;
         attr = {&#39;masterEntityRef&#39;:self.entity}
+        if self.isVersion(1, 0):
+            return attr
         if self.target_tolerance_master is not None:
             attr.update({&#39;targetToleranceMaster&#39;: str(self.target_tolerance_master)})
         if self.target_tolerance is not None:
@@ -1788,143 +1791,12 @@ class AbsoluteSynchronizeAction(_PrivateActionType):
         syncaction = ET.SubElement(element,&#39;SynchronizeAction&#39;,self.get_attributes())
         syncaction.append(self.entity_PositionType.get_element(&#39;TargetPositionMaster&#39;))
         syncaction.append(self.target_PositionType.get_element(&#39;TargetPosition&#39;))
-        finalspeed = ET.SubElement(syncaction,&#39;FinalSpeed&#39;)
-        ET.SubElement(finalspeed,&#39;AbsoluteSpeed&#39;,attrib={&#39;value&#39;:str(self.speed)})
-        if self.steady_state and not self.isVersion(0):
-            finalspeed.append(self.steady_state.get_element())
-        return element
-
-
-class RelativeSynchronizeAction(_PrivateActionType):
-    &#34;&#34;&#34; creates a SynchronizeAction with a relative speed target
-        
-        Parameters
-        ----------
-            entity (str): entity to syncronize with
-
-            entity_PositionType (*Position): the position of the entity to syncronize to
-
-            target_PositionType (*Position): the position of the target that should syncronize
-
-            speed (double): the relative speed of the target that should syncronize
-
-            speed_target_type (str): the semantics of the value (delta, factor)
-
-            target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
-
-            target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
-
-            steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
-                Default: None
-        Attributes
-        ----------
-            entity (str): entity to syncronize with
-
-            entity_PositionType (*Position): the position of the entity to syncronize to
-
-            target_PositionType (*Position): the position of the target that should syncronize
-
-            speed (double): the relative speed of the target that should syncronize
-
-            speed_target_type (str): the semantics of the value (delta, factor)
-
-            target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
-
-            target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
-
-            steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
-                
-        Methods
-        -------
-            get_element()
-                Returns the full ElementTree of the class
-
-            get_attributes()
-                Returns the the attributes of the class
-
-    &#34;&#34;&#34;
-    def __init__(self,entity,entity_PositionType,target_PositionType,speed,speed_target_type,target_tolerance_master=None,target_tolerance=None,steady_state=None):
-        &#34;&#34;&#34; initalize the RelativeSynchronizeAction
-    
-            Parameters
-            ----------
-                entity (str): entity to syncronize with
-
-                entity_PositionType (*Position): the position of the entity to syncronize to
-
-                target_PositionType (*Position): the position of the target that should syncronize
-
-                speed (double): the absolute speed of the target that should syncronize
-
-                speed_target_type (str): the semantics of the value (delta, factor)
-
-                target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
-
-                target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
-
-                steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
-                    Default: None
-        &#34;&#34;&#34;
-
-        self.entity = entity
-        if not isinstance(entity_PositionType,_PositionType):
-            raise TypeError(&#39;entity_PositionType input is not a valid Position&#39;)
-        
-        if not isinstance(target_PositionType,_PositionType):
-            raise TypeError(&#39;target_PositionType input is not a valid Position&#39;)
-        self.entity_PositionType = entity_PositionType
-        self.target_PositionType = target_PositionType
-        self.speed = speed
-        # if speed_target_type not in SpeedTargetValueType:
-            # ValueError(speed_target_type + &#39; is not a valid speed_target_type&#39;)
-        self.speed_target_type = speed_target_type
-        self.target_tolerance_master = target_tolerance_master
-        self.target_tolerance = target_tolerance
-        if steady_state and not (isinstance(steady_state,TargetTimeSteadyState) or isinstance(steady_state,TargetDistanceSteadyState)):
-            raise TypeError(&#39;steady_state input is not TargetTimeSteadyState or TargetDistanceSteadyState&#39;)
-        self.steady_state = steady_state
-
-    def __eq__(self,other):
-        if isinstance(other,RelativeSynchronizeAction):
-            if self.get_attributes() == other.get_attributes() and \
-            self.entity_PositionType == other.entity_PositionType and \
-            self.target_PositionType == other.target_PositionType and \
-            self.speed_target_type == other.speed_target_type and \
-            self.speed == other.speed and \
-            self.steady_state == other.steady_state:
-                return True
-        return False
-
-    def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes of the RelativeSynchronizeAction as a dict
-
-        &#34;&#34;&#34;
-        attr = {&#39;masterEntityRef&#39;:self.entity}
-        if self.target_tolerance_master:
-            attr.update({&#39;targetToleranceMaster&#39;: str(self.target_tolerance_master)})
-        if self.target_tolerance:
-            attr.update({&#39;targetTolerance&#39;: str(self.target_tolerance)})
-        return attr
-
-    def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the RelativeSynchronizeAction
-
-        &#34;&#34;&#34;
-        element = ET.Element(&#39;PrivateAction&#39;)
-        syncaction = ET.SubElement(element,&#39;SynchronizeAction&#39;,self.get_attributes())
-        syncaction.append(self.entity_PositionType.get_element(&#39;TargetPositionMaster&#39;))
-        syncaction.append(self.target_PositionType.get_element(&#39;TargetPosition&#39;))
-        finalspeed = ET.SubElement(syncaction,&#39;FinalSpeed&#39;)
-        if self.steady_state and not self.isVersion(0):
-            finalspeed.append(self.steady_state.get_element())
-        ET.SubElement(finalspeed,&#39;RelativeSpeedToMaster&#39;,attrib={&#39;value&#39;:str(self.speed),&#39;speedTargetValueType&#39;:self.speed_target_type})
-        
+        if self.final_speed is not None:
+            syncaction.append(self.final_speed.get_element())
         return element
 
 
 #### Global Actions ####
-
-
 class ParameterAddAction(_ActionType):
     &#34;&#34;&#34; The ParameterAddAction class creates a ParameterAction of type ParameterModifyAction which adds a value to an existing Parameter
         
@@ -2455,7 +2327,7 @@ class TrafficSourceAction(_ActionType):
         retdict = {}
         retdict[&#39;rate&#39;] = str(self.rate)
         retdict[&#39;radius&#39;] = str(self.radius)
-        if self.velocity:
+        if self.velocity is not None:
             retdict[&#39;velocity&#39;] = str(self.velocity)
         
 
@@ -2691,7 +2563,7 @@ class TrafficSwarmAction(_ActionType):
         retdict[&#39;innerRadius&#39;] = str(self.innerradius)
         retdict[&#39;offset&#39;] = str(self.offset)
         retdict[&#39;numberOfVehicles&#39;] = str(self.numberofvehicles)
-        if self.velocity:
+        if self.velocity is not None:
             retdict[&#39;velocity&#39;] = str(self.velocity)
         return retdict
 
@@ -2756,9 +2628,9 @@ class TrafficStopAction(_ActionType):
 
         &#34;&#34;&#34;
         retdict = {}
-        if self.name and not self.isVersion(0):
+        if self.name and not self.isVersion(minor=0):
             retdict[&#39;trafficName&#39;] = str(self.name)
-        elif self.isVersion(0):
+        elif self.isVersion(minor=0):
             raise OpenSCENARIOVersionError(&#39;TrafficStopAction was introduced in OpenSCENARIO V1.1&#39;)
 
         return retdict
@@ -3414,240 +3286,6 @@ transition_dynamics (TransitionDynamics): how the change should be made
     
     ET.SubElement(speedactiontarget,&#39;AbsoluteTargetSpeed&#39;,self.get_attributes())
     
-    return element</code></pre>
-</details>
-</dd>
-</dl>
-</dd>
-<dt id="scenariogeneration.xosc.actions.AbsoluteSynchronizeAction"><code class="flex name class">
-<span>class <span class="ident">AbsoluteSynchronizeAction</span></span>
-<span>(</span><span>entity, entity_PositionType, target_PositionType, speed, target_tolerance_master=None, target_tolerance=None, steady_state=None)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>creates a SynchronizeAction with an absolute speed as target speed</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>entity (str): entity to syncronize with
-
-entity_PositionType (*Position): the position of the entity to syncronize to
-
-target_PositionType (*Position): the position of the target that should syncronize
-
-speed (double): the absolute speed of the target that should syncronize
-
-target_tolerance_master (optional) (double): tolerance offset of the master's position [m]. (Valid from OpenSCENARIO V1.1)
-
-target_tolerance (optional) (double): tolerance offset of the target's position [m]. (Valid from OpenSCENARIO V1.1)
-
-steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
-    Default: None
-</code></pre>
-<h2 id="attributes">Attributes</h2>
-<pre><code>entity (str): entity to syncronize with
-
-entity_PositionType (*Position): the position of the entity to syncronize to
-
-target_PositionType (*Position): the position of the target that should syncronize
-
-speed (double): the absolute speed of the target that should syncronize
-
-target_tolerance_master (optional) (double): tolerance offset of the master's position [m]. (Valid from OpenSCENARIO V1.1)
-
-target_tolerance (optional) (double): tolerance offset of the target's position [m]. (Valid from OpenSCENARIO V1.1)
-
-steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>get_element()
-    Returns the full ElementTree of the class
-
-get_attributes()
-    Returns the the attributes of the class
-</code></pre>
-<p>initalize the AbsoluteSynchronizeAction</p>
-<h2 id="parameters_1">Parameters</h2>
-<pre><code>entity (str): entity to syncronize with
-
-entity_PositionType (*Position): the position of the entity to syncronize to
-
-target_PositionType (*Position): the position of the target that should syncronize
-
-speed (double): the absolute speed of the target that should syncronize
-
-target_tolerance_master (optional) (double): tolerance offset of the master's position [m]. (Valid from OpenSCENARIO V1.1)
-
-target_tolerance (optional) (double): tolerance offset of the target's position [m]. (Valid from OpenSCENARIO V1.1)
-
-steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
-Default: None
-</code></pre></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class AbsoluteSynchronizeAction(_PrivateActionType):
-    &#34;&#34;&#34; creates a SynchronizeAction with an absolute speed as target speed
-        
-        Parameters
-        ----------
-            entity (str): entity to syncronize with
-
-            entity_PositionType (*Position): the position of the entity to syncronize to
-
-            target_PositionType (*Position): the position of the target that should syncronize
-
-            speed (double): the absolute speed of the target that should syncronize
-
-            target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
-
-            target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
-
-            steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
-                Default: None
-        Attributes
-        ----------
-            entity (str): entity to syncronize with
-
-            entity_PositionType (*Position): the position of the entity to syncronize to
-
-            target_PositionType (*Position): the position of the target that should syncronize
-
-            speed (double): the absolute speed of the target that should syncronize
-
-            target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
-
-            target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
-
-            steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
-
-        Methods
-        -------
-            get_element()
-                Returns the full ElementTree of the class
-
-            get_attributes()
-                Returns the the attributes of the class
-
-    &#34;&#34;&#34;
-    def __init__(self,entity,entity_PositionType,target_PositionType,speed,target_tolerance_master=None,target_tolerance=None,steady_state=None):
-        &#34;&#34;&#34; initalize the AbsoluteSynchronizeAction
-
-            Parameters
-            ----------
-                entity (str): entity to syncronize with
-
-                entity_PositionType (*Position): the position of the entity to syncronize to
-
-                target_PositionType (*Position): the position of the target that should syncronize
-
-                speed (double): the absolute speed of the target that should syncronize
-
-                target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
-
-                target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
-
-                steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
-                Default: None
-        &#34;&#34;&#34;
-
-        self.entity = entity
-        if not isinstance(entity_PositionType,_PositionType):
-            raise TypeError(&#39;entity_PositionType input is not a valid Position&#39;)
-        
-        if not isinstance(target_PositionType,_PositionType):
-            raise TypeError(&#39;target_PositionType input is not a valid Position&#39;)
-        self.entity_PositionType = entity_PositionType
-        self.target_PositionType = target_PositionType
-        self.speed = speed
-        self.target_tolerance_master = target_tolerance_master
-        self.target_tolerance = target_tolerance
-        if steady_state and not (isinstance(steady_state,TargetTimeSteadyState) or isinstance(steady_state,TargetDistanceSteadyState)):
-            raise TypeError(&#39;steady_state input is not TargetTimeSteadyState or TargetDistanceSteadyState&#39;)
-        self.steady_state = steady_state
-    def __eq__(self,other):
-        if isinstance(other,AbsoluteSynchronizeAction):
-            if self.get_attributes() == other.get_attributes() and \
-            self.entity_PositionType == other.entity_PositionType and \
-            self.target_PositionType == other.target_PositionType and \
-            self.speed == other.speed and \
-            self.steady_state == other.steady_state:
-                return True
-        return False
-
-    def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes of the AbsoluteSynchronizeAction as a dict
-
-        &#34;&#34;&#34;
-        attr = {&#39;masterEntityRef&#39;:self.entity}
-        if self.target_tolerance_master is not None:
-            attr.update({&#39;targetToleranceMaster&#39;: str(self.target_tolerance_master)})
-        if self.target_tolerance is not None:
-            attr.update({&#39;targetTolerance&#39;: str(self.target_tolerance)})
-        return attr
-
-    def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the AbsoluteSynchronizeAction
-
-        &#34;&#34;&#34;
-        element = ET.Element(&#39;PrivateAction&#39;)
-        syncaction = ET.SubElement(element,&#39;SynchronizeAction&#39;,self.get_attributes())
-        syncaction.append(self.entity_PositionType.get_element(&#39;TargetPositionMaster&#39;))
-        syncaction.append(self.target_PositionType.get_element(&#39;TargetPosition&#39;))
-        finalspeed = ET.SubElement(syncaction,&#39;FinalSpeed&#39;)
-        ET.SubElement(finalspeed,&#39;AbsoluteSpeed&#39;,attrib={&#39;value&#39;:str(self.speed)})
-        if self.steady_state and not self.isVersion(0):
-            finalspeed.append(self.steady_state.get_element())
-        return element</code></pre>
-</details>
-<h3>Ancestors</h3>
-<ul class="hlist">
-<li>scenariogeneration.xosc.actions._PrivateActionType</li>
-<li>scenariogeneration.xosc.actions._ActionType</li>
-<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
-</ul>
-<h3>Methods</h3>
-<dl>
-<dt id="scenariogeneration.xosc.actions.AbsoluteSynchronizeAction.get_attributes"><code class="name flex">
-<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>returns the attributes of the AbsoluteSynchronizeAction as a dict</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34; returns the attributes of the AbsoluteSynchronizeAction as a dict
-
-    &#34;&#34;&#34;
-    attr = {&#39;masterEntityRef&#39;:self.entity}
-    if self.target_tolerance_master is not None:
-        attr.update({&#39;targetToleranceMaster&#39;: str(self.target_tolerance_master)})
-    if self.target_tolerance is not None:
-        attr.update({&#39;targetTolerance&#39;: str(self.target_tolerance)})
-    return attr</code></pre>
-</details>
-</dd>
-<dt id="scenariogeneration.xosc.actions.AbsoluteSynchronizeAction.get_element"><code class="name flex">
-<span>def <span class="ident">get_element</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>returns the elementTree of the AbsoluteSynchronizeAction</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_element(self):
-    &#34;&#34;&#34; returns the elementTree of the AbsoluteSynchronizeAction
-
-    &#34;&#34;&#34;
-    element = ET.Element(&#39;PrivateAction&#39;)
-    syncaction = ET.SubElement(element,&#39;SynchronizeAction&#39;,self.get_attributes())
-    syncaction.append(self.entity_PositionType.get_element(&#39;TargetPositionMaster&#39;))
-    syncaction.append(self.target_PositionType.get_element(&#39;TargetPosition&#39;))
-    finalspeed = ET.SubElement(syncaction,&#39;FinalSpeed&#39;)
-    ET.SubElement(finalspeed,&#39;AbsoluteSpeed&#39;,attrib={&#39;value&#39;:str(self.speed)})
-    if self.steady_state and not self.isVersion(0):
-        finalspeed.append(self.steady_state.get_element())
     return element</code></pre>
 </details>
 </dd>
@@ -6753,7 +6391,7 @@ target_lane_offset (float): if a offset in the target lane is wanted
         element = ET.Element(&#39;PrivateAction&#39;)
         laneoffset = {}
         lataction = ET.SubElement(element,&#39;LateralAction&#39;)
-        if self.target_lane_offset:
+        if self.target_lane_offset is not None:
             laneoffset = {&#39;targetLaneOffset&#39;:str(self.target_lane_offset)}
         lanechangeaction = ET.SubElement(lataction,&#39;LaneChangeAction&#39;,attrib=laneoffset)
         
@@ -6806,7 +6444,7 @@ target_lane_offset (float): if a offset in the target lane is wanted
     element = ET.Element(&#39;PrivateAction&#39;)
     laneoffset = {}
     lataction = ET.SubElement(element,&#39;LateralAction&#39;)
-    if self.target_lane_offset:
+    if self.target_lane_offset is not None:
         laneoffset = {&#39;targetLaneOffset&#39;:str(self.target_lane_offset)}
     lanechangeaction = ET.SubElement(lataction,&#39;LaneChangeAction&#39;,attrib=laneoffset)
     
@@ -7210,12 +6848,12 @@ continuous (bool): if the controller tries to keep the relative speed
 </dd>
 </dl>
 </dd>
-<dt id="scenariogeneration.xosc.actions.RelativeSynchronizeAction"><code class="flex name class">
-<span>class <span class="ident">RelativeSynchronizeAction</span></span>
-<span>(</span><span>entity, entity_PositionType, target_PositionType, speed, speed_target_type, target_tolerance_master=None, target_tolerance=None, steady_state=None)</span>
+<dt id="scenariogeneration.xosc.actions.SynchronizeAction"><code class="flex name class">
+<span>class <span class="ident">SynchronizeAction</span></span>
+<span>(</span><span>entity, entity_PositionType: scenariogeneration.xosc.utils._PositionType, target_PositionType: scenariogeneration.xosc.utils._PositionType, target_tolerance_master=None, target_tolerance=None, final_speed=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>creates a SynchronizeAction with a relative speed target</p>
+<div class="desc"><p>Synchronizes an entity's arrival at a destination with a master entity. Both entities are provided with their own reference position which shall be reached at the same time. Final speed can be specified. Note that the reference positions can be different or identical.</p>
 <h2 id="parameters">Parameters</h2>
 <pre><code>entity (str): entity to syncronize with
 
@@ -7223,15 +6861,13 @@ entity_PositionType (*Position): the position of the entity to syncronize to
 
 target_PositionType (*Position): the position of the target that should syncronize
 
-speed (double): the relative speed of the target that should syncronize
-
-speed_target_type (str): the semantics of the value (delta, factor)
+speed (double): the absolute speed of the target that should syncronize
 
 target_tolerance_master (optional) (double): tolerance offset of the master's position [m]. (Valid from OpenSCENARIO V1.1)
 
 target_tolerance (optional) (double): tolerance offset of the target's position [m]. (Valid from OpenSCENARIO V1.1)
 
-steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
+final_speed (AbsoluteSpeed or RelativeSpeedToMaster): The speed that the synchronized entity should have at its target position. (Valid from OpenSCENARIO V1.1)
     Default: None
 </code></pre>
 <h2 id="attributes">Attributes</h2>
@@ -7241,15 +6877,13 @@ entity_PositionType (*Position): the position of the entity to syncronize to
 
 target_PositionType (*Position): the position of the target that should syncronize
 
-speed (double): the relative speed of the target that should syncronize
-
-speed_target_type (str): the semantics of the value (delta, factor)
+speed (double): the absolute speed of the target that should syncronize
 
 target_tolerance_master (optional) (double): tolerance offset of the master's position [m]. (Valid from OpenSCENARIO V1.1)
 
 target_tolerance (optional) (double): tolerance offset of the target's position [m]. (Valid from OpenSCENARIO V1.1)
 
-steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
+final_speed (AbsoluteSpeed or RelativeSpeedToMaster): The speed that the synchronized entity should have at its target position. (Valid from OpenSCENARIO V1.1)
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>get_element()
@@ -7258,7 +6892,7 @@ steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state 
 get_attributes()
     Returns the the attributes of the class
 </code></pre>
-<p>initalize the RelativeSynchronizeAction</p>
+<p>initalize the SynchronizeAction</p>
 <h2 id="parameters_1">Parameters</h2>
 <pre><code>entity (str): entity to syncronize with
 
@@ -7268,21 +6902,19 @@ target_PositionType (*Position): the position of the target that should syncroni
 
 speed (double): the absolute speed of the target that should syncronize
 
-speed_target_type (str): the semantics of the value (delta, factor)
-
 target_tolerance_master (optional) (double): tolerance offset of the master's position [m]. (Valid from OpenSCENARIO V1.1)
 
 target_tolerance (optional) (double): tolerance offset of the target's position [m]. (Valid from OpenSCENARIO V1.1)
 
-steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
-    Default: None
+final_speed (AbsoluteSpeed or RelativeSpeedToMaster): The speed that the synchronized entity should have at its target position. (Valid from OpenSCENARIO V1.1)
+Default: None
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class RelativeSynchronizeAction(_PrivateActionType):
-    &#34;&#34;&#34; creates a SynchronizeAction with a relative speed target
+<pre><code class="python">class SynchronizeAction(_PrivateActionType):
+    &#34;&#34;&#34; Synchronizes an entity&#39;s arrival at a destination with a master entity. Both entities are provided with their own reference position which shall be reached at the same time. Final speed can be specified. Note that the reference positions can be different or identical.
         
         Parameters
         ----------
@@ -7292,15 +6924,13 @@ steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state 
 
             target_PositionType (*Position): the position of the target that should syncronize
 
-            speed (double): the relative speed of the target that should syncronize
-
-            speed_target_type (str): the semantics of the value (delta, factor)
+            speed (double): the absolute speed of the target that should syncronize
 
             target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
             target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
-            steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
+            final_speed (AbsoluteSpeed or RelativeSpeedToMaster): The speed that the synchronized entity should have at its target position. (Valid from OpenSCENARIO V1.1)
                 Default: None
         Attributes
         ----------
@@ -7310,16 +6940,14 @@ steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state 
 
             target_PositionType (*Position): the position of the target that should syncronize
 
-            speed (double): the relative speed of the target that should syncronize
-
-            speed_target_type (str): the semantics of the value (delta, factor)
+            speed (double): the absolute speed of the target that should syncronize
 
             target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
             target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
-            steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
-                
+            final_speed (AbsoluteSpeed or RelativeSpeedToMaster): The speed that the synchronized entity should have at its target position. (Valid from OpenSCENARIO V1.1)
+
         Methods
         -------
             get_element()
@@ -7329,9 +6957,9 @@ steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state 
                 Returns the the attributes of the class
 
     &#34;&#34;&#34;
-    def __init__(self,entity,entity_PositionType,target_PositionType,speed,speed_target_type,target_tolerance_master=None,target_tolerance=None,steady_state=None):
-        &#34;&#34;&#34; initalize the RelativeSynchronizeAction
-    
+    def __init__(self, entity, entity_PositionType:_PositionType, target_PositionType:_PositionType,target_tolerance_master=None,target_tolerance=None,final_speed=None):
+        &#34;&#34;&#34; initalize the SynchronizeAction
+
             Parameters
             ----------
                 entity (str): entity to syncronize with
@@ -7342,16 +6970,14 @@ steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state 
 
                 speed (double): the absolute speed of the target that should syncronize
 
-                speed_target_type (str): the semantics of the value (delta, factor)
-
                 target_tolerance_master (optional) (double): tolerance offset of the master&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
                 target_tolerance (optional) (double): tolerance offset of the target&#39;s position [m]. (Valid from OpenSCENARIO V1.1)
 
-                steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state for final phase (Valid from OpenSCENARIO V1.1)
-                    Default: None
+                final_speed (AbsoluteSpeed or RelativeSpeedToMaster): The speed that the synchronized entity should have at its target position. (Valid from OpenSCENARIO V1.1)
+                Default: None
         &#34;&#34;&#34;
-
+        
         self.entity = entity
         if not isinstance(entity_PositionType,_PositionType):
             raise TypeError(&#39;entity_PositionType input is not a valid Position&#39;)
@@ -7360,51 +6986,45 @@ steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state 
             raise TypeError(&#39;target_PositionType input is not a valid Position&#39;)
         self.entity_PositionType = entity_PositionType
         self.target_PositionType = target_PositionType
-        self.speed = speed
-        # if speed_target_type not in SpeedTargetValueType:
-            # ValueError(speed_target_type + &#39; is not a valid speed_target_type&#39;)
-        self.speed_target_type = speed_target_type
         self.target_tolerance_master = target_tolerance_master
         self.target_tolerance = target_tolerance
-        if steady_state and not (isinstance(steady_state,TargetTimeSteadyState) or isinstance(steady_state,TargetDistanceSteadyState)):
-            raise TypeError(&#39;steady_state input is not TargetTimeSteadyState or TargetDistanceSteadyState&#39;)
-        self.steady_state = steady_state
+        if final_speed and not (isinstance(final_speed,AbsoluteSpeed) or isinstance(final_speed,RelativeSpeedToMaster)):
+            raise TypeError(&#39;final_speed input is not AbsoluteSpeed or RelativeSpeedToMaster type&#39;)
+        else:
+            self.final_speed = final_speed
 
     def __eq__(self,other):
-        if isinstance(other,RelativeSynchronizeAction):
+        if isinstance(other,SynchronizeAction):
             if self.get_attributes() == other.get_attributes() and \
             self.entity_PositionType == other.entity_PositionType and \
             self.target_PositionType == other.target_PositionType and \
-            self.speed_target_type == other.speed_target_type and \
-            self.speed == other.speed and \
-            self.steady_state == other.steady_state:
+            self.final_speed == other.final_speed:
                 return True
         return False
 
     def get_attributes(self):
-        &#34;&#34;&#34; returns the attributes of the RelativeSynchronizeAction as a dict
+        &#34;&#34;&#34; returns the attributes of the AbsoluteSynchronizeAction as a dict
 
         &#34;&#34;&#34;
         attr = {&#39;masterEntityRef&#39;:self.entity}
-        if self.target_tolerance_master:
+        if self.isVersion(1, 0):
+            return attr
+        if self.target_tolerance_master is not None:
             attr.update({&#39;targetToleranceMaster&#39;: str(self.target_tolerance_master)})
-        if self.target_tolerance:
+        if self.target_tolerance is not None:
             attr.update({&#39;targetTolerance&#39;: str(self.target_tolerance)})
         return attr
 
     def get_element(self):
-        &#34;&#34;&#34; returns the elementTree of the RelativeSynchronizeAction
+        &#34;&#34;&#34; returns the elementTree of the AbsoluteSynchronizeAction
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;PrivateAction&#39;)
         syncaction = ET.SubElement(element,&#39;SynchronizeAction&#39;,self.get_attributes())
         syncaction.append(self.entity_PositionType.get_element(&#39;TargetPositionMaster&#39;))
         syncaction.append(self.target_PositionType.get_element(&#39;TargetPosition&#39;))
-        finalspeed = ET.SubElement(syncaction,&#39;FinalSpeed&#39;)
-        if self.steady_state and not self.isVersion(0):
-            finalspeed.append(self.steady_state.get_element())
-        ET.SubElement(finalspeed,&#39;RelativeSpeedToMaster&#39;,attrib={&#39;value&#39;:str(self.speed),&#39;speedTargetValueType&#39;:self.speed_target_type})
-        
+        if self.final_speed is not None:
+            syncaction.append(self.final_speed.get_element())
         return element</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -7415,49 +7035,48 @@ steady_state (TargetTimeSteadyState or TargetDistanceSteadyState): steady state 
 </ul>
 <h3>Methods</h3>
 <dl>
-<dt id="scenariogeneration.xosc.actions.RelativeSynchronizeAction.get_attributes"><code class="name flex">
+<dt id="scenariogeneration.xosc.actions.SynchronizeAction.get_attributes"><code class="name flex">
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes of the RelativeSynchronizeAction as a dict</p></div>
+<div class="desc"><p>returns the attributes of the AbsoluteSynchronizeAction as a dict</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34; returns the attributes of the RelativeSynchronizeAction as a dict
+    &#34;&#34;&#34; returns the attributes of the AbsoluteSynchronizeAction as a dict
 
     &#34;&#34;&#34;
     attr = {&#39;masterEntityRef&#39;:self.entity}
-    if self.target_tolerance_master:
+    if self.isVersion(1, 0):
+        return attr
+    if self.target_tolerance_master is not None:
         attr.update({&#39;targetToleranceMaster&#39;: str(self.target_tolerance_master)})
-    if self.target_tolerance:
+    if self.target_tolerance is not None:
         attr.update({&#39;targetTolerance&#39;: str(self.target_tolerance)})
     return attr</code></pre>
 </details>
 </dd>
-<dt id="scenariogeneration.xosc.actions.RelativeSynchronizeAction.get_element"><code class="name flex">
+<dt id="scenariogeneration.xosc.actions.SynchronizeAction.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the RelativeSynchronizeAction</p></div>
+<div class="desc"><p>returns the elementTree of the AbsoluteSynchronizeAction</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_element(self):
-    &#34;&#34;&#34; returns the elementTree of the RelativeSynchronizeAction
+    &#34;&#34;&#34; returns the elementTree of the AbsoluteSynchronizeAction
 
     &#34;&#34;&#34;
     element = ET.Element(&#39;PrivateAction&#39;)
     syncaction = ET.SubElement(element,&#39;SynchronizeAction&#39;,self.get_attributes())
     syncaction.append(self.entity_PositionType.get_element(&#39;TargetPositionMaster&#39;))
     syncaction.append(self.target_PositionType.get_element(&#39;TargetPosition&#39;))
-    finalspeed = ET.SubElement(syncaction,&#39;FinalSpeed&#39;)
-    if self.steady_state and not self.isVersion(0):
-        finalspeed.append(self.steady_state.get_element())
-    ET.SubElement(finalspeed,&#39;RelativeSpeedToMaster&#39;,attrib={&#39;value&#39;:str(self.speed),&#39;speedTargetValueType&#39;:self.speed_target_type})
-    
+    if self.final_speed is not None:
+        syncaction.append(self.final_speed.get_element())
     return element</code></pre>
 </details>
 </dd>
@@ -8201,7 +7820,7 @@ name (str): name of the TrafficAction, can be used to stop the TrafficAction, (v
         retdict = {}
         retdict[&#39;rate&#39;] = str(self.rate)
         retdict[&#39;radius&#39;] = str(self.radius)
-        if self.velocity:
+        if self.velocity is not None:
             retdict[&#39;velocity&#39;] = str(self.velocity)
         
 
@@ -8248,7 +7867,7 @@ name (str): name of the TrafficAction, can be used to stop the TrafficAction, (v
     retdict = {}
     retdict[&#39;rate&#39;] = str(self.rate)
     retdict[&#39;radius&#39;] = str(self.radius)
-    if self.velocity:
+    if self.velocity is not None:
         retdict[&#39;velocity&#39;] = str(self.velocity)
     
 
@@ -8357,9 +7976,9 @@ get_attributes()
 
         &#34;&#34;&#34;
         retdict = {}
-        if self.name and not self.isVersion(0):
+        if self.name and not self.isVersion(minor=0):
             retdict[&#39;trafficName&#39;] = str(self.name)
-        elif self.isVersion(0):
+        elif self.isVersion(minor=0):
             raise OpenSCENARIOVersionError(&#39;TrafficStopAction was introduced in OpenSCENARIO V1.1&#39;)
 
         return retdict
@@ -8395,9 +8014,9 @@ get_attributes()
 
     &#34;&#34;&#34;
     retdict = {}
-    if self.name and not self.isVersion(0):
+    if self.name and not self.isVersion(minor=0):
         retdict[&#39;trafficName&#39;] = str(self.name)
-    elif self.isVersion(0):
+    elif self.isVersion(minor=0):
         raise OpenSCENARIOVersionError(&#39;TrafficStopAction was introduced in OpenSCENARIO V1.1&#39;)
 
     return retdict</code></pre>
@@ -8616,7 +8235,7 @@ name (str): name of the TrafficAction, can be used to stop the TrafficAction, (v
         retdict[&#39;innerRadius&#39;] = str(self.innerradius)
         retdict[&#39;offset&#39;] = str(self.offset)
         retdict[&#39;numberOfVehicles&#39;] = str(self.numberofvehicles)
-        if self.velocity:
+        if self.velocity is not None:
             retdict[&#39;velocity&#39;] = str(self.velocity)
         return retdict
 
@@ -8662,7 +8281,7 @@ name (str): name of the TrafficAction, can be used to stop the TrafficAction, (v
     retdict[&#39;innerRadius&#39;] = str(self.innerradius)
     retdict[&#39;offset&#39;] = str(self.offset)
     retdict[&#39;numberOfVehicles&#39;] = str(self.numberofvehicles)
-    if self.velocity:
+    if self.velocity is not None:
         retdict[&#39;velocity&#39;] = str(self.velocity)
     return retdict</code></pre>
 </details>
@@ -8883,13 +8502,6 @@ get_attributes()
 </ul>
 </li>
 <li>
-<h4><code><a title="scenariogeneration.xosc.actions.AbsoluteSynchronizeAction" href="#scenariogeneration.xosc.actions.AbsoluteSynchronizeAction">AbsoluteSynchronizeAction</a></code></h4>
-<ul class="">
-<li><code><a title="scenariogeneration.xosc.actions.AbsoluteSynchronizeAction.get_attributes" href="#scenariogeneration.xosc.actions.AbsoluteSynchronizeAction.get_attributes">get_attributes</a></code></li>
-<li><code><a title="scenariogeneration.xosc.actions.AbsoluteSynchronizeAction.get_element" href="#scenariogeneration.xosc.actions.AbsoluteSynchronizeAction.get_element">get_element</a></code></li>
-</ul>
-</li>
-<li>
 <h4><code><a title="scenariogeneration.xosc.actions.AcquirePositionAction" href="#scenariogeneration.xosc.actions.AcquirePositionAction">AcquirePositionAction</a></code></h4>
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.actions.AcquirePositionAction.get_element" href="#scenariogeneration.xosc.actions.AcquirePositionAction.get_element">get_element</a></code></li>
@@ -9026,10 +8638,10 @@ get_attributes()
 </ul>
 </li>
 <li>
-<h4><code><a title="scenariogeneration.xosc.actions.RelativeSynchronizeAction" href="#scenariogeneration.xosc.actions.RelativeSynchronizeAction">RelativeSynchronizeAction</a></code></h4>
+<h4><code><a title="scenariogeneration.xosc.actions.SynchronizeAction" href="#scenariogeneration.xosc.actions.SynchronizeAction">SynchronizeAction</a></code></h4>
 <ul class="">
-<li><code><a title="scenariogeneration.xosc.actions.RelativeSynchronizeAction.get_attributes" href="#scenariogeneration.xosc.actions.RelativeSynchronizeAction.get_attributes">get_attributes</a></code></li>
-<li><code><a title="scenariogeneration.xosc.actions.RelativeSynchronizeAction.get_element" href="#scenariogeneration.xosc.actions.RelativeSynchronizeAction.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.actions.SynchronizeAction.get_attributes" href="#scenariogeneration.xosc.actions.SynchronizeAction.get_attributes">get_attributes</a></code></li>
+<li><code><a title="scenariogeneration.xosc.actions.SynchronizeAction.get_element" href="#scenariogeneration.xosc.actions.SynchronizeAction.get_element">get_element</a></code></li>
 </ul>
 </li>
 <li>

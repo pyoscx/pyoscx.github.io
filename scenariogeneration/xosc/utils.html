@@ -33,7 +33,7 @@ from .exceptions import OpenSCENARIOVersionError
 import xml.etree.ElementTree as ET
 from .helpers import printToFile
 
-from .enumerations import ParameterType, Rule, ReferenceContext, DynamicsShapes, DynamicsDimension, RouteStrategy,XSI,XMLNS, VehicleCategory,PrecipitationType,CloudState, VersionBase
+from .enumerations import ParameterType, Rule, ReferenceContext, DynamicsShapes, DynamicsDimension, RouteStrategy,XSI,XMLNS, VehicleCategory,PrecipitationType,CloudState, VersionBase, SpeedTargetValueType
 import datetime as dt
 
 class _StochasticDistributionType(VersionBase):
@@ -45,6 +45,10 @@ class _PositionType(VersionBase):
     &#34;&#34;&#34; helper class for typesetting
     &#34;&#34;&#34;
     pass
+
+    def get_element(self, param):
+        pass
+
 
 class _TriggerType(VersionBase):
     &#34;&#34;&#34; helper class for typesetting
@@ -88,7 +92,7 @@ class ParameterDeclarations(VersionBase):
             if self.parameters == other.parameters:
                 return True
         return False
-                
+
     def add_parameter(self,parameter):
         &#34;&#34;&#34; add_parameter adds a Parameter to the ParameterDeclarations
 
@@ -101,7 +105,7 @@ class ParameterDeclarations(VersionBase):
         if not isinstance(parameter,Parameter):
             raise TypeError(&#39;parameter input is not of type Parameter&#39;)
         self.parameters.append(parameter)
-    
+
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the ParameterDeclarations
 
@@ -189,7 +193,7 @@ class Parameter(VersionBase):
                 Returns a dictionary of all attributes of the class
 
     &#34;&#34;&#34;
-    
+
     def __init__(self,name,parameter_type,value):
         &#34;&#34;&#34; initalize the Parameter 
 
@@ -287,37 +291,37 @@ class Orientation(VersionBase):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
-        
+
     def is_filled(self):
         &#34;&#34;&#34; is_filled check is any orientations are  set
 
             Returns: boolean
 
         &#34;&#34;&#34;
-        if self.h or self.p or self.r or self.ref:
+        if self.h is not None or self.p is not None or self.r is not None or self.ref is not None:
             return True
         else:
             return False
-    
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the Orientation as a dict
 
         &#34;&#34;&#34;
         retdict = {}
-        if self.h:
+        if self.h is not None:
             retdict[&#39;h&#39;] = str(self.h)
 
-        if self.p:
+        if self.p is not None:
             retdict[&#39;p&#39;] = str(self.p)
 
-        if self.r:
+        if self.r is not None:
             retdict[&#39;r&#39;] = str(self.r)
 
-        if self.ref:
+        if self.ref is not None:
             retdict[&#39;type&#39;] = self.ref.get_name()
-        
+
         return retdict
-    
+
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the Orientation
 
@@ -366,7 +370,7 @@ class TransitionDynamics(VersionBase):
         &#34;&#34;&#34;
         if not hasattr(DynamicsShapes,str(shape)):
             raise TypeError(shape + &#39;; is not a valid shape.&#39;)
-        
+
         self.shape = shape
         if not hasattr(DynamicsDimension,str(dimension)):
             raise ValueError(dimension + &#39; is not a valid dynamics dimension&#39;)
@@ -378,7 +382,7 @@ class TransitionDynamics(VersionBase):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
-        
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the TransitionDynamics as a dict
 
@@ -437,7 +441,7 @@ class DynamicsConstrains(VersionBase):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
-        
+
     def is_filled(self):
         &#34;&#34;&#34; is_filled check is any constraints are set
 
@@ -455,11 +459,11 @@ class DynamicsConstrains(VersionBase):
 
         &#34;&#34;&#34;
         retdict = {}
-        if self.max_speed:
+        if self.max_speed is not None:
             retdict[&#39;maxSpeed&#39;] = str(self.max_speed)
-        if self.max_deceleration:
+        if self.max_deceleration is not None:
             retdict[&#39;maxDeceleration&#39;] = str(self.max_deceleration)
-        if self.max_acceleration:
+        if self.max_acceleration is not None:
             retdict[&#39;maxAcceleration&#39;] = str(self.max_acceleration)
         return retdict
 
@@ -537,7 +541,7 @@ class Route(VersionBase):
             self.waypoints == other.waypoints:
                 return True
         return False
-        
+
     def dump_to_catalog(self,filename,catalogtype,description,author):
         &#34;&#34;&#34; dump_to_catalog creates a new catalog and adds the Controller to it
             
@@ -556,7 +560,7 @@ class Route(VersionBase):
         cf.create_catalog(filename,catalogtype,description,author)
         cf.add_to_catalog(self)
         cf.dump()
-        
+
     def append_to_catalog(self,filename):
         &#34;&#34;&#34; adds the Controller to an existing catalog
 
@@ -764,7 +768,7 @@ class Trajectory(VersionBase):
         cf.create_catalog(filename,catalogtype,description,author)
         cf.add_to_catalog(self)
         cf.dump()
-        
+
     def append_to_catalog(self,filename):
         &#34;&#34;&#34; adds the Controller to an existing catalog
 
@@ -874,11 +878,11 @@ class TimeReference(VersionBase):
             raise ValueError(&#39;missing inputs for time reference&#39;)
         if reference_domain is not None and not hasattr(ReferenceContext,str(reference_domain)):
             raise TypeError(&#39;input reference_domain is not of type ReferenceContext&#39;)
-        
+
         self.reference_domain = reference_domain
         self.scale = scale
         self.offset = offset
-    
+
     def __eq__(self,other):
         if isinstance(other,TimeReference):
             if not self._only_nones and not other._only_nones:
@@ -908,7 +912,7 @@ class TimeReference(VersionBase):
             ET.SubElement(element,&#39;None&#39;)
         else:
             ET.SubElement(element,&#39;Timing&#39;,self.get_attributes())
-        
+
         return element
 
 class Polyline(VersionBase):
@@ -1034,14 +1038,14 @@ class Clothoid(VersionBase):
 
         &#34;&#34;&#34;
 
-        
+
         self.curvature = curvature
         self.curvature_change = curvature_change
         self.length = length
         if not isinstance(startposition,_PositionType):
             raise TypeError(&#39;position input is not a valid position&#39;)
         self.startposition = startposition
-        
+
         self.starttime = starttime
         self.stoptime = stoptime
         if (self.starttime == None and self.stoptime != None) or (self.starttime != None and self.stoptime == None):
@@ -1141,9 +1145,9 @@ class ControlPoint(VersionBase):
 
         &#34;&#34;&#34;
         retdict = {}
-        if self.time:
+        if self.time is not None:
             retdict[&#39;time&#39;] = str(self.time)
-        if self.weight:
+        if self.weight is not None:
             retdict[&#39;weight&#39;] = str(self.weight)
         return retdict
 
@@ -1195,11 +1199,11 @@ class Nurbs(VersionBase):
 
         &#34;&#34;&#34;
 
-        
+
         self.order = order
         self.controlpoints = []
         self.knots = []
-    
+
     def __eq__(self,other):
         if isinstance(other,Nurbs):
             if self.get_attributes() == other.get_attributes() and \
@@ -1246,7 +1250,7 @@ class Nurbs(VersionBase):
             element.append(c.get_element())
         for k in self.knots:
             ET.SubElement(element,&#39;Knot&#39;,attrib={&#39;value&#39;:str(k)})
-        
+
 
         return element
 
@@ -1299,7 +1303,7 @@ class License(VersionBase):
         self.resource = resource
         self._revMajor = 1
         self.spdxId = spdxId
-        
+
     def __eq__(self,other):
         if isinstance(other,License):
             if self.get_attributes() == other.get_attributes():
@@ -1322,7 +1326,7 @@ class License(VersionBase):
         &#34;&#34;&#34; returns the elementTree of the License
 
         &#34;&#34;&#34;
-        if self.isVersion(0):
+        if self.isVersion(minor=0):
             raise OpenSCENARIOVersionError(&#39;License was introduced in OpenSCENARIO V1.1&#39;)
         element = ET.Element(&#39;License&#39;,attrib=self.get_attributes())
 
@@ -1363,7 +1367,7 @@ class FileHeader(VersionBase):
         self.author = author
         self._revMajor = 1
         self._revMinor = revMinor
-        self.version_minor = revMinor
+        self.setVersion(minor=revMinor)
         if license and not isinstance(license,License):
             raise TypeError(&#39;license is not of type License&#39;)
         self.license = license
@@ -1419,7 +1423,7 @@ class _TrafficSignalState(VersionBase):
 
     &#34;&#34;&#34;
 
-    
+
     def __init__(self, signal_id, state):
         &#34;&#34;&#34; initalize the _TrafficSignalState 
         
@@ -1430,7 +1434,7 @@ class _TrafficSignalState(VersionBase):
             state (str): state of the signal
 
         &#34;&#34;&#34;
-        
+
         self.signal_id = signal_id
         self.state = state
 
@@ -1454,9 +1458,9 @@ class _TrafficSignalState(VersionBase):
 
         &#34;&#34;&#34;
         return ET.Element(&#39;TrafficSignalState&#39;,attrib=self.get_attributes())
-        
 
-    
+
+
 class Phase(VersionBase):
     &#34;&#34;&#34; crates a Traffic light phase
         
@@ -1496,7 +1500,7 @@ class Phase(VersionBase):
             duration (float): duration of the phase
 
         &#34;&#34;&#34;
-        
+
         self.name = name
         self.duration = duration
         self.signalstates = []
@@ -1533,7 +1537,7 @@ class Phase(VersionBase):
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;Phase&#39;,attrib=self.get_attributes())
-        for s in self.signalstates: 
+        for s in self.signalstates:
             element.append(s.get_element())
         return element
 
@@ -1586,7 +1590,7 @@ class TrafficSignalController(VersionBase):
                 Default: None
 
         &#34;&#34;&#34;
-        
+
         self.name = name
         self.delay = delay
         self.reference = reference
@@ -1616,7 +1620,7 @@ class TrafficSignalController(VersionBase):
         &#34;&#34;&#34;
         retdict = {}
         retdict[&#39;name&#39;] = self.name
-        if self.delay:
+        if self.delay is not None:
             retdict[&#39;delay&#39;] = str(self.delay)
         if self.reference:
             retdict[&#39;reference&#39;] = self.reference
@@ -1627,7 +1631,7 @@ class TrafficSignalController(VersionBase):
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;TrafficSignalController&#39;,attrib=self.get_attributes())
-        for ph in self.phases: 
+        for ph in self.phases:
             element.append(ph.get_element())
         return element
 
@@ -1677,14 +1681,14 @@ class TrafficDefinition(VersionBase):
         ----------
             name (str): name of the traffic definition
 
-        &#34;&#34;&#34;            
-        
+        &#34;&#34;&#34;
+
         self.name = name
-        self.vehicleweights = [] 
-        self.vehiclecategories = [] 
+        self.vehicleweights = []
+        self.vehiclecategories = []
         self.controllerweights = []
         self.controllers = []
-        
+
 
     def __eq__(self,other):
         if isinstance(other,TrafficDefinition):
@@ -1725,7 +1729,7 @@ class TrafficDefinition(VersionBase):
             raise TypeError(&#39;controller input not of type Controller or CatalogReference&#39;)
         self.controllers.append(controller)
         self.controllerweights.append(weight)
-    
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the TrafficDefinition
         
@@ -1742,9 +1746,9 @@ class TrafficDefinition(VersionBase):
             ValueError(&#39;No controllers defined for the TrafficDefinition&#39;)
         if not self.vehiclecategories:
             ValueError(&#39;No Vehicles defined for the TrafficDefinition&#39;)
-                
+
         element = ET.Element(&#39;TrafficDefinition&#39;,attrib=self.get_attributes())
-        
+
         veh_element = ET.SubElement(element,&#39;VehicleCategoryDistribution&#39;)
         for i in range(len(self.vehiclecategories)):
             ET.SubElement(veh_element,&#39;VehicleCategoryDistributionEntry&#39;,attrib={&#39;category&#39;: self.vehiclecategories[i].get_name(),&#39;weight&#39;: str(self.vehicleweights[i])})
@@ -1923,7 +1927,7 @@ class Catalog(VersionBase):
 
         if catalogname not in self._CATALOGS:
             raise ValueError(&#39;Not a correct catalog, approved catalogs are:&#39; &#39;&#39;.join(self._CATALOGS))
-        
+
         self.catalogs[catalogname] = path
 
 
@@ -1931,9 +1935,9 @@ class Catalog(VersionBase):
         &#34;&#34;&#34; returns the elementTree of the Catalog
 
         &#34;&#34;&#34;
-        
+
         catloc = ET.Element(&#39;CatalogLocations&#39;)
-        
+
         for i in self.catalogs:
             tmpel = ET.SubElement(catloc,i)
             ET.SubElement(tmpel,&#39;Directory&#39;,{&#39;path&#39;: self.catalogs[i]})
@@ -2016,8 +2020,8 @@ class CatalogReference(VersionBase):
         for parass in self.parameterassignments:
             parameterassigns.append(parass.get_element())
         return element
-        
-    
+
+
 
 class ParameterAssignment(VersionBase):
     &#34;&#34;&#34; ParameterAssignment creates an ParameterAssignment element of openscenario
@@ -2072,7 +2076,7 @@ class ParameterAssignment(VersionBase):
         retdict[&#39;parameterRef&#39;] = self.parameterref
         retdict[&#39;value&#39;] = str(self.value)
         return retdict
-    
+
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the ParameterAssignment
 
@@ -2144,7 +2148,7 @@ class TimeOfDay(VersionBase):
                 second (int): second   
                 
         &#34;&#34;&#34;
-        self.animation = animation 
+        self.animation = animation
         self.year = year
         self.month = month
         self.day = day
@@ -2270,7 +2274,7 @@ class Weather(VersionBase):
         self.sun = sun
         self.wind = wind
         self.precipitation = precipitation
-        
+
 
     def __eq__(self,other):
         if isinstance(other,Weather):
@@ -2278,7 +2282,7 @@ class Weather(VersionBase):
             self.fog == other.fog and \
             self.wind == other.wind and \
             self.sun == other.sun and \
-            self.precipitation == other.precipitation:                
+            self.precipitation == other.precipitation:
                 return True
         return False
 
@@ -2289,13 +2293,13 @@ class Weather(VersionBase):
         retdict = {}
         if self.cloudstate:
             retdict[&#39;cloudState&#39;] = self.cloudstate.get_name()
-        if self.temperature and not self.isVersion(0):
+        if self.temperature is not None and not self.isVersion(minor=0):
             retdict[&#39;temperature&#39;] = str(self.temperature)
-        elif self.temperature and self.isVersion(0):
+        elif self.temperature is not None and self.isVersion(minor=0):
             raise OpenSCENARIOVersionError(&#39;temperature was introduced in OpenSCENARIO V1.1&#39;)
-        if self.atmosphericPressure and not self.isVersion(0):
+        if self.atmosphericPressure is not None and not self.isVersion(minor=0):
             retdict[&#39;atmosphericPressure&#39;] = str(self.atmosphericPressure)
-        elif self.atmosphericPressure and self.isVersion(0):
+        elif self.atmosphericPressure is not None and self.isVersion(minor=0):
             raise OpenSCENARIOVersionError(&#39;atmosphericPressure was introduced in OpenSCENARIO V1.1&#39;)
         return retdict
 
@@ -2305,15 +2309,14 @@ class Weather(VersionBase):
         &#34;&#34;&#34;
         element = ET.Element(&#39;Weather&#39;,attrib=self.get_attributes())
         if self.sun:
-            print(self.sun)
             element.append(self.sun.get_element())
         if self.fog:
             element.append(self.fog.get_element())
         if self.precipitation:
             element.append(self.precipitation.get_element())
-        if self.wind and not self.isVersion(0):
+        if self.wind and not self.isVersion(minor=0):
             element.append(self.wind.get_element())
-        if self.wind and self.isVersion(0):
+        if self.wind and self.isVersion(minor=0):
             raise OpenSCENARIOVersionError(&#39;Wind was introduced in OpenSCENARIO V1.1&#39;)
         return element
 
@@ -2352,7 +2355,7 @@ class Fog(VersionBase):
                 
         &#34;&#34;&#34;
 
-        self.visual_range = visual_range 
+        self.visual_range = visual_range
         self.bounding_box = bounding_box
 
 
@@ -2422,7 +2425,7 @@ class Sun(VersionBase):
                 
         &#34;&#34;&#34;
 
-        self.azimuth = azimuth 
+        self.azimuth = azimuth
         self.intensity = intensity
         self.elevation = elevation
 
@@ -2486,7 +2489,7 @@ class Precipitation(VersionBase):
         &#34;&#34;&#34;
         if not hasattr(PrecipitationType,str(precipitation)):
             raise TypeError(&#39;precipitation input is not of type PrecipitationType&#39;)
-        self.precipitation = precipitation 
+        self.precipitation = precipitation
         self.intensity = intensity
 
     def __eq__(self,other):
@@ -2500,7 +2503,7 @@ class Precipitation(VersionBase):
         &#34;&#34;&#34;
         retdict = {}
         retdict[&#39;precipitationType&#39;] = self.precipitation.get_name()
-        if self.isVersion(0):
+        if self.isVersion(minor=0):
             retdict[&#39;intensity&#39;] = str(self.intensity)
         else:
             retdict[&#39;precipitationIntensity&#39;] = str(self.intensity)
@@ -2549,7 +2552,7 @@ class Wind(VersionBase):
                 speed (float): wind speed (m/s)
                 
         &#34;&#34;&#34;
-        self.direction = direction 
+        self.direction = direction
         self.speed = speed
 
     def __eq__(self,other):
@@ -2607,7 +2610,7 @@ class RoadCondition(VersionBase):
                     Default: None
                 
         &#34;&#34;&#34;
-        self.friction_scale_factor = friction_scale_factor 
+        self.friction_scale_factor = friction_scale_factor
         if properties is not None and not isinstance(properties,Properties):
             raise TypeError(&#39;properties input is not of type Properties&#39;)
         self.properties = properties
@@ -2694,7 +2697,7 @@ class Environment(VersionBase):
         if not isinstance(roadcondition,RoadCondition):
             raise TypeError(&#39;roadcondition input is not of type RoadCondition&#39;)
         if parameters is not None and not isinstance(parameters,ParameterDeclarations):
-            raise TypeError(&#39;parameters input is not of type ParameterDeclarations&#39;)    
+            raise TypeError(&#39;parameters input is not of type ParameterDeclarations&#39;)
         self.timeofday = timeofday
         self.weather = weather
         self.roadcondition = roadcondition
@@ -2726,7 +2729,7 @@ class Environment(VersionBase):
         cf.create_catalog(filename,catalogtype,description,author)
         cf.add_to_catalog(self)
         cf.dump()
-        
+
     def append_to_catalog(self,filename):
         &#34;&#34;&#34; adds the environment to an existing catalog
 
@@ -2795,7 +2798,7 @@ class Controller(VersionBase):
         
         &#34;&#34;&#34;
         self.name = name
-        
+
         self.parameters = ParameterDeclarations()
         if not isinstance(properties,Properties):
             raise TypeError(&#39;properties input is not of type Properties&#39;)
@@ -2827,7 +2830,7 @@ class Controller(VersionBase):
         cf.create_catalog(filename,catalogtype,description,author)
         cf.add_to_catalog(self)
         cf.dump()
-        
+
     def append_to_catalog(self,filename):
         &#34;&#34;&#34; adds the Controller to an existing catalog
 
@@ -2866,7 +2869,7 @@ class Controller(VersionBase):
         element = ET.Element(&#39;Controller&#39;,attrib=self.get_attributes())
         element.append(self.parameters.get_element())
         element.append(self.properties.get_element())
-        
+
         return element
 
 
@@ -3133,14 +3136,152 @@ class Properties(VersionBase):
             ET.SubElement(element,&#39;Property&#39;,attrib={&#39;name&#39;:p[0],&#39;value&#39;:p[1]})
         for f in self.files:
             ET.SubElement(element,&#39;File&#39;,attrib={&#39;filepath&#39;:f})
-        
-        
+
         return element
+
+
+class AbsoluteSpeed(VersionBase):
+    &#34;&#34;&#34;
+        Parameters
+        ----------
+            value (double): absolute speed [m/s]
+            
+            steadyState (TargetTimeSteadyState / TargetDistanceSteadyState): Final phase of constant (final) speed, start of which defined by distance or time. (Valid from OpenSCENARIO V1.1)
+
+        Attributes
+        ----------
+            value (double): absolute speed [m/s]
+            
+            steadyState (TargetTimeSteadyState / TargetDistanceSteadyState): Final phase of constant (final) speed, start of which defined by distance or time. (Valid from OpenSCENARIO V1.1)
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+                
+            get_attributes()
+                Returns the attributes of the class
+    &#34;&#34;&#34;
+    def __init__(self, value, steadyState=None):
+        &#34;&#34;&#34;initalzie the AbsoluteSpeed
+
+        Parameters
+        ----------
+            value (double): absolute speed [m/s]
+            steadyState (TargetTimeSteadyState / TargetDistanceSteadyState) Final phase of constant (final) speed, start of which defined by distance or time. (Valid from OpenSCENARIO V1.1)
+        &#34;&#34;&#34;
+        self.value = value
+        if steadyState:
+            if not (isinstance(steadyState, TargetTimeSteadyState) or isinstance(steadyState, TargetDistanceSteadyState)):
+                raise TypeError(&#39;steadyState input is not an TargetTimeSteadyState or TargetDistanceSteadyState input&#39;)
+        self.steadyState = steadyState
+
+    def __eq__(self,other):
+        if isinstance(other,AbsoluteSpeed):
+            if self.get_attributes() == other.get_attributes() and \
+               self.steadyState == other.steadyState:
+                return True
+        return False
+
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the AbsoluteSpeed
+
+        &#34;&#34;&#34;
+        return {&#39;value&#39;: str(self.value)}
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the AbsoluteSpeed
+
+        &#34;&#34;&#34;
+        if self.isVersion(minor=0):
+            raise OpenSCENARIOVersionError(&#39;AbsoluteSpeed was introduced in OpenSCENARIO V1.1&#39;)
+        elementFinalSpeed = ET.Element(&#39;FinalSpeed&#39;)
+        elementAbsoluteSpeed = ET.SubElement(elementFinalSpeed, &#39;AbsoluteSpeed&#39;, attrib=self.get_attributes())
+        if self.steadyState:
+            if self.isVersion(1, 0):
+                raise OpenSCENARIOVersionError(&#39;steadyState was introduced in OpenSCENARIO V1.1&#39;)
+            ET.SubElement(elementAbsoluteSpeed, self.steadyState.__class__.__name__, attrib=self.steadyState.get_attributes())
+        return elementFinalSpeed
+
+
+class RelativeSpeedToMaster(VersionBase):
+    &#34;&#34;&#34;
+        Parameters
+        ----------
+            value (double): Relative speed. Unit: m/s.
+            
+            speedTargetValueType (SpeedTargetValueType): The semantics of the value (delta, offset, factor).
+            
+            steadyState (TargetTimeSteadyState / TargetDistanceSteadyState): Optional final phase of constant (final) speed. (Valid from OpenSCENARIO V1.1)
+
+        Attributes
+        ----------
+            value (double): Relative speed. Unit: m/s.
+            
+            speedTargetValueType (SpeedTargetValueType): The semantics of the value (delta, offset, factor).
+            
+            steadyState (TargetTimeSteadyState / TargetDistanceSteadyState): Optional final phase of constant (final) speed. (Valid from OpenSCENARIO V1.1)
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+            get_attributes()
+                Returns the attributes of the class
+    &#34;&#34;&#34;
+    def __init__(self, value, speedTargetValueType, steadyState=None):
+        &#34;&#34;&#34;
+
+        Parameters
+        ----------
+            value (double): Relative speed. Unit: m/s.
+            
+            speedTargetValueType (SpeedTargetValueType): The semantics of the value (delta, offset, factor).
+            
+            steadyState (TargetTimeSteadyState / TargetDistanceSteadyState): Optional final phase of constant (final) speed.
+        &#34;&#34;&#34;
+        self.value = value
+        if steadyState:
+            if not (isinstance(steadyState, TargetTimeSteadyState) or isinstance(steadyState,
+                                                                                 TargetDistanceSteadyState)):
+                raise TypeError(&#39;steadyState input is not an TargetTimeSteadyState or TargetDistanceSteadyState input&#39;)
+        self.steadyState = steadyState
+        if not speedTargetValueType.classname == &#34;SpeedTargetValueType&#34;:
+            raise TypeError(&#39;speedTargetValueType input is not a valid SpeedTargetValueType&#39;)
+        self.speedTargetValueType = speedTargetValueType
+
+    def __eq__(self,other):
+        if isinstance(other,RelativeSpeedToMaster):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the RelativeSpeedToMaster
+
+        &#34;&#34;&#34;
+        return {&#39;speedTargetValueType&#39;: str(self.speedTargetValueType), &#39;value&#39;: str(self.value)}
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the RelativeSpeedToMaster
+
+        &#34;&#34;&#34;
+        if self.isVersion(minor=0):
+            raise OpenSCENARIOVersionError(&#39;RelativeSpeedToMaster was introduced in OpenSCENARIO V1.1&#39;)
+        elementFinalSpeed = ET.Element(&#39;FinalSpeed&#39;)
+        elementRelativeSpeed = ET.SubElement(elementFinalSpeed, &#39;RelativeSpeedToMaster&#39;, attrib=self.get_attributes())
+        if self.steadyState:
+            if self.isVersion(1, 0):
+                raise OpenSCENARIOVersionError(&#39;steadyState was introduced in OpenSCENARIO V1.1&#39;)
+            ET.SubElement(elementRelativeSpeed, self.steadyState.__class__.__name__,
+                          attrib=self.steadyState.get_attributes())
+        return elementFinalSpeed
 
 
 class TargetDistanceSteadyState(VersionBase):
     &#34;&#34;&#34; the TargetDistanceSteadyState describes a SteadyState of type TargetDistanceSteadyState
-
+        (Valid from OpenSCENARIO V1.1)
+        
         Parameters
         ----------
             distance (double): distance to target for the steady state
@@ -3164,7 +3305,6 @@ class TargetDistanceSteadyState(VersionBase):
         
         &#34;&#34;&#34;
         self.distance = distance
-        
 
     def __eq__(self,other):
         if isinstance(other,TargetDistanceSteadyState):
@@ -3176,21 +3316,23 @@ class TargetDistanceSteadyState(VersionBase):
         &#34;&#34;&#34; returns the attributes of the TargetDistanceSteadyState
         
         &#34;&#34;&#34;
+        if self.isVersion(1, 0):
+            raise OpenSCENARIOVersionError(&#39;TargetDistanceSteadyState was introduced in OpenSCENARIO V1.1&#39;)
         return {&#39;distance&#39;:str(self.distance)}
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the TargetDistanceSteadyState
 
         &#34;&#34;&#34;
-        if self.isVersion(0):
+        if self.isVersion(1, 0):
             raise OpenSCENARIOVersionError(&#39;TargetDistanceSteadyState was introduced in OpenSCENARIO V1.1&#39;)
-        element = ET.Element(&#39;SteadyState&#39;)
-        ET.SubElement(element,&#39;TargetDistanceSteadyState&#39;,attrib=self.get_attributes())
-        return element
+        return ET.Element(&#39;TargetDistanceSteadyState&#39;,attrib=self.get_attributes())
+
 
 class TargetTimeSteadyState(VersionBase):
     &#34;&#34;&#34; the TargetTimeSteadyState describes a SteadyState of type TargetTimeSteadyState
-
+        (Valid from OpenSCENARIO V1.1)
+        
         Parameters
         ----------
             time_gap (double): time_gap to target for the steady state
@@ -3214,7 +3356,6 @@ class TargetTimeSteadyState(VersionBase):
         
         &#34;&#34;&#34;
         self.time_gap = time_gap
-        
 
     def __eq__(self,other):
         if isinstance(other,TargetTimeSteadyState):
@@ -3226,17 +3367,18 @@ class TargetTimeSteadyState(VersionBase):
         &#34;&#34;&#34; returns the attributes of the TargetTimeSteadyState
         
         &#34;&#34;&#34;
+        if self.isVersion(1, 0):
+            raise OpenSCENARIOVersionError(&#39;TargetTimeSteadyState was introduced in OpenSCENARIO V1.1&#39;)
         return {&#39;time&#39;:str(self.time_gap)}
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the TargetTimeSteadyState
 
         &#34;&#34;&#34;
-        if self.isVersion(0):
+        if self.isVersion(1, 0):
             raise OpenSCENARIOVersionError(&#39;TargetTimeSteadyState was introduced in OpenSCENARIO V1.1&#39;)
-        element = ET.Element(&#39;SteadyState&#39;)
-        ET.SubElement(element,&#39;TargetTimeSteadyState&#39;,attrib=self.get_attributes())
-        return element
+        return ET.Element(&#39;TargetTimeSteadyState&#39;,attrib=self.get_attributes())
+
 
 def merge_dicts(*dict_args):
     &#34;&#34;&#34; Funciton to merge dicts 
@@ -3303,6 +3445,148 @@ def convert_bool(value):
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="scenariogeneration.xosc.utils.AbsoluteSpeed"><code class="flex name class">
+<span>class <span class="ident">AbsoluteSpeed</span></span>
+<span>(</span><span>value, steadyState=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><h2 id="parameters">Parameters</h2>
+<pre><code>value (double): absolute speed [m/s]
+
+steadyState (TargetTimeSteadyState / TargetDistanceSteadyState): Final phase of constant (final) speed, start of which defined by distance or time. (Valid from OpenSCENARIO V1.1)
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>value (double): absolute speed [m/s]
+
+steadyState (TargetTimeSteadyState / TargetDistanceSteadyState): Final phase of constant (final) speed, start of which defined by distance or time. (Valid from OpenSCENARIO V1.1)
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element()
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns the attributes of the class
+</code></pre>
+<p>initalzie the AbsoluteSpeed</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>value (double): absolute speed [m/s]
+steadyState (TargetTimeSteadyState / TargetDistanceSteadyState) Final phase of constant (final) speed, start of which defined by distance or time. (Valid from OpenSCENARIO V1.1)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AbsoluteSpeed(VersionBase):
+    &#34;&#34;&#34;
+        Parameters
+        ----------
+            value (double): absolute speed [m/s]
+            
+            steadyState (TargetTimeSteadyState / TargetDistanceSteadyState): Final phase of constant (final) speed, start of which defined by distance or time. (Valid from OpenSCENARIO V1.1)
+
+        Attributes
+        ----------
+            value (double): absolute speed [m/s]
+            
+            steadyState (TargetTimeSteadyState / TargetDistanceSteadyState): Final phase of constant (final) speed, start of which defined by distance or time. (Valid from OpenSCENARIO V1.1)
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+                
+            get_attributes()
+                Returns the attributes of the class
+    &#34;&#34;&#34;
+    def __init__(self, value, steadyState=None):
+        &#34;&#34;&#34;initalzie the AbsoluteSpeed
+
+        Parameters
+        ----------
+            value (double): absolute speed [m/s]
+            steadyState (TargetTimeSteadyState / TargetDistanceSteadyState) Final phase of constant (final) speed, start of which defined by distance or time. (Valid from OpenSCENARIO V1.1)
+        &#34;&#34;&#34;
+        self.value = value
+        if steadyState:
+            if not (isinstance(steadyState, TargetTimeSteadyState) or isinstance(steadyState, TargetDistanceSteadyState)):
+                raise TypeError(&#39;steadyState input is not an TargetTimeSteadyState or TargetDistanceSteadyState input&#39;)
+        self.steadyState = steadyState
+
+    def __eq__(self,other):
+        if isinstance(other,AbsoluteSpeed):
+            if self.get_attributes() == other.get_attributes() and \
+               self.steadyState == other.steadyState:
+                return True
+        return False
+
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the AbsoluteSpeed
+
+        &#34;&#34;&#34;
+        return {&#39;value&#39;: str(self.value)}
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the AbsoluteSpeed
+
+        &#34;&#34;&#34;
+        if self.isVersion(minor=0):
+            raise OpenSCENARIOVersionError(&#39;AbsoluteSpeed was introduced in OpenSCENARIO V1.1&#39;)
+        elementFinalSpeed = ET.Element(&#39;FinalSpeed&#39;)
+        elementAbsoluteSpeed = ET.SubElement(elementFinalSpeed, &#39;AbsoluteSpeed&#39;, attrib=self.get_attributes())
+        if self.steadyState:
+            if self.isVersion(1, 0):
+                raise OpenSCENARIOVersionError(&#39;steadyState was introduced in OpenSCENARIO V1.1&#39;)
+            ET.SubElement(elementAbsoluteSpeed, self.steadyState.__class__.__name__, attrib=self.steadyState.get_attributes())
+        return elementFinalSpeed</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.utils.AbsoluteSpeed.get_attributes"><code class="name flex">
+<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the attributes of the AbsoluteSpeed</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_attributes(self):
+    &#34;&#34;&#34; returns the attributes of the AbsoluteSpeed
+
+    &#34;&#34;&#34;
+    return {&#39;value&#39;: str(self.value)}</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xosc.utils.AbsoluteSpeed.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the elementTree of the AbsoluteSpeed</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self):
+    &#34;&#34;&#34; returns the elementTree of the AbsoluteSpeed
+
+    &#34;&#34;&#34;
+    if self.isVersion(minor=0):
+        raise OpenSCENARIOVersionError(&#39;AbsoluteSpeed was introduced in OpenSCENARIO V1.1&#39;)
+    elementFinalSpeed = ET.Element(&#39;FinalSpeed&#39;)
+    elementAbsoluteSpeed = ET.SubElement(elementFinalSpeed, &#39;AbsoluteSpeed&#39;, attrib=self.get_attributes())
+    if self.steadyState:
+        if self.isVersion(1, 0):
+            raise OpenSCENARIOVersionError(&#39;steadyState was introduced in OpenSCENARIO V1.1&#39;)
+        ET.SubElement(elementAbsoluteSpeed, self.steadyState.__class__.__name__, attrib=self.steadyState.get_attributes())
+    return elementFinalSpeed</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
 <dt id="scenariogeneration.xosc.utils.BoundingBox"><code class="flex name class">
 <span>class <span class="ident">BoundingBox</span></span>
 <span>(</span><span>width, length, height, x_center, y_center, z_center)</span>
@@ -3517,7 +3801,7 @@ add_catalog(catalogname, path)
 
         if catalogname not in self._CATALOGS:
             raise ValueError(&#39;Not a correct catalog, approved catalogs are:&#39; &#39;&#39;.join(self._CATALOGS))
-        
+
         self.catalogs[catalogname] = path
 
 
@@ -3525,9 +3809,9 @@ add_catalog(catalogname, path)
         &#34;&#34;&#34; returns the elementTree of the Catalog
 
         &#34;&#34;&#34;
-        
+
         catloc = ET.Element(&#39;CatalogLocations&#39;)
-        
+
         for i in self.catalogs:
             tmpel = ET.SubElement(catloc,i)
             ET.SubElement(tmpel,&#39;Directory&#39;,{&#39;path&#39;: self.catalogs[i]})
@@ -3567,7 +3851,7 @@ path (str): path to the catalog
 
     if catalogname not in self._CATALOGS:
         raise ValueError(&#39;Not a correct catalog, approved catalogs are:&#39; &#39;&#39;.join(self._CATALOGS))
-    
+
     self.catalogs[catalogname] = path</code></pre>
 </details>
 </dd>
@@ -3584,9 +3868,9 @@ path (str): path to the catalog
     &#34;&#34;&#34; returns the elementTree of the Catalog
 
     &#34;&#34;&#34;
-    
+
     catloc = ET.Element(&#39;CatalogLocations&#39;)
-    
+
     for i in self.catalogs:
         tmpel = ET.SubElement(catloc,i)
         ET.SubElement(tmpel,&#39;Directory&#39;,{&#39;path&#39;: self.catalogs[i]})
@@ -4343,14 +4627,14 @@ stoptime (float): (optional) end time of the clothoid
 
         &#34;&#34;&#34;
 
-        
+
         self.curvature = curvature
         self.curvature_change = curvature_change
         self.length = length
         if not isinstance(startposition,_PositionType):
             raise TypeError(&#39;position input is not a valid position&#39;)
         self.startposition = startposition
-        
+
         self.starttime = starttime
         self.stoptime = stoptime
         if (self.starttime == None and self.stoptime != None) or (self.starttime != None and self.stoptime == None):
@@ -4546,9 +4830,9 @@ weight (float): optional weight of the point
 
         &#34;&#34;&#34;
         retdict = {}
-        if self.time:
+        if self.time is not None:
             retdict[&#39;time&#39;] = str(self.time)
-        if self.weight:
+        if self.weight is not None:
             retdict[&#39;weight&#39;] = str(self.weight)
         return retdict
 
@@ -4580,9 +4864,9 @@ weight (float): optional weight of the point
 
     &#34;&#34;&#34;
     retdict = {}
-    if self.time:
+    if self.time is not None:
         retdict[&#39;time&#39;] = str(self.time)
-    if self.weight:
+    if self.weight is not None:
         retdict[&#39;weight&#39;] = str(self.weight)
     return retdict</code></pre>
 </details>
@@ -4693,7 +4977,7 @@ properties (Properties): properties of the Controller
         
         &#34;&#34;&#34;
         self.name = name
-        
+
         self.parameters = ParameterDeclarations()
         if not isinstance(properties,Properties):
             raise TypeError(&#39;properties input is not of type Properties&#39;)
@@ -4725,7 +5009,7 @@ properties (Properties): properties of the Controller
         cf.create_catalog(filename,catalogtype,description,author)
         cf.add_to_catalog(self)
         cf.dump()
-        
+
     def append_to_catalog(self,filename):
         &#34;&#34;&#34; adds the Controller to an existing catalog
 
@@ -4764,7 +5048,7 @@ properties (Properties): properties of the Controller
         element = ET.Element(&#39;Controller&#39;,attrib=self.get_attributes())
         element.append(self.parameters.get_element())
         element.append(self.properties.get_element())
-        
+
         return element</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -4894,7 +5178,7 @@ author (str): author of the catalog
     element = ET.Element(&#39;Controller&#39;,attrib=self.get_attributes())
     element.append(self.parameters.get_element())
     element.append(self.properties.get_element())
-    
+
     return element</code></pre>
 </details>
 </dd>
@@ -5125,7 +5409,7 @@ get_attributes()
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
-        
+
     def is_filled(self):
         &#34;&#34;&#34; is_filled check is any constraints are set
 
@@ -5143,11 +5427,11 @@ get_attributes()
 
         &#34;&#34;&#34;
         retdict = {}
-        if self.max_speed:
+        if self.max_speed is not None:
             retdict[&#39;maxSpeed&#39;] = str(self.max_speed)
-        if self.max_deceleration:
+        if self.max_deceleration is not None:
             retdict[&#39;maxDeceleration&#39;] = str(self.max_deceleration)
-        if self.max_acceleration:
+        if self.max_acceleration is not None:
             retdict[&#39;maxAcceleration&#39;] = str(self.max_acceleration)
         return retdict
 
@@ -5177,11 +5461,11 @@ get_attributes()
 
     &#34;&#34;&#34;
     retdict = {}
-    if self.max_speed:
+    if self.max_speed is not None:
         retdict[&#39;maxSpeed&#39;] = str(self.max_speed)
-    if self.max_deceleration:
+    if self.max_deceleration is not None:
         retdict[&#39;maxDeceleration&#39;] = str(self.max_deceleration)
-    if self.max_acceleration:
+    if self.max_acceleration is not None:
         retdict[&#39;maxAcceleration&#39;] = str(self.max_acceleration)
     return retdict</code></pre>
 </details>
@@ -5451,7 +5735,7 @@ parameters (ParameterDeclarations): the parameters to be used in the scenario
         if not isinstance(roadcondition,RoadCondition):
             raise TypeError(&#39;roadcondition input is not of type RoadCondition&#39;)
         if parameters is not None and not isinstance(parameters,ParameterDeclarations):
-            raise TypeError(&#39;parameters input is not of type ParameterDeclarations&#39;)    
+            raise TypeError(&#39;parameters input is not of type ParameterDeclarations&#39;)
         self.timeofday = timeofday
         self.weather = weather
         self.roadcondition = roadcondition
@@ -5483,7 +5767,7 @@ parameters (ParameterDeclarations): the parameters to be used in the scenario
         cf.create_catalog(filename,catalogtype,description,author)
         cf.add_to_catalog(self)
         cf.dump()
-        
+
     def append_to_catalog(self,filename):
         &#34;&#34;&#34; adds the environment to an existing catalog
 
@@ -5670,7 +5954,7 @@ get_attributes()
         self.author = author
         self._revMajor = 1
         self._revMinor = revMinor
-        self.version_minor = revMinor
+        self.setVersion(minor=revMinor)
         if license and not isinstance(license,License):
             raise TypeError(&#39;license is not of type License&#39;)
         self.license = license
@@ -5808,7 +6092,7 @@ get_attributes()
                 
         &#34;&#34;&#34;
 
-        self.visual_range = visual_range 
+        self.visual_range = visual_range
         self.bounding_box = bounding_box
 
 
@@ -5974,7 +6258,7 @@ spdxId (str): license identifier
         self.resource = resource
         self._revMajor = 1
         self.spdxId = spdxId
-        
+
     def __eq__(self,other):
         if isinstance(other,License):
             if self.get_attributes() == other.get_attributes():
@@ -5997,7 +6281,7 @@ spdxId (str): license identifier
         &#34;&#34;&#34; returns the elementTree of the License
 
         &#34;&#34;&#34;
-        if self.isVersion(0):
+        if self.isVersion(minor=0):
             raise OpenSCENARIOVersionError(&#39;License was introduced in OpenSCENARIO V1.1&#39;)
         element = ET.Element(&#39;License&#39;,attrib=self.get_attributes())
 
@@ -6044,7 +6328,7 @@ spdxId (str): license identifier
     &#34;&#34;&#34; returns the elementTree of the License
 
     &#34;&#34;&#34;
-    if self.isVersion(0):
+    if self.isVersion(minor=0):
         raise OpenSCENARIOVersionError(&#39;License was introduced in OpenSCENARIO V1.1&#39;)
     element = ET.Element(&#39;License&#39;,attrib=self.get_attributes())
 
@@ -6130,11 +6414,11 @@ get_attributes()
 
         &#34;&#34;&#34;
 
-        
+
         self.order = order
         self.controlpoints = []
         self.knots = []
-    
+
     def __eq__(self,other):
         if isinstance(other,Nurbs):
             if self.get_attributes() == other.get_attributes() and \
@@ -6181,7 +6465,7 @@ get_attributes()
             element.append(c.get_element())
         for k in self.knots:
             ET.SubElement(element,&#39;Knot&#39;,attrib={&#39;value&#39;:str(k)})
-        
+
 
         return element</code></pre>
 </details>
@@ -6275,7 +6559,7 @@ get_attributes()
         element.append(c.get_element())
     for k in self.knots:
         ET.SubElement(element,&#39;Knot&#39;,attrib={&#39;value&#39;:str(k)})
-    
+
 
     return element</code></pre>
 </details>
@@ -6390,37 +6674,37 @@ reference (ReferenceContext): absolute or relative
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
-        
+
     def is_filled(self):
         &#34;&#34;&#34; is_filled check is any orientations are  set
 
             Returns: boolean
 
         &#34;&#34;&#34;
-        if self.h or self.p or self.r or self.ref:
+        if self.h is not None or self.p is not None or self.r is not None or self.ref is not None:
             return True
         else:
             return False
-    
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the Orientation as a dict
 
         &#34;&#34;&#34;
         retdict = {}
-        if self.h:
+        if self.h is not None:
             retdict[&#39;h&#39;] = str(self.h)
 
-        if self.p:
+        if self.p is not None:
             retdict[&#39;p&#39;] = str(self.p)
 
-        if self.r:
+        if self.r is not None:
             retdict[&#39;r&#39;] = str(self.r)
 
-        if self.ref:
+        if self.ref is not None:
             retdict[&#39;type&#39;] = self.ref.get_name()
-        
+
         return retdict
-    
+
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the Orientation
 
@@ -6447,18 +6731,18 @@ reference (ReferenceContext): absolute or relative
 
     &#34;&#34;&#34;
     retdict = {}
-    if self.h:
+    if self.h is not None:
         retdict[&#39;h&#39;] = str(self.h)
 
-    if self.p:
+    if self.p is not None:
         retdict[&#39;p&#39;] = str(self.p)
 
-    if self.r:
+    if self.r is not None:
         retdict[&#39;r&#39;] = str(self.r)
 
-    if self.ref:
+    if self.ref is not None:
         retdict[&#39;type&#39;] = self.ref.get_name()
-    
+
     return retdict</code></pre>
 </details>
 </dd>
@@ -6495,7 +6779,7 @@ set</p>
         Returns: boolean
 
     &#34;&#34;&#34;
-    if self.h or self.p or self.r or self.ref:
+    if self.h is not None or self.p is not None or self.r is not None or self.ref is not None:
         return True
     else:
         return False</code></pre>
@@ -6574,7 +6858,7 @@ value (str): value of the parameter
                 Returns a dictionary of all attributes of the class
 
     &#34;&#34;&#34;
-    
+
     def __init__(self,name,parameter_type,value):
         &#34;&#34;&#34; initalize the Parameter 
 
@@ -6739,7 +7023,7 @@ value (str): assigned value of the parameter
         retdict[&#39;parameterRef&#39;] = self.parameterref
         retdict[&#39;value&#39;] = str(self.value)
         return retdict
-    
+
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the ParameterAssignment
 
@@ -6836,7 +7120,7 @@ add_parameter(Parameter)
             if self.parameters == other.parameters:
                 return True
         return False
-                
+
     def add_parameter(self,parameter):
         &#34;&#34;&#34; add_parameter adds a Parameter to the ParameterDeclarations
 
@@ -6849,7 +7133,7 @@ add_parameter(Parameter)
         if not isinstance(parameter,Parameter):
             raise TypeError(&#39;parameter input is not of type Parameter&#39;)
         self.parameters.append(parameter)
-    
+
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the ParameterDeclarations
 
@@ -6989,7 +7273,7 @@ duration (float): duration of the phase
             duration (float): duration of the phase
 
         &#34;&#34;&#34;
-        
+
         self.name = name
         self.duration = duration
         self.signalstates = []
@@ -7026,7 +7310,7 @@ duration (float): duration of the phase
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;Phase&#39;,attrib=self.get_attributes())
-        for s in self.signalstates: 
+        for s in self.signalstates:
             element.append(s.get_element())
         return element</code></pre>
 </details>
@@ -7096,7 +7380,7 @@ state (str): state of the signal defined in the road network
 
     &#34;&#34;&#34;
     element = ET.Element(&#39;Phase&#39;,attrib=self.get_attributes())
-    for s in self.signalstates: 
+    for s in self.signalstates:
         element.append(s.get_element())
     return element</code></pre>
 </details>
@@ -7296,7 +7580,7 @@ intensity (double): intensity of precipitation (0...1)
         &#34;&#34;&#34;
         if not hasattr(PrecipitationType,str(precipitation)):
             raise TypeError(&#39;precipitation input is not of type PrecipitationType&#39;)
-        self.precipitation = precipitation 
+        self.precipitation = precipitation
         self.intensity = intensity
 
     def __eq__(self,other):
@@ -7310,7 +7594,7 @@ intensity (double): intensity of precipitation (0...1)
         &#34;&#34;&#34;
         retdict = {}
         retdict[&#39;precipitationType&#39;] = self.precipitation.get_name()
-        if self.isVersion(0):
+        if self.isVersion(minor=0):
             retdict[&#39;intensity&#39;] = str(self.intensity)
         else:
             retdict[&#39;precipitationIntensity&#39;] = str(self.intensity)
@@ -7345,7 +7629,7 @@ intensity (double): intensity of precipitation (0...1)
     &#34;&#34;&#34;
     retdict = {}
     retdict[&#39;precipitationType&#39;] = self.precipitation.get_name()
-    if self.isVersion(0):
+    if self.isVersion(minor=0):
         retdict[&#39;intensity&#39;] = str(self.intensity)
     else:
         retdict[&#39;precipitationIntensity&#39;] = str(self.intensity)
@@ -7466,8 +7750,7 @@ get_element()
             ET.SubElement(element,&#39;Property&#39;,attrib={&#39;name&#39;:p[0],&#39;value&#39;:p[1]})
         for f in self.files:
             ET.SubElement(element,&#39;File&#39;,attrib={&#39;filepath&#39;:f})
-        
-        
+
         return element</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -7545,9 +7828,166 @@ value (str): value of the property
         ET.SubElement(element,&#39;Property&#39;,attrib={&#39;name&#39;:p[0],&#39;value&#39;:p[1]})
     for f in self.files:
         ET.SubElement(element,&#39;File&#39;,attrib={&#39;filepath&#39;:f})
-    
-    
+
     return element</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="scenariogeneration.xosc.utils.RelativeSpeedToMaster"><code class="flex name class">
+<span>class <span class="ident">RelativeSpeedToMaster</span></span>
+<span>(</span><span>value, speedTargetValueType, steadyState=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><h2 id="parameters">Parameters</h2>
+<pre><code>value (double): Relative speed. Unit: m/s.
+
+speedTargetValueType (SpeedTargetValueType): The semantics of the value (delta, offset, factor).
+
+steadyState (TargetTimeSteadyState / TargetDistanceSteadyState): Optional final phase of constant (final) speed. (Valid from OpenSCENARIO V1.1)
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>value (double): Relative speed. Unit: m/s.
+
+speedTargetValueType (SpeedTargetValueType): The semantics of the value (delta, offset, factor).
+
+steadyState (TargetTimeSteadyState / TargetDistanceSteadyState): Optional final phase of constant (final) speed. (Valid from OpenSCENARIO V1.1)
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element()
+    Returns the full ElementTree of the class
+get_attributes()
+    Returns the attributes of the class
+</code></pre>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>value (double): Relative speed. Unit: m/s.
+
+speedTargetValueType (SpeedTargetValueType): The semantics of the value (delta, offset, factor).
+
+steadyState (TargetTimeSteadyState / TargetDistanceSteadyState): Optional final phase of constant (final) speed.
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class RelativeSpeedToMaster(VersionBase):
+    &#34;&#34;&#34;
+        Parameters
+        ----------
+            value (double): Relative speed. Unit: m/s.
+            
+            speedTargetValueType (SpeedTargetValueType): The semantics of the value (delta, offset, factor).
+            
+            steadyState (TargetTimeSteadyState / TargetDistanceSteadyState): Optional final phase of constant (final) speed. (Valid from OpenSCENARIO V1.1)
+
+        Attributes
+        ----------
+            value (double): Relative speed. Unit: m/s.
+            
+            speedTargetValueType (SpeedTargetValueType): The semantics of the value (delta, offset, factor).
+            
+            steadyState (TargetTimeSteadyState / TargetDistanceSteadyState): Optional final phase of constant (final) speed. (Valid from OpenSCENARIO V1.1)
+
+        Methods
+        -------
+            get_element()
+                Returns the full ElementTree of the class
+            get_attributes()
+                Returns the attributes of the class
+    &#34;&#34;&#34;
+    def __init__(self, value, speedTargetValueType, steadyState=None):
+        &#34;&#34;&#34;
+
+        Parameters
+        ----------
+            value (double): Relative speed. Unit: m/s.
+            
+            speedTargetValueType (SpeedTargetValueType): The semantics of the value (delta, offset, factor).
+            
+            steadyState (TargetTimeSteadyState / TargetDistanceSteadyState): Optional final phase of constant (final) speed.
+        &#34;&#34;&#34;
+        self.value = value
+        if steadyState:
+            if not (isinstance(steadyState, TargetTimeSteadyState) or isinstance(steadyState,
+                                                                                 TargetDistanceSteadyState)):
+                raise TypeError(&#39;steadyState input is not an TargetTimeSteadyState or TargetDistanceSteadyState input&#39;)
+        self.steadyState = steadyState
+        if not speedTargetValueType.classname == &#34;SpeedTargetValueType&#34;:
+            raise TypeError(&#39;speedTargetValueType input is not a valid SpeedTargetValueType&#39;)
+        self.speedTargetValueType = speedTargetValueType
+
+    def __eq__(self,other):
+        if isinstance(other,RelativeSpeedToMaster):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+
+    def get_attributes(self):
+        &#34;&#34;&#34; returns the attributes of the RelativeSpeedToMaster
+
+        &#34;&#34;&#34;
+        return {&#39;speedTargetValueType&#39;: str(self.speedTargetValueType), &#39;value&#39;: str(self.value)}
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the RelativeSpeedToMaster
+
+        &#34;&#34;&#34;
+        if self.isVersion(minor=0):
+            raise OpenSCENARIOVersionError(&#39;RelativeSpeedToMaster was introduced in OpenSCENARIO V1.1&#39;)
+        elementFinalSpeed = ET.Element(&#39;FinalSpeed&#39;)
+        elementRelativeSpeed = ET.SubElement(elementFinalSpeed, &#39;RelativeSpeedToMaster&#39;, attrib=self.get_attributes())
+        if self.steadyState:
+            if self.isVersion(1, 0):
+                raise OpenSCENARIOVersionError(&#39;steadyState was introduced in OpenSCENARIO V1.1&#39;)
+            ET.SubElement(elementRelativeSpeed, self.steadyState.__class__.__name__,
+                          attrib=self.steadyState.get_attributes())
+        return elementFinalSpeed</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.utils.RelativeSpeedToMaster.get_attributes"><code class="name flex">
+<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the attributes of the RelativeSpeedToMaster</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_attributes(self):
+    &#34;&#34;&#34; returns the attributes of the RelativeSpeedToMaster
+
+    &#34;&#34;&#34;
+    return {&#39;speedTargetValueType&#39;: str(self.speedTargetValueType), &#39;value&#39;: str(self.value)}</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xosc.utils.RelativeSpeedToMaster.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the elementTree of the RelativeSpeedToMaster</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self):
+    &#34;&#34;&#34; returns the elementTree of the RelativeSpeedToMaster
+
+    &#34;&#34;&#34;
+    if self.isVersion(minor=0):
+        raise OpenSCENARIOVersionError(&#39;RelativeSpeedToMaster was introduced in OpenSCENARIO V1.1&#39;)
+    elementFinalSpeed = ET.Element(&#39;FinalSpeed&#39;)
+    elementRelativeSpeed = ET.SubElement(elementFinalSpeed, &#39;RelativeSpeedToMaster&#39;, attrib=self.get_attributes())
+    if self.steadyState:
+        if self.isVersion(1, 0):
+            raise OpenSCENARIOVersionError(&#39;steadyState was introduced in OpenSCENARIO V1.1&#39;)
+        ET.SubElement(elementRelativeSpeed, self.steadyState.__class__.__name__,
+                      attrib=self.steadyState.get_attributes())
+    return elementFinalSpeed</code></pre>
 </details>
 </dd>
 </dl>
@@ -7623,7 +8063,7 @@ properties (Properties): properties of the roadcondition
                     Default: None
                 
         &#34;&#34;&#34;
-        self.friction_scale_factor = friction_scale_factor 
+        self.friction_scale_factor = friction_scale_factor
         if properties is not None and not isinstance(properties,Properties):
             raise TypeError(&#39;properties input is not of type Properties&#39;)
         self.properties = properties
@@ -7809,7 +8249,7 @@ closed (boolean): if the waypoints forms a loop
             self.waypoints == other.waypoints:
                 return True
         return False
-        
+
     def dump_to_catalog(self,filename,catalogtype,description,author):
         &#34;&#34;&#34; dump_to_catalog creates a new catalog and adds the Controller to it
             
@@ -7828,7 +8268,7 @@ closed (boolean): if the waypoints forms a loop
         cf.create_catalog(filename,catalogtype,description,author)
         cf.add_to_catalog(self)
         cf.dump()
-        
+
     def append_to_catalog(self,filename):
         &#34;&#34;&#34; adds the Controller to an existing catalog
 
@@ -8134,7 +8574,7 @@ elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
                 
         &#34;&#34;&#34;
 
-        self.azimuth = azimuth 
+        self.azimuth = azimuth
         self.intensity = intensity
         self.elevation = elevation
 
@@ -8212,7 +8652,8 @@ elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
 <span>(</span><span>distance)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>the TargetDistanceSteadyState describes a SteadyState of type TargetDistanceSteadyState</p>
+<div class="desc"><p>the TargetDistanceSteadyState describes a SteadyState of type TargetDistanceSteadyState
+(Valid from OpenSCENARIO V1.1)</p>
 <h2 id="parameters">Parameters</h2>
 <pre><code>distance (double): distance to target for the steady state
 </code></pre>
@@ -8233,7 +8674,8 @@ elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
 </summary>
 <pre><code class="python">class TargetDistanceSteadyState(VersionBase):
     &#34;&#34;&#34; the TargetDistanceSteadyState describes a SteadyState of type TargetDistanceSteadyState
-
+        (Valid from OpenSCENARIO V1.1)
+        
         Parameters
         ----------
             distance (double): distance to target for the steady state
@@ -8257,7 +8699,6 @@ elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
         
         &#34;&#34;&#34;
         self.distance = distance
-        
 
     def __eq__(self,other):
         if isinstance(other,TargetDistanceSteadyState):
@@ -8269,17 +8710,17 @@ elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
         &#34;&#34;&#34; returns the attributes of the TargetDistanceSteadyState
         
         &#34;&#34;&#34;
+        if self.isVersion(1, 0):
+            raise OpenSCENARIOVersionError(&#39;TargetDistanceSteadyState was introduced in OpenSCENARIO V1.1&#39;)
         return {&#39;distance&#39;:str(self.distance)}
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the TargetDistanceSteadyState
 
         &#34;&#34;&#34;
-        if self.isVersion(0):
+        if self.isVersion(1, 0):
             raise OpenSCENARIOVersionError(&#39;TargetDistanceSteadyState was introduced in OpenSCENARIO V1.1&#39;)
-        element = ET.Element(&#39;SteadyState&#39;)
-        ET.SubElement(element,&#39;TargetDistanceSteadyState&#39;,attrib=self.get_attributes())
-        return element</code></pre>
+        return ET.Element(&#39;TargetDistanceSteadyState&#39;,attrib=self.get_attributes())</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -8300,6 +8741,8 @@ elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
     &#34;&#34;&#34; returns the attributes of the TargetDistanceSteadyState
     
     &#34;&#34;&#34;
+    if self.isVersion(1, 0):
+        raise OpenSCENARIOVersionError(&#39;TargetDistanceSteadyState was introduced in OpenSCENARIO V1.1&#39;)
     return {&#39;distance&#39;:str(self.distance)}</code></pre>
 </details>
 </dd>
@@ -8316,11 +8759,9 @@ elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
     &#34;&#34;&#34; returns the elementTree of the TargetDistanceSteadyState
 
     &#34;&#34;&#34;
-    if self.isVersion(0):
+    if self.isVersion(1, 0):
         raise OpenSCENARIOVersionError(&#39;TargetDistanceSteadyState was introduced in OpenSCENARIO V1.1&#39;)
-    element = ET.Element(&#39;SteadyState&#39;)
-    ET.SubElement(element,&#39;TargetDistanceSteadyState&#39;,attrib=self.get_attributes())
-    return element</code></pre>
+    return ET.Element(&#39;TargetDistanceSteadyState&#39;,attrib=self.get_attributes())</code></pre>
 </details>
 </dd>
 </dl>
@@ -8330,7 +8771,8 @@ elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
 <span>(</span><span>time_gap)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>the TargetTimeSteadyState describes a SteadyState of type TargetTimeSteadyState</p>
+<div class="desc"><p>the TargetTimeSteadyState describes a SteadyState of type TargetTimeSteadyState
+(Valid from OpenSCENARIO V1.1)</p>
 <h2 id="parameters">Parameters</h2>
 <pre><code>time_gap (double): time_gap to target for the steady state
 </code></pre>
@@ -8351,7 +8793,8 @@ elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
 </summary>
 <pre><code class="python">class TargetTimeSteadyState(VersionBase):
     &#34;&#34;&#34; the TargetTimeSteadyState describes a SteadyState of type TargetTimeSteadyState
-
+        (Valid from OpenSCENARIO V1.1)
+        
         Parameters
         ----------
             time_gap (double): time_gap to target for the steady state
@@ -8375,7 +8818,6 @@ elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
         
         &#34;&#34;&#34;
         self.time_gap = time_gap
-        
 
     def __eq__(self,other):
         if isinstance(other,TargetTimeSteadyState):
@@ -8387,17 +8829,17 @@ elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
         &#34;&#34;&#34; returns the attributes of the TargetTimeSteadyState
         
         &#34;&#34;&#34;
+        if self.isVersion(1, 0):
+            raise OpenSCENARIOVersionError(&#39;TargetTimeSteadyState was introduced in OpenSCENARIO V1.1&#39;)
         return {&#39;time&#39;:str(self.time_gap)}
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the TargetTimeSteadyState
 
         &#34;&#34;&#34;
-        if self.isVersion(0):
+        if self.isVersion(1, 0):
             raise OpenSCENARIOVersionError(&#39;TargetTimeSteadyState was introduced in OpenSCENARIO V1.1&#39;)
-        element = ET.Element(&#39;SteadyState&#39;)
-        ET.SubElement(element,&#39;TargetTimeSteadyState&#39;,attrib=self.get_attributes())
-        return element</code></pre>
+        return ET.Element(&#39;TargetTimeSteadyState&#39;,attrib=self.get_attributes())</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -8418,6 +8860,8 @@ elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
     &#34;&#34;&#34; returns the attributes of the TargetTimeSteadyState
     
     &#34;&#34;&#34;
+    if self.isVersion(1, 0):
+        raise OpenSCENARIOVersionError(&#39;TargetTimeSteadyState was introduced in OpenSCENARIO V1.1&#39;)
     return {&#39;time&#39;:str(self.time_gap)}</code></pre>
 </details>
 </dd>
@@ -8434,11 +8878,9 @@ elevation (double): sun elevation angle 0 x/y plane, pi/2 zenith
     &#34;&#34;&#34; returns the elementTree of the TargetTimeSteadyState
 
     &#34;&#34;&#34;
-    if self.isVersion(0):
+    if self.isVersion(1, 0):
         raise OpenSCENARIOVersionError(&#39;TargetTimeSteadyState was introduced in OpenSCENARIO V1.1&#39;)
-    element = ET.Element(&#39;SteadyState&#39;)
-    ET.SubElement(element,&#39;TargetTimeSteadyState&#39;,attrib=self.get_attributes())
-    return element</code></pre>
+    return ET.Element(&#39;TargetTimeSteadyState&#39;,attrib=self.get_attributes())</code></pre>
 </details>
 </dd>
 </dl>
@@ -8571,7 +9013,7 @@ second (int): second
                 second (int): second   
                 
         &#34;&#34;&#34;
-        self.animation = animation 
+        self.animation = animation
         self.year = year
         self.month = month
         self.day = day
@@ -8730,11 +9172,11 @@ Default: None</p></div>
             raise ValueError(&#39;missing inputs for time reference&#39;)
         if reference_domain is not None and not hasattr(ReferenceContext,str(reference_domain)):
             raise TypeError(&#39;input reference_domain is not of type ReferenceContext&#39;)
-        
+
         self.reference_domain = reference_domain
         self.scale = scale
         self.offset = offset
-    
+
     def __eq__(self,other):
         if isinstance(other,TimeReference):
             if not self._only_nones and not other._only_nones:
@@ -8764,7 +9206,7 @@ Default: None</p></div>
             ET.SubElement(element,&#39;None&#39;)
         else:
             ET.SubElement(element,&#39;Timing&#39;,self.get_attributes())
-        
+
         return element</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -8812,7 +9254,7 @@ Default: None</p></div>
         ET.SubElement(element,&#39;None&#39;)
     else:
         ET.SubElement(element,&#39;Timing&#39;,self.get_attributes())
-    
+
     return element</code></pre>
 </details>
 </dd>
@@ -8903,14 +9345,14 @@ add_controller(controller,weight)
         ----------
             name (str): name of the traffic definition
 
-        &#34;&#34;&#34;            
-        
+        &#34;&#34;&#34;
+
         self.name = name
-        self.vehicleweights = [] 
-        self.vehiclecategories = [] 
+        self.vehicleweights = []
+        self.vehiclecategories = []
         self.controllerweights = []
         self.controllers = []
-        
+
 
     def __eq__(self,other):
         if isinstance(other,TrafficDefinition):
@@ -8951,7 +9393,7 @@ add_controller(controller,weight)
             raise TypeError(&#39;controller input not of type Controller or CatalogReference&#39;)
         self.controllers.append(controller)
         self.controllerweights.append(weight)
-    
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the TrafficDefinition
         
@@ -8968,9 +9410,9 @@ add_controller(controller,weight)
             ValueError(&#39;No controllers defined for the TrafficDefinition&#39;)
         if not self.vehiclecategories:
             ValueError(&#39;No Vehicles defined for the TrafficDefinition&#39;)
-                
+
         element = ET.Element(&#39;TrafficDefinition&#39;,attrib=self.get_attributes())
-        
+
         veh_element = ET.SubElement(element,&#39;VehicleCategoryDistribution&#39;)
         for i in range(len(self.vehiclecategories)):
             ET.SubElement(veh_element,&#39;VehicleCategoryDistributionEntry&#39;,attrib={&#39;category&#39;: self.vehiclecategories[i].get_name(),&#39;weight&#39;: str(self.vehicleweights[i])})
@@ -9083,9 +9525,9 @@ weight (float): the corresponding weight for the distribution of the vehicle cat
         ValueError(&#39;No controllers defined for the TrafficDefinition&#39;)
     if not self.vehiclecategories:
         ValueError(&#39;No Vehicles defined for the TrafficDefinition&#39;)
-            
+
     element = ET.Element(&#39;TrafficDefinition&#39;,attrib=self.get_attributes())
-    
+
     veh_element = ET.SubElement(element,&#39;VehicleCategoryDistribution&#39;)
     for i in range(len(self.vehiclecategories)):
         ET.SubElement(veh_element,&#39;VehicleCategoryDistributionEntry&#39;,attrib={&#39;category&#39;: self.vehiclecategories[i].get_name(),&#39;weight&#39;: str(self.vehicleweights[i])})
@@ -9195,7 +9637,7 @@ reference (string): id to the controller in the RoadNetwork
                 Default: None
 
         &#34;&#34;&#34;
-        
+
         self.name = name
         self.delay = delay
         self.reference = reference
@@ -9225,7 +9667,7 @@ reference (string): id to the controller in the RoadNetwork
         &#34;&#34;&#34;
         retdict = {}
         retdict[&#39;name&#39;] = self.name
-        if self.delay:
+        if self.delay is not None:
             retdict[&#39;delay&#39;] = str(self.delay)
         if self.reference:
             retdict[&#39;reference&#39;] = self.reference
@@ -9236,7 +9678,7 @@ reference (string): id to the controller in the RoadNetwork
 
         &#34;&#34;&#34;
         element = ET.Element(&#39;TrafficSignalController&#39;,attrib=self.get_attributes())
-        for ph in self.phases: 
+        for ph in self.phases:
             element.append(ph.get_element())
         return element</code></pre>
 </details>
@@ -9286,7 +9728,7 @@ reference (string): id to the controller in the RoadNetwork
     &#34;&#34;&#34;
     retdict = {}
     retdict[&#39;name&#39;] = self.name
-    if self.delay:
+    if self.delay is not None:
         retdict[&#39;delay&#39;] = str(self.delay)
     if self.reference:
         retdict[&#39;reference&#39;] = self.reference
@@ -9307,7 +9749,7 @@ reference (string): id to the controller in the RoadNetwork
 
     &#34;&#34;&#34;
     element = ET.Element(&#39;TrafficSignalController&#39;,attrib=self.get_attributes())
-    for ph in self.phases: 
+    for ph in self.phases:
         element.append(ph.get_element())
     return element</code></pre>
 </details>
@@ -9446,7 +9888,7 @@ get_attributes()
         cf.create_catalog(filename,catalogtype,description,author)
         cf.add_to_catalog(self)
         cf.dump()
-        
+
     def append_to_catalog(self,filename):
         &#34;&#34;&#34; adds the Controller to an existing catalog
 
@@ -9745,7 +10187,7 @@ value (float): the value of the dynamics (time rate or distance)
         &#34;&#34;&#34;
         if not hasattr(DynamicsShapes,str(shape)):
             raise TypeError(shape + &#39;; is not a valid shape.&#39;)
-        
+
         self.shape = shape
         if not hasattr(DynamicsDimension,str(dimension)):
             raise ValueError(dimension + &#39; is not a valid dynamics dimension&#39;)
@@ -9757,7 +10199,7 @@ value (float): the value of the dynamics (time rate or distance)
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
-        
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the TransitionDynamics as a dict
 
@@ -10121,7 +10563,7 @@ wind (Wind): the wind (valid from OpenSCENARIO V1.1)
         self.sun = sun
         self.wind = wind
         self.precipitation = precipitation
-        
+
 
     def __eq__(self,other):
         if isinstance(other,Weather):
@@ -10129,7 +10571,7 @@ wind (Wind): the wind (valid from OpenSCENARIO V1.1)
             self.fog == other.fog and \
             self.wind == other.wind and \
             self.sun == other.sun and \
-            self.precipitation == other.precipitation:                
+            self.precipitation == other.precipitation:
                 return True
         return False
 
@@ -10140,13 +10582,13 @@ wind (Wind): the wind (valid from OpenSCENARIO V1.1)
         retdict = {}
         if self.cloudstate:
             retdict[&#39;cloudState&#39;] = self.cloudstate.get_name()
-        if self.temperature and not self.isVersion(0):
+        if self.temperature is not None and not self.isVersion(minor=0):
             retdict[&#39;temperature&#39;] = str(self.temperature)
-        elif self.temperature and self.isVersion(0):
+        elif self.temperature is not None and self.isVersion(minor=0):
             raise OpenSCENARIOVersionError(&#39;temperature was introduced in OpenSCENARIO V1.1&#39;)
-        if self.atmosphericPressure and not self.isVersion(0):
+        if self.atmosphericPressure is not None and not self.isVersion(minor=0):
             retdict[&#39;atmosphericPressure&#39;] = str(self.atmosphericPressure)
-        elif self.atmosphericPressure and self.isVersion(0):
+        elif self.atmosphericPressure is not None and self.isVersion(minor=0):
             raise OpenSCENARIOVersionError(&#39;atmosphericPressure was introduced in OpenSCENARIO V1.1&#39;)
         return retdict
 
@@ -10156,15 +10598,14 @@ wind (Wind): the wind (valid from OpenSCENARIO V1.1)
         &#34;&#34;&#34;
         element = ET.Element(&#39;Weather&#39;,attrib=self.get_attributes())
         if self.sun:
-            print(self.sun)
             element.append(self.sun.get_element())
         if self.fog:
             element.append(self.fog.get_element())
         if self.precipitation:
             element.append(self.precipitation.get_element())
-        if self.wind and not self.isVersion(0):
+        if self.wind and not self.isVersion(minor=0):
             element.append(self.wind.get_element())
-        if self.wind and self.isVersion(0):
+        if self.wind and self.isVersion(minor=0):
             raise OpenSCENARIOVersionError(&#39;Wind was introduced in OpenSCENARIO V1.1&#39;)
         return element</code></pre>
 </details>
@@ -10190,13 +10631,13 @@ wind (Wind): the wind (valid from OpenSCENARIO V1.1)
     retdict = {}
     if self.cloudstate:
         retdict[&#39;cloudState&#39;] = self.cloudstate.get_name()
-    if self.temperature and not self.isVersion(0):
+    if self.temperature is not None and not self.isVersion(minor=0):
         retdict[&#39;temperature&#39;] = str(self.temperature)
-    elif self.temperature and self.isVersion(0):
+    elif self.temperature is not None and self.isVersion(minor=0):
         raise OpenSCENARIOVersionError(&#39;temperature was introduced in OpenSCENARIO V1.1&#39;)
-    if self.atmosphericPressure and not self.isVersion(0):
+    if self.atmosphericPressure is not None and not self.isVersion(minor=0):
         retdict[&#39;atmosphericPressure&#39;] = str(self.atmosphericPressure)
-    elif self.atmosphericPressure and self.isVersion(0):
+    elif self.atmosphericPressure is not None and self.isVersion(minor=0):
         raise OpenSCENARIOVersionError(&#39;atmosphericPressure was introduced in OpenSCENARIO V1.1&#39;)
     return retdict</code></pre>
 </details>
@@ -10216,15 +10657,14 @@ wind (Wind): the wind (valid from OpenSCENARIO V1.1)
     &#34;&#34;&#34;
     element = ET.Element(&#39;Weather&#39;,attrib=self.get_attributes())
     if self.sun:
-        print(self.sun)
         element.append(self.sun.get_element())
     if self.fog:
         element.append(self.fog.get_element())
     if self.precipitation:
         element.append(self.precipitation.get_element())
-    if self.wind and not self.isVersion(0):
+    if self.wind and not self.isVersion(minor=0):
         element.append(self.wind.get_element())
-    if self.wind and self.isVersion(0):
+    if self.wind and self.isVersion(minor=0):
         raise OpenSCENARIOVersionError(&#39;Wind was introduced in OpenSCENARIO V1.1&#39;)
     return element</code></pre>
 </details>
@@ -10298,7 +10738,7 @@ speed (float): wind speed (m/s)
                 speed (float): wind speed (m/s)
                 
         &#34;&#34;&#34;
-        self.direction = direction 
+        self.direction = direction
         self.speed = speed
 
     def __eq__(self,other):
@@ -10384,6 +10824,13 @@ speed (float): wind speed (m/s)
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
+<li>
+<h4><code><a title="scenariogeneration.xosc.utils.AbsoluteSpeed" href="#scenariogeneration.xosc.utils.AbsoluteSpeed">AbsoluteSpeed</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xosc.utils.AbsoluteSpeed.get_attributes" href="#scenariogeneration.xosc.utils.AbsoluteSpeed.get_attributes">get_attributes</a></code></li>
+<li><code><a title="scenariogeneration.xosc.utils.AbsoluteSpeed.get_element" href="#scenariogeneration.xosc.utils.AbsoluteSpeed.get_element">get_element</a></code></li>
+</ul>
+</li>
 <li>
 <h4><code><a title="scenariogeneration.xosc.utils.BoundingBox" href="#scenariogeneration.xosc.utils.BoundingBox">BoundingBox</a></code></h4>
 <ul class="">
@@ -10562,6 +11009,13 @@ speed (float): wind speed (m/s)
 <li><code><a title="scenariogeneration.xosc.utils.Properties.add_file" href="#scenariogeneration.xosc.utils.Properties.add_file">add_file</a></code></li>
 <li><code><a title="scenariogeneration.xosc.utils.Properties.add_property" href="#scenariogeneration.xosc.utils.Properties.add_property">add_property</a></code></li>
 <li><code><a title="scenariogeneration.xosc.utils.Properties.get_element" href="#scenariogeneration.xosc.utils.Properties.get_element">get_element</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xosc.utils.RelativeSpeedToMaster" href="#scenariogeneration.xosc.utils.RelativeSpeedToMaster">RelativeSpeedToMaster</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xosc.utils.RelativeSpeedToMaster.get_attributes" href="#scenariogeneration.xosc.utils.RelativeSpeedToMaster.get_attributes">get_attributes</a></code></li>
+<li><code><a title="scenariogeneration.xosc.utils.RelativeSpeedToMaster.get_element" href="#scenariogeneration.xosc.utils.RelativeSpeedToMaster.get_element">get_element</a></code></li>
 </ul>
 </li>
 <li>

@@ -44,7 +44,11 @@ class VersionBase():
     version_minor = _MINOR_VERSION
 
     def isVersion(self,major=1,minor=1):
-        return major == self.version_major and minor == self.version_minor
+        return major &gt;= self.version_major and minor &gt;= self.version_minor
+    
+    def setVersion(self,major=1,minor=0):
+        VersionBase.version_major = major
+        VersionBase.version_minor = minor
 
 class _OscEnum(VersionBase):
     &#34;&#34;&#34; custom &#34;enum&#34; class to be able to handle different versions of the enums in OpenSCENARIO
@@ -1274,7 +1278,11 @@ class LongitudinalDisplacement():
     version_minor = _MINOR_VERSION
 
     def isVersion(self,major=1,minor=1):
-        return major == self.version_major and minor == self.version_minor</code></pre>
+        return major &gt;= self.version_major and minor &gt;= self.version_minor
+    
+    def setVersion(self,major=1,minor=0):
+        VersionBase.version_major = major
+        VersionBase.version_minor = minor</code></pre>
 </details>
 <h3>Subclasses</h3>
 <ul class="hlist">
@@ -1289,6 +1297,7 @@ class LongitudinalDisplacement():
 <li><a title="scenariogeneration.xosc.scenario.RoadNetwork" href="scenario.html#scenariogeneration.xosc.scenario.RoadNetwork">RoadNetwork</a></li>
 <li><a title="scenariogeneration.xosc.storyboard.Event" href="storyboard.html#scenariogeneration.xosc.storyboard.Event">Event</a></li>
 <li><a title="scenariogeneration.xosc.triggers.TriggeringEntities" href="triggers.html#scenariogeneration.xosc.triggers.TriggeringEntities">TriggeringEntities</a></li>
+<li><a title="scenariogeneration.xosc.utils.AbsoluteSpeed" href="utils.html#scenariogeneration.xosc.utils.AbsoluteSpeed">AbsoluteSpeed</a></li>
 <li><a title="scenariogeneration.xosc.utils.BoundingBox" href="utils.html#scenariogeneration.xosc.utils.BoundingBox">BoundingBox</a></li>
 <li><a title="scenariogeneration.xosc.utils.Catalog" href="utils.html#scenariogeneration.xosc.utils.Catalog">Catalog</a></li>
 <li><a title="scenariogeneration.xosc.utils.CatalogFile" href="utils.html#scenariogeneration.xosc.utils.CatalogFile">CatalogFile</a></li>
@@ -1313,6 +1322,7 @@ class LongitudinalDisplacement():
 <li><a title="scenariogeneration.xosc.utils.Polyline" href="utils.html#scenariogeneration.xosc.utils.Polyline">Polyline</a></li>
 <li><a title="scenariogeneration.xosc.utils.Precipitation" href="utils.html#scenariogeneration.xosc.utils.Precipitation">Precipitation</a></li>
 <li><a title="scenariogeneration.xosc.utils.Properties" href="utils.html#scenariogeneration.xosc.utils.Properties">Properties</a></li>
+<li><a title="scenariogeneration.xosc.utils.RelativeSpeedToMaster" href="utils.html#scenariogeneration.xosc.utils.RelativeSpeedToMaster">RelativeSpeedToMaster</a></li>
 <li><a title="scenariogeneration.xosc.utils.RoadCondition" href="utils.html#scenariogeneration.xosc.utils.RoadCondition">RoadCondition</a></li>
 <li><a title="scenariogeneration.xosc.utils.Route" href="utils.html#scenariogeneration.xosc.utils.Route">Route</a></li>
 <li><a title="scenariogeneration.xosc.utils.Sun" href="utils.html#scenariogeneration.xosc.utils.Sun">Sun</a></li>
@@ -1357,7 +1367,21 @@ class LongitudinalDisplacement():
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def isVersion(self,major=1,minor=1):
-    return major == self.version_major and minor == self.version_minor</code></pre>
+    return major &gt;= self.version_major and minor &gt;= self.version_minor</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VersionBase.setVersion"><code class="name flex">
+<span>def <span class="ident">setVersion</span></span>(<span>self, major=1, minor=0)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def setVersion(self,major=1,minor=0):
+    VersionBase.version_major = major
+    VersionBase.version_minor = minor</code></pre>
 </details>
 </dd>
 </dl>
@@ -1605,6 +1629,7 @@ class LongitudinalDisplacement():
 <h4><code><a title="scenariogeneration.xosc.enumerations.VersionBase" href="#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></code></h4>
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.enumerations.VersionBase.isVersion" href="#scenariogeneration.xosc.enumerations.VersionBase.isVersion">isVersion</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VersionBase.setVersion" href="#scenariogeneration.xosc.enumerations.VersionBase.setVersion">setVersion</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.VersionBase.version_major" href="#scenariogeneration.xosc.enumerations.VersionBase.version_major">version_major</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.VersionBase.version_minor" href="#scenariogeneration.xosc.enumerations.VersionBase.version_minor">version_minor</a></code></li>
 </ul>

@@ -28,6 +28,7 @@
 <pre><code class="python">&#34;&#34;&#34; helpers contains a launcher of esmini and a simple print function for the xmls
 
 &#34;&#34;&#34;
+from genericpath import exists
 import xml.etree.ElementTree as ET
 import xml.dom.minidom as mini
 import os
@@ -45,6 +46,8 @@ def esmini(generator,esminipath=&#39;esmini&#39;,
     args = &#39;&#39;,
     index_to_run= &#39;first&#39;,
     run_with_replayer = False,
+    generation_path = &#39;generated&#39;,
+    resource_path = None,
     timestep = 0.01,
     car_density = 15):
     &#34;&#34;&#34; write a scenario and runs it in esminis OpenDriveViewer with some random traffic
@@ -59,8 +62,8 @@ def esmini(generator,esminipath=&#39;esmini&#39;,
             window_size (str): sets the window size of the esmini viewer 
                 Default: 60 60 800 400
 
-            save_osi (bool): if an .osi file should be saved
-                Default: False
+            save_osi (str): name of the wanted osi file (None will not create a osi file)
+                Default: None
 
             record (str): name of a esmini .dat file should be saved
                 Default: &#39;&#39; (no recording)
@@ -77,24 +80,44 @@ def esmini(generator,esminipath=&#39;esmini&#39;,
             run_with_replayer (bool): bool to run esmini in headless mode and then run the viewer afterwards (only used for scenarios not for roads)
                 Default: False
 
+            generation_path (str): path to where the files should be generated
+                Default: generated
+
+            resource_path (str): path to the catalogs/xodrs that you want to add (relative path in scenario should be relative to this one)
+                Default: esminipath/resources/xosc
+
             timestep (double): fixed timestep to use in combination with replayer
 
             car_density (int): density of fictious cars (used only for pure OpenDRIVE cases)
 
     &#34;&#34;&#34;
     additional_args = &#39;&#39;
-    resource_path = os.path.join(esminipath,&#39;resources&#39;)
+    # resource_path = os.path.join(esminipath,&#39;resources&#39;)
+    if not resource_path:
+        resource_path = os.path.join(esminipath,&#39;resources&#39;,&#39;xosc&#39;)
     # genereate file for running in esmini, and set some esmini replated parameters
     if isinstance(generator,OpenDrive):
+        if not os.path.exists(generation_path):
+            os.mkdir(generation_path)
+        if not os.path.exists(os.path.join(generation_path,&#39;xosc&#39;)):
+            os.mkdir(os.path.join(generation_path,&#39;xosc&#39;))
+        if not os.path.exists(os.path.join(generation_path,&#39;xodr&#39;)):
+            os.mkdir(os.path.join(generation_path,&#39;xodr&#39;))
         executable = &#39;odrviewer&#39;
         filetype = &#39; --odr &#39;
         additional_args += &#39; --density &#39; + str(car_density)
         additional_args += &#39; --window &#39;+ window_size
         run_with_replayer = False
-        filename = os.path.join(resource_path,&#39;xodr&#39;,&#39;python_road.xodr&#39;)
+        filename = os.path.join(generation_path,&#39;xodr&#39;,&#39;python_road.xodr&#39;)
         generator.write_xml(filename,True)
 
     elif isinstance(generator,Scenario):
+        if not os.path.exists(generation_path):
+            os.mkdir(generation_path)
+        if not os.path.exists(os.path.join(generation_path,&#39;xosc&#39;)):
+            os.mkdir(os.path.join(generation_path,&#39;xosc&#39;))
+        if not os.path.exists(os.path.join(generation_path,&#39;xodr&#39;)):
+            os.mkdir(os.path.join(generation_path,&#39;xodr&#39;))
         executable = &#39;esmini&#39;
         filetype = &#39; --osc &#39;
         if run_with_replayer:
@@ -104,11 +127,11 @@ def esmini(generator,esminipath=&#39;esmini&#39;,
         else:
             additional_args += &#39; --window &#39;+ window_size
 
-        filename = os.path.join(resource_path,&#39;xosc&#39;,&#39;python_scenario.xosc&#39;)
+        filename = os.path.join(generation_path,&#39;xosc&#39;,&#39;python_scenario.xosc&#39;)
         generator.write_xml(filename)
 
     elif isinstance(generator,ScenarioGenerator):
-        scenario_file, road_file = generator.generate_single(resource_path, order = index_to_run)
+        scenario_file, road_file = generator.generate_single(generation_path, order = index_to_run)
         
         if scenario_file == &#39;&#39;:
             run_with_replayer = False
@@ -134,7 +157,7 @@ def esmini(generator,esminipath=&#39;esmini&#39;,
 
     # create the additional_args for the esmini execusion
     if save_osi:
-        additional_args += &#39; --osi_file on&#39;
+        additional_args += &#39; --osi_file &#39; + save_osi
     
     if record:
         additional_args += &#39; --record &#39; + record
@@ -143,7 +166,7 @@ def esmini(generator,esminipath=&#39;esmini&#39;,
         additional_args += &#39; --disable_controllers&#39;
     
 
-    additional_args += &#39; &#39; + args
+    additional_args += &#39; &#39; + args +  &#39;--path &#39;+resource_path
     
     # find executable based on OS
     if os.name == &#39;posix&#39;:
@@ -161,7 +184,7 @@ def esmini(generator,esminipath=&#39;esmini&#39;,
 
     # run viewer if wanted
     if run_with_replayer:
-        os.system(replay_executable + &#39; --file &#39; + record +&#39; --res_path &#39; + os.path.join(esminipath,&#39;resources&#39;) +  &#39; --window &#39;+ window_size)
+        os.system(replay_executable + &#39; --file &#39; + record +&#39; --res_path &#39; + os.path.join(resource_path,os.pardir) +  &#39; --window &#39;+ window_size)
 
 
 
@@ -188,7 +211,7 @@ def prettyprint(element):
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="scenariogeneration.helpers.esmini"><code class="name flex">
-<span>def <span class="ident">esmini</span></span>(<span>generator, esminipath='esmini', window_size='60 60 800 400', save_osi=False, record=False, disable_controllers=False, args='', index_to_run='first', run_with_replayer=False, timestep=0.01, car_density=15)</span>
+<span>def <span class="ident">esmini</span></span>(<span>generator, esminipath='esmini', window_size='60 60 800 400', save_osi=False, record=False, disable_controllers=False, args='', index_to_run='first', run_with_replayer=False, generation_path='generated', resource_path=None, timestep=0.01, car_density=15)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>write a scenario and runs it in esminis OpenDriveViewer with some random traffic</p>
@@ -201,8 +224,8 @@ esminipath (str): the path to esmini
 window_size (str): sets the window size of the esmini viewer 
     Default: 60 60 800 400
 
-save_osi (bool): if an .osi file should be saved
-    Default: False
+save_osi (str): name of the wanted osi file (None will not create a osi file)
+    Default: None
 
 record (str): name of a esmini .dat file should be saved
     Default: '' (no recording)
@@ -218,6 +241,12 @@ index_to_run (str,int): if the a class inheriting ScenarioGenerator is used as i
 
 run_with_replayer (bool): bool to run esmini in headless mode and then run the viewer afterwards (only used for scenarios not for roads)
     Default: False
+
+generation_path (str): path to where the files should be generated
+    Default: generated
+
+resource_path (str): path to the catalogs/xodrs that you want to add (relative path in scenario should be relative to this one)
+    Default: esminipath/resources/xosc
 
 timestep (double): fixed timestep to use in combination with replayer
 
@@ -235,6 +264,8 @@ car_density (int): density of fictious cars (used only for pure OpenDRIVE cases)
     args = &#39;&#39;,
     index_to_run= &#39;first&#39;,
     run_with_replayer = False,
+    generation_path = &#39;generated&#39;,
+    resource_path = None,
     timestep = 0.01,
     car_density = 15):
     &#34;&#34;&#34; write a scenario and runs it in esminis OpenDriveViewer with some random traffic
@@ -249,8 +280,8 @@ car_density (int): density of fictious cars (used only for pure OpenDRIVE cases)
             window_size (str): sets the window size of the esmini viewer 
                 Default: 60 60 800 400
 
-            save_osi (bool): if an .osi file should be saved
-                Default: False
+            save_osi (str): name of the wanted osi file (None will not create a osi file)
+                Default: None
 
             record (str): name of a esmini .dat file should be saved
                 Default: &#39;&#39; (no recording)
@@ -267,24 +298,44 @@ car_density (int): density of fictious cars (used only for pure OpenDRIVE cases)
             run_with_replayer (bool): bool to run esmini in headless mode and then run the viewer afterwards (only used for scenarios not for roads)
                 Default: False
 
+            generation_path (str): path to where the files should be generated
+                Default: generated
+
+            resource_path (str): path to the catalogs/xodrs that you want to add (relative path in scenario should be relative to this one)
+                Default: esminipath/resources/xosc
+
             timestep (double): fixed timestep to use in combination with replayer
 
             car_density (int): density of fictious cars (used only for pure OpenDRIVE cases)
 
     &#34;&#34;&#34;
     additional_args = &#39;&#39;
-    resource_path = os.path.join(esminipath,&#39;resources&#39;)
+    # resource_path = os.path.join(esminipath,&#39;resources&#39;)
+    if not resource_path:
+        resource_path = os.path.join(esminipath,&#39;resources&#39;,&#39;xosc&#39;)
     # genereate file for running in esmini, and set some esmini replated parameters
     if isinstance(generator,OpenDrive):
+        if not os.path.exists(generation_path):
+            os.mkdir(generation_path)
+        if not os.path.exists(os.path.join(generation_path,&#39;xosc&#39;)):
+            os.mkdir(os.path.join(generation_path,&#39;xosc&#39;))
+        if not os.path.exists(os.path.join(generation_path,&#39;xodr&#39;)):
+            os.mkdir(os.path.join(generation_path,&#39;xodr&#39;))
         executable = &#39;odrviewer&#39;
         filetype = &#39; --odr &#39;
         additional_args += &#39; --density &#39; + str(car_density)
         additional_args += &#39; --window &#39;+ window_size
         run_with_replayer = False
-        filename = os.path.join(resource_path,&#39;xodr&#39;,&#39;python_road.xodr&#39;)
+        filename = os.path.join(generation_path,&#39;xodr&#39;,&#39;python_road.xodr&#39;)
         generator.write_xml(filename,True)
 
     elif isinstance(generator,Scenario):
+        if not os.path.exists(generation_path):
+            os.mkdir(generation_path)
+        if not os.path.exists(os.path.join(generation_path,&#39;xosc&#39;)):
+            os.mkdir(os.path.join(generation_path,&#39;xosc&#39;))
+        if not os.path.exists(os.path.join(generation_path,&#39;xodr&#39;)):
+            os.mkdir(os.path.join(generation_path,&#39;xodr&#39;))
         executable = &#39;esmini&#39;
         filetype = &#39; --osc &#39;
         if run_with_replayer:
@@ -294,11 +345,11 @@ car_density (int): density of fictious cars (used only for pure OpenDRIVE cases)
         else:
             additional_args += &#39; --window &#39;+ window_size
 
-        filename = os.path.join(resource_path,&#39;xosc&#39;,&#39;python_scenario.xosc&#39;)
+        filename = os.path.join(generation_path,&#39;xosc&#39;,&#39;python_scenario.xosc&#39;)
         generator.write_xml(filename)
 
     elif isinstance(generator,ScenarioGenerator):
-        scenario_file, road_file = generator.generate_single(resource_path, order = index_to_run)
+        scenario_file, road_file = generator.generate_single(generation_path, order = index_to_run)
         
         if scenario_file == &#39;&#39;:
             run_with_replayer = False
@@ -324,7 +375,7 @@ car_density (int): density of fictious cars (used only for pure OpenDRIVE cases)
 
     # create the additional_args for the esmini execusion
     if save_osi:
-        additional_args += &#39; --osi_file on&#39;
+        additional_args += &#39; --osi_file &#39; + save_osi
     
     if record:
         additional_args += &#39; --record &#39; + record
@@ -333,7 +384,7 @@ car_density (int): density of fictious cars (used only for pure OpenDRIVE cases)
         additional_args += &#39; --disable_controllers&#39;
     
 
-    additional_args += &#39; &#39; + args
+    additional_args += &#39; &#39; + args +  &#39;--path &#39;+resource_path
     
     # find executable based on OS
     if os.name == &#39;posix&#39;:
@@ -351,7 +402,7 @@ car_density (int): density of fictious cars (used only for pure OpenDRIVE cases)
 
     # run viewer if wanted
     if run_with_replayer:
-        os.system(replay_executable + &#39; --file &#39; + record +&#39; --res_path &#39; + os.path.join(esminipath,&#39;resources&#39;) +  &#39; --window &#39;+ window_size)</code></pre>
+        os.system(replay_executable + &#39; --file &#39; + record +&#39; --res_path &#39; + os.path.join(resource_path,os.pardir) +  &#39; --window &#39;+ window_size)</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.helpers.prettyprint"><code class="name flex">

@@ -108,13 +108,13 @@ class WorldPosition(_PositionType):
 
         &#34;&#34;&#34;
         retdict = {&#39;x&#39;:str(self.x),&#39;y&#39;:str(self.y)}
-        if self.z:
+        if self.z is not None:
             retdict[&#39;z&#39;] = str(self.z)
-        if self.h:
+        if self.h is not None:
             retdict[&#39;h&#39;] = str(self.h)
-        if self.p:
+        if self.p is not None:
             retdict[&#39;p&#39;] = str(self.p)
-        if self.r:
+        if self.r is not None:
             retdict[&#39;r&#39;] = str(self.r)
         return retdict
     def get_element(self,elementname = &#39;Position&#39;):
@@ -691,11 +691,11 @@ class RelativeLanePosition(_PositionType):
         &#34;&#34;&#34;
         retdict = {}
         retdict[&#39;entityRef&#39;] = self.entity
-        if self.ds:
+        if self.ds is not None:
             retdict[&#39;ds&#39;] = str(self.ds)
-        if self.dsLane and not self.isVersion(minor=0):
+        if self.dsLane is not None and not self.isVersion(minor=0):
             retdict[&#39;dsLane&#39;] = str(self.dsLane)
-        elif self.dsLane and self.isVersion(minor=0):
+        elif self.dsLane is not None and self.isVersion(minor=0):
             OpenSCENARIOVersionError(&#39;dsLane was introduced in OpenSCENARIO V1.1, not in 1.0&#39;)
         retdict[&#39;offset&#39;] = str(self.offset)
         retdict[&#39;dLane&#39;] = str(self.lane_id)
@@ -1008,7 +1008,7 @@ class TrajectoryPosition(_PositionType):
         &#34;&#34;&#34;
         retdict = {}
         retdict[&#39;s&#39;] = str(self.s)
-        if self.t:
+        if self.t is not None:
             retdict[&#39;t&#39;] = str(self.t)
         return retdict
 
@@ -1098,7 +1098,7 @@ class GeoPosition(_PositionType):
         retdict = {}
         retdict[&#39;longitude&#39;] = str(self.longitude)
         retdict[&#39;latitude&#39;] = str(self.latitude)
-        if self.height:
+        if self.height is not None:
             retdict[&#39;height&#39;] = str(self.height)
         return retdict
 
@@ -1243,7 +1243,7 @@ orientation (Orientation): Oritation of the entity
         retdict = {}
         retdict[&#39;longitude&#39;] = str(self.longitude)
         retdict[&#39;latitude&#39;] = str(self.latitude)
-        if self.height:
+        if self.height is not None:
             retdict[&#39;height&#39;] = str(self.height)
         return retdict
 
@@ -1283,7 +1283,7 @@ orientation (Orientation): Oritation of the entity
     retdict = {}
     retdict[&#39;longitude&#39;] = str(self.longitude)
     retdict[&#39;latitude&#39;] = str(self.latitude)
-    if self.height:
+    if self.height is not None:
         retdict[&#39;height&#39;] = str(self.height)
     return retdict</code></pre>
 </details>
@@ -1682,11 +1682,11 @@ orientation (Orientation): the angular orientation of the entity
         &#34;&#34;&#34;
         retdict = {}
         retdict[&#39;entityRef&#39;] = self.entity
-        if self.ds:
+        if self.ds is not None:
             retdict[&#39;ds&#39;] = str(self.ds)
-        if self.dsLane and not self.isVersion(minor=0):
+        if self.dsLane is not None and not self.isVersion(minor=0):
             retdict[&#39;dsLane&#39;] = str(self.dsLane)
-        elif self.dsLane and self.isVersion(minor=0):
+        elif self.dsLane is not None and self.isVersion(minor=0):
             OpenSCENARIOVersionError(&#39;dsLane was introduced in OpenSCENARIO V1.1, not in 1.0&#39;)
         retdict[&#39;offset&#39;] = str(self.offset)
         retdict[&#39;dLane&#39;] = str(self.lane_id)
@@ -1729,11 +1729,11 @@ orientation (Orientation): the angular orientation of the entity
     &#34;&#34;&#34;
     retdict = {}
     retdict[&#39;entityRef&#39;] = self.entity
-    if self.ds:
+    if self.ds is not None:
         retdict[&#39;ds&#39;] = str(self.ds)
-    if self.dsLane and not self.isVersion(minor=0):
+    if self.dsLane is not None and not self.isVersion(minor=0):
         retdict[&#39;dsLane&#39;] = str(self.dsLane)
-    elif self.dsLane and self.isVersion(minor=0):
+    elif self.dsLane is not None and self.isVersion(minor=0):
         OpenSCENARIOVersionError(&#39;dsLane was introduced in OpenSCENARIO V1.1, not in 1.0&#39;)
     retdict[&#39;offset&#39;] = str(self.offset)
     retdict[&#39;dLane&#39;] = str(self.lane_id)
@@ -3140,7 +3140,7 @@ orientation (Orientation): Oritation of the entity
         &#34;&#34;&#34;
         retdict = {}
         retdict[&#39;s&#39;] = str(self.s)
-        if self.t:
+        if self.t is not None:
             retdict[&#39;t&#39;] = str(self.t)
         return retdict
 
@@ -3181,7 +3181,7 @@ orientation (Orientation): Oritation of the entity
     &#34;&#34;&#34;
     retdict = {}
     retdict[&#39;s&#39;] = str(self.s)
-    if self.t:
+    if self.t is not None:
         retdict[&#39;t&#39;] = str(self.t)
     return retdict</code></pre>
 </details>
@@ -3344,13 +3344,13 @@ r (float): roll of the entity
 
         &#34;&#34;&#34;
         retdict = {&#39;x&#39;:str(self.x),&#39;y&#39;:str(self.y)}
-        if self.z:
+        if self.z is not None:
             retdict[&#39;z&#39;] = str(self.z)
-        if self.h:
+        if self.h is not None:
             retdict[&#39;h&#39;] = str(self.h)
-        if self.p:
+        if self.p is not None:
             retdict[&#39;p&#39;] = str(self.p)
-        if self.r:
+        if self.r is not None:
             retdict[&#39;r&#39;] = str(self.r)
         return retdict
     def get_element(self,elementname = &#39;Position&#39;):
@@ -3386,13 +3386,13 @@ r (float): roll of the entity
 
     &#34;&#34;&#34;
     retdict = {&#39;x&#39;:str(self.x),&#39;y&#39;:str(self.y)}
-    if self.z:
+    if self.z is not None:
         retdict[&#39;z&#39;] = str(self.z)
-    if self.h:
+    if self.h is not None:
         retdict[&#39;h&#39;] = str(self.h)
-    if self.p:
+    if self.p is not None:
         retdict[&#39;p&#39;] = str(self.p)
-    if self.r:
+    if self.r is not None:
         retdict[&#39;r&#39;] = str(self.r)
     return retdict</code></pre>
 </details>

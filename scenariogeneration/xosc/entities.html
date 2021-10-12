@@ -863,7 +863,7 @@ class Vehicle(VersionBase):
         retdict = {}
         retdict[&#39;name&#39;] = str(self.name)
         retdict[&#39;vehicleCategory&#39;] = self.vehicle_type.get_name()
-        if self.mass and not self.isVersion(0):
+        if self.mass and not self.isVersion(minor=0):
             retdict[&#39;mass&#39;] = str(self.mass)
         return retdict
 
@@ -3297,7 +3297,7 @@ mass (float): the mass of the vehicle (valid from OpenSCENARIO V1.1)
         retdict = {}
         retdict[&#39;name&#39;] = str(self.name)
         retdict[&#39;vehicleCategory&#39;] = self.vehicle_type.get_name()
-        if self.mass and not self.isVersion(0):
+        if self.mass and not self.isVersion(minor=0):
             retdict[&#39;mass&#39;] = str(self.mass)
         return retdict
 
@@ -3499,7 +3499,7 @@ author (str): author of the catalog
     retdict = {}
     retdict[&#39;name&#39;] = str(self.name)
     retdict[&#39;vehicleCategory&#39;] = self.vehicle_type.get_name()
-    if self.mass and not self.isVersion(0):
+    if self.mass and not self.isVersion(minor=0):
         retdict[&#39;mass&#39;] = str(self.mass)
     return retdict</code></pre>
 </details>
