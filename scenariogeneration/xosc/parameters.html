@@ -31,9 +31,9 @@
 import xml.etree.ElementTree as ET
 
 from .enumerations import VersionBase, XMLNS, XSI
-from .utils import _StochasticDistributionType,  FileHeader, VersionBase, printToFile, ParameterAssignment
+from .utils import _StochasticDistributionType,  FileHeader, VersionBase, ParameterAssignment, Rule
 from .exceptions import NotEnoughInputArguments, OpenSCENARIOVersionError
-
+from ..helpers import printToFile
 
 class _HistogramBin():
     &#34;&#34;&#34; the _HistogramBin is used by Histogram to define the bins
@@ -717,14 +717,14 @@ class DistributionRange():
         
         Parameters
         ----------
-            step_width (double): step size of the distribution
+            step_width (float): step size of the distribution
 
             range (Range): the range of the parameter
 
         Attributes
         ----------
 
-            step_width (double): step size of the distribution
+            step_width (float): step size of the distribution
 
             range (Range): the range of the parameter
 
@@ -743,7 +743,7 @@ class DistributionRange():
 
             Parameters
             ----------
-                step_width (double): step size of the distribution
+                step_width (float): step size of the distribution
 
                 range (Range): the range of the parameter
 
@@ -918,18 +918,23 @@ class ParameterValueDistribution(VersionBase):
         
         Parameters
         ----------
-            number_of_tests (int): number of tests to run 
+            description (str): a description of the parameter set
 
-            random_seed (float): the seed for the run
-                Default: None
+            author (str): the author of the file
+
+            scenario_file (str): path to the scenario that the parameter distribution should set
+
+            parameter_distribution (Stocastic or Deterministic): the parameter distribution
+
+            osc_minor_version (int): the osi version wanted (Note: only available from OpenSCENARIO V1.1.0)
 
         Attributes
         ----------
-            number_of_tests (int): number of tests to run 
+            header (FileHeader): header of osc file
 
-            random_seed (float): the seed for the run
+            scenario_file (str): path to the scenario that the parameter distribution should set
 
-            distributions (dict of *StochasticDistribution): the distributions for the parameters
+            parameter_distribution (Stocastic or Deterministic): the parameter distribution
 
         Methods
         -------
@@ -943,7 +948,7 @@ class ParameterValueDistribution(VersionBase):
     _XMLNS = XMLNS
     _XSI = XSI
     def __init__(self, description, author, scenario_file, parameter_distribution, osc_minor_version=1):
-        &#34;&#34;&#34; initalizes the Stocastic 
+        &#34;&#34;&#34; initalizes the ParameterValueDistribution 
 
         Parameters
         ----------
@@ -958,7 +963,7 @@ class ParameterValueDistribution(VersionBase):
             osc_minor_version (int): the osi version wanted (Note: only available from OpenSCENARIO V1.1.0)
 
         &#34;&#34;&#34; 
-        self.header = FileHeader(description,author,revMinor=osc_minor_version)
+        self.header = FileHeader(author,description,revMinor=osc_minor_version)
         if not isinstance(parameter_distribution,Stocastic):
             raise TypeError(type(parameter_distribution) + &#34;is not of type Stocastic or Deterministic&#34;)
         self.scenario_file = scenario_file
@@ -1340,12 +1345,12 @@ get_element(elementname)
 <dd>
 <div class="desc"><p>Creates the DistributionRange used to define a Single parameter distribution</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>step_width (double): step size of the distribution
+<pre><code>step_width (float): step size of the distribution
 
 range (Range): the range of the parameter
 </code></pre>
 <h2 id="attributes">Attributes</h2>
-<pre><code>step_width (double): step size of the distribution
+<pre><code>step_width (float): step size of the distribution
 
 range (Range): the range of the parameter
 </code></pre>
@@ -1358,7 +1363,7 @@ get_attributes()
 </code></pre>
 <p>initalizes the DistributionRange </p>
 <h2 id="parameters_1">Parameters</h2>
-<pre><code>step_width (double): step size of the distribution
+<pre><code>step_width (float): step size of the distribution
 
 range (Range): the range of the parameter
 </code></pre></div>
@@ -1371,14 +1376,14 @@ range (Range): the range of the parameter
         
         Parameters
         ----------
-            step_width (double): step size of the distribution
+            step_width (float): step size of the distribution
 
             range (Range): the range of the parameter
 
         Attributes
         ----------
 
-            step_width (double): step size of the distribution
+            step_width (float): step size of the distribution
 
             range (Range): the range of the parameter
 
@@ -1397,7 +1402,7 @@ range (Range): the range of the parameter
 
             Parameters
             ----------
-                step_width (double): step size of the distribution
+                step_width (float): step size of the distribution
 
                 range (Range): the range of the parameter
 
@@ -1885,17 +1890,22 @@ range (Range): limit of the values (optional)
 <dd>
 <div class="desc"><p>Creates the the ParameterValueDistribution file for open scenario</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>number_of_tests (int): number of tests to run
+<pre><code>description (str): a description of the parameter set
 
-random_seed (float): the seed for the run
-    Default: None
+author (str): the author of the file
+
+scenario_file (str): path to the scenario that the parameter distribution should set
+
+parameter_distribution (Stocastic or Deterministic): the parameter distribution
+
+osc_minor_version (int): the osi version wanted (Note: only available from OpenSCENARIO V1.1.0)
 </code></pre>
 <h2 id="attributes">Attributes</h2>
-<pre><code>number_of_tests (int): number of tests to run
+<pre><code>header (FileHeader): header of osc file
 
-random_seed (float): the seed for the run
+scenario_file (str): path to the scenario that the parameter distribution should set
 
-distributions (dict of *StochasticDistribution): the distributions for the parameters
+parameter_distribution (Stocastic or Deterministic): the parameter distribution
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>write_xml(filename)
@@ -1904,7 +1914,7 @@ distributions (dict of *StochasticDistribution): the distributions for the param
 get_element(elementname)
     Returns the full ElementTree of the class
 </code></pre>
-<p>initalizes the Stocastic </p>
+<p>initalizes the ParameterValueDistribution </p>
 <h2 id="parameters_1">Parameters</h2>
 <pre><code>description (str): a description of the parameter set
 
@@ -1925,18 +1935,23 @@ osc_minor_version (int): the osi version wanted (Note: only available from OpenS
         
         Parameters
         ----------
-            number_of_tests (int): number of tests to run 
+            description (str): a description of the parameter set
 
-            random_seed (float): the seed for the run
-                Default: None
+            author (str): the author of the file
+
+            scenario_file (str): path to the scenario that the parameter distribution should set
+
+            parameter_distribution (Stocastic or Deterministic): the parameter distribution
+
+            osc_minor_version (int): the osi version wanted (Note: only available from OpenSCENARIO V1.1.0)
 
         Attributes
         ----------
-            number_of_tests (int): number of tests to run 
+            header (FileHeader): header of osc file
 
-            random_seed (float): the seed for the run
+            scenario_file (str): path to the scenario that the parameter distribution should set
 
-            distributions (dict of *StochasticDistribution): the distributions for the parameters
+            parameter_distribution (Stocastic or Deterministic): the parameter distribution
 
         Methods
         -------
@@ -1950,7 +1965,7 @@ osc_minor_version (int): the osi version wanted (Note: only available from OpenS
     _XMLNS = XMLNS
     _XSI = XSI
     def __init__(self, description, author, scenario_file, parameter_distribution, osc_minor_version=1):
-        &#34;&#34;&#34; initalizes the Stocastic 
+        &#34;&#34;&#34; initalizes the ParameterValueDistribution 
 
         Parameters
         ----------
@@ -1965,7 +1980,7 @@ osc_minor_version (int): the osi version wanted (Note: only available from OpenS
             osc_minor_version (int): the osi version wanted (Note: only available from OpenSCENARIO V1.1.0)
 
         &#34;&#34;&#34; 
-        self.header = FileHeader(description,author,revMinor=osc_minor_version)
+        self.header = FileHeader(author,description,revMinor=osc_minor_version)
         if not isinstance(parameter_distribution,Stocastic):
             raise TypeError(type(parameter_distribution) + &#34;is not of type Stocastic or Deterministic&#34;)
         self.scenario_file = scenario_file

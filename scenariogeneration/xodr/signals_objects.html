@@ -29,7 +29,7 @@
 
 &#34;&#34;&#34;
 import xml.etree.ElementTree as ET
-from .helpers import enum2str
+from ..helpers import enum2str
 from .enumerations import ObjectType, Orientation, Dynamic 
 
 class _SignalObjectBase():
@@ -211,7 +211,7 @@ class Signal(_SignalObjectBase):
             
             dynamic (Dynamic): specifies if Signal is static or dynamic (init in base class)
             
-            value (double): value for further specification of the signal
+            value (float): value for further specification of the signal
             
             unit (str): unit, needs to be provided when value is given
             
@@ -263,7 +263,7 @@ class Signal(_SignalObjectBase):
                 Default: None 
             dynamic (Dynamic): specifies if Signal is static or dynamic (init in base class)
                 Default: Dynamic.no 
-            value (double): value for further specification of the signal
+            value (float): value for further specification of the signal
                 Default: None
             unit (str): unit, needs to be provided when value is given
                 Default: None                                  
@@ -1275,7 +1275,7 @@ name (string): name for identification of Signal (init in base class)
 
 dynamic (Dynamic): specifies if Signal is static or dynamic (init in base class)
 
-value (double): value for further specification of the signal
+value (float): value for further specification of the signal
 
 unit (str): unit, needs to be provided when value is given
 
@@ -1320,7 +1320,7 @@ name (string): name for identification of Signal (init in base class)
     Default: None 
 dynamic (Dynamic): specifies if Signal is static or dynamic (init in base class)
     Default: Dynamic.no 
-value (double): value for further specification of the signal
+value (float): value for further specification of the signal
     Default: None
 unit (str): unit, needs to be provided when value is given
     Default: None                                  
@@ -1364,7 +1364,7 @@ height (float): height of Signal (init in base class)
             
             dynamic (Dynamic): specifies if Signal is static or dynamic (init in base class)
             
-            value (double): value for further specification of the signal
+            value (float): value for further specification of the signal
             
             unit (str): unit, needs to be provided when value is given
             
@@ -1416,7 +1416,7 @@ height (float): height of Signal (init in base class)
                 Default: None 
             dynamic (Dynamic): specifies if Signal is static or dynamic (init in base class)
                 Default: Dynamic.no 
-            value (double): value for further specification of the signal
+            value (float): value for further specification of the signal
                 Default: None
             unit (str): unit, needs to be provided when value is given
                 Default: None                                  

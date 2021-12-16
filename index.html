@@ -31,7 +31,7 @@
 <p>For more detailed view of the new updates, please see the <a href="https://github.com/pyoscx/scenariogeneration/blob/main/release_notes.md">release notes</a></p>
 <h1 id="the-modules">The modules</h1>
 <h2 id="xosc">xosc</h2>
-<p>The <strong>xosc</strong> module handles the parts related to OpenSCENARIO, and covers all of OpenSCENARIO V 1.0.0 and most of OpenSCENARIO V 1.1.0 (except the parts related to ParameterValueDistributionDefinition). The module is a xml file generator which allows the user to easily generate a full OpenSCENARIO hierarchy without the need of explicity define all the levels of abstraction (if not needed). This has led to a couple of name changes compared to the standard (mostly adding Absolute or Relative to the name), in the description of the class, the OpenSCENARIO references are written for reference.
+<p>The <strong>xosc</strong> module handles the parts related to OpenSCENARIO, and covers all of OpenSCENARIO V 1.0.0 and most of OpenSCENARIO V 1.1.0 (except the parts related to UserDefined things). The module is a xml file generator which allows the user to easily generate a full OpenSCENARIO hierarchy without the need of explicity define all the levels of abstraction (if not needed). This has led to a couple of name changes compared to the standard (mostly adding Absolute or Relative to the name), in the description of the class, the OpenSCENARIO references are written for reference.
 </p>
 <p>The idea with this module is to create easy access to the elements of OpenSCENARIO without having to expose the user to all the xml levels that does not carry any vital information for the user. Hence, some of the xml-elements that build up OpenSCENARIO are never seen in the class structure but compressed to a level where the user can set the required data. </p>
 <p>The module can generate xmls of both V1.0.0 and V1.1.0 of OpenSCENARIO.</p>
@@ -49,6 +49,14 @@ This feature is enabled by one simple input to the Scenario class as:</p>
 <p>The default is 1 (V1.1.0), but with this V1.0.0 OpenSCENARIO xmls can be generated. </p>
 <p>The V1.1.0 will remove the depricated attributes, and have a pure V1.1.0 xml. If version specific elements are used together with the wrong version, a <strong>OpenSCENARIOVersionError</strong> will be raised. </p>
 <p>NOTE: as of V0.5.0 some interfaces had to be changed in order to fulfill the V1.1.0 standard, please see the <a href="https://github.com/pyoscx/scenariogeneration/blob/main/release_notes.md">release notes</a> for more info.</p>
+<h3 id="parsing-an-xosc-file-and-get-the-python-object-back">Parsing an .xosc file and get the Python object back</h3>
+<p>As of scenariogeneration V0.7.0, the <strong>xosc</strong> module supports parsing an existing .xosc file.
+This enables modifying already exisisting xosc files, eg. from a Scenario editor.
+</p>
+<pre><code>scenario = ParseOpenScenario('my_non_python_made_scenario.xosc')
+</code></pre>
+<p><strong>ParseOpenScenario</strong> can read all types of OpenSCENARIO files (Scenario, Catalog and ParameterValueDistribution), and will return the Object related to that file type. </p>
+<p>NOTE: more layers of classes are added in some cases, that the user don't usually see/use. Eg. the <strong>ValueTrigger</strong> and <strong>EntityTrigger</strong> will never be returned, but a Trigger, ConditionGroup will always be present. </p>
 <h2 id="xodr">xodr</h2>
 <p>The xodr module handles the part related to OpenDrive, and does not (as of now) have a full coverage of the standard, please see <a href="https://github.com/pyoscx/scenariogeneration/blob/main/xodr_coverage.txt">coverage</a> for more information. </p>
 <p>The <strong>xodr</strong> module is also a xml generator, similar to the <strong>xosc</strong> module. However, since opendrive is more complicated to create a functional road-network, it includes a number of automation algorithms which allow the user to easily generate a correct OpenDRIVE hierarchy. As a matter of fact the OpenDRIVE standard contains many geometrical dependencies, indexing, and complex structures, that to create the xml directly is quite cumbersome. Hence, it is highly recommended to use the automations and "generators" included in the package. In the examples, both "generator" level (<a href="examples/xodr/full_junction.html">full_junction</a>, <a href="examples/xodr/highway_example.html">highway_example</a>, and <a href="examples/xodr/simple_road_with_objects.html">simple_road_with_objects</a>) and low level examples (as <a href="examples/xodr/junction_trippel_twoway.html">junction_trippel_twoway</a>, <a href="examples/xodr/multiple_geometries_one_road.html">multiple_geometries_one_road</a> and <a href="exampels/xodr/road_merge_w_lane_merge.html">road_merge_w_lane_merge</a> ) are presented. </p>
@@ -169,6 +177,7 @@ To connect the scenario and the generated road, create the RoadNetwork object in
 <li><a href="#xosc">xosc</a><ul>
 <li><a href="#automatic-generation-of-story-act-and-maneuvergroup">Automatic generation of Story, Act, and ManeuverGroup</a></li>
 <li><a href="#generate-different-versions-of-openscenario">Generate different versions of OpenSCENARIO</a></li>
+<li><a href="#parsing-an-xosc-file-and-get-the-python-object-back">Parsing an .xosc file and get the Python object back</a></li>
 </ul>
 </li>
 <li><a href="#xodr">xodr</a><ul>

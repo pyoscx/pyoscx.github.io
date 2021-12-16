@@ -32,10 +32,9 @@
 import xml.etree.ElementTree as ET
 
 from .utils import EntityRef, convert_bool, _PositionType, _ValueTriggerType, _EntityTriggerType, _TriggerType
-from .enumerations import CoordinateSystem, Rule, ConditionEdge, TriggeringEntitiesRule, RelativeDistanceType, StoryboardElementType, StoryboardElementState, VersionBase
-from .exceptions import ToManyOptionalArguments
-
-
+from .enumerations import CoordinateSystem, ObjectType, Rule, ConditionEdge, TriggeringEntitiesRule, RelativeDistanceType, StoryboardElementType, StoryboardElementState, VersionBase
+from .exceptions import ToManyOptionalArguments, NotAValidElement
+from .position import _PositionFactory
 
 
 class EmptyTrigger(_TriggerType):
@@ -73,6 +72,10 @@ class EmptyTrigger(_TriggerType):
         if isinstance(other,EmptyTrigger):
             if self._triggerpoint == other._triggerpoint:
                 return True
+        elif isinstance(other,Trigger):
+            if len(other.conditiongroups) == 0 and \
+                self._triggerpoint == other._triggerpoint:
+                return True
         return False
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the Trigger
@@ -80,6 +83,72 @@ class EmptyTrigger(_TriggerType):
         &#34;&#34;&#34;
         return ET.Element(self._triggerpoint)
         
+class _EntityConditionFactory():
+    @staticmethod
+    def parse_entity_condition(element):
+        if element.find(&#39;EndOfRoadCondition&#39;) is not None:
+            return EndOfRoadCondition.parse(element)
+        elif element.find(&#39;CollisionCondition&#39;) is not None:
+            return CollisionCondition.parse(element)
+        elif element.find(&#39;OffroadCondition&#39;) is not None:
+            return OffroadCondition.parse(element)
+        elif element.find(&#39;TimeHeadwayCondition&#39;) is not None:
+            return TimeHeadwayCondition.parse(element)
+        elif element.find(&#39;TimeToCollisionCondition&#39;) is not None:
+            return TimeToCollisionCondition.parse(element)
+        elif element.find(&#39;AccelerationCondition&#39;) is not None:
+            return AccelerationCondition.parse(element)
+        elif element.find(&#39;StandStillCondition&#39;) is not None:
+            return StandStillCondition.parse(element)
+        elif element.find(&#39;SpeedCondition&#39;) is not None:
+            return SpeedCondition.parse(element)
+        elif element.find(&#39;RelativeSpeedCondition&#39;) is not None:
+            return RelativeSpeedCondition.parse(element)
+        elif element.find(&#39;TraveledDistanceCondition&#39;) is not None:
+            return TraveledDistanceCondition.parse(element)
+        elif element.find(&#39;ReachPositionCondition&#39;) is not None:
+            return ReachPositionCondition.parse(element)
+        elif element.find(&#39;DistanceCondition&#39;) is not None:
+            return DistanceCondition.parse(element)
+        elif element.find(&#39;RelativeDistanceCondition&#39;) is not None:
+            return RelativeDistanceCondition.parse(element)
+        else:       
+            raise NotAValidElement(&#39;element &#39;, element ,&#39;is not a valid entity condition&#39;)
+
+
+
+
+
+
+class _ValueConditionFactory():
+    @staticmethod
+    def parse_value_condition(element):
+        if element.find(&#39;ParameterCondition&#39;) is not None:
+            return ParameterCondition.parse(element.find(&#39;ParameterCondition&#39;))
+        elif element.find(&#39;TimeOfDayCondition&#39;) is not None:
+            return TimeOfDayCondition.parse(element.find(&#39;TimeOfDayCondition&#39;))
+        elif element.find(&#39;SimulationTimeCondition&#39;) is not None:
+            return SimulationTimeCondition.parse(element.find(&#39;SimulationTimeCondition&#39;))
+        elif element.find(&#39;StoryboardElementStateCondition&#39;) is not None:
+            return StoryboardElementStateCondition.parse(element.find(&#39;StoryboardElementStateCondition&#39;))
+        elif element.find(&#39;UserDefinedValueCondition&#39;) is not None:
+            return UserDefinedValueCondition.parse(element.find(&#39;UserDefinedValueCondition&#39;))
+        elif element.find(&#39;TrafficSignalCondition&#39;) is not None:
+            return TrafficSignalCondition.parse(element.find(&#39;TrafficSignalCondition&#39;))
+        elif element.find(&#39;TrafficSignalControllerCondition&#39;) is not None:
+            return TrafficSignalControllerCondition.parse(element.find(&#39;TrafficSignalControllerCondition&#39;))
+        else:
+            raise NotAValidElement(&#39;element &#39;, element ,&#39;is not a valid entity condition&#39;)
+
+class _ConditionFactory():
+    @staticmethod
+    def parse_condition(element):
+        if element.find(&#39;ByEntityCondition/EntityCondition&#39;) is not None:
+            return EntityTrigger.parse(element)
+        elif element.find(&#39;ByValueCondition&#39;) is not None:
+            return ValueTrigger.parse(element)
+        else:
+            raise NotAValidElement(&#39;element &#39;, element ,&#39;is not a valid condition&#39;)
 
 
 class Trigger(_TriggerType):
@@ -127,7 +196,44 @@ class Trigger(_TriggerType):
             if self.conditiongroups == other.conditiongroups and \
             self._triggerpoint == other._triggerpoint:
                 return True
+        elif isinstance(other,EntityTrigger) or isinstance(other,ValueTrigger):
+            if len(self.conditiongroups) == 1 and len(self.conditiongroups[0].conditions) == 1:
+                if self._triggerpoint == other._triggerpoint and \
+                    self.conditiongroups[0].conditions[0] == other:
+                    return True
+        elif isinstance(other,ConditionGroup):
+            if len(self.conditiongroups) == 1:
+                if self._triggerpoint == other._triggerpoint and \
+                    self.conditiongroups[0] == other:
+                    return True
+        elif isinstance(other,EmptyTrigger):
+            if len(self.conditiongroups) == 0 and \
+                self._triggerpoint == other._triggerpoint:
+                return True
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of ConditionGroup
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                conditiongroup (ConditionGroup): a ConditionGroup object
+                
+        &#34;&#34;&#34;
+        
+        trigger = Trigger()
+        trigger._triggerpoint = element.tag
+        
+        conditiongroups = element.findall(&#39;ConditionGroup&#39;)
+        for condgr in conditiongroups:
+            trigger.add_conditiongroup(ConditionGroup.parse(condgr))
+
+        return trigger
 
     def add_conditiongroup(self,conditiongroup):
         &#34;&#34;&#34; Adds a conditiongroup to the trigger
@@ -152,6 +258,7 @@ class Trigger(_TriggerType):
         for c in self.conditiongroups:
             element.append(c.get_element())
         return element
+
 
 class ConditionGroup(_TriggerType):
     &#34;&#34;&#34; The ConditionGroup class creates a Trigger that can be used if multiple Conditions are wanted
@@ -198,7 +305,41 @@ class ConditionGroup(_TriggerType):
             if self.conditions == other.conditions and \
             self._triggerpoint == other._triggerpoint:
                 return True
+        elif isinstance(other,Trigger):
+            if len(other.conditiongroups) == 1:
+                if self._triggerpoint == other._triggerpoint and \
+                    other.conditiongroups[0] == self:
+                    return True
+        elif isinstance(other,EntityTrigger) or isinstance(other,ValueTrigger):
+            if  len(self.conditions) == 1:
+                if self._triggerpoint == other._triggerpoint and \
+                    self.conditions[0] == other:
+                    return True
+        
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of ConditionGroup
+            Note: if 
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                conditiongroup (ConditionGroup): a ConditionGroup object
+                
+        &#34;&#34;&#34;
+        
+        condgr = ConditionGroup()
+        conditions = element.findall(&#39;Condition&#39;)
+        for cond in conditions:
+            condgr.add_condition(_ConditionFactory().parse_condition(cond))
+
+        return condgr
+
 
     def add_condition(self,condition):
         &#34;&#34;&#34; Adds a condition (EntityTrigger or ValueTrigger) to the ConditionGroup
@@ -330,7 +471,45 @@ class EntityTrigger(_TriggerType):
             self.entitycondition == other.entitycondition and \
             self._triggerpoint == other._triggerpoint:
                 return True
+        elif isinstance(other,Trigger):
+            if len(other.conditiongroups) == 1 and len(other.conditiongroups[0].conditions) == 1:
+                if self._triggerpoint == other._triggerpoint and \
+                    other.conditiongroups[0].conditions[0] == self:
+                    return True
+        elif isinstance(other,ConditionGroup):
+            if len(other.conditions) == 1:
+                if self._triggerpoint == other._triggerpoint and \
+                    other.conditions[0] == self:
+                    return True
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of EntityTrigger
+            NOTE: this parser will ONLY parse the Condition itself, not the CondintionGroup or Trigger that it can generate
+            
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (EntityTrigger): a EntityTrigger object
+                
+        &#34;&#34;&#34;
+        if element.tag != &#39;Condition&#39;:
+            raise NotAValidElement(&#39;ValueTrigger only parses a Condition, not &#39;, element)
+
+        name = element.attrib[&#39;name&#39;]
+        delay = element.attrib[&#39;delay&#39;]
+        conditionedge = getattr(ConditionEdge,element.attrib[&#39;conditionEdge&#39;])
+        entityconditionelement = element.find(&#39;ByEntityCondition&#39;)
+        triggering_entities = TriggeringEntities.parse(entityconditionelement.find(&#39;TriggeringEntities&#39;))
+        condition = _EntityConditionFactory.parse_entity_condition(entityconditionelement.find(&#39;EntityCondition&#39;))
+        enttrig = EntityTrigger(name,delay,conditionedge,condition,&#39;&#39;)
+        enttrig.triggerentity = triggering_entities
+
+        return enttrig
 
     def _set_used_by_parent(self):
         &#34;&#34;&#34; _set_used_by_parent is used internaly if the condition is added to a ConditionGroup
@@ -459,8 +638,41 @@ class ValueTrigger(_TriggerType):
             self.valuecondition == other.valuecondition and \
             self._triggerpoint == other._triggerpoint:
                 return True
+        elif isinstance(other,Trigger):
+            if len(other.conditiongroups) == 1 and len(other.conditiongroups[0].conditions) == 1:
+                if self._triggerpoint == other._triggerpoint and \
+                    other.conditiongroups[0].conditions[0] == self:
+                    return True
+        elif isinstance(other,ConditionGroup):
+            if len(other.conditions) == 1:
+                if self._triggerpoint == other._triggerpoint and \
+                    other.conditions[0] == self:
+                    return True
         return False
-        
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of ValueTrigger
+            NOTE: this parser will ONLY parse the Condition itself, not the CondintionGroup or Trigger that it can generate
+            
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (ValueTrigger): a ValueTrigger object
+                
+        &#34;&#34;&#34;
+        if element.tag != &#39;Condition&#39;:
+            raise NotAValidElement(&#39;ValueTrigger only parses a Condition, not &#39;, element)
+
+        name = element.attrib[&#39;name&#39;]
+        delay = element.attrib[&#39;delay&#39;]
+        conditionedge = getattr(ConditionEdge,element.attrib[&#39;conditionEdge&#39;])
+        condition = _ValueConditionFactory.parse_value_condition(element.find(&#39;ByValueCondition&#39;))
+        return ValueTrigger(name,delay,conditionedge,condition)
+
     def _set_used_by_parent(self):
         &#34;&#34;&#34; _set_used_by_parent is used internaly if the condition is added to a ConditionGroup
 
@@ -537,6 +749,28 @@ class TriggeringEntities(VersionBase):
                 return True
         return False
 
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of TriggeringEntities
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                triggeringentities (TriggeringEntities): a TriggeringEntities object
+                
+        &#34;&#34;&#34;
+        
+        rule = getattr(TriggeringEntitiesRule,element.attrib[&#39;triggeringEntitiesRule&#39;])
+        triggeringentities = TriggeringEntities(rule)
+        entrefs = element.findall(&#39;EntityRef&#39;)
+        for ent in entrefs:
+            entityref = EntityRef.parse(ent)
+            triggeringentities.add_entity(entityref.entity)
+        return triggeringentities
+
     def add_entity(self,entity):
         &#34;&#34;&#34; add_entity adds an entity to the TriggeringEntities
 
@@ -582,6 +816,9 @@ class EndOfRoadCondition(_EntityTriggerType):
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -604,6 +841,24 @@ class EndOfRoadCondition(_EntityTriggerType):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of EndOfRoadCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (EndOfRoadCondition): a EndOfRoadCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;EndOfRoadCondition&#39;)
+        duration = condition.attrib[&#39;duration&#39;]
+        return EndOfRoadCondition(duration)
+
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the EndOfRoadCondition as a dict
@@ -632,6 +887,9 @@ class CollisionCondition(_EntityTriggerType):
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -642,9 +900,9 @@ class CollisionCondition(_EntityTriggerType):
     def __init__(self,entity):
         &#34;&#34;&#34; the CollisionCondition class is an Entity Condition used by the EntityTrigger
         
-        Parameters
-        ----------
-            entity (str or ObjectType): name of the entity to collide with
+            Parameters
+            ----------
+                entity (str or ObjectType): name of the entity to collide with
 
         &#34;&#34;&#34;
         
@@ -656,6 +914,28 @@ class CollisionCondition(_EntityTriggerType):
                 return True
         return False
 
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of CollisionCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (CollisionCondition): a CollisionCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;CollisionCondition&#39;)
+        bytype = condition.find(&#39;ByType&#39;)
+        if bytype is not None:
+            entity = getattr(ObjectType,bytype.attrib[&#39;type&#39;]) 
+        else:
+            entityref = EntityRef.parse(condition.find(&#39;EntityRef&#39;))
+            entity = entityref.entity
+        return CollisionCondition(entity)
+    
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the CollisionCondition
 
@@ -681,6 +961,9 @@ class OffroadCondition(_EntityTriggerType):
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -703,6 +986,23 @@ class OffroadCondition(_EntityTriggerType):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of OffroadCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (OffroadCondition): a OffroadCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;OffroadCondition&#39;)
+        duration = condition.attrib[&#39;duration&#39;]
+        return OffroadCondition(duration)
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the OffroadCondition as a dict
@@ -758,6 +1058,9 @@ class TimeHeadwayCondition(_EntityTriggerType):
                 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -812,6 +1115,41 @@ class TimeHeadwayCondition(_EntityTriggerType):
                 return True
         return False
 
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of TimeHeadwayCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (TimeHeadwayCondition): a TimeHeadwayCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;TimeHeadwayCondition&#39;)
+        entity = condition.attrib[&#39;entityRef&#39;]
+        value = condition.attrib[&#39;value&#39;]
+        rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
+        if &#39;alongRoute&#39; in condition.attrib:
+            alongroute = condition.attrib[&#39;alongRoute&#39;]
+        else:
+            alongroute = True
+
+        if &#39;relativeDistanceType&#39; in condition.attrib:
+            reldisttype = getattr(RelativeDistanceType,condition.attrib[&#39;relativeDistanceType&#39;])
+        else:
+            reldisttype = RelativeDistanceType.longitudinal
+        
+        if &#39;coordinateSystem&#39; in condition.attrib:
+            coordsystem = getattr(CoordinateSystem,condition.attrib[&#39;coordinateSystem&#39;])
+        else:
+            coordsystem = CoordinateSystem.road
+        freespace = convert_bool(condition.attrib[&#39;freespace&#39;])
+        
+        return TimeHeadwayCondition(entity,value,rule,alongroute,freespace,reldisttype,coordsystem)
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the TimeHeadwayCondition as a dict
 
@@ -822,8 +1160,8 @@ class TimeHeadwayCondition(_EntityTriggerType):
         if self.isVersion(minor=0):
             basedict[&#39;alongRoute&#39;] = convert_bool(self.alongroute)
         else:
-            basedict[&#39;relativeDistanceType&#39;] = self.relative_distance_type.name
-            basedict[&#39;coordinateSystem&#39;] = self.coordinate_system.name
+            basedict[&#39;relativeDistanceType&#39;] = self.relative_distance_type.get_name()
+            basedict[&#39;coordinateSystem&#39;] = self.coordinate_system.get_name()
         basedict[&#39;freespace&#39;] = convert_bool(self.freespace)
         basedict[&#39;rule&#39;] = self.rule.get_name()
         return basedict
@@ -835,7 +1173,6 @@ class TimeHeadwayCondition(_EntityTriggerType):
         element = ET.Element(&#39;EntityCondition&#39;)
         ET.SubElement(element,&#39;TimeHeadwayCondition&#39;,attrib=self.get_attributes())
         return element
-
 
 class TimeToCollisionCondition(_EntityTriggerType):
     &#34;&#34;&#34; the TimeToCollisionCondition class is an Entity Condition used by the EntityTrigger
@@ -886,6 +1223,9 @@ class TimeToCollisionCondition(_EntityTriggerType):
                 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -941,6 +1281,10 @@ class TimeToCollisionCondition(_EntityTriggerType):
                 raise TypeError(&#39;input position is not a valid Position&#39;)
             self.position = position
             self.use_entity = False
+        
+        if self.use_entity == None:
+            raise ValueError(&#39;neither position or entity was set.&#39;)
+
         if not hasattr(RelativeDistanceType,str(distance_type)):
             raise ValueError(distance_type + &#39;; is not a valid RelativeDistanceType.&#39;)
         if not hasattr(CoordinateSystem,str(coordinate_system)):
@@ -955,6 +1299,48 @@ class TimeToCollisionCondition(_EntityTriggerType):
                 (not self.use_entity and not other.use_entity and self.position and other.position):
                     return True
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of TimeToCollisionCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (TimeToCollisionCondition): a TimeToCollisionCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;TimeToCollisionCondition&#39;)
+        value = condition.attrib[&#39;value&#39;]
+        rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
+        freespace = convert_bool(condition.attrib[&#39;freespace&#39;])
+        if &#39;alongRoute&#39; in condition.attrib:
+            alongroute = condition.attrib[&#39;alongRoute&#39;]
+        else:
+            alongroute = True
+
+        if &#39;relativeDistanceType&#39; in condition.attrib:
+            reldisttype = getattr(RelativeDistanceType,condition.attrib[&#39;relativeDistanceType&#39;])
+        else:
+            reldisttype = RelativeDistanceType.longitudinal
+        
+        if &#39;coordinateSystem&#39; in condition.attrib:
+            coordsystem = getattr(CoordinateSystem,condition.attrib[&#39;coordinateSystem&#39;])
+        else:
+            coordsystem = CoordinateSystem.road
+        entity = None
+        position = None
+        if condition.find(&#39;TimeToCollisionConditionTarget/EntityRef&#39;) is not None:
+            entityref = EntityRef.parse(condition.find(&#39;TimeToCollisionConditionTarget/EntityRef&#39;))
+            entity = entityref.entity
+        elif condition.find(&#39;TimeToCollisionConditionTarget/Position&#39;) is not None:
+            position = _PositionFactory.parse_position(condition.find(&#39;TimeToCollisionConditionTarget/Position&#39;))
+        else:
+            raise ValueError(&#39;No TimeToCollisionConditionTarget found while parsing TimeToCollisionCondition.&#39;)
+        return TimeToCollisionCondition(value,rule,alongroute,freespace,entity,position,reldisttype,coordsystem)
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the TimeToCollisionCondition as a dict
@@ -980,9 +1366,8 @@ class TimeToCollisionCondition(_EntityTriggerType):
         collisionevent = ET.SubElement(element,&#39;TimeToCollisionCondition&#39;,attrib=self.get_attributes())
         
         targetelement = ET.SubElement(collisionevent,&#39;TimeToCollisionConditionTarget&#39;)
-        if self.use_entity == None:
-            raise ValueError(&#39;neither position or entity was set.&#39;)
-        elif self.use_entity:
+
+        if self.use_entity:
             targetelement.append(self.entity.get_element())
         else: 
             targetelement.append(self.position.get_element())
@@ -990,9 +1375,6 @@ class TimeToCollisionCondition(_EntityTriggerType):
         
         return element
         
-
-
-
 class AccelerationCondition(_EntityTriggerType):
     &#34;&#34;&#34; the AccelerationCondition class is an Entity Condition used by the EntityTrigger
         
@@ -1010,6 +1392,9 @@ class AccelerationCondition(_EntityTriggerType):
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -1036,6 +1421,24 @@ class AccelerationCondition(_EntityTriggerType):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of AccelerationCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (AccelerationCondition): a AccelerationCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;AccelerationCondition&#39;)
+        value = condition.attrib[&#39;value&#39;]
+        rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
+        return AccelerationCondition(value,rule)
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the AccelerationCondition as a dict
@@ -1064,6 +1467,9 @@ class StandStillCondition(_EntityTriggerType):
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -1077,6 +1483,7 @@ class StandStillCondition(_EntityTriggerType):
         Parameters
         ----------
             duration (float): time of standstill
+
         &#34;&#34;&#34;
         self.duration = duration
 
@@ -1085,6 +1492,23 @@ class StandStillCondition(_EntityTriggerType):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of StandStillCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (StandStillCondition): a StandStillCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;StandStillCondition&#39;)
+        duration = condition.attrib[&#39;duration&#39;]
+        return StandStillCondition(duration)
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the StandStillCondition as a dict
@@ -1117,6 +1541,9 @@ class SpeedCondition(_EntityTriggerType):
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -1143,6 +1570,24 @@ class SpeedCondition(_EntityTriggerType):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
+    
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of SpeedCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (SpeedCondition): a SpeedCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;SpeedCondition&#39;)
+        value = condition.attrib[&#39;value&#39;]
+        rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
+        return SpeedCondition(value,rule)
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the SpeedCondition as a dict
@@ -1183,6 +1628,9 @@ class RelativeSpeedCondition(_EntityTriggerType):
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -1213,6 +1661,25 @@ class RelativeSpeedCondition(_EntityTriggerType):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of RelativeSpeedCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (RelativeSpeedCondition): a RelativeSpeedCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;RelativeSpeedCondition&#39;)
+        value = condition.attrib[&#39;value&#39;]
+        entity = condition.attrib[&#39;entityRef&#39;]
+        rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
+        return RelativeSpeedCondition(value,rule,entity)
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the RelativeSpeedCondition as a dict
@@ -1246,6 +1713,9 @@ class TraveledDistanceCondition(_EntityTriggerType):
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -1268,6 +1738,23 @@ class TraveledDistanceCondition(_EntityTriggerType):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of TraveledDistanceCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (TraveledDistanceCondition): a TraveledDistanceCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;TraveledDistanceCondition&#39;)
+        value = condition.attrib[&#39;value&#39;]
+        return TraveledDistanceCondition(value)
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the TraveledDistanceCondition as a dict
@@ -1300,6 +1787,9 @@ class ReachPositionCondition(_EntityTriggerType):
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -1328,6 +1818,24 @@ class ReachPositionCondition(_EntityTriggerType):
             self.position == other.position:
                 return True
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of ReachPositionCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (ReachPositionCondition): a ReachPositionCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;ReachPositionCondition&#39;)
+        tolerance = condition.attrib[&#39;tolerance&#39;]
+        position = _PositionFactory.parse_position(condition.find(&#39;Position&#39;))
+        return ReachPositionCondition(position,tolerance)
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the ReachPositionCondition as a dict
@@ -1386,6 +1894,9 @@ class DistanceCondition(_EntityTriggerType):
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -1416,6 +1927,42 @@ class DistanceCondition(_EntityTriggerType):
             self.position == other.position:
                 return True
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of DistanceCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (DistanceCondition): a DistanceCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;DistanceCondition&#39;)
+        value = condition.attrib[&#39;value&#39;]
+        rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
+        freespace = convert_bool(condition.attrib[&#39;freespace&#39;])
+        if &#39;alongRoute&#39; in condition.attrib:
+            alongroute = condition.attrib[&#39;alongRoute&#39;]
+        else:
+            alongroute = True
+
+        if &#39;relativeDistanceType&#39; in condition.attrib:
+            reldisttype = getattr(RelativeDistanceType,condition.attrib[&#39;relativeDistanceType&#39;])
+        else:
+            reldisttype = RelativeDistanceType.longitudinal
+        
+        if &#39;coordinateSystem&#39; in condition.attrib:
+            coordsystem = getattr(CoordinateSystem,condition.attrib[&#39;coordinateSystem&#39;])
+        else:
+            coordsystem = CoordinateSystem.road
+        position = None
+
+        position = _PositionFactory.parse_position(condition.find(&#39;Position&#39;))
+        return DistanceCondition(value,rule,position,alongroute,freespace,reldisttype,coordsystem)
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the DistanceCondition as a dict
@@ -1479,6 +2026,9 @@ class RelativeDistanceCondition(_EntityTriggerType):
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -1525,6 +2075,41 @@ class RelativeDistanceCondition(_EntityTriggerType):
                 return True
         return False
 
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of RelativeDistanceCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (RelativeDistanceCondition): a RelativeDistanceCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;RelativeDistanceCondition&#39;)
+        value = condition.attrib[&#39;value&#39;]
+        rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
+        freespace = convert_bool(condition.attrib[&#39;freespace&#39;])
+        entity = condition.attrib[&#39;entityRef&#39;]
+        if &#39;alongRoute&#39; in condition.attrib:
+            alongroute = condition.attrib[&#39;alongRoute&#39;]
+        else:
+            alongroute = True
+
+        if &#39;relativeDistanceType&#39; in condition.attrib:
+            reldisttype = getattr(RelativeDistanceType,condition.attrib[&#39;relativeDistanceType&#39;])
+        else:
+            reldisttype = RelativeDistanceType.longitudinal
+        
+        if &#39;coordinateSystem&#39; in condition.attrib:
+            coordsystem = getattr(CoordinateSystem,condition.attrib[&#39;coordinateSystem&#39;])
+        else:
+            coordsystem = CoordinateSystem.road
+        
+        return RelativeDistanceCondition(value,rule,reldisttype,entity,alongroute,freespace,coordsystem)
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the RelativeDistanceCondition as a dict
 
@@ -1553,7 +2138,6 @@ class RelativeDistanceCondition(_EntityTriggerType):
 
 &#34;&#34;&#34;
 
-
 class ParameterCondition(_ValueTriggerType):
     &#34;&#34;&#34; the ParameterCondition class is an Value Condition used by the ValueTrigger
         
@@ -1575,6 +2159,9 @@ class ParameterCondition(_ValueTriggerType):
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -1605,6 +2192,24 @@ class ParameterCondition(_ValueTriggerType):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of ParameterCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (ParameterCondition): a ParameterCondition object
+                
+        &#34;&#34;&#34;
+        parameter = element.attrib[&#39;parameterRef&#39;]
+        value = element.attrib[&#39;value&#39;]
+        rule = getattr(Rule,element.attrib[&#39;rule&#39;])
+        return ParameterCondition(parameter,value,rule)
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the ParameterCondition as a dict
@@ -1663,6 +2268,24 @@ class TimeOfDayCondition(_ValueTriggerType):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of TimeOfDayCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (TimeOfDayCondition): a TimeOfDayCondition object
+                
+        &#34;&#34;&#34;
+        
+        datetime = element.attrib[&#39;datetime&#39;]
+        rule = getattr(Rule,element.attrib[&#39;rule&#39;])
+        return TimeOfDayCondition(rule,datetime)
     
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the TimeOfDayCondition as a dict
@@ -1678,7 +2301,6 @@ class TimeOfDayCondition(_ValueTriggerType):
 
         &#34;&#34;&#34;
         return ET.Element(&#39;TimeOfDayCondition&#39;,attrib=self.get_attributes())
-
 
 class SimulationTimeCondition(_ValueTriggerType):
     &#34;&#34;&#34; the SimulationTimeCondition class is an Value Condition used by the ValueTrigger
@@ -1697,6 +2319,9 @@ class SimulationTimeCondition(_ValueTriggerType):
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -1723,6 +2348,24 @@ class SimulationTimeCondition(_ValueTriggerType):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of SimulationTimeCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (SimulationTimeCondition): a SimulationTimeCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;SimulationTimeCondition&#39;)
+        value = element.attrib[&#39;value&#39;]
+        rule = getattr(Rule,element.attrib[&#39;rule&#39;])
+        return SimulationTimeCondition(value,rule)
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the SimulationTimeCondition as a dict
@@ -1759,6 +2402,9 @@ class StoryboardElementStateCondition(_ValueTriggerType):
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -1790,6 +2436,24 @@ class StoryboardElementStateCondition(_ValueTriggerType):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of StoryboardElementStateCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (StoryboardElementStateCondition): a StoryboardElementStateCondition object
+                
+        &#34;&#34;&#34;
+        ref = element.attrib[&#39;storyboardElementRef&#39;]
+        sbet = getattr(StoryboardElementType,element.attrib[&#39;storyboardElementType&#39;])
+        state = getattr(StoryboardElementState,element.attrib[&#39;state&#39;])
+        return StoryboardElementStateCondition(sbet,ref,state)
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the StoryboardElementStateCondition as a dict
@@ -1824,6 +2488,9 @@ class UserDefinedValueCondition(_ValueTriggerType):
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -1853,6 +2520,24 @@ class UserDefinedValueCondition(_ValueTriggerType):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of UserDefinedValueCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (UserDefinedValueCondition): a UserDefinedValueCondition object
+                
+        &#34;&#34;&#34;
+        name = element.attrib[&#39;name&#39;]
+        value = element.attrib[&#39;value&#39;]
+        rule = getattr(Rule,element.attrib[&#39;rule&#39;])
+        return UserDefinedValueCondition(name,value,rule)
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the UserDefinedValueCondition as a dict
@@ -1884,6 +2569,9 @@ class TrafficSignalCondition(_ValueTriggerType):
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -1910,6 +2598,24 @@ class TrafficSignalCondition(_ValueTriggerType):
                 return True
         return False
 
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of TrafficSignalCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (TrafficSignalCondition): a TrafficSignalCondition object
+                
+        &#34;&#34;&#34;
+        name = element.attrib[&#39;name&#39;]
+        state = element.attrib[&#39;state&#39;]
+
+        return TrafficSignalCondition(name,state)
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the TrafficSignalCondition as a dict
 
@@ -1921,7 +2627,6 @@ class TrafficSignalCondition(_ValueTriggerType):
 
         &#34;&#34;&#34;
         return ET.Element(&#39;TrafficSignalCondition&#39;,attrib=self.get_attributes())
-
 
 class TrafficSignalControllerCondition(_ValueTriggerType):
     &#34;&#34;&#34; the TrafficSignalControllerCondition class is an Value Condition used by the ValueTrigger
@@ -1940,6 +2645,9 @@ class TrafficSignalControllerCondition(_ValueTriggerType):
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -1965,6 +2673,24 @@ class TrafficSignalControllerCondition(_ValueTriggerType):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of TrafficSignalControllerCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (TrafficSignalControllerCondition): a TrafficSignalControllerCondition object
+                
+        &#34;&#34;&#34;
+        trafficsignalref = element.attrib[&#39;trafficSignalControllerRef&#39;]
+        phase = element.attrib[&#39;phase&#39;]
+
+        return TrafficSignalControllerCondition(trafficsignalref,phase)
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the TrafficSignalControllerCondition as a dict
@@ -2005,7 +2731,10 @@ rule (Rule): condition rule of triggering
 rule (Rule): condition rule of triggering
 </code></pre>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element()
     Returns the full ElementTree of the class
 
 get_attributes()
@@ -2038,6 +2767,9 @@ rule (Rule): condition rule of triggering
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -2065,6 +2797,24 @@ rule (Rule): condition rule of triggering
                 return True
         return False
 
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of AccelerationCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (AccelerationCondition): a AccelerationCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;AccelerationCondition&#39;)
+        value = condition.attrib[&#39;value&#39;]
+        rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
+        return AccelerationCondition(value,rule)
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the AccelerationCondition as a dict
 
@@ -2084,6 +2834,43 @@ rule (Rule): condition rule of triggering
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.AccelerationCondition.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of AccelerationCondition</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>condition (AccelerationCondition): a AccelerationCondition object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of AccelerationCondition
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (AccelerationCondition): a AccelerationCondition object
+            
+    &#34;&#34;&#34;
+    condition = element.find(&#39;AccelerationCondition&#39;)
+    value = condition.attrib[&#39;value&#39;]
+    rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
+    return AccelerationCondition(value,rule)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.AccelerationCondition.get_attributes"><code class="name flex">
@@ -2135,7 +2922,10 @@ rule (Rule): condition rule of triggering
 <pre><code>entity (str or ObjectType): name of the entity to collide with
 </code></pre>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element()
     Returns the full ElementTree of the class
 
 get_attributes()
@@ -2162,6 +2952,9 @@ get_attributes()
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -2172,9 +2965,9 @@ get_attributes()
     def __init__(self,entity):
         &#34;&#34;&#34; the CollisionCondition class is an Entity Condition used by the EntityTrigger
         
-        Parameters
-        ----------
-            entity (str or ObjectType): name of the entity to collide with
+            Parameters
+            ----------
+                entity (str or ObjectType): name of the entity to collide with
 
         &#34;&#34;&#34;
         
@@ -2186,6 +2979,28 @@ get_attributes()
                 return True
         return False
 
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of CollisionCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (CollisionCondition): a CollisionCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;CollisionCondition&#39;)
+        bytype = condition.find(&#39;ByType&#39;)
+        if bytype is not None:
+            entity = getattr(ObjectType,bytype.attrib[&#39;type&#39;]) 
+        else:
+            entityref = EntityRef.parse(condition.find(&#39;EntityRef&#39;))
+            entity = entityref.entity
+        return CollisionCondition(entity)
+    
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the CollisionCondition
 
@@ -2203,6 +3018,47 @@ get_attributes()
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.CollisionCondition.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of CollisionCondition</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>condition (CollisionCondition): a CollisionCondition object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of CollisionCondition
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (CollisionCondition): a CollisionCondition object
+            
+    &#34;&#34;&#34;
+    condition = element.find(&#39;CollisionCondition&#39;)
+    bytype = condition.find(&#39;ByType&#39;)
+    if bytype is not None:
+        entity = getattr(ObjectType,bytype.attrib[&#39;type&#39;]) 
+    else:
+        entityref = EntityRef.parse(condition.find(&#39;EntityRef&#39;))
+        entity = entityref.entity
+    return CollisionCondition(entity)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.CollisionCondition.get_element"><code class="name flex">
@@ -2305,7 +3161,41 @@ add_condition(condition)
             if self.conditions == other.conditions and \
             self._triggerpoint == other._triggerpoint:
                 return True
+        elif isinstance(other,Trigger):
+            if len(other.conditiongroups) == 1:
+                if self._triggerpoint == other._triggerpoint and \
+                    other.conditiongroups[0] == self:
+                    return True
+        elif isinstance(other,EntityTrigger) or isinstance(other,ValueTrigger):
+            if  len(self.conditions) == 1:
+                if self._triggerpoint == other._triggerpoint and \
+                    self.conditions[0] == other:
+                    return True
+        
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of ConditionGroup
+            Note: if 
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                conditiongroup (ConditionGroup): a ConditionGroup object
+                
+        &#34;&#34;&#34;
+        
+        condgr = ConditionGroup()
+        conditions = element.findall(&#39;Condition&#39;)
+        for cond in conditions:
+            condgr.add_condition(_ConditionFactory().parse_condition(cond))
+
+        return condgr
+
 
     def add_condition(self,condition):
         &#34;&#34;&#34; Adds a condition (EntityTrigger or ValueTrigger) to the ConditionGroup
@@ -2351,6 +3241,48 @@ add_condition(condition)
 <li>scenariogeneration.xosc.utils._TriggerType</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.ConditionGroup.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of ConditionGroup
+Note: if </p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>conditiongroup (ConditionGroup): a ConditionGroup object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of ConditionGroup
+        Note: if 
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            conditiongroup (ConditionGroup): a ConditionGroup object
+            
+    &#34;&#34;&#34;
+    
+    condgr = ConditionGroup()
+    conditions = element.findall(&#39;Condition&#39;)
+    for cond in conditions:
+        condgr.add_condition(_ConditionFactory().parse_condition(cond))
+
+    return condgr</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.ConditionGroup.add_condition"><code class="name flex">
@@ -2452,7 +3384,10 @@ distance_type (RelativeDistanceType): how the relative distance should be calcul
 coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance
 </code></pre>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element()
     Returns the full ElementTree of the class
 
 get_attributes()
@@ -2503,6 +3438,9 @@ get_attributes()
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -2533,6 +3471,42 @@ get_attributes()
             self.position == other.position:
                 return True
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of DistanceCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (DistanceCondition): a DistanceCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;DistanceCondition&#39;)
+        value = condition.attrib[&#39;value&#39;]
+        rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
+        freespace = convert_bool(condition.attrib[&#39;freespace&#39;])
+        if &#39;alongRoute&#39; in condition.attrib:
+            alongroute = condition.attrib[&#39;alongRoute&#39;]
+        else:
+            alongroute = True
+
+        if &#39;relativeDistanceType&#39; in condition.attrib:
+            reldisttype = getattr(RelativeDistanceType,condition.attrib[&#39;relativeDistanceType&#39;])
+        else:
+            reldisttype = RelativeDistanceType.longitudinal
+        
+        if &#39;coordinateSystem&#39; in condition.attrib:
+            coordsystem = getattr(CoordinateSystem,condition.attrib[&#39;coordinateSystem&#39;])
+        else:
+            coordsystem = CoordinateSystem.road
+        position = None
+
+        position = _PositionFactory.parse_position(condition.find(&#39;Position&#39;))
+        return DistanceCondition(value,rule,position,alongroute,freespace,reldisttype,coordsystem)
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the DistanceCondition as a dict
@@ -2566,6 +3540,61 @@ get_attributes()
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.DistanceCondition.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of DistanceCondition</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>condition (DistanceCondition): a DistanceCondition object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of DistanceCondition
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (DistanceCondition): a DistanceCondition object
+            
+    &#34;&#34;&#34;
+    condition = element.find(&#39;DistanceCondition&#39;)
+    value = condition.attrib[&#39;value&#39;]
+    rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
+    freespace = convert_bool(condition.attrib[&#39;freespace&#39;])
+    if &#39;alongRoute&#39; in condition.attrib:
+        alongroute = condition.attrib[&#39;alongRoute&#39;]
+    else:
+        alongroute = True
+
+    if &#39;relativeDistanceType&#39; in condition.attrib:
+        reldisttype = getattr(RelativeDistanceType,condition.attrib[&#39;relativeDistanceType&#39;])
+    else:
+        reldisttype = RelativeDistanceType.longitudinal
+    
+    if &#39;coordinateSystem&#39; in condition.attrib:
+        coordsystem = getattr(CoordinateSystem,condition.attrib[&#39;coordinateSystem&#39;])
+    else:
+        coordsystem = CoordinateSystem.road
+    position = None
+
+    position = _PositionFactory.parse_position(condition.find(&#39;Position&#39;))
+    return DistanceCondition(value,rule,position,alongroute,freespace,reldisttype,coordsystem)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.DistanceCondition.get_attributes"><code class="name flex">
@@ -2674,6 +3703,10 @@ get_attributes()
         if isinstance(other,EmptyTrigger):
             if self._triggerpoint == other._triggerpoint:
                 return True
+        elif isinstance(other,Trigger):
+            if len(other.conditiongroups) == 0 and \
+                self._triggerpoint == other._triggerpoint:
+                return True
         return False
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the Trigger
@@ -2719,7 +3752,10 @@ get_attributes()
 <pre><code>duration (float): the duration at the en of road
 </code></pre>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element()
     Returns the full ElementTree of the class
 
 get_attributes()
@@ -2746,6 +3782,9 @@ get_attributes()
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -2769,6 +3808,24 @@ get_attributes()
                 return True
         return False
 
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of EndOfRoadCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (EndOfRoadCondition): a EndOfRoadCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;EndOfRoadCondition&#39;)
+        duration = condition.attrib[&#39;duration&#39;]
+        return EndOfRoadCondition(duration)
+
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the EndOfRoadCondition as a dict
 
@@ -2788,6 +3845,42 @@ get_attributes()
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.EndOfRoadCondition.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of EndOfRoadCondition</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>condition (EndOfRoadCondition): a EndOfRoadCondition object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of EndOfRoadCondition
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (EndOfRoadCondition): a EndOfRoadCondition object
+            
+    &#34;&#34;&#34;
+    condition = element.find(&#39;EndOfRoadCondition&#39;)
+    duration = condition.attrib[&#39;duration&#39;]
+    return EndOfRoadCondition(duration)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.EndOfRoadCondition.get_attributes"><code class="name flex">
@@ -2976,7 +4069,45 @@ triggeringpoint (str): start or stop
             self.entitycondition == other.entitycondition and \
             self._triggerpoint == other._triggerpoint:
                 return True
+        elif isinstance(other,Trigger):
+            if len(other.conditiongroups) == 1 and len(other.conditiongroups[0].conditions) == 1:
+                if self._triggerpoint == other._triggerpoint and \
+                    other.conditiongroups[0].conditions[0] == self:
+                    return True
+        elif isinstance(other,ConditionGroup):
+            if len(other.conditions) == 1:
+                if self._triggerpoint == other._triggerpoint and \
+                    other.conditions[0] == self:
+                    return True
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of EntityTrigger
+            NOTE: this parser will ONLY parse the Condition itself, not the CondintionGroup or Trigger that it can generate
+            
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (EntityTrigger): a EntityTrigger object
+                
+        &#34;&#34;&#34;
+        if element.tag != &#39;Condition&#39;:
+            raise NotAValidElement(&#39;ValueTrigger only parses a Condition, not &#39;, element)
+
+        name = element.attrib[&#39;name&#39;]
+        delay = element.attrib[&#39;delay&#39;]
+        conditionedge = getattr(ConditionEdge,element.attrib[&#39;conditionEdge&#39;])
+        entityconditionelement = element.find(&#39;ByEntityCondition&#39;)
+        triggering_entities = TriggeringEntities.parse(entityconditionelement.find(&#39;TriggeringEntities&#39;))
+        condition = _EntityConditionFactory.parse_entity_condition(entityconditionelement.find(&#39;EntityCondition&#39;))
+        enttrig = EntityTrigger(name,delay,conditionedge,condition,&#39;&#39;)
+        enttrig.triggerentity = triggering_entities
+
+        return enttrig
 
     def _set_used_by_parent(self):
         &#34;&#34;&#34; _set_used_by_parent is used internaly if the condition is added to a ConditionGroup
@@ -3022,6 +4153,54 @@ triggeringpoint (str): start or stop
 <li>scenariogeneration.xosc.utils._TriggerType</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.EntityTrigger.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of EntityTrigger
+NOTE: this parser will ONLY parse the Condition itself, not the CondintionGroup or Trigger that it can generate</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>condition (EntityTrigger): a EntityTrigger object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of EntityTrigger
+        NOTE: this parser will ONLY parse the Condition itself, not the CondintionGroup or Trigger that it can generate
+        
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (EntityTrigger): a EntityTrigger object
+            
+    &#34;&#34;&#34;
+    if element.tag != &#39;Condition&#39;:
+        raise NotAValidElement(&#39;ValueTrigger only parses a Condition, not &#39;, element)
+
+    name = element.attrib[&#39;name&#39;]
+    delay = element.attrib[&#39;delay&#39;]
+    conditionedge = getattr(ConditionEdge,element.attrib[&#39;conditionEdge&#39;])
+    entityconditionelement = element.find(&#39;ByEntityCondition&#39;)
+    triggering_entities = TriggeringEntities.parse(entityconditionelement.find(&#39;TriggeringEntities&#39;))
+    condition = _EntityConditionFactory.parse_entity_condition(entityconditionelement.find(&#39;EntityCondition&#39;))
+    enttrig = EntityTrigger(name,delay,conditionedge,condition,&#39;&#39;)
+    enttrig.triggerentity = triggering_entities
+
+    return enttrig</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.EntityTrigger.add_triggering_entity"><code class="name flex">
@@ -3106,7 +4285,10 @@ triggeringpoint (str): start or stop
 <pre><code>duration (float): the duration of offroad
 </code></pre>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element()
     Returns the full ElementTree of the class
 
 get_attributes()
@@ -3133,6 +4315,9 @@ get_attributes()
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -3156,6 +4341,23 @@ get_attributes()
                 return True
         return False
 
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of OffroadCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (OffroadCondition): a OffroadCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;OffroadCondition&#39;)
+        duration = condition.attrib[&#39;duration&#39;]
+        return OffroadCondition(duration)
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the OffroadCondition as a dict
 
@@ -3175,6 +4377,42 @@ get_attributes()
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.OffroadCondition.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of OffroadCondition</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>condition (OffroadCondition): a OffroadCondition object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of OffroadCondition
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (OffroadCondition): a OffroadCondition object
+            
+    &#34;&#34;&#34;
+    condition = element.find(&#39;OffroadCondition&#39;)
+    duration = condition.attrib[&#39;duration&#39;]
+    return OffroadCondition(duration)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.OffroadCondition.get_attributes"><code class="name flex">
@@ -3234,7 +4472,10 @@ value (int): value to trigger on
 rule (Rule): condition rule of triggering
 </code></pre>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element()
     Returns the full ElementTree of the class
 
 get_attributes()
@@ -3273,6 +4514,9 @@ rule (Rule): condition rule of triggering
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -3304,6 +4548,24 @@ rule (Rule): condition rule of triggering
                 return True
         return False
 
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of ParameterCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (ParameterCondition): a ParameterCondition object
+                
+        &#34;&#34;&#34;
+        parameter = element.attrib[&#39;parameterRef&#39;]
+        value = element.attrib[&#39;value&#39;]
+        rule = getattr(Rule,element.attrib[&#39;rule&#39;])
+        return ParameterCondition(parameter,value,rule)
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the ParameterCondition as a dict
 
@@ -3323,6 +4585,43 @@ rule (Rule): condition rule of triggering
 <li>scenariogeneration.xosc.utils._ValueTriggerType</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.ParameterCondition.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of ParameterCondition</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>condition (ParameterCondition): a ParameterCondition object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of ParameterCondition
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (ParameterCondition): a ParameterCondition object
+            
+    &#34;&#34;&#34;
+    parameter = element.attrib[&#39;parameterRef&#39;]
+    value = element.attrib[&#39;value&#39;]
+    rule = getattr(Rule,element.attrib[&#39;rule&#39;])
+    return ParameterCondition(parameter,value,rule)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.ParameterCondition.get_attributes"><code class="name flex">
@@ -3378,7 +4677,10 @@ tolerance (float): tolerance of the position
 tolerance (float): tolerance of the position
 </code></pre>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element()
     Returns the full ElementTree of the class
 
 get_attributes()
@@ -3411,6 +4713,9 @@ tolerance (float): tolerance of the position
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -3440,6 +4745,24 @@ tolerance (float): tolerance of the position
                 return True
         return False
 
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of ReachPositionCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (ReachPositionCondition): a ReachPositionCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;ReachPositionCondition&#39;)
+        tolerance = condition.attrib[&#39;tolerance&#39;]
+        position = _PositionFactory.parse_position(condition.find(&#39;Position&#39;))
+        return ReachPositionCondition(position,tolerance)
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the ReachPositionCondition as a dict
 
@@ -3461,6 +4784,43 @@ tolerance (float): tolerance of the position
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.ReachPositionCondition.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of ReachPositionCondition</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>condition (ReachPositionCondition): a ReachPositionCondition object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of ReachPositionCondition
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (ReachPositionCondition): a ReachPositionCondition object
+            
+    &#34;&#34;&#34;
+    condition = element.find(&#39;ReachPositionCondition&#39;)
+    tolerance = condition.attrib[&#39;tolerance&#39;]
+    position = _PositionFactory.parse_position(condition.find(&#39;Position&#39;))
+    return ReachPositionCondition(position,tolerance)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.ReachPositionCondition.get_attributes"><code class="name flex">
@@ -3535,7 +4895,10 @@ freespace (bool): (True) distance between bounding boxes, (False) distance betwe
 coordinate_system (CoordinateSystem): what coordinate system to use (valid from V1.1)
 </code></pre>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element()
     Returns the full ElementTree of the class
 
 get_attributes()
@@ -3596,6 +4959,9 @@ coordinate_system (CoordinateSystem): what coordinate system to use (valid from 
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -3642,6 +5008,41 @@ coordinate_system (CoordinateSystem): what coordinate system to use (valid from 
                 return True
         return False
 
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of RelativeDistanceCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (RelativeDistanceCondition): a RelativeDistanceCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;RelativeDistanceCondition&#39;)
+        value = condition.attrib[&#39;value&#39;]
+        rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
+        freespace = convert_bool(condition.attrib[&#39;freespace&#39;])
+        entity = condition.attrib[&#39;entityRef&#39;]
+        if &#39;alongRoute&#39; in condition.attrib:
+            alongroute = condition.attrib[&#39;alongRoute&#39;]
+        else:
+            alongroute = True
+
+        if &#39;relativeDistanceType&#39; in condition.attrib:
+            reldisttype = getattr(RelativeDistanceType,condition.attrib[&#39;relativeDistanceType&#39;])
+        else:
+            reldisttype = RelativeDistanceType.longitudinal
+        
+        if &#39;coordinateSystem&#39; in condition.attrib:
+            coordsystem = getattr(CoordinateSystem,condition.attrib[&#39;coordinateSystem&#39;])
+        else:
+            coordsystem = CoordinateSystem.road
+        
+        return RelativeDistanceCondition(value,rule,reldisttype,entity,alongroute,freespace,coordsystem)
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the RelativeDistanceCondition as a dict
 
@@ -3669,6 +5070,60 @@ coordinate_system (CoordinateSystem): what coordinate system to use (valid from 
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.RelativeDistanceCondition.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of RelativeDistanceCondition</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>condition (RelativeDistanceCondition): a RelativeDistanceCondition object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of RelativeDistanceCondition
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (RelativeDistanceCondition): a RelativeDistanceCondition object
+            
+    &#34;&#34;&#34;
+    condition = element.find(&#39;RelativeDistanceCondition&#39;)
+    value = condition.attrib[&#39;value&#39;]
+    rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
+    freespace = convert_bool(condition.attrib[&#39;freespace&#39;])
+    entity = condition.attrib[&#39;entityRef&#39;]
+    if &#39;alongRoute&#39; in condition.attrib:
+        alongroute = condition.attrib[&#39;alongRoute&#39;]
+    else:
+        alongroute = True
+
+    if &#39;relativeDistanceType&#39; in condition.attrib:
+        reldisttype = getattr(RelativeDistanceType,condition.attrib[&#39;relativeDistanceType&#39;])
+    else:
+        reldisttype = RelativeDistanceType.longitudinal
+    
+    if &#39;coordinateSystem&#39; in condition.attrib:
+        coordsystem = getattr(CoordinateSystem,condition.attrib[&#39;coordinateSystem&#39;])
+    else:
+        coordsystem = CoordinateSystem.road
+    
+    return RelativeDistanceCondition(value,rule,reldisttype,entity,alongroute,freespace,coordsystem)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.RelativeDistanceCondition.get_attributes"><code class="name flex">
@@ -3736,7 +5191,10 @@ rule (Rule): condition rule of triggering
 entity (str): name of the entity to be relative to
 </code></pre>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element()
     Returns the full ElementTree of the class
 
 get_attributes()
@@ -3775,6 +5233,9 @@ entity (str): name of the entity to be relative to
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -3806,6 +5267,25 @@ entity (str): name of the entity to be relative to
                 return True
         return False
 
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of RelativeSpeedCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (RelativeSpeedCondition): a RelativeSpeedCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;RelativeSpeedCondition&#39;)
+        value = condition.attrib[&#39;value&#39;]
+        entity = condition.attrib[&#39;entityRef&#39;]
+        rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
+        return RelativeSpeedCondition(value,rule,entity)
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the RelativeSpeedCondition as a dict
 
@@ -3830,6 +5310,44 @@ entity (str): name of the entity to be relative to
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.RelativeSpeedCondition.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of RelativeSpeedCondition</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>condition (RelativeSpeedCondition): a RelativeSpeedCondition object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of RelativeSpeedCondition
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (RelativeSpeedCondition): a RelativeSpeedCondition object
+            
+    &#34;&#34;&#34;
+    condition = element.find(&#39;RelativeSpeedCondition&#39;)
+    value = condition.attrib[&#39;value&#39;]
+    entity = condition.attrib[&#39;entityRef&#39;]
+    rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
+    return RelativeSpeedCondition(value,rule,entity)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.RelativeSpeedCondition.get_attributes"><code class="name flex">
@@ -3889,7 +5407,10 @@ rule (Rule): condition rule of triggering
 rule (Rule): condition rule of triggering
 </code></pre>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element()
     Returns the full ElementTree of the class
 
 get_attributes()
@@ -3922,6 +5443,9 @@ rule (Rule): condition rule of triggering
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -3949,6 +5473,24 @@ rule (Rule): condition rule of triggering
                 return True
         return False
 
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of SimulationTimeCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (SimulationTimeCondition): a SimulationTimeCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;SimulationTimeCondition&#39;)
+        value = element.attrib[&#39;value&#39;]
+        rule = getattr(Rule,element.attrib[&#39;rule&#39;])
+        return SimulationTimeCondition(value,rule)
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the SimulationTimeCondition as a dict
 
@@ -3968,6 +5510,43 @@ rule (Rule): condition rule of triggering
 <li>scenariogeneration.xosc.utils._ValueTriggerType</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.SimulationTimeCondition.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of SimulationTimeCondition</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>condition (SimulationTimeCondition): a SimulationTimeCondition object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of SimulationTimeCondition
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (SimulationTimeCondition): a SimulationTimeCondition object
+            
+    &#34;&#34;&#34;
+    condition = element.find(&#39;SimulationTimeCondition&#39;)
+    value = element.attrib[&#39;value&#39;]
+    rule = getattr(Rule,element.attrib[&#39;rule&#39;])
+    return SimulationTimeCondition(value,rule)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.SimulationTimeCondition.get_attributes"><code class="name flex">
@@ -4024,7 +5603,10 @@ rule (Rule): condition rule of triggering
 rule (Rule): condition rule of triggering
 </code></pre>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element()
     Returns the full ElementTree of the class
 
 get_attributes()
@@ -4057,6 +5639,9 @@ rule (Rule): condition rule of triggering
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -4083,6 +5668,24 @@ rule (Rule): condition rule of triggering
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
+    
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of SpeedCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (SpeedCondition): a SpeedCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;SpeedCondition&#39;)
+        value = condition.attrib[&#39;value&#39;]
+        rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
+        return SpeedCondition(value,rule)
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the SpeedCondition as a dict
@@ -4107,6 +5710,43 @@ rule (Rule): condition rule of triggering
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.SpeedCondition.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of SpeedCondition</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>condition (SpeedCondition): a SpeedCondition object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of SpeedCondition
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (SpeedCondition): a SpeedCondition object
+            
+    &#34;&#34;&#34;
+    condition = element.find(&#39;SpeedCondition&#39;)
+    value = condition.attrib[&#39;value&#39;]
+    rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
+    return SpeedCondition(value,rule)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.SpeedCondition.get_attributes"><code class="name flex">
@@ -4161,7 +5801,10 @@ rule (Rule): condition rule of triggering
 <pre><code>duration (float): time of standstill
 </code></pre>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element()
     Returns the full ElementTree of the class
 
 get_attributes()
@@ -4188,6 +5831,9 @@ get_attributes()
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -4201,6 +5847,7 @@ get_attributes()
         Parameters
         ----------
             duration (float): time of standstill
+
         &#34;&#34;&#34;
         self.duration = duration
 
@@ -4209,6 +5856,23 @@ get_attributes()
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of StandStillCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (StandStillCondition): a StandStillCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;StandStillCondition&#39;)
+        duration = condition.attrib[&#39;duration&#39;]
+        return StandStillCondition(duration)
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the StandStillCondition as a dict
@@ -4229,6 +5893,42 @@ get_attributes()
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.StandStillCondition.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of StandStillCondition</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>condition (StandStillCondition): a StandStillCondition object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of StandStillCondition
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (StandStillCondition): a StandStillCondition object
+            
+    &#34;&#34;&#34;
+    condition = element.find(&#39;StandStillCondition&#39;)
+    duration = condition.attrib[&#39;duration&#39;]
+    return StandStillCondition(duration)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.StandStillCondition.get_attributes"><code class="name flex">
@@ -4288,7 +5988,10 @@ reference (str): reference of the parameter
 state (StoryboardElementState): state to trigger on
 </code></pre>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element()
     Returns the full ElementTree of the class
 
 get_attributes()
@@ -4327,6 +6030,9 @@ state (StoryBoardElementState): state to trigger on
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -4359,6 +6065,24 @@ state (StoryBoardElementState): state to trigger on
                 return True
         return False
 
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of StoryboardElementStateCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (StoryboardElementStateCondition): a StoryboardElementStateCondition object
+                
+        &#34;&#34;&#34;
+        ref = element.attrib[&#39;storyboardElementRef&#39;]
+        sbet = getattr(StoryboardElementType,element.attrib[&#39;storyboardElementType&#39;])
+        state = getattr(StoryboardElementState,element.attrib[&#39;state&#39;])
+        return StoryboardElementStateCondition(sbet,ref,state)
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the StoryboardElementStateCondition as a dict
 
@@ -4376,6 +6100,43 @@ state (StoryBoardElementState): state to trigger on
 <li>scenariogeneration.xosc.utils._ValueTriggerType</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.StoryboardElementStateCondition.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of StoryboardElementStateCondition</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>condition (StoryboardElementStateCondition): a StoryboardElementStateCondition object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of StoryboardElementStateCondition
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (StoryboardElementStateCondition): a StoryboardElementStateCondition object
+            
+    &#34;&#34;&#34;
+    ref = element.attrib[&#39;storyboardElementRef&#39;]
+    sbet = getattr(StoryboardElementType,element.attrib[&#39;storyboardElementType&#39;])
+    state = getattr(StoryboardElementState,element.attrib[&#39;state&#39;])
+    return StoryboardElementStateCondition(sbet,ref,state)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.StoryboardElementStateCondition.get_attributes"><code class="name flex">
@@ -4453,7 +6214,10 @@ distance_type (RelativeDistanceType): how the relative distance should be calcul
 coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
 </code></pre>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element()
     Returns the full ElementTree of the class
 
 get_attributes()
@@ -4523,6 +6287,9 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
                 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -4577,6 +6344,41 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
                 return True
         return False
 
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of TimeHeadwayCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (TimeHeadwayCondition): a TimeHeadwayCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;TimeHeadwayCondition&#39;)
+        entity = condition.attrib[&#39;entityRef&#39;]
+        value = condition.attrib[&#39;value&#39;]
+        rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
+        if &#39;alongRoute&#39; in condition.attrib:
+            alongroute = condition.attrib[&#39;alongRoute&#39;]
+        else:
+            alongroute = True
+
+        if &#39;relativeDistanceType&#39; in condition.attrib:
+            reldisttype = getattr(RelativeDistanceType,condition.attrib[&#39;relativeDistanceType&#39;])
+        else:
+            reldisttype = RelativeDistanceType.longitudinal
+        
+        if &#39;coordinateSystem&#39; in condition.attrib:
+            coordsystem = getattr(CoordinateSystem,condition.attrib[&#39;coordinateSystem&#39;])
+        else:
+            coordsystem = CoordinateSystem.road
+        freespace = convert_bool(condition.attrib[&#39;freespace&#39;])
+        
+        return TimeHeadwayCondition(entity,value,rule,alongroute,freespace,reldisttype,coordsystem)
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the TimeHeadwayCondition as a dict
 
@@ -4587,8 +6389,8 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
         if self.isVersion(minor=0):
             basedict[&#39;alongRoute&#39;] = convert_bool(self.alongroute)
         else:
-            basedict[&#39;relativeDistanceType&#39;] = self.relative_distance_type.name
-            basedict[&#39;coordinateSystem&#39;] = self.coordinate_system.name
+            basedict[&#39;relativeDistanceType&#39;] = self.relative_distance_type.get_name()
+            basedict[&#39;coordinateSystem&#39;] = self.coordinate_system.get_name()
         basedict[&#39;freespace&#39;] = convert_bool(self.freespace)
         basedict[&#39;rule&#39;] = self.rule.get_name()
         return basedict
@@ -4606,6 +6408,60 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.TimeHeadwayCondition.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of TimeHeadwayCondition</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>condition (TimeHeadwayCondition): a TimeHeadwayCondition object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of TimeHeadwayCondition
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (TimeHeadwayCondition): a TimeHeadwayCondition object
+            
+    &#34;&#34;&#34;
+    condition = element.find(&#39;TimeHeadwayCondition&#39;)
+    entity = condition.attrib[&#39;entityRef&#39;]
+    value = condition.attrib[&#39;value&#39;]
+    rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
+    if &#39;alongRoute&#39; in condition.attrib:
+        alongroute = condition.attrib[&#39;alongRoute&#39;]
+    else:
+        alongroute = True
+
+    if &#39;relativeDistanceType&#39; in condition.attrib:
+        reldisttype = getattr(RelativeDistanceType,condition.attrib[&#39;relativeDistanceType&#39;])
+    else:
+        reldisttype = RelativeDistanceType.longitudinal
+    
+    if &#39;coordinateSystem&#39; in condition.attrib:
+        coordsystem = getattr(CoordinateSystem,condition.attrib[&#39;coordinateSystem&#39;])
+    else:
+        coordsystem = CoordinateSystem.road
+    freespace = convert_bool(condition.attrib[&#39;freespace&#39;])
+    
+    return TimeHeadwayCondition(entity,value,rule,alongroute,freespace,reldisttype,coordsystem)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.TimeHeadwayCondition.get_attributes"><code class="name flex">
@@ -4627,8 +6483,8 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
     if self.isVersion(minor=0):
         basedict[&#39;alongRoute&#39;] = convert_bool(self.alongroute)
     else:
-        basedict[&#39;relativeDistanceType&#39;] = self.relative_distance_type.name
-        basedict[&#39;coordinateSystem&#39;] = self.coordinate_system.name
+        basedict[&#39;relativeDistanceType&#39;] = self.relative_distance_type.get_name()
+        basedict[&#39;coordinateSystem&#39;] = self.coordinate_system.get_name()
     basedict[&#39;freespace&#39;] = convert_bool(self.freespace)
     basedict[&#39;rule&#39;] = self.rule.get_name()
     return basedict</code></pre>
@@ -4731,6 +6587,24 @@ time of day (str): datetime ??? format unknown
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of TimeOfDayCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (TimeOfDayCondition): a TimeOfDayCondition object
+                
+        &#34;&#34;&#34;
+        
+        datetime = element.attrib[&#39;datetime&#39;]
+        rule = getattr(Rule,element.attrib[&#39;rule&#39;])
+        return TimeOfDayCondition(rule,datetime)
     
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the TimeOfDayCondition as a dict
@@ -4752,6 +6626,43 @@ time of day (str): datetime ??? format unknown
 <li>scenariogeneration.xosc.utils._ValueTriggerType</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.TimeOfDayCondition.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of TimeOfDayCondition</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>condition (TimeOfDayCondition): a TimeOfDayCondition object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of TimeOfDayCondition
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (TimeOfDayCondition): a TimeOfDayCondition object
+            
+    &#34;&#34;&#34;
+    
+    datetime = element.attrib[&#39;datetime&#39;]
+    rule = getattr(Rule,element.attrib[&#39;rule&#39;])
+    return TimeOfDayCondition(rule,datetime)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.TimeOfDayCondition.get_attributes"><code class="name flex">
@@ -4839,7 +6750,10 @@ distance_type (RelativeDistanceType): how the relative distance should be calcul
 coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
 </code></pre>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element()
     Returns the full ElementTree of the class
 
 get_attributes()
@@ -4921,6 +6835,9 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
                 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -4976,6 +6893,10 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
                 raise TypeError(&#39;input position is not a valid Position&#39;)
             self.position = position
             self.use_entity = False
+        
+        if self.use_entity == None:
+            raise ValueError(&#39;neither position or entity was set.&#39;)
+
         if not hasattr(RelativeDistanceType,str(distance_type)):
             raise ValueError(distance_type + &#39;; is not a valid RelativeDistanceType.&#39;)
         if not hasattr(CoordinateSystem,str(coordinate_system)):
@@ -4990,6 +6911,48 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
                 (not self.use_entity and not other.use_entity and self.position and other.position):
                     return True
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of TimeToCollisionCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (TimeToCollisionCondition): a TimeToCollisionCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;TimeToCollisionCondition&#39;)
+        value = condition.attrib[&#39;value&#39;]
+        rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
+        freespace = convert_bool(condition.attrib[&#39;freespace&#39;])
+        if &#39;alongRoute&#39; in condition.attrib:
+            alongroute = condition.attrib[&#39;alongRoute&#39;]
+        else:
+            alongroute = True
+
+        if &#39;relativeDistanceType&#39; in condition.attrib:
+            reldisttype = getattr(RelativeDistanceType,condition.attrib[&#39;relativeDistanceType&#39;])
+        else:
+            reldisttype = RelativeDistanceType.longitudinal
+        
+        if &#39;coordinateSystem&#39; in condition.attrib:
+            coordsystem = getattr(CoordinateSystem,condition.attrib[&#39;coordinateSystem&#39;])
+        else:
+            coordsystem = CoordinateSystem.road
+        entity = None
+        position = None
+        if condition.find(&#39;TimeToCollisionConditionTarget/EntityRef&#39;) is not None:
+            entityref = EntityRef.parse(condition.find(&#39;TimeToCollisionConditionTarget/EntityRef&#39;))
+            entity = entityref.entity
+        elif condition.find(&#39;TimeToCollisionConditionTarget/Position&#39;) is not None:
+            position = _PositionFactory.parse_position(condition.find(&#39;TimeToCollisionConditionTarget/Position&#39;))
+        else:
+            raise ValueError(&#39;No TimeToCollisionConditionTarget found while parsing TimeToCollisionCondition.&#39;)
+        return TimeToCollisionCondition(value,rule,alongroute,freespace,entity,position,reldisttype,coordsystem)
 
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the TimeToCollisionCondition as a dict
@@ -5015,9 +6978,8 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
         collisionevent = ET.SubElement(element,&#39;TimeToCollisionCondition&#39;,attrib=self.get_attributes())
         
         targetelement = ET.SubElement(collisionevent,&#39;TimeToCollisionConditionTarget&#39;)
-        if self.use_entity == None:
-            raise ValueError(&#39;neither position or entity was set.&#39;)
-        elif self.use_entity:
+
+        if self.use_entity:
             targetelement.append(self.entity.get_element())
         else: 
             targetelement.append(self.position.get_element())
@@ -5030,6 +6992,67 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.TimeToCollisionCondition.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of TimeToCollisionCondition</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>condition (TimeToCollisionCondition): a TimeToCollisionCondition object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of TimeToCollisionCondition
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (TimeToCollisionCondition): a TimeToCollisionCondition object
+            
+    &#34;&#34;&#34;
+    condition = element.find(&#39;TimeToCollisionCondition&#39;)
+    value = condition.attrib[&#39;value&#39;]
+    rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
+    freespace = convert_bool(condition.attrib[&#39;freespace&#39;])
+    if &#39;alongRoute&#39; in condition.attrib:
+        alongroute = condition.attrib[&#39;alongRoute&#39;]
+    else:
+        alongroute = True
+
+    if &#39;relativeDistanceType&#39; in condition.attrib:
+        reldisttype = getattr(RelativeDistanceType,condition.attrib[&#39;relativeDistanceType&#39;])
+    else:
+        reldisttype = RelativeDistanceType.longitudinal
+    
+    if &#39;coordinateSystem&#39; in condition.attrib:
+        coordsystem = getattr(CoordinateSystem,condition.attrib[&#39;coordinateSystem&#39;])
+    else:
+        coordsystem = CoordinateSystem.road
+    entity = None
+    position = None
+    if condition.find(&#39;TimeToCollisionConditionTarget/EntityRef&#39;) is not None:
+        entityref = EntityRef.parse(condition.find(&#39;TimeToCollisionConditionTarget/EntityRef&#39;))
+        entity = entityref.entity
+    elif condition.find(&#39;TimeToCollisionConditionTarget/Position&#39;) is not None:
+        position = _PositionFactory.parse_position(condition.find(&#39;TimeToCollisionConditionTarget/Position&#39;))
+    else:
+        raise ValueError(&#39;No TimeToCollisionConditionTarget found while parsing TimeToCollisionCondition.&#39;)
+    return TimeToCollisionCondition(value,rule,alongroute,freespace,entity,position,reldisttype,coordsystem)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.TimeToCollisionCondition.get_attributes"><code class="name flex">
@@ -5074,9 +7097,8 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
     collisionevent = ET.SubElement(element,&#39;TimeToCollisionCondition&#39;,attrib=self.get_attributes())
     
     targetelement = ET.SubElement(collisionevent,&#39;TimeToCollisionConditionTarget&#39;)
-    if self.use_entity == None:
-        raise ValueError(&#39;neither position or entity was set.&#39;)
-    elif self.use_entity:
+
+    if self.use_entity:
         targetelement.append(self.entity.get_element())
     else: 
         targetelement.append(self.position.get_element())
@@ -5104,7 +7126,10 @@ state (str): state of the signal
 state (str): state of the signal
 </code></pre>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element()
     Returns the full ElementTree of the class
 
 get_attributes()
@@ -5137,6 +7162,9 @@ state (str): state of the signal
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -5163,6 +7191,24 @@ state (str): state of the signal
                 return True
         return False
 
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of TrafficSignalCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (TrafficSignalCondition): a TrafficSignalCondition object
+                
+        &#34;&#34;&#34;
+        name = element.attrib[&#39;name&#39;]
+        state = element.attrib[&#39;state&#39;]
+
+        return TrafficSignalCondition(name,state)
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the TrafficSignalCondition as a dict
 
@@ -5180,6 +7226,43 @@ state (str): state of the signal
 <li>scenariogeneration.xosc.utils._ValueTriggerType</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.TrafficSignalCondition.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of TrafficSignalCondition</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>condition (TrafficSignalCondition): a TrafficSignalCondition object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of TrafficSignalCondition
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (TrafficSignalCondition): a TrafficSignalCondition object
+            
+    &#34;&#34;&#34;
+    name = element.attrib[&#39;name&#39;]
+    state = element.attrib[&#39;state&#39;]
+
+    return TrafficSignalCondition(name,state)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.TrafficSignalCondition.get_attributes"><code class="name flex">
@@ -5233,7 +7316,10 @@ phase (str): ???
 phase (str): ???
 </code></pre>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element()
     Returns the full ElementTree of the class
 
 get_attributes()
@@ -5266,6 +7352,9 @@ phase (str): ???
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -5292,6 +7381,24 @@ phase (str): ???
                 return True
         return False
 
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of TrafficSignalControllerCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (TrafficSignalControllerCondition): a TrafficSignalControllerCondition object
+                
+        &#34;&#34;&#34;
+        trafficsignalref = element.attrib[&#39;trafficSignalControllerRef&#39;]
+        phase = element.attrib[&#39;phase&#39;]
+
+        return TrafficSignalControllerCondition(trafficsignalref,phase)
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the TrafficSignalControllerCondition as a dict
 
@@ -5309,6 +7416,43 @@ phase (str): ???
 <li>scenariogeneration.xosc.utils._ValueTriggerType</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.TrafficSignalControllerCondition.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of TrafficSignalControllerCondition</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>condition (TrafficSignalControllerCondition): a TrafficSignalControllerCondition object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of TrafficSignalControllerCondition
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (TrafficSignalControllerCondition): a TrafficSignalControllerCondition object
+            
+    &#34;&#34;&#34;
+    trafficsignalref = element.attrib[&#39;trafficSignalControllerRef&#39;]
+    phase = element.attrib[&#39;phase&#39;]
+
+    return TrafficSignalControllerCondition(trafficsignalref,phase)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.TrafficSignalControllerCondition.get_attributes"><code class="name flex">
@@ -5358,7 +7502,10 @@ phase (str): ???
 <pre><code>value (float): how far it has traveled
 </code></pre>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element()
     Returns the full ElementTree of the class
 
 get_attributes()
@@ -5385,6 +7532,9 @@ get_attributes()
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -5408,6 +7558,23 @@ get_attributes()
                 return True
         return False
 
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of TraveledDistanceCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (TraveledDistanceCondition): a TraveledDistanceCondition object
+                
+        &#34;&#34;&#34;
+        condition = element.find(&#39;TraveledDistanceCondition&#39;)
+        value = condition.attrib[&#39;value&#39;]
+        return TraveledDistanceCondition(value)
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the TraveledDistanceCondition as a dict
 
@@ -5427,6 +7594,42 @@ get_attributes()
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.TraveledDistanceCondition.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of TraveledDistanceCondition</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>condition (TraveledDistanceCondition): a TraveledDistanceCondition object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of TraveledDistanceCondition
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (TraveledDistanceCondition): a TraveledDistanceCondition object
+            
+    &#34;&#34;&#34;
+    condition = element.find(&#39;TraveledDistanceCondition&#39;)
+    value = condition.attrib[&#39;value&#39;]
+    return TraveledDistanceCondition(value)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.TraveledDistanceCondition.get_attributes"><code class="name flex">
@@ -5541,7 +7744,44 @@ add_conditiongroup(conditiongroup)
             if self.conditiongroups == other.conditiongroups and \
             self._triggerpoint == other._triggerpoint:
                 return True
+        elif isinstance(other,EntityTrigger) or isinstance(other,ValueTrigger):
+            if len(self.conditiongroups) == 1 and len(self.conditiongroups[0].conditions) == 1:
+                if self._triggerpoint == other._triggerpoint and \
+                    self.conditiongroups[0].conditions[0] == other:
+                    return True
+        elif isinstance(other,ConditionGroup):
+            if len(self.conditiongroups) == 1:
+                if self._triggerpoint == other._triggerpoint and \
+                    self.conditiongroups[0] == other:
+                    return True
+        elif isinstance(other,EmptyTrigger):
+            if len(self.conditiongroups) == 0 and \
+                self._triggerpoint == other._triggerpoint:
+                return True
         return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of ConditionGroup
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                conditiongroup (ConditionGroup): a ConditionGroup object
+                
+        &#34;&#34;&#34;
+        
+        trigger = Trigger()
+        trigger._triggerpoint = element.tag
+        
+        conditiongroups = element.findall(&#39;ConditionGroup&#39;)
+        for condgr in conditiongroups:
+            trigger.add_conditiongroup(ConditionGroup.parse(condgr))
+
+        return trigger
 
     def add_conditiongroup(self,conditiongroup):
         &#34;&#34;&#34; Adds a conditiongroup to the trigger
@@ -5572,6 +7812,48 @@ add_conditiongroup(conditiongroup)
 <li>scenariogeneration.xosc.utils._TriggerType</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.Trigger.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of ConditionGroup</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>conditiongroup (ConditionGroup): a ConditionGroup object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of ConditionGroup
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            conditiongroup (ConditionGroup): a ConditionGroup object
+            
+    &#34;&#34;&#34;
+    
+    trigger = Trigger()
+    trigger._triggerpoint = element.tag
+    
+    conditiongroups = element.findall(&#39;ConditionGroup&#39;)
+    for condgr in conditiongroups:
+        trigger.add_conditiongroup(ConditionGroup.parse(condgr))
+
+    return trigger</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.Trigger.add_conditiongroup"><code class="name flex">
@@ -5704,6 +7986,28 @@ triggeringrule (str): all or any
                 return True
         return False
 
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of TriggeringEntities
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                triggeringentities (TriggeringEntities): a TriggeringEntities object
+                
+        &#34;&#34;&#34;
+        
+        rule = getattr(TriggeringEntitiesRule,element.attrib[&#39;triggeringEntitiesRule&#39;])
+        triggeringentities = TriggeringEntities(rule)
+        entrefs = element.findall(&#39;EntityRef&#39;)
+        for ent in entrefs:
+            entityref = EntityRef.parse(ent)
+            triggeringentities.add_entity(entityref.entity)
+        return triggeringentities
+
     def add_entity(self,entity):
         &#34;&#34;&#34; add_entity adds an entity to the TriggeringEntities
 
@@ -5733,6 +8037,47 @@ triggeringrule (str): all or any
 <ul class="hlist">
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.TriggeringEntities.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of TriggeringEntities</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>triggeringentities (TriggeringEntities): a TriggeringEntities object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of TriggeringEntities
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            triggeringentities (TriggeringEntities): a TriggeringEntities object
+            
+    &#34;&#34;&#34;
+    
+    rule = getattr(TriggeringEntitiesRule,element.attrib[&#39;triggeringEntitiesRule&#39;])
+    triggeringentities = TriggeringEntities(rule)
+    entrefs = element.findall(&#39;EntityRef&#39;)
+    for ent in entrefs:
+        entityref = EntityRef.parse(ent)
+        triggeringentities.add_entity(entityref.entity)
+    return triggeringentities</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.TriggeringEntities.add_entity"><code class="name flex">
@@ -5816,7 +8161,10 @@ value (int): value to trigger on
 rule (Rule): condition rule of triggering
 </code></pre>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element()
     Returns the full ElementTree of the class
 
 get_attributes()
@@ -5855,6 +8203,9 @@ rule (Rule): condition rule of triggering
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class   
+
             get_element()
                 Returns the full ElementTree of the class
 
@@ -5885,6 +8236,24 @@ rule (Rule): condition rule of triggering
                 return True
         return False
 
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of UserDefinedValueCondition
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (UserDefinedValueCondition): a UserDefinedValueCondition object
+                
+        &#34;&#34;&#34;
+        name = element.attrib[&#39;name&#39;]
+        value = element.attrib[&#39;value&#39;]
+        rule = getattr(Rule,element.attrib[&#39;rule&#39;])
+        return UserDefinedValueCondition(name,value,rule)
+
     def get_attributes(self):
         &#34;&#34;&#34; returns the attributes of the UserDefinedValueCondition as a dict
 
@@ -5903,6 +8272,43 @@ rule (Rule): condition rule of triggering
 <li>scenariogeneration.xosc.utils._ValueTriggerType</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.UserDefinedValueCondition.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of UserDefinedValueCondition</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>condition (UserDefinedValueCondition): a UserDefinedValueCondition object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of UserDefinedValueCondition
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (UserDefinedValueCondition): a UserDefinedValueCondition object
+            
+    &#34;&#34;&#34;
+    name = element.attrib[&#39;name&#39;]
+    value = element.attrib[&#39;value&#39;]
+    rule = getattr(Rule,element.attrib[&#39;rule&#39;])
+    return UserDefinedValueCondition(name,value,rule)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.UserDefinedValueCondition.get_attributes"><code class="name flex">
@@ -6087,8 +8493,41 @@ triggeringpoint (str): start or stop
             self.valuecondition == other.valuecondition and \
             self._triggerpoint == other._triggerpoint:
                 return True
+        elif isinstance(other,Trigger):
+            if len(other.conditiongroups) == 1 and len(other.conditiongroups[0].conditions) == 1:
+                if self._triggerpoint == other._triggerpoint and \
+                    other.conditiongroups[0].conditions[0] == self:
+                    return True
+        elif isinstance(other,ConditionGroup):
+            if len(other.conditions) == 1:
+                if self._triggerpoint == other._triggerpoint and \
+                    other.conditions[0] == self:
+                    return True
         return False
-        
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of ValueTrigger
+            NOTE: this parser will ONLY parse the Condition itself, not the CondintionGroup or Trigger that it can generate
+            
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+            Returns
+            -------
+                condition (ValueTrigger): a ValueTrigger object
+                
+        &#34;&#34;&#34;
+        if element.tag != &#39;Condition&#39;:
+            raise NotAValidElement(&#39;ValueTrigger only parses a Condition, not &#39;, element)
+
+        name = element.attrib[&#39;name&#39;]
+        delay = element.attrib[&#39;delay&#39;]
+        conditionedge = getattr(ConditionEdge,element.attrib[&#39;conditionEdge&#39;])
+        condition = _ValueConditionFactory.parse_value_condition(element.find(&#39;ByValueCondition&#39;))
+        return ValueTrigger(name,delay,conditionedge,condition)
+
     def _set_used_by_parent(self):
         &#34;&#34;&#34; _set_used_by_parent is used internaly if the condition is added to a ConditionGroup
 
@@ -6122,6 +8561,49 @@ triggeringpoint (str): start or stop
 <li>scenariogeneration.xosc.utils._TriggerType</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.ValueTrigger.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of ValueTrigger
+NOTE: this parser will ONLY parse the Condition itself, not the CondintionGroup or Trigger that it can generate</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>condition (ValueTrigger): a ValueTrigger object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of ValueTrigger
+        NOTE: this parser will ONLY parse the Condition itself, not the CondintionGroup or Trigger that it can generate
+        
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (ValueTrigger): a ValueTrigger object
+            
+    &#34;&#34;&#34;
+    if element.tag != &#39;Condition&#39;:
+        raise NotAValidElement(&#39;ValueTrigger only parses a Condition, not &#39;, element)
+
+    name = element.attrib[&#39;name&#39;]
+    delay = element.attrib[&#39;delay&#39;]
+    conditionedge = getattr(ConditionEdge,element.attrib[&#39;conditionEdge&#39;])
+    condition = _ValueConditionFactory.parse_value_condition(element.find(&#39;ByValueCondition&#39;))
+    return ValueTrigger(name,delay,conditionedge,condition)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.triggers.ValueTrigger.get_attributes"><code class="name flex">
@@ -6189,12 +8671,14 @@ triggeringpoint (str): start or stop
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.triggers.AccelerationCondition.get_attributes" href="#scenariogeneration.xosc.triggers.AccelerationCondition.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.AccelerationCondition.get_element" href="#scenariogeneration.xosc.triggers.AccelerationCondition.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.AccelerationCondition.parse" href="#scenariogeneration.xosc.triggers.AccelerationCondition.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
 <h4><code><a title="scenariogeneration.xosc.triggers.CollisionCondition" href="#scenariogeneration.xosc.triggers.CollisionCondition">CollisionCondition</a></code></h4>
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.triggers.CollisionCondition.get_element" href="#scenariogeneration.xosc.triggers.CollisionCondition.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.CollisionCondition.parse" href="#scenariogeneration.xosc.triggers.CollisionCondition.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
@@ -6202,6 +8686,7 @@ triggeringpoint (str): start or stop
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.triggers.ConditionGroup.add_condition" href="#scenariogeneration.xosc.triggers.ConditionGroup.add_condition">add_condition</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.ConditionGroup.get_element" href="#scenariogeneration.xosc.triggers.ConditionGroup.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.ConditionGroup.parse" href="#scenariogeneration.xosc.triggers.ConditionGroup.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
@@ -6209,6 +8694,7 @@ triggeringpoint (str): start or stop
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.triggers.DistanceCondition.get_attributes" href="#scenariogeneration.xosc.triggers.DistanceCondition.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.DistanceCondition.get_element" href="#scenariogeneration.xosc.triggers.DistanceCondition.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.DistanceCondition.parse" href="#scenariogeneration.xosc.triggers.DistanceCondition.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
@@ -6222,6 +8708,7 @@ triggeringpoint (str): start or stop
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.triggers.EndOfRoadCondition.get_attributes" href="#scenariogeneration.xosc.triggers.EndOfRoadCondition.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.EndOfRoadCondition.get_element" href="#scenariogeneration.xosc.triggers.EndOfRoadCondition.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.EndOfRoadCondition.parse" href="#scenariogeneration.xosc.triggers.EndOfRoadCondition.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
@@ -6230,6 +8717,7 @@ triggeringpoint (str): start or stop
 <li><code><a title="scenariogeneration.xosc.triggers.EntityTrigger.add_triggering_entity" href="#scenariogeneration.xosc.triggers.EntityTrigger.add_triggering_entity">add_triggering_entity</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.EntityTrigger.get_attributes" href="#scenariogeneration.xosc.triggers.EntityTrigger.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.EntityTrigger.get_element" href="#scenariogeneration.xosc.triggers.EntityTrigger.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.EntityTrigger.parse" href="#scenariogeneration.xosc.triggers.EntityTrigger.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
@@ -6237,6 +8725,7 @@ triggeringpoint (str): start or stop
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.triggers.OffroadCondition.get_attributes" href="#scenariogeneration.xosc.triggers.OffroadCondition.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.OffroadCondition.get_element" href="#scenariogeneration.xosc.triggers.OffroadCondition.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.OffroadCondition.parse" href="#scenariogeneration.xosc.triggers.OffroadCondition.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
@@ -6244,6 +8733,7 @@ triggeringpoint (str): start or stop
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.triggers.ParameterCondition.get_attributes" href="#scenariogeneration.xosc.triggers.ParameterCondition.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.ParameterCondition.get_element" href="#scenariogeneration.xosc.triggers.ParameterCondition.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.ParameterCondition.parse" href="#scenariogeneration.xosc.triggers.ParameterCondition.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
@@ -6251,6 +8741,7 @@ triggeringpoint (str): start or stop
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.triggers.ReachPositionCondition.get_attributes" href="#scenariogeneration.xosc.triggers.ReachPositionCondition.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.ReachPositionCondition.get_element" href="#scenariogeneration.xosc.triggers.ReachPositionCondition.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.ReachPositionCondition.parse" href="#scenariogeneration.xosc.triggers.ReachPositionCondition.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
@@ -6258,6 +8749,7 @@ triggeringpoint (str): start or stop
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.triggers.RelativeDistanceCondition.get_attributes" href="#scenariogeneration.xosc.triggers.RelativeDistanceCondition.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.RelativeDistanceCondition.get_element" href="#scenariogeneration.xosc.triggers.RelativeDistanceCondition.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.RelativeDistanceCondition.parse" href="#scenariogeneration.xosc.triggers.RelativeDistanceCondition.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
@@ -6265,6 +8757,7 @@ triggeringpoint (str): start or stop
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.triggers.RelativeSpeedCondition.get_attributes" href="#scenariogeneration.xosc.triggers.RelativeSpeedCondition.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.RelativeSpeedCondition.get_element" href="#scenariogeneration.xosc.triggers.RelativeSpeedCondition.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.RelativeSpeedCondition.parse" href="#scenariogeneration.xosc.triggers.RelativeSpeedCondition.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
@@ -6272,6 +8765,7 @@ triggeringpoint (str): start or stop
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.triggers.SimulationTimeCondition.get_attributes" href="#scenariogeneration.xosc.triggers.SimulationTimeCondition.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.SimulationTimeCondition.get_element" href="#scenariogeneration.xosc.triggers.SimulationTimeCondition.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.SimulationTimeCondition.parse" href="#scenariogeneration.xosc.triggers.SimulationTimeCondition.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
@@ -6279,6 +8773,7 @@ triggeringpoint (str): start or stop
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.triggers.SpeedCondition.get_attributes" href="#scenariogeneration.xosc.triggers.SpeedCondition.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.SpeedCondition.get_element" href="#scenariogeneration.xosc.triggers.SpeedCondition.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.SpeedCondition.parse" href="#scenariogeneration.xosc.triggers.SpeedCondition.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
@@ -6286,6 +8781,7 @@ triggeringpoint (str): start or stop
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.triggers.StandStillCondition.get_attributes" href="#scenariogeneration.xosc.triggers.StandStillCondition.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.StandStillCondition.get_element" href="#scenariogeneration.xosc.triggers.StandStillCondition.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.StandStillCondition.parse" href="#scenariogeneration.xosc.triggers.StandStillCondition.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
@@ -6293,6 +8789,7 @@ triggeringpoint (str): start or stop
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.triggers.StoryboardElementStateCondition.get_attributes" href="#scenariogeneration.xosc.triggers.StoryboardElementStateCondition.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.StoryboardElementStateCondition.get_element" href="#scenariogeneration.xosc.triggers.StoryboardElementStateCondition.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.StoryboardElementStateCondition.parse" href="#scenariogeneration.xosc.triggers.StoryboardElementStateCondition.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
@@ -6300,6 +8797,7 @@ triggeringpoint (str): start or stop
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.triggers.TimeHeadwayCondition.get_attributes" href="#scenariogeneration.xosc.triggers.TimeHeadwayCondition.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.TimeHeadwayCondition.get_element" href="#scenariogeneration.xosc.triggers.TimeHeadwayCondition.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.TimeHeadwayCondition.parse" href="#scenariogeneration.xosc.triggers.TimeHeadwayCondition.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
@@ -6307,6 +8805,7 @@ triggeringpoint (str): start or stop
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.triggers.TimeOfDayCondition.get_attributes" href="#scenariogeneration.xosc.triggers.TimeOfDayCondition.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.TimeOfDayCondition.get_element" href="#scenariogeneration.xosc.triggers.TimeOfDayCondition.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.TimeOfDayCondition.parse" href="#scenariogeneration.xosc.triggers.TimeOfDayCondition.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
@@ -6314,6 +8813,7 @@ triggeringpoint (str): start or stop
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.triggers.TimeToCollisionCondition.get_attributes" href="#scenariogeneration.xosc.triggers.TimeToCollisionCondition.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.TimeToCollisionCondition.get_element" href="#scenariogeneration.xosc.triggers.TimeToCollisionCondition.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.TimeToCollisionCondition.parse" href="#scenariogeneration.xosc.triggers.TimeToCollisionCondition.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
@@ -6321,6 +8821,7 @@ triggeringpoint (str): start or stop
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.triggers.TrafficSignalCondition.get_attributes" href="#scenariogeneration.xosc.triggers.TrafficSignalCondition.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.TrafficSignalCondition.get_element" href="#scenariogeneration.xosc.triggers.TrafficSignalCondition.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.TrafficSignalCondition.parse" href="#scenariogeneration.xosc.triggers.TrafficSignalCondition.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
@@ -6328,6 +8829,7 @@ triggeringpoint (str): start or stop
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.triggers.TrafficSignalControllerCondition.get_attributes" href="#scenariogeneration.xosc.triggers.TrafficSignalControllerCondition.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.TrafficSignalControllerCondition.get_element" href="#scenariogeneration.xosc.triggers.TrafficSignalControllerCondition.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.TrafficSignalControllerCondition.parse" href="#scenariogeneration.xosc.triggers.TrafficSignalControllerCondition.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
@@ -6335,6 +8837,7 @@ triggeringpoint (str): start or stop
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.triggers.TraveledDistanceCondition.get_attributes" href="#scenariogeneration.xosc.triggers.TraveledDistanceCondition.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.TraveledDistanceCondition.get_element" href="#scenariogeneration.xosc.triggers.TraveledDistanceCondition.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.TraveledDistanceCondition.parse" href="#scenariogeneration.xosc.triggers.TraveledDistanceCondition.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
@@ -6342,6 +8845,7 @@ triggeringpoint (str): start or stop
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.triggers.Trigger.add_conditiongroup" href="#scenariogeneration.xosc.triggers.Trigger.add_conditiongroup">add_conditiongroup</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.Trigger.get_element" href="#scenariogeneration.xosc.triggers.Trigger.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.Trigger.parse" href="#scenariogeneration.xosc.triggers.Trigger.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
@@ -6350,6 +8854,7 @@ triggeringpoint (str): start or stop
 <li><code><a title="scenariogeneration.xosc.triggers.TriggeringEntities.add_entity" href="#scenariogeneration.xosc.triggers.TriggeringEntities.add_entity">add_entity</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.TriggeringEntities.get_attributes" href="#scenariogeneration.xosc.triggers.TriggeringEntities.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.TriggeringEntities.get_element" href="#scenariogeneration.xosc.triggers.TriggeringEntities.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.TriggeringEntities.parse" href="#scenariogeneration.xosc.triggers.TriggeringEntities.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
@@ -6357,6 +8862,7 @@ triggeringpoint (str): start or stop
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.triggers.UserDefinedValueCondition.get_attributes" href="#scenariogeneration.xosc.triggers.UserDefinedValueCondition.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.UserDefinedValueCondition.get_element" href="#scenariogeneration.xosc.triggers.UserDefinedValueCondition.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.UserDefinedValueCondition.parse" href="#scenariogeneration.xosc.triggers.UserDefinedValueCondition.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
@@ -6364,6 +8870,7 @@ triggeringpoint (str): start or stop
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.triggers.ValueTrigger.get_attributes" href="#scenariogeneration.xosc.triggers.ValueTrigger.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.ValueTrigger.get_element" href="#scenariogeneration.xosc.triggers.ValueTrigger.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.ValueTrigger.parse" href="#scenariogeneration.xosc.triggers.ValueTrigger.parse">parse</a></code></li>
 </ul>
 </li>
 </ul>

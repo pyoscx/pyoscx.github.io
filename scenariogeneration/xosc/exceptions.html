@@ -54,6 +54,11 @@ class ToManyOptionalArguments(Exception):
 class NotEnoughInputArguments(Exception):
     &#34;&#34;&#34; Raised when one of the needed &#34;optional&#34; inputs are not used
     &#34;&#34;&#34;
+    pass
+
+class NotAValidElement(Exception):
+    &#34;&#34;&#34; Raised when one of the needed &#34;optional&#34; inputs are not used
+    &#34;&#34;&#34;
     pass</code></pre>
 </details>
 </section>
@@ -99,6 +104,27 @@ class NotEnoughInputArguments(Exception):
 </summary>
 <pre><code class="python">class NoCatalogFoundError(Exception):
     &#34;&#34;&#34; Raised when no catalog is found with the given name
+    &#34;&#34;&#34;
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="scenariogeneration.xosc.exceptions.NotAValidElement"><code class="flex name class">
+<span>class <span class="ident">NotAValidElement</span></span>
+<span>(</span><span>...)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Raised when one of the needed "optional" inputs are not used</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class NotAValidElement(Exception):
+    &#34;&#34;&#34; Raised when one of the needed &#34;optional&#34; inputs are not used
     &#34;&#34;&#34;
     pass</code></pre>
 </details>
@@ -192,6 +218,9 @@ class NotEnoughInputArguments(Exception):
 </li>
 <li>
 <h4><code><a title="scenariogeneration.xosc.exceptions.NoCatalogFoundError" href="#scenariogeneration.xosc.exceptions.NoCatalogFoundError">NoCatalogFoundError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xosc.exceptions.NotAValidElement" href="#scenariogeneration.xosc.exceptions.NotAValidElement">NotAValidElement</a></code></h4>
 </li>
 <li>
 <h4><code><a title="scenariogeneration.xosc.exceptions.NotEnoughInputArguments" href="#scenariogeneration.xosc.exceptions.NotEnoughInputArguments">NotEnoughInputArguments</a></code></h4>

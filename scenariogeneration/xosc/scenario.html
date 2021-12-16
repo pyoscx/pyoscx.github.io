@@ -35,7 +35,7 @@ import xml.etree.ElementTree as ET
 import xml.dom.minidom as mini
 
 
-from .helpers import printToFile
+from ..helpers import printToFile
 from .utils import FileHeader, ParameterDeclarations, Catalog, TrafficSignalController
 from .enumerations import VersionBase, XMLNS, XSI
 from .entities import Entities
@@ -135,8 +135,8 @@ class Scenario():
 
         return element
 
-    def write_xml(self,filename,prettyprint = True):
-        &#34;&#34;&#34; writeXml writes the open scenario xml file
+    def write_xml(self, filename, prettyprint = True, encoding = &#39;utf-8&#39;):
+        &#34;&#34;&#34; write_xml writes the OpenSCENARIO xml file
 
         Parameters
         ----------
@@ -144,6 +144,9 @@ class Scenario():
 
             prettyprint (bool): pretty print or ugly print?
                 Default: True
+                
+            encoding (str): specifies the output encoding
+                Default: &#39;utf-8&#39;
 
         &#34;&#34;&#34;
         printToFile(self.get_element(),filename,prettyprint)
@@ -178,12 +181,12 @@ class RoadNetwork(VersionBase):
 
 
     &#34;&#34;&#34;
-    def __init__(self,roadfile,scenegraph=None):
+    def __init__(self,roadfile=None,scenegraph=None):
         &#34;&#34;&#34; Initalizes the RoadNetwork
 
         Parameters
         ----------
-            roadfile (str): path to the opendrive file
+            roadfile (str): path to the opendrive file (optional)
 
             scenegraph (str): path to the opensceengraph file (optional)
 
@@ -229,7 +232,8 @@ class RoadNetwork(VersionBase):
 
         &#34;&#34;&#34;
         roadnetwork = ET.Element(&#39;RoadNetwork&#39;)
-        ET.SubElement(roadnetwork,&#39;LogicFile&#39;,{&#39;filepath&#39;: self.road_file})
+        if self.road_file:
+            ET.SubElement(roadnetwork,&#39;LogicFile&#39;,{&#39;filepath&#39;: self.road_file})
         if self.scene:
             ET.SubElement(roadnetwork,&#39;SceneGraphFile&#39;,{&#39;filepath&#39;:self.scene})
         if self.traffic_signals:
@@ -260,7 +264,7 @@ class RoadNetwork(VersionBase):
 <dl>
 <dt id="scenariogeneration.xosc.scenario.RoadNetwork"><code class="flex name class">
 <span>class <span class="ident">RoadNetwork</span></span>
-<span>(</span><span>roadfile, scenegraph=None)</span>
+<span>(</span><span>roadfile=None, scenegraph=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>The RoadNetwork class creates the RoadNetwork of the openScenario</p>
@@ -284,7 +288,7 @@ used_area_positions (list of Positions): the positions that determines the used 
 </code></pre>
 <p>Initalizes the RoadNetwork</p>
 <h2 id="parameters_1">Parameters</h2>
-<pre><code>roadfile (str): path to the opendrive file
+<pre><code>roadfile (str): path to the opendrive file (optional)
 
 scenegraph (str): path to the opensceengraph file (optional)
 </code></pre></div>
@@ -319,12 +323,12 @@ scenegraph (str): path to the opensceengraph file (optional)
 
 
     &#34;&#34;&#34;
-    def __init__(self,roadfile,scenegraph=None):
+    def __init__(self,roadfile=None,scenegraph=None):
         &#34;&#34;&#34; Initalizes the RoadNetwork
 
         Parameters
         ----------
-            roadfile (str): path to the opendrive file
+            roadfile (str): path to the opendrive file (optional)
 
             scenegraph (str): path to the opensceengraph file (optional)
 
@@ -370,7 +374,8 @@ scenegraph (str): path to the opensceengraph file (optional)
 
         &#34;&#34;&#34;
         roadnetwork = ET.Element(&#39;RoadNetwork&#39;)
-        ET.SubElement(roadnetwork,&#39;LogicFile&#39;,{&#39;filepath&#39;: self.road_file})
+        if self.road_file:
+            ET.SubElement(roadnetwork,&#39;LogicFile&#39;,{&#39;filepath&#39;: self.road_file})
         if self.scene:
             ET.SubElement(roadnetwork,&#39;SceneGraphFile&#39;,{&#39;filepath&#39;:self.scene})
         if self.traffic_signals:
@@ -458,7 +463,8 @@ Atleast 2 positions are required.</p>
 
     &#34;&#34;&#34;
     roadnetwork = ET.Element(&#39;RoadNetwork&#39;)
-    ET.SubElement(roadnetwork,&#39;LogicFile&#39;,{&#39;filepath&#39;: self.road_file})
+    if self.road_file:
+        ET.SubElement(roadnetwork,&#39;LogicFile&#39;,{&#39;filepath&#39;: self.road_file})
     if self.scene:
         ET.SubElement(roadnetwork,&#39;SceneGraphFile&#39;,{&#39;filepath&#39;:self.scene})
     if self.traffic_signals:
@@ -625,8 +631,8 @@ osc_minor_version (int): used to set if another than the newest version of OpenS
 
         return element
 
-    def write_xml(self,filename,prettyprint = True):
-        &#34;&#34;&#34; writeXml writes the open scenario xml file
+    def write_xml(self, filename, prettyprint = True, encoding = &#39;utf-8&#39;):
+        &#34;&#34;&#34; write_xml writes the OpenSCENARIO xml file
 
         Parameters
         ----------
@@ -634,6 +640,9 @@ osc_minor_version (int): used to set if another than the newest version of OpenS
 
             prettyprint (bool): pretty print or ugly print?
                 Default: True
+                
+            encoding (str): specifies the output encoding
+                Default: &#39;utf-8&#39;
 
         &#34;&#34;&#34;
         printToFile(self.get_element(),filename,prettyprint)</code></pre>
@@ -665,22 +674,25 @@ osc_minor_version (int): used to set if another than the newest version of OpenS
 </details>
 </dd>
 <dt id="scenariogeneration.xosc.scenario.Scenario.write_xml"><code class="name flex">
-<span>def <span class="ident">write_xml</span></span>(<span>self, filename, prettyprint=True)</span>
+<span>def <span class="ident">write_xml</span></span>(<span>self, filename, prettyprint=True, encoding='utf-8')</span>
 </code></dt>
 <dd>
-<div class="desc"><p>writeXml writes the open scenario xml file</p>
+<div class="desc"><p>write_xml writes the OpenSCENARIO xml file</p>
 <h2 id="parameters">Parameters</h2>
 <pre><code>filename (str): path and filename of the wanted xml file
 
 prettyprint (bool): pretty print or ugly print?
     Default: True
+
+encoding (str): specifies the output encoding
+    Default: 'utf-8'
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def write_xml(self,filename,prettyprint = True):
-    &#34;&#34;&#34; writeXml writes the open scenario xml file
+<pre><code class="python">def write_xml(self, filename, prettyprint = True, encoding = &#39;utf-8&#39;):
+    &#34;&#34;&#34; write_xml writes the OpenSCENARIO xml file
 
     Parameters
     ----------
@@ -688,6 +700,9 @@ prettyprint (bool): pretty print or ugly print?
 
         prettyprint (bool): pretty print or ugly print?
             Default: True
+            
+        encoding (str): specifies the output encoding
+            Default: &#39;utf-8&#39;
 
     &#34;&#34;&#34;
     printToFile(self.get_element(),filename,prettyprint)</code></pre>

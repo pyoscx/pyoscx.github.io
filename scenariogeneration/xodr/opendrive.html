@@ -30,7 +30,7 @@
 &#34;&#34;&#34;
 import xml.etree.ElementTree as ET
 
-from .helpers import printToFile,enum2str
+from ..helpers import printToFile,enum2str
 from .links import _Link, _Links, create_lane_links
 from .enumerations import ElementType, ContactPoint, RoadSide, TrafficRule
 from .exceptions import UndefinedRoadNetwork, RoadsAndLanesNotAdjusted
@@ -790,8 +790,8 @@ class OpenDrive():
         return element
 
 
-    def write_xml(self,filename=None,prettyprint = True):
-        &#34;&#34;&#34; writeXml writes the open scenario xml file
+    def write_xml(self, filename = None, prettyprint = True, encoding = &#39;utf-8&#39;):
+        &#34;&#34;&#34; write_xml writes the OpenDRIVE xml file
 
         Parameters
         ----------
@@ -800,11 +800,14 @@ class OpenDrive():
 
             prettyprint (bool): pretty print or ugly print?
                 Default: True
+                
+            encoding (str): specifies the output encoding
+                Default: &#39;utf-8&#39;
 
         &#34;&#34;&#34;
         if filename == None:
             filename = self.name + &#39;.xodr&#39;
-        printToFile(self.get_element(),filename,prettyprint)
+        printToFile(self.get_element(),filename,prettyprint,encoding)
         
 class _Type():
     &#34;&#34;&#34; class to generate the type element of a road, (not the Enumeration it self).
@@ -1234,8 +1237,8 @@ write_xml(filename)
         return element
 
 
-    def write_xml(self,filename=None,prettyprint = True):
-        &#34;&#34;&#34; writeXml writes the open scenario xml file
+    def write_xml(self, filename = None, prettyprint = True, encoding = &#39;utf-8&#39;):
+        &#34;&#34;&#34; write_xml writes the OpenDRIVE xml file
 
         Parameters
         ----------
@@ -1244,11 +1247,14 @@ write_xml(filename)
 
             prettyprint (bool): pretty print or ugly print?
                 Default: True
+                
+            encoding (str): specifies the output encoding
+                Default: &#39;utf-8&#39;
 
         &#34;&#34;&#34;
         if filename == None:
             filename = self.name + &#39;.xodr&#39;
-        printToFile(self.get_element(),filename,prettyprint)</code></pre>
+        printToFile(self.get_element(),filename,prettyprint,encoding)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -1455,23 +1461,26 @@ write_xml(filename)
 </details>
 </dd>
 <dt id="scenariogeneration.xodr.opendrive.OpenDrive.write_xml"><code class="name flex">
-<span>def <span class="ident">write_xml</span></span>(<span>self, filename=None, prettyprint=True)</span>
+<span>def <span class="ident">write_xml</span></span>(<span>self, filename=None, prettyprint=True, encoding='utf-8')</span>
 </code></dt>
 <dd>
-<div class="desc"><p>writeXml writes the open scenario xml file</p>
+<div class="desc"><p>write_xml writes the OpenDRIVE xml file</p>
 <h2 id="parameters">Parameters</h2>
 <pre><code>filename (str): path and filename of the wanted xml file
     Default: name of the opendrive
 
 prettyprint (bool): pretty print or ugly print?
     Default: True
+
+encoding (str): specifies the output encoding
+    Default: 'utf-8'
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def write_xml(self,filename=None,prettyprint = True):
-    &#34;&#34;&#34; writeXml writes the open scenario xml file
+<pre><code class="python">def write_xml(self, filename = None, prettyprint = True, encoding = &#39;utf-8&#39;):
+    &#34;&#34;&#34; write_xml writes the OpenDRIVE xml file
 
     Parameters
     ----------
@@ -1480,11 +1489,14 @@ prettyprint (bool): pretty print or ugly print?
 
         prettyprint (bool): pretty print or ugly print?
             Default: True
+            
+        encoding (str): specifies the output encoding
+            Default: &#39;utf-8&#39;
 
     &#34;&#34;&#34;
     if filename == None:
         filename = self.name + &#39;.xodr&#39;
-    printToFile(self.get_element(),filename,prettyprint)</code></pre>
+    printToFile(self.get_element(),filename,prettyprint,encoding)</code></pre>
 </details>
 </dd>
 </dl>

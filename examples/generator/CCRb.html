@@ -164,7 +164,7 @@ class Scenario(ScenarioGenerator):
         event_tar = xosc.Event(&#39;targetspeedchange&#39;,xosc.Priority.overwrite)
         event_tar.add_trigger(trigger)
 
-        target_action = xosc.LongitudinalDistanceAction(-kwargs[&#39;distance&#39;],egoname,freespace=False)
+        target_action = xosc.LongitudinalDistanceAction(egoname, distance=-kwargs[&#39;distance&#39;], freespace=False)
         event_tar.add_action(&#39;targetspeed&#39;,target_action)
 
         # trigger here could be changed to speed but tested for esmini at the point where speed condition was not implemented
@@ -345,7 +345,7 @@ generate_all_roads (bool): will only generate unique roads
         event_tar = xosc.Event(&#39;targetspeedchange&#39;,xosc.Priority.overwrite)
         event_tar.add_trigger(trigger)
 
-        target_action = xosc.LongitudinalDistanceAction(-kwargs[&#39;distance&#39;],egoname,freespace=False)
+        target_action = xosc.LongitudinalDistanceAction(egoname, distance=-kwargs[&#39;distance&#39;], freespace=False)
         event_tar.add_action(&#39;targetspeed&#39;,target_action)
 
         # trigger here could be changed to speed but tested for esmini at the point where speed condition was not implemented
