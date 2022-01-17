@@ -46,7 +46,7 @@ import numpy as np
 import pyclothoids as pcloth
 
 from .lane import Lane, RoadMark, LaneSection, Lanes
-from .enumerations import RoadMarkType, MarkRule, ContactPoint, ElementType, ObjectType
+from .enumerations import JunctionType, RoadMarkType, MarkRule, ContactPoint, ElementType, ObjectType
 
 from .geometry import Line, Arc, Spiral, PlanView
 from .opendrive import Road, OpenDrive
@@ -771,6 +771,73 @@ def create_junction(junction_roads, id, roads, name=&#39;my junction&#39;):
         junc.add_connection(conne2)
     return junc
 
+
+
+def create_direct_junction(roads, id, name=&#39;my junction&#39;):
+    &#34;&#34;&#34; create_junction creates the junction struct for a set of roads
+
+
+        Parameters
+        ----------
+            junction_roads (list of Road): all connecting roads in the junction
+
+            id (int): the id of the junction
+            
+            roads (list of Road): all incomming roads to the junction
+            
+            name(str): name of the junction
+            default: &#39;my junction&#39;
+
+        Returns
+        -------
+            junction (Junction): the junction struct ready to use
+
+    &#34;&#34;&#34;
+
+
+
+    junc = Junction(name,id,junction_type=JunctionType.direct)
+    used_road_indexes = []
+    for r in roads:
+        if r.id not in used_road_indexes:
+            used_road_indexes.append(r.id)
+            if r.succ_direct_junction:
+                for dr in r.succ_direct_junction:
+                    used_road_indexes.append(dr)
+                    conn = Connection(r.id,str(dr),ContactPoint.start)
+                    outgoingroad = get_road_by_id(roads,dr)
+                    # _, sign, _ =  _get_related_lanesection(r,get_road_by_id(roads,dr) ) 
+                    _create_junction_links(conn,len(outgoingroad.lanes.lanesections[-1].rightlanes),-1,1,from_offset=outgoingroad.lane_offset_pred)
+                    _create_junction_links(conn,len(outgoingroad.lanes.lanesections[-1].leftlanes),1,1,from_offset=outgoingroad.lane_offset_pred)
+                    junc.add_connection(conn)
+            elif r.pred_direct_junction:
+                for dr in r.pred_direct_junction:
+                    used_road_indexes.append(dr)
+                    conn = Connection(r.id,str(dr),ContactPoint.end)
+                    outgoingroad = get_road_by_id(roads,dr)
+                    # _, sign, _ =  _get_related_lanesection(r,get_road_by_id(roads,dr) ) 
+                    _create_junction_links(conn,len(outgoingroad.lanes.lanesections[-1].rightlanes),-1,1,from_offset=outgoingroad.lane_offset_suc)
+                    _create_junction_links(conn,len(outgoingroad.lanes.lanesections[-1].leftlanes),1,1,from_offset=outgoingroad.lane_offset_suc)
+                    junc.add_connection(conn)
+            else:
+                raise ValueError(&#39;Road is not connected to a direct junction&#39;)
+
+        # # handle succesor lanes
+        # conne1 = Connection(jr.successor.element_id,jr.id,ContactPoint.end) 
+        # _, sign, _ =  _get_related_lanesection(jr,get_road_by_id(roads,jr.successor.element_id) ) 
+
+        # _create_junction_links(conne1,len(jr.lanes.lanesections[-1].rightlanes),-1,sign,to_offset=jr.lane_offset_suc)
+        # _create_junction_links(conne1,len(jr.lanes.lanesections[-1].leftlanes),1,sign,to_offset=jr.lane_offset_suc)
+        # junc.add_connection(conne1)
+
+        # # handle predecessor lanes
+        # conne2 = Connection(jr.predecessor.element_id,jr.id,ContactPoint.start)
+        # _, sign, _ =  _get_related_lanesection( jr,get_road_by_id(roads,jr.predecessor.element_id)) 
+        # _create_junction_links(conne2,len(jr.lanes.lanesections[0].rightlanes),-1,sign,from_offset=jr.lane_offset_pred)
+        # _create_junction_links(conne2,len(jr.lanes.lanesections[0].leftlanes ),1,sign,from_offset=jr.lane_offset_pred)
+        # junc.add_connection(conne2)
+    return junc
+
 def get_road_by_id(roads,id):
     &#34;&#34;&#34; get_road_by_id returns a road based on the road id
 
@@ -1311,6 +1378,94 @@ lane_offset (int): width of the road
 
     # create road
     return Road(r_id,pv,lanes,road_type=junction)</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.generators.create_direct_junction"><code class="name flex">
+<span>def <span class="ident">create_direct_junction</span></span>(<span>roads, id, name='my junction')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>create_junction creates the junction struct for a set of roads</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>junction_roads (list of Road): all connecting roads in the junction
+
+id (int): the id of the junction
+
+roads (list of Road): all incomming roads to the junction
+
+name(str): name of the junction
+default: 'my junction'
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>junction (Junction): the junction struct ready to use
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_direct_junction(roads, id, name=&#39;my junction&#39;):
+    &#34;&#34;&#34; create_junction creates the junction struct for a set of roads
+
+
+        Parameters
+        ----------
+            junction_roads (list of Road): all connecting roads in the junction
+
+            id (int): the id of the junction
+            
+            roads (list of Road): all incomming roads to the junction
+            
+            name(str): name of the junction
+            default: &#39;my junction&#39;
+
+        Returns
+        -------
+            junction (Junction): the junction struct ready to use
+
+    &#34;&#34;&#34;
+
+
+
+    junc = Junction(name,id,junction_type=JunctionType.direct)
+    used_road_indexes = []
+    for r in roads:
+        if r.id not in used_road_indexes:
+            used_road_indexes.append(r.id)
+            if r.succ_direct_junction:
+                for dr in r.succ_direct_junction:
+                    used_road_indexes.append(dr)
+                    conn = Connection(r.id,str(dr),ContactPoint.start)
+                    outgoingroad = get_road_by_id(roads,dr)
+                    # _, sign, _ =  _get_related_lanesection(r,get_road_by_id(roads,dr) ) 
+                    _create_junction_links(conn,len(outgoingroad.lanes.lanesections[-1].rightlanes),-1,1,from_offset=outgoingroad.lane_offset_pred)
+                    _create_junction_links(conn,len(outgoingroad.lanes.lanesections[-1].leftlanes),1,1,from_offset=outgoingroad.lane_offset_pred)
+                    junc.add_connection(conn)
+            elif r.pred_direct_junction:
+                for dr in r.pred_direct_junction:
+                    used_road_indexes.append(dr)
+                    conn = Connection(r.id,str(dr),ContactPoint.end)
+                    outgoingroad = get_road_by_id(roads,dr)
+                    # _, sign, _ =  _get_related_lanesection(r,get_road_by_id(roads,dr) ) 
+                    _create_junction_links(conn,len(outgoingroad.lanes.lanesections[-1].rightlanes),-1,1,from_offset=outgoingroad.lane_offset_suc)
+                    _create_junction_links(conn,len(outgoingroad.lanes.lanesections[-1].leftlanes),1,1,from_offset=outgoingroad.lane_offset_suc)
+                    junc.add_connection(conn)
+            else:
+                raise ValueError(&#39;Road is not connected to a direct junction&#39;)
+
+        # # handle succesor lanes
+        # conne1 = Connection(jr.successor.element_id,jr.id,ContactPoint.end) 
+        # _, sign, _ =  _get_related_lanesection(jr,get_road_by_id(roads,jr.successor.element_id) ) 
+
+        # _create_junction_links(conne1,len(jr.lanes.lanesections[-1].rightlanes),-1,sign,to_offset=jr.lane_offset_suc)
+        # _create_junction_links(conne1,len(jr.lanes.lanesections[-1].leftlanes),1,sign,to_offset=jr.lane_offset_suc)
+        # junc.add_connection(conne1)
+
+        # # handle predecessor lanes
+        # conne2 = Connection(jr.predecessor.element_id,jr.id,ContactPoint.start)
+        # _, sign, _ =  _get_related_lanesection( jr,get_road_by_id(roads,jr.predecessor.element_id)) 
+        # _create_junction_links(conne2,len(jr.lanes.lanesections[0].rightlanes),-1,sign,from_offset=jr.lane_offset_pred)
+        # _create_junction_links(conne2,len(jr.lanes.lanesections[0].leftlanes ),1,sign,from_offset=jr.lane_offset_pred)
+        # junc.add_connection(conne2)
+    return junc</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xodr.generators.create_junction"><code class="name flex">
@@ -2321,6 +2476,7 @@ sub_lane (int): the lane that should be created (split) or removed (merge)
 <ul class="">
 <li><code><a title="scenariogeneration.xodr.generators.create_3cloths" href="#scenariogeneration.xodr.generators.create_3cloths">create_3cloths</a></code></li>
 <li><code><a title="scenariogeneration.xodr.generators.create_cloth_arc_cloth" href="#scenariogeneration.xodr.generators.create_cloth_arc_cloth">create_cloth_arc_cloth</a></code></li>
+<li><code><a title="scenariogeneration.xodr.generators.create_direct_junction" href="#scenariogeneration.xodr.generators.create_direct_junction">create_direct_junction</a></code></li>
 <li><code><a title="scenariogeneration.xodr.generators.create_junction" href="#scenariogeneration.xodr.generators.create_junction">create_junction</a></code></li>
 <li><code><a title="scenariogeneration.xodr.generators.create_junction_roads" href="#scenariogeneration.xodr.generators.create_junction_roads">create_junction_roads</a></code></li>
 <li><code><a title="scenariogeneration.xodr.generators.create_junction_roads_from_arc" href="#scenariogeneration.xodr.generators.create_junction_roads_from_arc">create_junction_roads_from_arc</a></code></li>

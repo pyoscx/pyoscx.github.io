@@ -94,6 +94,11 @@ def esmini(generator,esminipath=&#39;esmini&#39;,
     # resource_path = os.path.join(esminipath,&#39;resources&#39;)
     if not resource_path:
         resource_path = os.path.join(esminipath,&#39;resources&#39;,&#39;xosc&#39;)
+    
+    if timestep == None:
+        ts = 0.01
+    else:
+        ts = timestep
     # genereate file for running in esmini, and set some esmini replated parameters
     if isinstance(generator,OpenDrive):
         if not os.path.exists(generation_path):
@@ -120,7 +125,7 @@ def esmini(generator,esminipath=&#39;esmini&#39;,
         executable = &#39;esmini&#39;
         filetype = &#39; --osc &#39;
         if run_with_replayer:
-            additional_args += &#39; --headless&#39; + &#39; --fixed_timestep &#39; +  str(timestep)
+            additional_args += &#39; --headless&#39; + &#39; --fixed_timestep &#39; +  str(ts)
             if not record:
                 record = &#39;python_record&#39;
         else:
@@ -143,7 +148,7 @@ def esmini(generator,esminipath=&#39;esmini&#39;,
             executable = &#39;esmini&#39;
             filetype = &#39; --osc &#39;
             if run_with_replayer:
-                additional_args += &#39; --headless&#39; + &#39; --fixed_timestep &#39; +  str(timestep)
+                additional_args += &#39; --headless&#39; + &#39; --fixed_timestep &#39; +  str(ts)
                 if not record:
                     record = &#39;python_record&#39;
             else:
@@ -163,7 +168,10 @@ def esmini(generator,esminipath=&#39;esmini&#39;,
 
     if disable_controllers:
         additional_args += &#39; --disable_controllers&#39;
-    
+
+    if timestep != None:
+        additional_args += &#39; --fixed_timestep &#39; +  str(timestep)
+
 
     additional_args += &#39; &#39; + args +  &#39;--path &#39;+resource_path
     
@@ -296,6 +304,11 @@ car_density (int): density of fictious cars (used only for pure OpenDRIVE cases)
     # resource_path = os.path.join(esminipath,&#39;resources&#39;)
     if not resource_path:
         resource_path = os.path.join(esminipath,&#39;resources&#39;,&#39;xosc&#39;)
+    
+    if timestep == None:
+        ts = 0.01
+    else:
+        ts = timestep
     # genereate file for running in esmini, and set some esmini replated parameters
     if isinstance(generator,OpenDrive):
         if not os.path.exists(generation_path):
@@ -322,7 +335,7 @@ car_density (int): density of fictious cars (used only for pure OpenDRIVE cases)
         executable = &#39;esmini&#39;
         filetype = &#39; --osc &#39;
         if run_with_replayer:
-            additional_args += &#39; --headless&#39; + &#39; --fixed_timestep &#39; +  str(timestep)
+            additional_args += &#39; --headless&#39; + &#39; --fixed_timestep &#39; +  str(ts)
             if not record:
                 record = &#39;python_record&#39;
         else:
@@ -345,7 +358,7 @@ car_density (int): density of fictious cars (used only for pure OpenDRIVE cases)
             executable = &#39;esmini&#39;
             filetype = &#39; --osc &#39;
             if run_with_replayer:
-                additional_args += &#39; --headless&#39; + &#39; --fixed_timestep &#39; +  str(timestep)
+                additional_args += &#39; --headless&#39; + &#39; --fixed_timestep &#39; +  str(ts)
                 if not record:
                     record = &#39;python_record&#39;
             else:
@@ -365,7 +378,10 @@ car_density (int): density of fictious cars (used only for pure OpenDRIVE cases)
 
     if disable_controllers:
         additional_args += &#39; --disable_controllers&#39;
-    
+
+    if timestep != None:
+        additional_args += &#39; --fixed_timestep &#39; +  str(timestep)
+
 
     additional_args += &#39; &#39; + args +  &#39;--path &#39;+resource_path
     

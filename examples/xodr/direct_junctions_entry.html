@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.8.0" />
-<title>examples.xosc.ParameterValueDistribution API documentation</title>
-<meta name="description" content="Example showing how one vehicle triggers based on the acceleration of another vehcile, then changes it speed …" />
+<title>examples.xodr.direct_junctions_entry API documentation</title>
+<meta name="description" content="Example of how to create a highway entry using direct junctions …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -17,23 +17,21 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>examples.xosc.ParameterValueDistribution</code></h1>
+<h1 class="title">Module <code>examples.xodr.direct_junctions_entry</code></h1>
 </header>
 <section id="section-intro">
-<p>Example showing how one vehicle triggers based on the acceleration of another vehcile, then changes it speed.</p>
+<p>Example of how to create a highway entry using direct junctions. </p>
 <p>Some features used:</p>
 <ul>
 <li>
-<p>ParameterValueDistribution</p>
+<p>create_road</p>
 </li>
 <li>
-<p>Stocastic</p>
+<p>add_successor/add_predecessor with and without the lane_offset option, and the direct_junction input
+</p>
 </li>
 <li>
-<p>NormalDistribution</p>
-</li>
-<li>
-<p>Histogram</p>
+<p>create_direct_junction</p>
 </li>
 </ul>
 <details class="source">
@@ -41,93 +39,51 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">&#34;&#34;&#34; 
-    Example showing how one vehicle triggers based on the acceleration of another vehcile, then changes it speed.
-    
+    Example of how to create a highway entry using direct junctions. 
+
     Some features used:
 
-    - ParameterValueDistribution
+    - create_road
 
-    - Stocastic
+    - add_successor/add_predecessor with and without the lane_offset option, and the direct_junction input  
 
-    - NormalDistribution
-
-    - Histogram
-        
+    - create_direct_junction
 &#34;&#34;&#34;
+from scenariogeneration import xodr
 import os
-from scenariogeneration import xosc, prettyprint  
 
-# some names used in both scenario and 
-scenario_filename = &#39;base_scenario.xosc&#39;
-ego_param_name = &#39;$egospeed&#39;
-target_param_name = &#39;$targetspeed&#39;
+# create some simple roads
+roads= []
 
-### create a simple parametrized scenario
+first_road = xodr.create_road(xodr.Line(100),1,left_lanes = 3,right_lanes=2)
+continuation_road = xodr.create_road(xodr.Line(100),2,left_lanes=2,right_lanes=2)
+entry_road = xodr.create_road(xodr.Line(50),3,left_lanes = 1, right_lanes = 0)
 
-## create catalogs
-catalog = xosc.Catalog()
-catalog.add_catalog(&#39;VehicleCatalog&#39;,&#39;../xosc/Catalogs/Vehicles&#39;)
+# add successors and predecessors as a direct junction
+first_road.add_successor(xodr.ElementType.junction,100,direct_junction=[2,3])
+continuation_road.add_predecessor(xodr.ElementType.junction,100,direct_junction=[1])
+entry_road.add_predecessor(xodr.ElementType.junction,100,lane_offset=2,direct_junction=[1])
 
-## create road
-road = xosc.RoadNetwork(roadfile=&#39;../xodr/e6mini.xodr&#39;)
+# create the direct junction struct 
+direct_junction = xodr.create_direct_junction([first_road,continuation_road,entry_road],100)
 
-## create parameters
-paramdec = xosc.ParameterDeclarations()
-paramdec.add_parameter(xosc.Parameter(ego_param_name,xosc.ParameterType.double,&#39;10&#39;))
-paramdec.add_parameter(xosc.Parameter(target_param_name,xosc.ParameterType.double,&#39;10&#39;))
+# create the opendrive
+odr = xodr.OpenDrive(&#39;myroad&#39;)
+odr.add_road(first_road)
+odr.add_road(continuation_road)
+odr.add_road(entry_road)
 
-## create entities
+# adjust the roads and lanes properly
+odr.adjust_roads_and_lanes()
 
-egoname = &#39;Ego&#39;
-redname = &#39;Target1&#39;
+odr.add_junction(direct_junction)
 
-entities = xosc.Entities()
-entities.add_scenario_object(egoname,xosc.CatalogReference(&#39;VehicleCatalog&#39;,&#39;car_white&#39;))
-entities.add_scenario_object(redname,xosc.CatalogReference(&#39;VehicleCatalog&#39;,&#39;car_red&#39;))
+# write the OpenDRIVE file as xodr using current script name
+odr.write_xml(os.path.basename(__file__).replace(&#39;.py&#39;,&#39;.xodr&#39;))
 
-## create a parametrized init
-init = xosc.Init()
-step_time = xosc.TransitionDynamics(xosc.DynamicsShapes.step,xosc.DynamicsDimension.time,1)
-
-init.add_init_action(egoname,xosc.AbsoluteSpeedAction(ego_param_name,step_time))
-init.add_init_action(egoname,xosc.TeleportAction(xosc.LanePosition(25,0,-3,0)))
-init.add_init_action(redname,xosc.AbsoluteSpeedAction(target_param_name,step_time))
-init.add_init_action(redname,xosc.TeleportAction(xosc.LanePosition(15,0,-2,0)))
-
-## create storyboard
-sb = xosc.StoryBoard(init,xosc.ValueTrigger(&#39;stop_simulation&#39;,0,xosc.ConditionEdge.rising,xosc.SimulationTimeCondition(10,xosc.Rule.greaterThan),&#39;stop&#39;))
-
-## create the scenario file
-sce = xosc.Scenario(&#39;Parameter_example&#39;,&#39;Mandolin&#39;,paramdec,entities=entities,storyboard = sb,roadnetwork=road,catalog=catalog)
-
-## write and print the scenario
-sce.write_xml(scenario_filename)
-
-prettyprint(sce.get_element())
-
-### create the paramtrization
-
-## create a stocastic distribution with 100 runs
-stoc = xosc.Stochastic(50,1.234)
-
-## add a Normal distribution for the ego
-nd = xosc.NormalDistribution(25,1)
-stoc.add_distribution(ego_param_name,nd)
-
-## add a histogram for the target 
-hg = xosc.Histogram()
-hg.add_bin(0.3,xosc.Range(15,25))
-hg.add_bin(0.7,xosc.Range(25,35))
-stoc.add_distribution(target_param_name,hg)
-
-## create the ParameterValueDistribution
-pvd = xosc.ParameterValueDistribution(&#39;my_parametrization&#39;,&#39;Mandolin&#39;,scenario_filename,stoc)
-
-## Print the resulting xml
-prettyprint(pvd.get_element())
-
-## write the OpenSCENARIO file as xosc using current script name
-pvd.write_xml(os.path.basename(__file__).replace(&#39;.py&#39;,&#39;.xosc&#39;))</code></pre>
+# uncomment the following lines to display the road using esmini
+# from scenariogeneration import esmini
+# esmini(odr,os.path.join(&#39;esmini&#39;))</code></pre>
 </details>
 </section>
 <section>
@@ -147,7 +103,7 @@ pvd.write_xml(os.path.basename(__file__).replace(&#39;.py&#39;,&#39;.xosc&#39;))
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="examples.xosc" href="index.html">examples.xosc</a></code></li>
+<li><code><a title="examples.xodr" href="index.html">examples.xodr</a></code></li>
 </ul>
 </li>
 </ul>

@@ -30,9 +30,9 @@
 &#34;&#34;&#34;
 import xml.etree.ElementTree as ET
 from ..helpers import enum2str
-from .enumerations import ElementType, JunctionGroupType
+from .enumerations import ElementType, JunctionGroupType, JunctionType, Orientation
 
-from .exceptions import NotSameAmountOfLanesError
+from .exceptions import NotEnoughInputArguments, NotSameAmountOfLanesError
 import warnings
 
 class _Links():
@@ -357,7 +357,7 @@ class Connection():
         ----------
             incoming_road (int): the id of the incoming road to the junction
 
-            connecting_road (int): id of the connecting road (type junction)
+            connecting_road (int): id of the connecting road (for junctiontypes virutal and default), or the linkedRoad (for junctiontype direct)
             
             contact_point (ContactPoint): the contact point of the link
 
@@ -397,22 +397,34 @@ class Connection():
                 out_lane: land id of the outgoing road
         &#34;&#34;&#34;
         self.links.append((in_lane,out_lane))
-    def get_attributes(self):
+    def get_attributes(self, junctiontype = JunctionType.default):
         &#34;&#34;&#34; returns the attributes as a dict of the Connection
+
+            Parameters
+            ----------
+                junctiontype (JunctionType): type of junction created (connections will be different)
 
         &#34;&#34;&#34;
         retdict = {}
         retdict[&#39;incomingRoad&#39;] = str(self.incoming_road)
         retdict[&#39;id&#39;] = str(self.id)
         retdict[&#39;contactPoint&#39;] = enum2str(self.contact_point)
-        retdict[&#39;connectingRoad&#39;] = str(self.connecting_road)
+        if junctiontype == JunctionType.direct:
+            retdict[&#39;linkedRoad&#39;] = str(self.connecting_road)
+        else:
+            retdict[&#39;connectingRoad&#39;] = str(self.connecting_road)
         return retdict
 
-    def get_element(self):
+    def get_element(self,junctiontype = JunctionType.default):
         &#34;&#34;&#34; returns the elementTree of the Connection
+            
+            Parameters
+            ----------
+                junctiontype (JunctionType): type of junction created (connections will be different)
 
         &#34;&#34;&#34;
-        element = ET.Element(&#39;connection&#39;,attrib=self.get_attributes())
+
+        element = ET.Element(&#39;connection&#39;,attrib=self.get_attributes(junctiontype))
         for l in self.links:
             ET.SubElement(element,&#39;laneLink&#39;,attrib={&#39;from&#39;:str(l[0]),&#39;to&#39;:str(l[1])})
         return element
@@ -428,6 +440,21 @@ class Junction():
 
             id (int): id of the junction
 
+            junction_type (JunctionType): type of junction 
+                Default: JunctionType.default
+
+            orientation (Orientation): the orientation of the junction (only used for virtual junction)
+                Default: None
+
+            sstart (float): start of the virtual junction (only used for virtual junction)
+                Default: None
+
+            send (float): end of the virtual junction (only used for virtual junction)
+                Default: None
+
+            mainroad (int): main road for a virtual junction
+                Default: None
+
         Attributes
         ----------
             name (str): name of the junction
@@ -435,6 +462,18 @@ class Junction():
             id (int): id of the junction
 
             connections (list of Connection): all the connections in the junction
+
+            junction_type (JunctionType): type of junction 
+                Default: JunctionType.default
+
+            orientation (Orientation): the orientation of the junction (only used for virtual junction)
+
+            sstart (float): start of the virtual junction (only used for virtual junction)
+
+            send (float): end of the virtual junction (only used for virtual junction)
+
+            mainroad (int): main road for a virtual junction
+
 
         Methods
         -------
@@ -448,7 +487,7 @@ class Junction():
                 Adds a connection to the junction
     &#34;&#34;&#34;
     ##TODO: add type
-    def __init__(self,name,id):
+    def __init__(self,name,id,junction_type = JunctionType.default, orientation = None, sstart = None, send = None, mainroad=None):
         &#34;&#34;&#34; initalize the Junction
 
         Parameters
@@ -456,12 +495,34 @@ class Junction():
             name (str): name of the junction
 
             id (int): id of the junction
+
+            junction_type (JunctionType): type of junction 
+                Default: JunctionType.default
+
+            orientation (Orientation): the orientation of the junction (only used for virtual junction)
+
+            sstart (float): start of the virtual junction (only used for virtual junction)
+
+            send (float): end of the virtual junction (only used for virtual junction)
+
+            mainroad (int): main road for a virtual junction
+
         &#34;&#34;&#34;
         self.name = name
         self.id = id
         self.connections = []
         self._id_counter = 0
+        if not isinstance(junction_type,JunctionType):
+            raise TypeError(&#39;Not a valid junction type&#39;)
 
+        self.junction_type = junction_type
+        if junction_type == JunctionType.virtual:
+            if not (sstart is not None and send is not None and mainroad is not None and orientation is not None):
+                raise NotEnoughInputArguments(&#39;For virtual junctions sstart, send, orientation, and mainroad has to be added&#39;)
+        self.sstart = sstart
+        self.send = send
+        self.mainroad = mainroad
+        self.orientation = orientation
     def __eq__(self, other):
         if isinstance(other,Junction):
             if self.get_attributes() == other.get_attributes() and \
@@ -488,6 +549,17 @@ class Junction():
         retdict = {}
         retdict[&#39;name&#39;] = self.name
         retdict[&#39;id&#39;] = str(self.id)
+        retdict[&#39;type&#39;] = self.junction_type.name
+
+
+        if self.junction_type == JunctionType.virtual:
+            if self.orientation == Orientation.positive:
+                retdict[&#39;orientation&#39;] = &#39;+&#39;    
+            elif self.orientation == Orientation.negative:
+                retdict[&#39;orientation&#39;] = &#39;-&#39; 
+            retdict[&#39;sEnd&#39;] = str(self.send)
+            retdict[&#39;sStart&#39;] = str(self.sstart)
+            retdict[&#39;mainRoad&#39;] = str(self.mainroad)
         return retdict
 
     def get_element(self):
@@ -496,7 +568,7 @@ class Junction():
         &#34;&#34;&#34;
         element = ET.Element(&#39;junction&#39;,attrib=self.get_attributes())
         for con in self.connections:
-            element.append(con.get_element())
+            element.append(con.get_element(self.junction_type))
         return element
 
 #from .exceptions import NotSameAmountOfLanesError
@@ -978,7 +1050,7 @@ add_lanelink(in_lane,out_lane)
 <h2 id="parameters_1">Parameters</h2>
 <pre><code>incoming_road (int): the id of the incoming road to the junction
 
-connecting_road (int): id of the connecting road (type junction)
+connecting_road (int): id of the connecting road (for junctiontypes virutal and default), or the linkedRoad (for junctiontype direct)
 
 contact_point (ContactPoint): the contact point of the link
 
@@ -1032,7 +1104,7 @@ id (int): id of the junction (automated)
         ----------
             incoming_road (int): the id of the incoming road to the junction
 
-            connecting_road (int): id of the connecting road (type junction)
+            connecting_road (int): id of the connecting road (for junctiontypes virutal and default), or the linkedRoad (for junctiontype direct)
             
             contact_point (ContactPoint): the contact point of the link
 
@@ -1072,22 +1144,34 @@ id (int): id of the junction (automated)
                 out_lane: land id of the outgoing road
         &#34;&#34;&#34;
         self.links.append((in_lane,out_lane))
-    def get_attributes(self):
+    def get_attributes(self, junctiontype = JunctionType.default):
         &#34;&#34;&#34; returns the attributes as a dict of the Connection
+
+            Parameters
+            ----------
+                junctiontype (JunctionType): type of junction created (connections will be different)
 
         &#34;&#34;&#34;
         retdict = {}
         retdict[&#39;incomingRoad&#39;] = str(self.incoming_road)
         retdict[&#39;id&#39;] = str(self.id)
         retdict[&#39;contactPoint&#39;] = enum2str(self.contact_point)
-        retdict[&#39;connectingRoad&#39;] = str(self.connecting_road)
+        if junctiontype == JunctionType.direct:
+            retdict[&#39;linkedRoad&#39;] = str(self.connecting_road)
+        else:
+            retdict[&#39;connectingRoad&#39;] = str(self.connecting_road)
         return retdict
 
-    def get_element(self):
+    def get_element(self,junctiontype = JunctionType.default):
         &#34;&#34;&#34; returns the elementTree of the Connection
+            
+            Parameters
+            ----------
+                junctiontype (JunctionType): type of junction created (connections will be different)
 
         &#34;&#34;&#34;
-        element = ET.Element(&#39;connection&#39;,attrib=self.get_attributes())
+
+        element = ET.Element(&#39;connection&#39;,attrib=self.get_attributes(junctiontype))
         for l in self.links:
             ET.SubElement(element,&#39;laneLink&#39;,attrib={&#39;from&#39;:str(l[0]),&#39;to&#39;:str(l[1])})
         return element</code></pre>
@@ -1121,40 +1205,58 @@ out_lane: land id of the outgoing road
 </details>
 </dd>
 <dt id="scenariogeneration.xodr.links.Connection.get_attributes"><code class="name flex">
-<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+<span>def <span class="ident">get_attributes</span></span>(<span>self, junctiontype=JunctionType.default)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes as a dict of the Connection</p></div>
+<div class="desc"><p>returns the attributes as a dict of the Connection</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>junctiontype (JunctionType): type of junction created (connections will be different)
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_attributes(self):
+<pre><code class="python">def get_attributes(self, junctiontype = JunctionType.default):
     &#34;&#34;&#34; returns the attributes as a dict of the Connection
+
+        Parameters
+        ----------
+            junctiontype (JunctionType): type of junction created (connections will be different)
 
     &#34;&#34;&#34;
     retdict = {}
     retdict[&#39;incomingRoad&#39;] = str(self.incoming_road)
     retdict[&#39;id&#39;] = str(self.id)
     retdict[&#39;contactPoint&#39;] = enum2str(self.contact_point)
-    retdict[&#39;connectingRoad&#39;] = str(self.connecting_road)
+    if junctiontype == JunctionType.direct:
+        retdict[&#39;linkedRoad&#39;] = str(self.connecting_road)
+    else:
+        retdict[&#39;connectingRoad&#39;] = str(self.connecting_road)
     return retdict</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xodr.links.Connection.get_element"><code class="name flex">
-<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+<span>def <span class="ident">get_element</span></span>(<span>self, junctiontype=JunctionType.default)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the Connection</p></div>
+<div class="desc"><p>returns the elementTree of the Connection</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>junctiontype (JunctionType): type of junction created (connections will be different)
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_element(self):
+<pre><code class="python">def get_element(self,junctiontype = JunctionType.default):
     &#34;&#34;&#34; returns the elementTree of the Connection
+        
+        Parameters
+        ----------
+            junctiontype (JunctionType): type of junction created (connections will be different)
 
     &#34;&#34;&#34;
-    element = ET.Element(&#39;connection&#39;,attrib=self.get_attributes())
+
+    element = ET.Element(&#39;connection&#39;,attrib=self.get_attributes(junctiontype))
     for l in self.links:
         ET.SubElement(element,&#39;laneLink&#39;,attrib={&#39;from&#39;:str(l[0]),&#39;to&#39;:str(l[1])})
     return element</code></pre>
@@ -1164,7 +1266,7 @@ out_lane: land id of the outgoing road
 </dd>
 <dt id="scenariogeneration.xodr.links.Junction"><code class="flex name class">
 <span>class <span class="ident">Junction</span></span>
-<span>(</span><span>name, id)</span>
+<span>(</span><span>name, id, junction_type=JunctionType.default, orientation=None, sstart=None, send=None, mainroad=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Junction creates a junction of OpenDRIVE</p>
@@ -1172,6 +1274,21 @@ out_lane: land id of the outgoing road
 <pre><code>name (str): name of the junction
 
 id (int): id of the junction
+
+junction_type (JunctionType): type of junction 
+    Default: JunctionType.default
+
+orientation (Orientation): the orientation of the junction (only used for virtual junction)
+    Default: None
+
+sstart (float): start of the virtual junction (only used for virtual junction)
+    Default: None
+
+send (float): end of the virtual junction (only used for virtual junction)
+    Default: None
+
+mainroad (int): main road for a virtual junction
+    Default: None
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>name (str): name of the junction
@@ -1179,6 +1296,17 @@ id (int): id of the junction
 id (int): id of the junction
 
 connections (list of Connection): all the connections in the junction
+
+junction_type (JunctionType): type of junction 
+    Default: JunctionType.default
+
+orientation (Orientation): the orientation of the junction (only used for virtual junction)
+
+sstart (float): start of the virtual junction (only used for virtual junction)
+
+send (float): end of the virtual junction (only used for virtual junction)
+
+mainroad (int): main road for a virtual junction
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>get_element()
@@ -1195,6 +1323,17 @@ add_connection(connection)
 <pre><code>name (str): name of the junction
 
 id (int): id of the junction
+
+junction_type (JunctionType): type of junction 
+    Default: JunctionType.default
+
+orientation (Orientation): the orientation of the junction (only used for virtual junction)
+
+sstart (float): start of the virtual junction (only used for virtual junction)
+
+send (float): end of the virtual junction (only used for virtual junction)
+
+mainroad (int): main road for a virtual junction
 </code></pre></div>
 <details class="source">
 <summary>
@@ -1209,6 +1348,21 @@ id (int): id of the junction
 
             id (int): id of the junction
 
+            junction_type (JunctionType): type of junction 
+                Default: JunctionType.default
+
+            orientation (Orientation): the orientation of the junction (only used for virtual junction)
+                Default: None
+
+            sstart (float): start of the virtual junction (only used for virtual junction)
+                Default: None
+
+            send (float): end of the virtual junction (only used for virtual junction)
+                Default: None
+
+            mainroad (int): main road for a virtual junction
+                Default: None
+
         Attributes
         ----------
             name (str): name of the junction
@@ -1216,6 +1370,18 @@ id (int): id of the junction
             id (int): id of the junction
 
             connections (list of Connection): all the connections in the junction
+
+            junction_type (JunctionType): type of junction 
+                Default: JunctionType.default
+
+            orientation (Orientation): the orientation of the junction (only used for virtual junction)
+
+            sstart (float): start of the virtual junction (only used for virtual junction)
+
+            send (float): end of the virtual junction (only used for virtual junction)
+
+            mainroad (int): main road for a virtual junction
+
 
         Methods
         -------
@@ -1229,7 +1395,7 @@ id (int): id of the junction
                 Adds a connection to the junction
     &#34;&#34;&#34;
     ##TODO: add type
-    def __init__(self,name,id):
+    def __init__(self,name,id,junction_type = JunctionType.default, orientation = None, sstart = None, send = None, mainroad=None):
         &#34;&#34;&#34; initalize the Junction
 
         Parameters
@@ -1237,12 +1403,34 @@ id (int): id of the junction
             name (str): name of the junction
 
             id (int): id of the junction
+
+            junction_type (JunctionType): type of junction 
+                Default: JunctionType.default
+
+            orientation (Orientation): the orientation of the junction (only used for virtual junction)
+
+            sstart (float): start of the virtual junction (only used for virtual junction)
+
+            send (float): end of the virtual junction (only used for virtual junction)
+
+            mainroad (int): main road for a virtual junction
+
         &#34;&#34;&#34;
         self.name = name
         self.id = id
         self.connections = []
         self._id_counter = 0
+        if not isinstance(junction_type,JunctionType):
+            raise TypeError(&#39;Not a valid junction type&#39;)
 
+        self.junction_type = junction_type
+        if junction_type == JunctionType.virtual:
+            if not (sstart is not None and send is not None and mainroad is not None and orientation is not None):
+                raise NotEnoughInputArguments(&#39;For virtual junctions sstart, send, orientation, and mainroad has to be added&#39;)
+        self.sstart = sstart
+        self.send = send
+        self.mainroad = mainroad
+        self.orientation = orientation
     def __eq__(self, other):
         if isinstance(other,Junction):
             if self.get_attributes() == other.get_attributes() and \
@@ -1269,6 +1457,17 @@ id (int): id of the junction
         retdict = {}
         retdict[&#39;name&#39;] = self.name
         retdict[&#39;id&#39;] = str(self.id)
+        retdict[&#39;type&#39;] = self.junction_type.name
+
+
+        if self.junction_type == JunctionType.virtual:
+            if self.orientation == Orientation.positive:
+                retdict[&#39;orientation&#39;] = &#39;+&#39;    
+            elif self.orientation == Orientation.negative:
+                retdict[&#39;orientation&#39;] = &#39;-&#39; 
+            retdict[&#39;sEnd&#39;] = str(self.send)
+            retdict[&#39;sStart&#39;] = str(self.sstart)
+            retdict[&#39;mainRoad&#39;] = str(self.mainroad)
         return retdict
 
     def get_element(self):
@@ -1277,7 +1476,7 @@ id (int): id of the junction
         &#34;&#34;&#34;
         element = ET.Element(&#39;junction&#39;,attrib=self.get_attributes())
         for con in self.connections:
-            element.append(con.get_element())
+            element.append(con.get_element(self.junction_type))
         return element</code></pre>
 </details>
 <h3>Methods</h3>
@@ -1323,6 +1522,17 @@ id (int): id of the junction
     retdict = {}
     retdict[&#39;name&#39;] = self.name
     retdict[&#39;id&#39;] = str(self.id)
+    retdict[&#39;type&#39;] = self.junction_type.name
+
+
+    if self.junction_type == JunctionType.virtual:
+        if self.orientation == Orientation.positive:
+            retdict[&#39;orientation&#39;] = &#39;+&#39;    
+        elif self.orientation == Orientation.negative:
+            retdict[&#39;orientation&#39;] = &#39;-&#39; 
+        retdict[&#39;sEnd&#39;] = str(self.send)
+        retdict[&#39;sStart&#39;] = str(self.sstart)
+        retdict[&#39;mainRoad&#39;] = str(self.mainroad)
     return retdict</code></pre>
 </details>
 </dd>
@@ -1341,7 +1551,7 @@ id (int): id of the junction
     &#34;&#34;&#34;
     element = ET.Element(&#39;junction&#39;,attrib=self.get_attributes())
     for con in self.connections:
-        element.append(con.get_element())
+        element.append(con.get_element(self.junction_type))
     return element</code></pre>
 </details>
 </dd>

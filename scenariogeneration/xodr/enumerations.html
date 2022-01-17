@@ -200,7 +200,15 @@ class JunctionGroupType(Enum):
     &#34;&#34;&#34; Enum for JunctionGroup
     &#34;&#34;&#34;
     roundabout = auto()
-    unknown = auto()</code></pre>
+    unknown = auto()
+
+class JunctionType(Enum):
+    &#34;&#34;&#34; Enum for JunctionType
+
+    &#34;&#34;&#34;
+    default = auto()
+    virtual = auto()
+    direct = auto()</code></pre>
 </details>
 </section>
 <section>
@@ -367,6 +375,44 @@ class JunctionGroupType(Enum):
 <div class="desc"></div>
 </dd>
 <dt id="scenariogeneration.xodr.enumerations.JunctionGroupType.unknown"><code class="name">var <span class="ident">unknown</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="scenariogeneration.xodr.enumerations.JunctionType"><code class="flex name class">
+<span>class <span class="ident">JunctionType</span></span>
+<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enum for JunctionType</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class JunctionType(Enum):
+    &#34;&#34;&#34; Enum for JunctionType
+
+    &#34;&#34;&#34;
+    default = auto()
+    virtual = auto()
+    direct = auto()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="scenariogeneration.xodr.enumerations.JunctionType.default"><code class="name">var <span class="ident">default</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xodr.enumerations.JunctionType.direct"><code class="name">var <span class="ident">direct</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xodr.enumerations.JunctionType.virtual"><code class="name">var <span class="ident">virtual</span></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -1133,6 +1179,14 @@ class JunctionGroupType(Enum):
 <ul class="">
 <li><code><a title="scenariogeneration.xodr.enumerations.JunctionGroupType.roundabout" href="#scenariogeneration.xodr.enumerations.JunctionGroupType.roundabout">roundabout</a></code></li>
 <li><code><a title="scenariogeneration.xodr.enumerations.JunctionGroupType.unknown" href="#scenariogeneration.xodr.enumerations.JunctionGroupType.unknown">unknown</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xodr.enumerations.JunctionType" href="#scenariogeneration.xodr.enumerations.JunctionType">JunctionType</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xodr.enumerations.JunctionType.default" href="#scenariogeneration.xodr.enumerations.JunctionType.default">default</a></code></li>
+<li><code><a title="scenariogeneration.xodr.enumerations.JunctionType.direct" href="#scenariogeneration.xodr.enumerations.JunctionType.direct">direct</a></code></li>
+<li><code><a title="scenariogeneration.xodr.enumerations.JunctionType.virtual" href="#scenariogeneration.xodr.enumerations.JunctionType.virtual">virtual</a></code></li>
 </ul>
 </li>
 <li>

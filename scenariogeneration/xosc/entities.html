@@ -235,7 +235,7 @@ class ScenarioObject(VersionBase):
                 
         &#34;&#34;&#34;
         name = element.attrib[&#39;name&#39;]
-        if element.find(&#39;CatalogReference&#39;):
+        if element.find(&#39;CatalogReference&#39;) != None:
             entityobject = CatalogReference.parse(element.find(&#39;CatalogReference&#39;))
         elif element.find(&#39;Vehicle&#39;) != None:
             entityobject = Vehicle.parse(element.find(&#39;Vehicle&#39;))
@@ -480,7 +480,7 @@ class Pedestrian(VersionBase):
         &#34;&#34;&#34;
         self.name = name
         self.model = model
-        self.mass = mass
+        self.mass = convert_float(mass)
         if not hasattr(PedestrianCategory,str(category)):
             ValueError(str(category) + &#39; is not a valid pedestrian type&#39;)    
         if not isinstance(boundingbox,BoundingBox):
@@ -514,7 +514,7 @@ class Pedestrian(VersionBase):
 
         &#34;&#34;&#34;
         name = element.attrib[&#39;name&#39;]
-        mass = element.attrib[&#39;mass&#39;]
+        mass = convert_float(element.attrib[&#39;mass&#39;])
         model = None
         if &#39;model&#39; in element.attrib:
             model = element.attrib[&#39;model&#39;]
@@ -3314,7 +3314,7 @@ model (str): definition model of the pedestrian
         &#34;&#34;&#34;
         self.name = name
         self.model = model
-        self.mass = mass
+        self.mass = convert_float(mass)
         if not hasattr(PedestrianCategory,str(category)):
             ValueError(str(category) + &#39; is not a valid pedestrian type&#39;)    
         if not isinstance(boundingbox,BoundingBox):
@@ -3348,7 +3348,7 @@ model (str): definition model of the pedestrian
 
         &#34;&#34;&#34;
         name = element.attrib[&#39;name&#39;]
-        mass = element.attrib[&#39;mass&#39;]
+        mass = convert_float(element.attrib[&#39;mass&#39;])
         model = None
         if &#39;model&#39; in element.attrib:
             model = element.attrib[&#39;model&#39;]
@@ -3492,7 +3492,7 @@ def parse(element):
 
     &#34;&#34;&#34;
     name = element.attrib[&#39;name&#39;]
-    mass = element.attrib[&#39;mass&#39;]
+    mass = convert_float(element.attrib[&#39;mass&#39;])
     model = None
     if &#39;model&#39; in element.attrib:
         model = element.attrib[&#39;model&#39;]
@@ -3817,7 +3817,7 @@ controller (CatalogReference, or Controller): controller for the object
                 
         &#34;&#34;&#34;
         name = element.attrib[&#39;name&#39;]
-        if element.find(&#39;CatalogReference&#39;):
+        if element.find(&#39;CatalogReference&#39;) != None:
             entityobject = CatalogReference.parse(element.find(&#39;CatalogReference&#39;))
         elif element.find(&#39;Vehicle&#39;) != None:
             entityobject = Vehicle.parse(element.find(&#39;Vehicle&#39;))
@@ -3894,7 +3894,7 @@ def parse(element):
             
     &#34;&#34;&#34;
     name = element.attrib[&#39;name&#39;]
-    if element.find(&#39;CatalogReference&#39;):
+    if element.find(&#39;CatalogReference&#39;) != None:
         entityobject = CatalogReference.parse(element.find(&#39;CatalogReference&#39;))
     elif element.find(&#39;Vehicle&#39;) != None:
         entityobject = Vehicle.parse(element.find(&#39;Vehicle&#39;))

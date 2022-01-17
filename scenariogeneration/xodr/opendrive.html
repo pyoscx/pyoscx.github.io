@@ -231,6 +231,8 @@ class Road():
         self.predecessor = None
         self.lane_offset_suc = 0
         self.lane_offset_pred = 0
+        self.succ_direct_junction = []
+        self.pred_direct_junction = []
         self.adjusted = False
         self.objects = []
         self.signals = []
@@ -253,11 +255,12 @@ class Road():
             self.predecessor == other.predecessor and \
             self.successor == other.successor and \
             self.lane_offset_suc == other.lane_offset_suc and \
-            self.lane_offset_pred == other.lane_offset_pred:
+            self.lane_offset_pred == other.lane_offset_pred and \
+            self.direct_junction == other.direct_junction:
                 return True
         return False
 
-    def add_successor(self,element_type,element_id,contact_point=None,lane_offset=0):
+    def add_successor(self,element_type,element_id,contact_point=None,lane_offset=0,direct_junction=[]):
         &#34;&#34;&#34; add_successor adds a successor link to the road
         
         Parameters
@@ -274,9 +277,11 @@ class Road():
         self.successor = _Link(&#39;successor&#39;,element_id,element_type,contact_point)
         self.links.add_link(self.successor)
         self.lane_offset_suc = lane_offset
+        if element_type != ElementType.junction and len(direct_junction) &gt; 0:
+            raise ValueError(&#39;If direct junction is used, the element_type has to be junction&#39;)
+        self.succ_direct_junction = direct_junction
 
-
-    def add_predecessor(self,element_type,element_id,contact_point=None,lane_offset=0):
+    def add_predecessor(self,element_type,element_id,contact_point=None,lane_offset=0,direct_junction=[]):
         &#34;&#34;&#34; add_successor adds a successor link to the road
         
         Parameters
@@ -293,6 +298,9 @@ class Road():
         self.predecessor = _Link(&#39;predecessor&#39;,element_id,element_type,contact_point)
         self.links.add_link(self.predecessor)
         self.lane_offset_pred = lane_offset
+        if element_type != ElementType.junction and len(direct_junction) &gt; 0:
+            raise ValueError(&#39;If direct junction is used, the element_type has to be junction&#39;)
+        self.pred_direct_junction = direct_junction
         
 
     def add_neighbor(self,element_type,element_id,direction): 
@@ -755,7 +763,33 @@ class OpenDrive():
                             else:
                                 self._adjust_road_wrt_neighbour(pred_id, k, ContactPoint.start, &#39;successor&#39;)
                             count_adjusted_roads +=1
-            
+                    # do special check for direct junctions
+                    elif self.roads[k].succ_direct_junction or self.roads[k].pred_direct_junction:
+                        if self.roads[k].successor is not None and \
+                            self.roads[k].successor.element_type is ElementType.junction:
+                            for dr in self.roads[k].succ_direct_junction:
+                                if self.roads[str(dr)].planview.adjusted is True:
+                                    if int(k) in self.roads[str(dr)].succ_direct_junction:
+                                        cp = ContactPoint.end
+                                    elif int(k) in self.roads[str(dr)].pred_direct_junction:
+                                        cp = ContactPoint.start
+                                    else:
+                                        raise UndefinedRoadNetwork(&#39;direct junction is not properly defined&#39;)
+                                    self._adjust_road_wrt_neighbour(k, dr, cp, &#39;successor&#39;)
+                                    
+                                    count_adjusted_roads +=1
+                        elif self.roads[k].predecessor is not None and \
+                            self.roads[k].predecessor.element_type is ElementType.junction:
+                            for dr in self.roads[k].pred_direct_junction:
+                                if self.roads[str(dr)].planview.adjusted is True:
+                                    if int(k) in self.roads[str(dr)].succ_direct_junction:
+                                        cp = ContactPoint.end
+                                    elif int(k) in self.roads[str(dr)].pred_direct_junction:
+                                        cp = ContactPoint.start
+                                    else:
+                                        raise UndefinedRoadNetwork(&#39;direct junction is not properly defined&#39;)
+                                    self._adjust_road_wrt_neighbour(k, dr, cp, &#39;predecessor&#39;)
+                                    count_adjusted_roads +=1
             count_total_adjusted_roads += count_adjusted_roads
 
             if count_total_adjusted_roads != len(self.roads) and count_adjusted_roads == 0:
@@ -1202,7 +1236,33 @@ write_xml(filename)
                             else:
                                 self._adjust_road_wrt_neighbour(pred_id, k, ContactPoint.start, &#39;successor&#39;)
                             count_adjusted_roads +=1
-            
+                    # do special check for direct junctions
+                    elif self.roads[k].succ_direct_junction or self.roads[k].pred_direct_junction:
+                        if self.roads[k].successor is not None and \
+                            self.roads[k].successor.element_type is ElementType.junction:
+                            for dr in self.roads[k].succ_direct_junction:
+                                if self.roads[str(dr)].planview.adjusted is True:
+                                    if int(k) in self.roads[str(dr)].succ_direct_junction:
+                                        cp = ContactPoint.end
+                                    elif int(k) in self.roads[str(dr)].pred_direct_junction:
+                                        cp = ContactPoint.start
+                                    else:
+                                        raise UndefinedRoadNetwork(&#39;direct junction is not properly defined&#39;)
+                                    self._adjust_road_wrt_neighbour(k, dr, cp, &#39;successor&#39;)
+                                    
+                                    count_adjusted_roads +=1
+                        elif self.roads[k].predecessor is not None and \
+                            self.roads[k].predecessor.element_type is ElementType.junction:
+                            for dr in self.roads[k].pred_direct_junction:
+                                if self.roads[str(dr)].planview.adjusted is True:
+                                    if int(k) in self.roads[str(dr)].succ_direct_junction:
+                                        cp = ContactPoint.end
+                                    elif int(k) in self.roads[str(dr)].pred_direct_junction:
+                                        cp = ContactPoint.start
+                                    else:
+                                        raise UndefinedRoadNetwork(&#39;direct junction is not properly defined&#39;)
+                                    self._adjust_road_wrt_neighbour(k, dr, cp, &#39;predecessor&#39;)
+                                    count_adjusted_roads +=1
             count_total_adjusted_roads += count_adjusted_roads
 
             if count_total_adjusted_roads != len(self.roads) and count_adjusted_roads == 0:
@@ -1428,7 +1488,33 @@ write_xml(filename)
                         else:
                             self._adjust_road_wrt_neighbour(pred_id, k, ContactPoint.start, &#39;successor&#39;)
                         count_adjusted_roads +=1
-        
+                # do special check for direct junctions
+                elif self.roads[k].succ_direct_junction or self.roads[k].pred_direct_junction:
+                    if self.roads[k].successor is not None and \
+                        self.roads[k].successor.element_type is ElementType.junction:
+                        for dr in self.roads[k].succ_direct_junction:
+                            if self.roads[str(dr)].planview.adjusted is True:
+                                if int(k) in self.roads[str(dr)].succ_direct_junction:
+                                    cp = ContactPoint.end
+                                elif int(k) in self.roads[str(dr)].pred_direct_junction:
+                                    cp = ContactPoint.start
+                                else:
+                                    raise UndefinedRoadNetwork(&#39;direct junction is not properly defined&#39;)
+                                self._adjust_road_wrt_neighbour(k, dr, cp, &#39;successor&#39;)
+                                
+                                count_adjusted_roads +=1
+                    elif self.roads[k].predecessor is not None and \
+                        self.roads[k].predecessor.element_type is ElementType.junction:
+                        for dr in self.roads[k].pred_direct_junction:
+                            if self.roads[str(dr)].planview.adjusted is True:
+                                if int(k) in self.roads[str(dr)].succ_direct_junction:
+                                    cp = ContactPoint.end
+                                elif int(k) in self.roads[str(dr)].pred_direct_junction:
+                                    cp = ContactPoint.start
+                                else:
+                                    raise UndefinedRoadNetwork(&#39;direct junction is not properly defined&#39;)
+                                self._adjust_road_wrt_neighbour(k, dr, cp, &#39;predecessor&#39;)
+                                count_adjusted_roads +=1
         count_total_adjusted_roads += count_adjusted_roads
 
         if count_total_adjusted_roads != len(self.roads) and count_adjusted_roads == 0:
@@ -1716,6 +1802,8 @@ rule (TrafficRule): traffic rule (optional)
         self.predecessor = None
         self.lane_offset_suc = 0
         self.lane_offset_pred = 0
+        self.succ_direct_junction = []
+        self.pred_direct_junction = []
         self.adjusted = False
         self.objects = []
         self.signals = []
@@ -1738,11 +1826,12 @@ rule (TrafficRule): traffic rule (optional)
             self.predecessor == other.predecessor and \
             self.successor == other.successor and \
             self.lane_offset_suc == other.lane_offset_suc and \
-            self.lane_offset_pred == other.lane_offset_pred:
+            self.lane_offset_pred == other.lane_offset_pred and \
+            self.direct_junction == other.direct_junction:
                 return True
         return False
 
-    def add_successor(self,element_type,element_id,contact_point=None,lane_offset=0):
+    def add_successor(self,element_type,element_id,contact_point=None,lane_offset=0,direct_junction=[]):
         &#34;&#34;&#34; add_successor adds a successor link to the road
         
         Parameters
@@ -1759,9 +1848,11 @@ rule (TrafficRule): traffic rule (optional)
         self.successor = _Link(&#39;successor&#39;,element_id,element_type,contact_point)
         self.links.add_link(self.successor)
         self.lane_offset_suc = lane_offset
+        if element_type != ElementType.junction and len(direct_junction) &gt; 0:
+            raise ValueError(&#39;If direct junction is used, the element_type has to be junction&#39;)
+        self.succ_direct_junction = direct_junction
 
-
-    def add_predecessor(self,element_type,element_id,contact_point=None,lane_offset=0):
+    def add_predecessor(self,element_type,element_id,contact_point=None,lane_offset=0,direct_junction=[]):
         &#34;&#34;&#34; add_successor adds a successor link to the road
         
         Parameters
@@ -1778,6 +1869,9 @@ rule (TrafficRule): traffic rule (optional)
         self.predecessor = _Link(&#39;predecessor&#39;,element_id,element_type,contact_point)
         self.links.add_link(self.predecessor)
         self.lane_offset_pred = lane_offset
+        if element_type != ElementType.junction and len(direct_junction) &gt; 0:
+            raise ValueError(&#39;If direct junction is used, the element_type has to be junction&#39;)
+        self.pred_direct_junction = direct_junction
         
 
     def add_neighbor(self,element_type,element_id,direction): 
@@ -2183,7 +2277,7 @@ default: both
 </details>
 </dd>
 <dt id="scenariogeneration.xodr.opendrive.Road.add_predecessor"><code class="name flex">
-<span>def <span class="ident">add_predecessor</span></span>(<span>self, element_type, element_id, contact_point=None, lane_offset=0)</span>
+<span>def <span class="ident">add_predecessor</span></span>(<span>self, element_type, element_id, contact_point=None, lane_offset=0, direct_junction=[])</span>
 </code></dt>
 <dd>
 <div class="desc"><p>add_successor adds a successor link to the road</p>
@@ -2198,7 +2292,7 @@ contact_point (ContactPoint): the contact point of the link
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_predecessor(self,element_type,element_id,contact_point=None,lane_offset=0):
+<pre><code class="python">def add_predecessor(self,element_type,element_id,contact_point=None,lane_offset=0,direct_junction=[]):
     &#34;&#34;&#34; add_successor adds a successor link to the road
     
     Parameters
@@ -2214,7 +2308,10 @@ contact_point (ContactPoint): the contact point of the link
         raise ValueError(&#39;only one predecessor is allowed&#39;)
     self.predecessor = _Link(&#39;predecessor&#39;,element_id,element_type,contact_point)
     self.links.add_link(self.predecessor)
-    self.lane_offset_pred = lane_offset</code></pre>
+    self.lane_offset_pred = lane_offset
+    if element_type != ElementType.junction and len(direct_junction) &gt; 0:
+        raise ValueError(&#39;If direct junction is used, the element_type has to be junction&#39;)
+    self.pred_direct_junction = direct_junction</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xodr.opendrive.Road.add_shape"><code class="name flex">
@@ -2283,7 +2380,7 @@ d (float): d coefficient of the polynomial
 </details>
 </dd>
 <dt id="scenariogeneration.xodr.opendrive.Road.add_successor"><code class="name flex">
-<span>def <span class="ident">add_successor</span></span>(<span>self, element_type, element_id, contact_point=None, lane_offset=0)</span>
+<span>def <span class="ident">add_successor</span></span>(<span>self, element_type, element_id, contact_point=None, lane_offset=0, direct_junction=[])</span>
 </code></dt>
 <dd>
 <div class="desc"><p>add_successor adds a successor link to the road</p>
@@ -2298,7 +2395,7 @@ contact_point (ContactPoint): the contact point of the link
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_successor(self,element_type,element_id,contact_point=None,lane_offset=0):
+<pre><code class="python">def add_successor(self,element_type,element_id,contact_point=None,lane_offset=0,direct_junction=[]):
     &#34;&#34;&#34; add_successor adds a successor link to the road
     
     Parameters
@@ -2314,7 +2411,10 @@ contact_point (ContactPoint): the contact point of the link
         raise ValueError(&#39;only one successor is allowed&#39;)
     self.successor = _Link(&#39;successor&#39;,element_id,element_type,contact_point)
     self.links.add_link(self.successor)
-    self.lane_offset_suc = lane_offset</code></pre>
+    self.lane_offset_suc = lane_offset
+    if element_type != ElementType.junction and len(direct_junction) &gt; 0:
+        raise ValueError(&#39;If direct junction is used, the element_type has to be junction&#39;)
+    self.succ_direct_junction = direct_junction</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xodr.opendrive.Road.add_superelevation"><code class="name flex">

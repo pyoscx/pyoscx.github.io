@@ -30,8 +30,6 @@
 &#34;&#34;&#34;
 import xml.etree.ElementTree as ET
 
-from scenariogeneration.xosc import parameters
-
 
 
 from .actions import _Action, _ActionType, _PrivateActionType
@@ -361,8 +359,8 @@ class StoryBoard():
             if isinstance(actors,list):
                 for a in actors:
                     mangr.add_actor(a)
-        else:
-            mangr.add_actor(actors)
+            else:
+                mangr.add_actor(actors)
         mangr.add_maneuver(maneuver)
         self.add_maneuver_group(mangr,starttrigger=starttrigger,stoptrigger=stoptrigger,parameters=parameters)
 
@@ -681,7 +679,7 @@ class ManeuverGroup():
         
         &#34;&#34;&#34;
         self.name = name
-        self.maxexecution = maxexecution
+        self.maxexecution = convert_int(maxexecution)
         self.actors = _Actors(selecttriggeringentities)
         self.maneuvers = []
 
@@ -708,7 +706,7 @@ class ManeuverGroup():
         &#34;&#34;&#34;
 
         name = element.attrib[&#39;name&#39;]
-        maxexec = element.attrib[&#39;maximumExecutionCount&#39;]
+        maxexec = convert_int(element.attrib[&#39;maximumExecutionCount&#39;])
         actors = _Actors.parse(element.find(&#39;Actors&#39;))
         maneuver_group = ManeuverGroup(name,maxexec)
         maneuver_group.actors = actors
@@ -2599,7 +2597,7 @@ selecttriggeringentities (bool): Have no idea what this does ??? TODO: check
         
         &#34;&#34;&#34;
         self.name = name
-        self.maxexecution = maxexecution
+        self.maxexecution = convert_int(maxexecution)
         self.actors = _Actors(selecttriggeringentities)
         self.maneuvers = []
 
@@ -2626,7 +2624,7 @@ selecttriggeringentities (bool): Have no idea what this does ??? TODO: check
         &#34;&#34;&#34;
 
         name = element.attrib[&#39;name&#39;]
-        maxexec = element.attrib[&#39;maximumExecutionCount&#39;]
+        maxexec = convert_int(element.attrib[&#39;maximumExecutionCount&#39;])
         actors = _Actors.parse(element.find(&#39;Actors&#39;))
         maneuver_group = ManeuverGroup(name,maxexec)
         maneuver_group.actors = actors
@@ -2707,7 +2705,7 @@ def parse(element):
     &#34;&#34;&#34;
 
     name = element.attrib[&#39;name&#39;]
-    maxexec = element.attrib[&#39;maximumExecutionCount&#39;]
+    maxexec = convert_int(element.attrib[&#39;maximumExecutionCount&#39;])
     actors = _Actors.parse(element.find(&#39;Actors&#39;))
     maneuver_group = ManeuverGroup(name,maxexec)
     maneuver_group.actors = actors
@@ -3287,8 +3285,8 @@ stoptrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigge
             if isinstance(actors,list):
                 for a in actors:
                     mangr.add_actor(a)
-        else:
-            mangr.add_actor(actors)
+            else:
+                mangr.add_actor(actors)
         mangr.add_maneuver(maneuver)
         self.add_maneuver_group(mangr,starttrigger=starttrigger,stoptrigger=stoptrigger,parameters=parameters)
 
@@ -3440,8 +3438,8 @@ parameters (ParameterDeclarations): the parameters of the story (optional)
         if isinstance(actors,list):
             for a in actors:
                 mangr.add_actor(a)
-    else:
-        mangr.add_actor(actors)
+        else:
+            mangr.add_actor(actors)
     mangr.add_maneuver(maneuver)
     self.add_maneuver_group(mangr,starttrigger=starttrigger,stoptrigger=stoptrigger,parameters=parameters)</code></pre>
 </details>

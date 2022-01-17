@@ -188,7 +188,7 @@ class PlanView():
         self.x_end, self.y_end, self.h_end, length = newgeom.get_end_data()
         self.present_s += length
         self.adjusted = True
-        self._addition_mode == &#39;add_fixed_geometry&#39;
+        self._addition_mode = &#39;add_fixed_geometry&#39;
 
 
     def set_start_point(self,x_start=0,y_start=0,h_start=0):
@@ -2362,7 +2362,7 @@ Note: if multiple roads are used, the start values can be recalculated.</p></div
         self.x_end, self.y_end, self.h_end, length = newgeom.get_end_data()
         self.present_s += length
         self.adjusted = True
-        self._addition_mode == &#39;add_fixed_geometry&#39;
+        self._addition_mode = &#39;add_fixed_geometry&#39;
 
 
     def set_start_point(self,x_start=0,y_start=0,h_start=0):
@@ -2552,7 +2552,7 @@ s (float): start s value of the geometry (optional)
     self.x_end, self.y_end, self.h_end, length = newgeom.get_end_data()
     self.present_s += length
     self.adjusted = True
-    self._addition_mode == &#39;add_fixed_geometry&#39;</code></pre>
+    self._addition_mode = &#39;add_fixed_geometry&#39;</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.PlanView.add_geometry"><code class="name flex">

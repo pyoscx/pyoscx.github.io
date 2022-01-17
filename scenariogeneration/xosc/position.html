@@ -2315,6 +2315,9 @@ class Nurbs(VersionBase):
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class
+
             add_knots(knots)
                 Adds the knots to the nurbs
 
@@ -3549,7 +3552,10 @@ controlpoints (list of *ControlPoint): a list of control point createing the nur
 knots (list of double): knots of the nurbs (must be order + len(controlpoints)) in decending order
 </code></pre>
 <h2 id="methods">Methods</h2>
-<pre><code>add_knots(knots)
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+add_knots(knots)
     Adds the knots to the nurbs
 
 add_control_point(controlpoint)
@@ -3586,6 +3592,9 @@ get_attributes()
 
         Methods
         -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class
+
             add_knots(knots)
                 Adds the knots to the nurbs
 
