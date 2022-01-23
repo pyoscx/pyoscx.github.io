@@ -3,15 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.8.0" />
+<meta name="generator" content="pdoc 0.8.4" />
 <title>scenariogeneration.xosc.actions API documentation</title>
 <meta name="description" content="the actions module contains the actions defined OpenSCENARIO" />
-<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
-<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
-<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
 <style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js" integrity="sha256-eOgo0OtLL4cdq7RdwRUiGKLX9XsIJ7nGhWEKbohmVAQ=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
 </head>
 <body>
 <main>
@@ -95,12 +97,8 @@ class _PrivateActionFactory():
             return SynchronizeAction.parse(element)
         elif element.findall(&#39;ActivateControllerAction&#39;):
             return ActivateControllerAction.parse(element)
-        elif element.findall(&#39;ControllerAction/AssignControllerAction&#39;):
-            return AssignControllerAction.parse(element)
-        elif element.findall(&#39;ControllerAction/OverrideControllerValueAction&#39;):
-            return OverrideControllerValueAction.parse(element)
-        elif element.findall(&#39;ControllerAction/ActivateControllerAction&#39;):
-            return ActivateControllerAction.parse(element)
+        elif element.findall(&#39;ControllerAction&#39;):
+            return ControllerAction.parse(element)
         elif element.findall(&#39;TeleportAction&#39;):
             return TeleportAction.parse(element)
         elif element.findall(&#39;RoutingAction/AssignRouteAction&#39;):
@@ -357,7 +355,6 @@ class RelativeSpeedAction(_PrivateActionType):
         &#34;&#34;&#34;
         self.speed = speed
         self.target = entity
-        print(str(valuetype))
         if not hasattr(SpeedTargetValueType,str(valuetype)):
             raise TypeError(&#39;valuetype input not of type SpeedTargetValueType&#39;)
         self.valuetype = valuetype
@@ -1619,8 +1616,131 @@ class FollowTrajectoryAction(_PrivateActionType):
         return element
 
 
+class ControllerAction(_PrivateActionType):
+    &#34;&#34;&#34; ControllerAction creates a ControllerAction of open scenario
+        
+        Parameters
+        ----------
+            assignControllerAction (AssignControllerAction): assign a controller to an entity
+
+            overrideControllerValueAction (OverrideControllerValueAction): values for brake, clutch, parking brake, steering wheel or gear
+
+            activateControllerAction (ActivateControllerAction): activate/deactivate a controller on the reference entity/entities. Replaces the depreciated
+                                                                    element in PrivateAction in 1.1
 
 
+        Methods
+        -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class
+                
+            get_element()
+                Returns the full ElementTree of the class
+
+
+    &#34;&#34;&#34;
+
+    def __init__(self, assignControllerAction= None, overrideControllerValueAction=None, activateControllerAction=None):
+    
+        &#34;&#34;&#34; initalizes the ControllerAction
+
+            Parameters
+            ----------
+                assignControllerAction (AssignControllerAction): assign a controller to an entity
+
+                overrideControllerValueAction (OverrideControllerValueAction): values for brake, clutch, parking brake, steering wheel or gear
+
+                activateControllerAction (ActivateControllerAction): activate/deactivate a controller on the reference entity/entities. Replaces the depreciated
+                                                                    element in PrivateAction in 1.1
+
+        &#34;&#34;&#34;
+        if assignControllerAction is not None and not isinstance(assignControllerAction, AssignControllerAction):
+            raise TypeError(&#39;assignControllerAction is not of type AssignControllerAction&#39;)
+        if overrideControllerValueAction is not None and not isinstance(overrideControllerValueAction, OverrideControllerValueAction):
+            raise TypeError(&#39;overrideControllerValueAction is not of type OverrideControllerValueAction&#39;)
+        if activateControllerAction is not None and not isinstance(activateControllerAction, ActivateControllerAction):
+            raise TypeError(&#39;activateControllerAction is not of type ActivateControllerAction&#39;)
+        self.assignControllerAction = assignControllerAction
+        self.overrideControllerValueAction = overrideControllerValueAction
+        self.activateControllerAction = activateControllerAction
+
+    def __eq__(self, other):
+        if isinstance(other,ControllerAction):
+            if self.activateControllerAction == other.activateControllerAction and \
+            self.overrideControllerValueAction == other.overrideControllerValueAction and \
+            self.assignControllerAction == other.assignControllerAction:
+                return True
+        if isinstance(other, AssignControllerAction):
+            if self.assignControllerAction == other:
+                return True
+        if isinstance(other, OverrideControllerValueAction):
+            if self.overrideControllerValueAction == other:
+                return True
+        if isinstance(other, ActivateControllerAction):
+            if self.activateControllerAction == other:
+                return True
+        
+        return False
+
+    
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of ControllerAction
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A ControllerAction element (same as generated by the class itself)
+
+            Returns
+            -------
+                (ControllerAction): a ActivateControllerAction object
+
+        &#34;&#34;&#34;
+
+        activateControllerAction = None
+        overrideControllerValueAction = None
+        assignControllerAction = None
+
+        ca_element = element.find(&#39;ControllerAction&#39;)
+        
+        if ca_element.find(&#39;ActivateControllerAction&#39;) != None:
+            activateControllerAction = ActivateControllerAction.parse(element)
+        if ca_element.find(&#39;OverrideControllerValueAction&#39;) != None:
+            overrideControllerValueAction = OverrideControllerValueAction.parse(element)
+        if ca_element.find(&#39;AssignControllerAction&#39;) != None:
+            assignControllerAction = AssignControllerAction.parse(element)
+        
+        return ControllerAction(assignControllerAction, overrideControllerValueAction, activateControllerAction)
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the ControllerAction
+
+        &#34;&#34;&#34;
+        if self.isVersion(minor=0):
+            if self.assignControllerAction is None or self.overrideControllerValueAction is None:
+                raise NotEnoughInputArguments(&#39;Both assignControllerAction and overrideControllerValueAction are required in version 1.0.&#39;) 
+            if self.activateControllerAction is not None:
+                raise OpenSCENARIOVersionError(&#39;activateControllerAction is not parameter in version 1.0.&#39;)
+
+        element = ET.Element(&#39;PrivateAction&#39;)
+        controlleraction = ET.SubElement(element,&#39;ControllerAction&#39;)
+
+        if self.activateControllerAction != None:
+            pa_element = self.activateControllerAction.get_element()
+            aca_element = pa_element.find(&#39;ControllerAction/ActivateControllerAction&#39;)
+            controlleraction.append(aca_element)
+    
+        if self.overrideControllerValueAction != None:
+            pa_element = self.overrideControllerValueAction.get_element()
+            ocva_element = pa_element.find(&#39;ControllerAction/OverrideControllerValueAction&#39;)
+            controlleraction.append(ocva_element)
+
+        if self.assignControllerAction != None:
+            pa_element = self.assignControllerAction.get_element()
+            aca_element = pa_element.find(&#39;ControllerAction/AssignControllerAction&#39;)
+            controlleraction.append(aca_element)
+  
+        return element
 
 class ActivateControllerAction(_PrivateActionType):
     &#34;&#34;&#34; ActivateControllerAction creates a ActivateControllerAction of open scenario
@@ -1669,6 +1789,9 @@ class ActivateControllerAction(_PrivateActionType):
     def __eq__(self,other):
         if isinstance(other,ActivateControllerAction):
             if self.get_attributes() == other.get_attributes():
+                return True
+        elif isinstance(other, ControllerAction):
+            if self.get_attributes() == other.activateControllerAction.get_attributes():
                 return True
         return False
 
@@ -1761,6 +1884,9 @@ class AssignControllerAction(_PrivateActionType):
     def __eq__(self,other):
         if isinstance(other,AssignControllerAction):
             if self.controller == other.controller:
+                return True
+        elif isinstance(other, ControllerAction):
+            if self.controller == other.assignControllerAction.controller:
                 return True
         return False
 
@@ -1899,7 +2025,7 @@ class OverrideControllerValueAction(_PrivateActionType):
         self.parkingbrake_active = None
         self.parkingbrake_value = convert_float(0)
 
-    def __eq__(self,other):
+    def __eq__(self,other) :
         if isinstance(other,OverrideControllerValueAction):
             if self.throttle_value == other.throttle_value and \
             self.throttle_value == other.throttle_value and \
@@ -1913,6 +2039,20 @@ class OverrideControllerValueAction(_PrivateActionType):
             self.gear_value == other.gear_value and \
             self.parkingbrake_active == other.parkingbrake_active and \
             self.parkingbrake_value == other.parkingbrake_value:
+                return True
+        elif isinstance(other,ControllerAction):
+             if self.throttle_value == other.overrideControllerValueAction.throttle_value and \
+            self.throttle_value == other.overrideControllerValueAction.throttle_value and \
+            self.brake_active == other.overrideControllerValueAction.brake_active and \
+            self.brake_value == other.overrideControllerValueAction.brake_value and \
+            self.clutch_active == other.overrideControllerValueAction.clutch_active and \
+            self.clutch_value == other.overrideControllerValueAction.clutch_value and \
+            self.steeringwheel_active == other.overrideControllerValueAction.steeringwheel_active and \
+            self.steeringwheel_value == other.overrideControllerValueAction.steeringwheel_value and \
+            self.gear_active == other.overrideControllerValueAction.gear_active and \
+            self.gear_value == other.overrideControllerValueAction.gear_value and \
+            self.parkingbrake_active == other.overrideControllerValueAction.parkingbrake_active and \
+            self.parkingbrake_value == other.overrideControllerValueAction.parkingbrake_value:
                 return True
         return False
 
@@ -4672,6 +4812,9 @@ longitudinal (boolean): activate or deactivate the controller
         if isinstance(other,ActivateControllerAction):
             if self.get_attributes() == other.get_attributes():
                 return True
+        elif isinstance(other, ControllerAction):
+            if self.get_attributes() == other.activateControllerAction.get_attributes():
+                return True
         return False
 
     @staticmethod 
@@ -5092,6 +5235,9 @@ activateLongitudinal (bool): if the longitudinal control should be activated (va
         if isinstance(other,AssignControllerAction):
             if self.controller == other.controller:
                 return True
+        elif isinstance(other, ControllerAction):
+            if self.controller == other.assignControllerAction.controller:
+                return True
         return False
 
     @staticmethod 
@@ -5417,6 +5563,264 @@ def parse(element):
     routeaction = ET.SubElement(element,&#39;RoutingAction&#39;)
     assignrouteaction = ET.SubElement(routeaction,&#39;AssignRouteAction&#39;)
     assignrouteaction.append(self.route.get_element())
+
+    return element</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="scenariogeneration.xosc.actions.ControllerAction"><code class="flex name class">
+<span>class <span class="ident">ControllerAction</span></span>
+<span>(</span><span>assignControllerAction=None, overrideControllerValueAction=None, activateControllerAction=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>ControllerAction creates a ControllerAction of open scenario</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>assignControllerAction (AssignControllerAction): assign a controller to an entity
+
+overrideControllerValueAction (OverrideControllerValueAction): values for brake, clutch, parking brake, steering wheel or gear
+
+activateControllerAction (ActivateControllerAction): activate/deactivate a controller on the reference entity/entities. Replaces the depreciated
+                                                        element in PrivateAction in 1.1
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element()
+    Returns the full ElementTree of the class
+</code></pre>
+<p>initalizes the ControllerAction</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>assignControllerAction (AssignControllerAction): assign a controller to an entity
+
+overrideControllerValueAction (OverrideControllerValueAction): values for brake, clutch, parking brake, steering wheel or gear
+
+activateControllerAction (ActivateControllerAction): activate/deactivate a controller on the reference entity/entities. Replaces the depreciated
+                                                    element in PrivateAction in 1.1
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ControllerAction(_PrivateActionType):
+    &#34;&#34;&#34; ControllerAction creates a ControllerAction of open scenario
+        
+        Parameters
+        ----------
+            assignControllerAction (AssignControllerAction): assign a controller to an entity
+
+            overrideControllerValueAction (OverrideControllerValueAction): values for brake, clutch, parking brake, steering wheel or gear
+
+            activateControllerAction (ActivateControllerAction): activate/deactivate a controller on the reference entity/entities. Replaces the depreciated
+                                                                    element in PrivateAction in 1.1
+
+
+        Methods
+        -------
+            parse(element)
+                parses a ElementTree created by the class and returns an instance of the class
+                
+            get_element()
+                Returns the full ElementTree of the class
+
+
+    &#34;&#34;&#34;
+
+    def __init__(self, assignControllerAction= None, overrideControllerValueAction=None, activateControllerAction=None):
+    
+        &#34;&#34;&#34; initalizes the ControllerAction
+
+            Parameters
+            ----------
+                assignControllerAction (AssignControllerAction): assign a controller to an entity
+
+                overrideControllerValueAction (OverrideControllerValueAction): values for brake, clutch, parking brake, steering wheel or gear
+
+                activateControllerAction (ActivateControllerAction): activate/deactivate a controller on the reference entity/entities. Replaces the depreciated
+                                                                    element in PrivateAction in 1.1
+
+        &#34;&#34;&#34;
+        if assignControllerAction is not None and not isinstance(assignControllerAction, AssignControllerAction):
+            raise TypeError(&#39;assignControllerAction is not of type AssignControllerAction&#39;)
+        if overrideControllerValueAction is not None and not isinstance(overrideControllerValueAction, OverrideControllerValueAction):
+            raise TypeError(&#39;overrideControllerValueAction is not of type OverrideControllerValueAction&#39;)
+        if activateControllerAction is not None and not isinstance(activateControllerAction, ActivateControllerAction):
+            raise TypeError(&#39;activateControllerAction is not of type ActivateControllerAction&#39;)
+        self.assignControllerAction = assignControllerAction
+        self.overrideControllerValueAction = overrideControllerValueAction
+        self.activateControllerAction = activateControllerAction
+
+    def __eq__(self, other):
+        if isinstance(other,ControllerAction):
+            if self.activateControllerAction == other.activateControllerAction and \
+            self.overrideControllerValueAction == other.overrideControllerValueAction and \
+            self.assignControllerAction == other.assignControllerAction:
+                return True
+        if isinstance(other, AssignControllerAction):
+            if self.assignControllerAction == other:
+                return True
+        if isinstance(other, OverrideControllerValueAction):
+            if self.overrideControllerValueAction == other:
+                return True
+        if isinstance(other, ActivateControllerAction):
+            if self.activateControllerAction == other:
+                return True
+        
+        return False
+
+    
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34; Parses the xml element of ControllerAction
+
+            Parameters
+            ----------
+                element (xml.etree.ElementTree.Element): A ControllerAction element (same as generated by the class itself)
+
+            Returns
+            -------
+                (ControllerAction): a ActivateControllerAction object
+
+        &#34;&#34;&#34;
+
+        activateControllerAction = None
+        overrideControllerValueAction = None
+        assignControllerAction = None
+
+        ca_element = element.find(&#39;ControllerAction&#39;)
+        
+        if ca_element.find(&#39;ActivateControllerAction&#39;) != None:
+            activateControllerAction = ActivateControllerAction.parse(element)
+        if ca_element.find(&#39;OverrideControllerValueAction&#39;) != None:
+            overrideControllerValueAction = OverrideControllerValueAction.parse(element)
+        if ca_element.find(&#39;AssignControllerAction&#39;) != None:
+            assignControllerAction = AssignControllerAction.parse(element)
+        
+        return ControllerAction(assignControllerAction, overrideControllerValueAction, activateControllerAction)
+
+    def get_element(self):
+        &#34;&#34;&#34; returns the elementTree of the ControllerAction
+
+        &#34;&#34;&#34;
+        if self.isVersion(minor=0):
+            if self.assignControllerAction is None or self.overrideControllerValueAction is None:
+                raise NotEnoughInputArguments(&#39;Both assignControllerAction and overrideControllerValueAction are required in version 1.0.&#39;) 
+            if self.activateControllerAction is not None:
+                raise OpenSCENARIOVersionError(&#39;activateControllerAction is not parameter in version 1.0.&#39;)
+
+        element = ET.Element(&#39;PrivateAction&#39;)
+        controlleraction = ET.SubElement(element,&#39;ControllerAction&#39;)
+
+        if self.activateControllerAction != None:
+            pa_element = self.activateControllerAction.get_element()
+            aca_element = pa_element.find(&#39;ControllerAction/ActivateControllerAction&#39;)
+            controlleraction.append(aca_element)
+    
+        if self.overrideControllerValueAction != None:
+            pa_element = self.overrideControllerValueAction.get_element()
+            ocva_element = pa_element.find(&#39;ControllerAction/OverrideControllerValueAction&#39;)
+            controlleraction.append(ocva_element)
+
+        if self.assignControllerAction != None:
+            pa_element = self.assignControllerAction.get_element()
+            aca_element = pa_element.find(&#39;ControllerAction/AssignControllerAction&#39;)
+            controlleraction.append(aca_element)
+  
+        return element</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>scenariogeneration.xosc.actions._PrivateActionType</li>
+<li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.actions.ControllerAction.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of ControllerAction</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A ControllerAction element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>(ControllerAction): a ActivateControllerAction object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34; Parses the xml element of ControllerAction
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A ControllerAction element (same as generated by the class itself)
+
+        Returns
+        -------
+            (ControllerAction): a ActivateControllerAction object
+
+    &#34;&#34;&#34;
+
+    activateControllerAction = None
+    overrideControllerValueAction = None
+    assignControllerAction = None
+
+    ca_element = element.find(&#39;ControllerAction&#39;)
+    
+    if ca_element.find(&#39;ActivateControllerAction&#39;) != None:
+        activateControllerAction = ActivateControllerAction.parse(element)
+    if ca_element.find(&#39;OverrideControllerValueAction&#39;) != None:
+        overrideControllerValueAction = OverrideControllerValueAction.parse(element)
+    if ca_element.find(&#39;AssignControllerAction&#39;) != None:
+        assignControllerAction = AssignControllerAction.parse(element)
+    
+    return ControllerAction(assignControllerAction, overrideControllerValueAction, activateControllerAction)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.actions.ControllerAction.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the elementTree of the ControllerAction</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self):
+    &#34;&#34;&#34; returns the elementTree of the ControllerAction
+
+    &#34;&#34;&#34;
+    if self.isVersion(minor=0):
+        if self.assignControllerAction is None or self.overrideControllerValueAction is None:
+            raise NotEnoughInputArguments(&#39;Both assignControllerAction and overrideControllerValueAction are required in version 1.0.&#39;) 
+        if self.activateControllerAction is not None:
+            raise OpenSCENARIOVersionError(&#39;activateControllerAction is not parameter in version 1.0.&#39;)
+
+    element = ET.Element(&#39;PrivateAction&#39;)
+    controlleraction = ET.SubElement(element,&#39;ControllerAction&#39;)
+
+    if self.activateControllerAction != None:
+        pa_element = self.activateControllerAction.get_element()
+        aca_element = pa_element.find(&#39;ControllerAction/ActivateControllerAction&#39;)
+        controlleraction.append(aca_element)
+
+    if self.overrideControllerValueAction != None:
+        pa_element = self.overrideControllerValueAction.get_element()
+        ocva_element = pa_element.find(&#39;ControllerAction/OverrideControllerValueAction&#39;)
+        controlleraction.append(ocva_element)
+
+    if self.assignControllerAction != None:
+        pa_element = self.assignControllerAction.get_element()
+        aca_element = pa_element.find(&#39;ControllerAction/AssignControllerAction&#39;)
+        controlleraction.append(aca_element)
 
     return element</code></pre>
 </details>
@@ -7176,7 +7580,7 @@ set_parkingbrake(active,value)
         self.parkingbrake_active = None
         self.parkingbrake_value = convert_float(0)
 
-    def __eq__(self,other):
+    def __eq__(self,other) :
         if isinstance(other,OverrideControllerValueAction):
             if self.throttle_value == other.throttle_value and \
             self.throttle_value == other.throttle_value and \
@@ -7190,6 +7594,20 @@ set_parkingbrake(active,value)
             self.gear_value == other.gear_value and \
             self.parkingbrake_active == other.parkingbrake_active and \
             self.parkingbrake_value == other.parkingbrake_value:
+                return True
+        elif isinstance(other,ControllerAction):
+             if self.throttle_value == other.overrideControllerValueAction.throttle_value and \
+            self.throttle_value == other.overrideControllerValueAction.throttle_value and \
+            self.brake_active == other.overrideControllerValueAction.brake_active and \
+            self.brake_value == other.overrideControllerValueAction.brake_value and \
+            self.clutch_active == other.overrideControllerValueAction.clutch_active and \
+            self.clutch_value == other.overrideControllerValueAction.clutch_value and \
+            self.steeringwheel_active == other.overrideControllerValueAction.steeringwheel_active and \
+            self.steeringwheel_value == other.overrideControllerValueAction.steeringwheel_value and \
+            self.gear_active == other.overrideControllerValueAction.gear_active and \
+            self.gear_value == other.overrideControllerValueAction.gear_value and \
+            self.parkingbrake_active == other.overrideControllerValueAction.parkingbrake_active and \
+            self.parkingbrake_value == other.overrideControllerValueAction.parkingbrake_value:
                 return True
         return False
 
@@ -8947,7 +9365,6 @@ continuous (bool): if the controller tries to keep the relative speed
         &#34;&#34;&#34;
         self.speed = speed
         self.target = entity
-        print(str(valuetype))
         if not hasattr(SpeedTargetValueType,str(valuetype)):
             raise TypeError(&#39;valuetype input not of type SpeedTargetValueType&#39;)
         self.valuetype = valuetype
@@ -11667,6 +12084,13 @@ def parse(element):
 </ul>
 </li>
 <li>
+<h4><code><a title="scenariogeneration.xosc.actions.ControllerAction" href="#scenariogeneration.xosc.actions.ControllerAction">ControllerAction</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xosc.actions.ControllerAction.get_element" href="#scenariogeneration.xosc.actions.ControllerAction.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.actions.ControllerAction.parse" href="#scenariogeneration.xosc.actions.ControllerAction.parse">parse</a></code></li>
+</ul>
+</li>
+<li>
 <h4><code><a title="scenariogeneration.xosc.actions.CustomCommandAction" href="#scenariogeneration.xosc.actions.CustomCommandAction">CustomCommandAction</a></code></h4>
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.actions.CustomCommandAction.get_element" href="#scenariogeneration.xosc.actions.CustomCommandAction.get_element">get_element</a></code></li>
@@ -11858,9 +12282,7 @@ def parse(element):
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.0</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.4</a>.</p>
 </footer>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-<script>hljs.initHighlightingOnLoad()</script>
 </body>
 </html>
