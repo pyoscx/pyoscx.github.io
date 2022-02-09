@@ -2110,7 +2110,7 @@ class OverrideControllerValueAction(_PrivateActionType):
         if ocva_element.find(&#39;Gear&#39;) != None:
             gear_element = ocva_element.find(&#39;Gear&#39;)
             ocv_action.gear_active = convert_bool(gear_element.attrib[&#39;active&#39;])
-            ocv_action.gear_value = convert_float(gear_element.attrib[&#39;value&#39;])
+            ocv_action.gear_value = convert_float(gear_element.attrib[&#39;number&#39;])
 
         return ocv_action
 
@@ -7665,7 +7665,7 @@ set_parkingbrake(active,value)
         if ocva_element.find(&#39;Gear&#39;) != None:
             gear_element = ocva_element.find(&#39;Gear&#39;)
             ocv_action.gear_active = convert_bool(gear_element.attrib[&#39;active&#39;])
-            ocv_action.gear_value = convert_float(gear_element.attrib[&#39;value&#39;])
+            ocv_action.gear_value = convert_float(gear_element.attrib[&#39;number&#39;])
 
         return ocv_action
 
@@ -7854,7 +7854,7 @@ def parse(element):
     if ocva_element.find(&#39;Gear&#39;) != None:
         gear_element = ocva_element.find(&#39;Gear&#39;)
         ocv_action.gear_active = convert_bool(gear_element.attrib[&#39;active&#39;])
-        ocv_action.gear_value = convert_float(gear_element.attrib[&#39;value&#39;])
+        ocv_action.gear_value = convert_float(gear_element.attrib[&#39;number&#39;])
 
     return ocv_action</code></pre>
 </details>

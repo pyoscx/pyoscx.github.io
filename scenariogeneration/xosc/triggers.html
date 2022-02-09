@@ -1133,7 +1133,7 @@ class TimeHeadwayCondition(_EntityTriggerType):
         value = condition.attrib[&#39;value&#39;]
         rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
         if &#39;alongRoute&#39; in condition.attrib:
-            alongroute = condition.attrib[&#39;alongRoute&#39;]
+            alongroute = convert_bool(condition.attrib[&#39;alongRoute&#39;])
         else:
             alongroute = True
 
@@ -1318,7 +1318,7 @@ class TimeToCollisionCondition(_EntityTriggerType):
         rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
         freespace = convert_bool(condition.attrib[&#39;freespace&#39;])
         if &#39;alongRoute&#39; in condition.attrib:
-            alongroute = condition.attrib[&#39;alongRoute&#39;]
+            alongroute = convert_bool(condition.attrib[&#39;alongRoute&#39;])
         else:
             alongroute = True
 
@@ -1946,7 +1946,7 @@ class DistanceCondition(_EntityTriggerType):
         rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
         freespace = convert_bool(condition.attrib[&#39;freespace&#39;])
         if &#39;alongRoute&#39; in condition.attrib:
-            alongroute = condition.attrib[&#39;alongRoute&#39;]
+            alongroute = convert_bool(condition.attrib[&#39;alongRoute&#39;])
         else:
             alongroute = True
 
@@ -2094,7 +2094,7 @@ class RelativeDistanceCondition(_EntityTriggerType):
         freespace = convert_bool(condition.attrib[&#39;freespace&#39;])
         entity = condition.attrib[&#39;entityRef&#39;]
         if &#39;alongRoute&#39; in condition.attrib:
-            alongroute = condition.attrib[&#39;alongRoute&#39;]
+            alongroute = convert_bool(condition.attrib[&#39;alongRoute&#39;])
         else:
             alongroute = True
 
@@ -3490,7 +3490,7 @@ get_attributes()
         rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
         freespace = convert_bool(condition.attrib[&#39;freespace&#39;])
         if &#39;alongRoute&#39; in condition.attrib:
-            alongroute = condition.attrib[&#39;alongRoute&#39;]
+            alongroute = convert_bool(condition.attrib[&#39;alongRoute&#39;])
         else:
             alongroute = True
 
@@ -3575,7 +3575,7 @@ def parse(element):
     rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
     freespace = convert_bool(condition.attrib[&#39;freespace&#39;])
     if &#39;alongRoute&#39; in condition.attrib:
-        alongroute = condition.attrib[&#39;alongRoute&#39;]
+        alongroute = convert_bool(condition.attrib[&#39;alongRoute&#39;])
     else:
         alongroute = True
 
@@ -5027,7 +5027,7 @@ coordinate_system (CoordinateSystem): what coordinate system to use (valid from 
         freespace = convert_bool(condition.attrib[&#39;freespace&#39;])
         entity = condition.attrib[&#39;entityRef&#39;]
         if &#39;alongRoute&#39; in condition.attrib:
-            alongroute = condition.attrib[&#39;alongRoute&#39;]
+            alongroute = convert_bool(condition.attrib[&#39;alongRoute&#39;])
         else:
             alongroute = True
 
@@ -5106,7 +5106,7 @@ def parse(element):
     freespace = convert_bool(condition.attrib[&#39;freespace&#39;])
     entity = condition.attrib[&#39;entityRef&#39;]
     if &#39;alongRoute&#39; in condition.attrib:
-        alongroute = condition.attrib[&#39;alongRoute&#39;]
+        alongroute = convert_bool(condition.attrib[&#39;alongRoute&#39;])
     else:
         alongroute = True
 
@@ -6362,7 +6362,7 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
         value = condition.attrib[&#39;value&#39;]
         rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
         if &#39;alongRoute&#39; in condition.attrib:
-            alongroute = condition.attrib[&#39;alongRoute&#39;]
+            alongroute = convert_bool(condition.attrib[&#39;alongRoute&#39;])
         else:
             alongroute = True
 
@@ -6443,7 +6443,7 @@ def parse(element):
     value = condition.attrib[&#39;value&#39;]
     rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
     if &#39;alongRoute&#39; in condition.attrib:
-        alongroute = condition.attrib[&#39;alongRoute&#39;]
+        alongroute = convert_bool(condition.attrib[&#39;alongRoute&#39;])
     else:
         alongroute = True
 
@@ -6930,7 +6930,7 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
         rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
         freespace = convert_bool(condition.attrib[&#39;freespace&#39;])
         if &#39;alongRoute&#39; in condition.attrib:
-            alongroute = condition.attrib[&#39;alongRoute&#39;]
+            alongroute = convert_bool(condition.attrib[&#39;alongRoute&#39;])
         else:
             alongroute = True
 
@@ -7027,7 +7027,7 @@ def parse(element):
     rule = getattr(Rule,condition.attrib[&#39;rule&#39;])
     freespace = convert_bool(condition.attrib[&#39;freespace&#39;])
     if &#39;alongRoute&#39; in condition.attrib:
-        alongroute = condition.attrib[&#39;alongRoute&#39;]
+        alongroute = convert_bool(condition.attrib[&#39;alongRoute&#39;])
     else:
         alongroute = True
 
