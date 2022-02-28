@@ -769,12 +769,19 @@ class FileHeader(VersionBase):
             license (License): license (valid from OpenSCENARIO V1.1)
                 Default: None
 
+            creation_date (datetime.datetime): optional hardcoded creation date
+                Default: datetime.datetime.now() (when actually generating the xml)
+
         Attributes
         ----------
             name (str): name of the scenario 
 
             author (str): the author of the scenario
 
+            license (License): license (valid from OpenSCENARIO V1.1)
+            
+            creation_date (datetime.datetime): optional hardcoded creation date
+            
         Methods
         -------
             parse(element)
@@ -787,11 +794,29 @@ class FileHeader(VersionBase):
                 Returns a dictionary of all attributes of FileHeader
 
     &#34;&#34;&#34;
-    def __init__(self,author,description,revMinor=1,license=None):
+    def __init__(self,author,description,revMinor=1,license=None,creation_date=None):
+        &#34;&#34;&#34; FileHeader creates the header of the OpenScenario file1
+        
+            Parameters
+            ----------
+                name (str): name of the scenario 
+
+                author (str): the author of the scenario
+
+                revMinor (int): the minor revision of the standard
+                    Default: 1
+
+                license (License): license (valid from OpenSCENARIO V1.1)
+                    Default: None
+
+                creation_date (datetime.datetime): optional hardcoded creation date
+                    Default: datetime.datetime.now() (when actually generating the xml)
+        &#34;&#34;&#34;
         self.description = description
         self.author = author
         self._revMajor = 1
         self._revMinor = revMinor
+        self.creation_date = creation_date
         self.setVersion(minor=revMinor)
         if license and not isinstance(license,License):
             raise TypeError(&#39;license is not of type License&#39;)
@@ -836,7 +861,12 @@ class FileHeader(VersionBase):
         &#34;&#34;&#34; returns the attributes as a dict of the FileHeader
 
         &#34;&#34;&#34;
-        return {&#39;description&#39;:self.description,&#39;author&#39;:self.author,&#39;revMajor&#39;:str(self._revMajor),&#39;revMinor&#39;:str(self._revMinor),&#39;date&#39;:dt.datetime.now().isoformat()}
+        retdict = {&#39;description&#39;:self.description,&#39;author&#39;:self.author,&#39;revMajor&#39;:str(self._revMajor),&#39;revMinor&#39;:str(self._revMinor)}
+        if self.creation_date != None:
+            retdict[&#39;date&#39;] = self.creation_date.isoformat()
+        else:
+            retdict[&#39;date&#39;] = dt.datetime.now().isoformat()
+        return retdict
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the FileHeader
@@ -6938,7 +6968,7 @@ author (str): author of the catalog
 </dd>
 <dt id="scenariogeneration.xosc.utils.FileHeader"><code class="flex name class">
 <span>class <span class="ident">FileHeader</span></span>
-<span>(</span><span>author, description, revMinor=1, license=None)</span>
+<span>(</span><span>author, description, revMinor=1, license=None, creation_date=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>FileHeader creates the header of the OpenScenario file1</p>
@@ -6952,11 +6982,18 @@ revMinor (int): the minor revision of the standard
 
 license (License): license (valid from OpenSCENARIO V1.1)
     Default: None
+
+creation_date (datetime.datetime): optional hardcoded creation date
+    Default: datetime.datetime.now() (when actually generating the xml)
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>name (str): name of the scenario
 
 author (str): the author of the scenario
+
+license (License): license (valid from OpenSCENARIO V1.1)
+
+creation_date (datetime.datetime): optional hardcoded creation date
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>parse(element)
@@ -6967,6 +7004,21 @@ get_element()
 
 get_attributes()
     Returns a dictionary of all attributes of FileHeader
+</code></pre>
+<p>FileHeader creates the header of the OpenScenario file1</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>name (str): name of the scenario
+
+author (str): the author of the scenario
+
+revMinor (int): the minor revision of the standard
+    Default: 1
+
+license (License): license (valid from OpenSCENARIO V1.1)
+    Default: None
+
+creation_date (datetime.datetime): optional hardcoded creation date
+    Default: datetime.datetime.now() (when actually generating the xml)
 </code></pre></div>
 <details class="source">
 <summary>
@@ -6987,12 +7039,19 @@ get_attributes()
             license (License): license (valid from OpenSCENARIO V1.1)
                 Default: None
 
+            creation_date (datetime.datetime): optional hardcoded creation date
+                Default: datetime.datetime.now() (when actually generating the xml)
+
         Attributes
         ----------
             name (str): name of the scenario 
 
             author (str): the author of the scenario
 
+            license (License): license (valid from OpenSCENARIO V1.1)
+            
+            creation_date (datetime.datetime): optional hardcoded creation date
+            
         Methods
         -------
             parse(element)
@@ -7005,11 +7064,29 @@ get_attributes()
                 Returns a dictionary of all attributes of FileHeader
 
     &#34;&#34;&#34;
-    def __init__(self,author,description,revMinor=1,license=None):
+    def __init__(self,author,description,revMinor=1,license=None,creation_date=None):
+        &#34;&#34;&#34; FileHeader creates the header of the OpenScenario file1
+        
+            Parameters
+            ----------
+                name (str): name of the scenario 
+
+                author (str): the author of the scenario
+
+                revMinor (int): the minor revision of the standard
+                    Default: 1
+
+                license (License): license (valid from OpenSCENARIO V1.1)
+                    Default: None
+
+                creation_date (datetime.datetime): optional hardcoded creation date
+                    Default: datetime.datetime.now() (when actually generating the xml)
+        &#34;&#34;&#34;
         self.description = description
         self.author = author
         self._revMajor = 1
         self._revMinor = revMinor
+        self.creation_date = creation_date
         self.setVersion(minor=revMinor)
         if license and not isinstance(license,License):
             raise TypeError(&#39;license is not of type License&#39;)
@@ -7054,7 +7131,12 @@ get_attributes()
         &#34;&#34;&#34; returns the attributes as a dict of the FileHeader
 
         &#34;&#34;&#34;
-        return {&#39;description&#39;:self.description,&#39;author&#39;:self.author,&#39;revMajor&#39;:str(self._revMajor),&#39;revMinor&#39;:str(self._revMinor),&#39;date&#39;:dt.datetime.now().isoformat()}
+        retdict = {&#39;description&#39;:self.description,&#39;author&#39;:self.author,&#39;revMajor&#39;:str(self._revMajor),&#39;revMinor&#39;:str(self._revMinor)}
+        if self.creation_date != None:
+            retdict[&#39;date&#39;] = self.creation_date.isoformat()
+        else:
+            retdict[&#39;date&#39;] = dt.datetime.now().isoformat()
+        return retdict
 
     def get_element(self):
         &#34;&#34;&#34; returns the elementTree of the FileHeader
@@ -7126,7 +7208,12 @@ def parse(element):
     &#34;&#34;&#34; returns the attributes as a dict of the FileHeader
 
     &#34;&#34;&#34;
-    return {&#39;description&#39;:self.description,&#39;author&#39;:self.author,&#39;revMajor&#39;:str(self._revMajor),&#39;revMinor&#39;:str(self._revMinor),&#39;date&#39;:dt.datetime.now().isoformat()}</code></pre>
+    retdict = {&#39;description&#39;:self.description,&#39;author&#39;:self.author,&#39;revMajor&#39;:str(self._revMajor),&#39;revMinor&#39;:str(self._revMinor)}
+    if self.creation_date != None:
+        retdict[&#39;date&#39;] = self.creation_date.isoformat()
+    else:
+        retdict[&#39;date&#39;] = dt.datetime.now().isoformat()
+    return retdict</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xosc.utils.FileHeader.get_element"><code class="name flex">

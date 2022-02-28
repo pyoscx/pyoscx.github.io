@@ -2216,7 +2216,7 @@ class OverrideControllerValueAction(_PrivateActionType):
         if self.steeringwheel_active != None:
             ET.SubElement(overrideaction,&#39;SteeringWheel&#39;,{&#39;active&#39;:convert_bool(self.steeringwheel_active),&#39;value&#39;:str(self.steeringwheel_value)})
         if self.gear_active != None:
-            ET.SubElement(overrideaction,&#39;Gear&#39;,{&#39;active&#39;:convert_bool(self.gear_active),&#39;value&#39;:str(self.gear_value)})
+            ET.SubElement(overrideaction,&#39;Gear&#39;,{&#39;active&#39;:convert_bool(self.gear_active),&#39;number&#39;:str(self.gear_value)})
 
         return element
 
@@ -7771,7 +7771,7 @@ set_parkingbrake(active,value)
         if self.steeringwheel_active != None:
             ET.SubElement(overrideaction,&#39;SteeringWheel&#39;,{&#39;active&#39;:convert_bool(self.steeringwheel_active),&#39;value&#39;:str(self.steeringwheel_value)})
         if self.gear_active != None:
-            ET.SubElement(overrideaction,&#39;Gear&#39;,{&#39;active&#39;:convert_bool(self.gear_active),&#39;value&#39;:str(self.gear_value)})
+            ET.SubElement(overrideaction,&#39;Gear&#39;,{&#39;active&#39;:convert_bool(self.gear_active),&#39;number&#39;:str(self.gear_value)})
 
         return element</code></pre>
 </details>
@@ -7893,7 +7893,7 @@ def parse(element):
     if self.steeringwheel_active != None:
         ET.SubElement(overrideaction,&#39;SteeringWheel&#39;,{&#39;active&#39;:convert_bool(self.steeringwheel_active),&#39;value&#39;:str(self.steeringwheel_value)})
     if self.gear_active != None:
-        ET.SubElement(overrideaction,&#39;Gear&#39;,{&#39;active&#39;:convert_bool(self.gear_active),&#39;value&#39;:str(self.gear_value)})
+        ET.SubElement(overrideaction,&#39;Gear&#39;,{&#39;active&#39;:convert_bool(self.gear_active),&#39;number&#39;:str(self.gear_value)})
 
     return element</code></pre>
 </details>

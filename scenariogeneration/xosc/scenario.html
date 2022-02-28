@@ -44,8 +44,8 @@ from .storyboard import StoryBoard
 
 class Scenario():
     &#34;&#34;&#34; The Scenario class collects all parts of OpenScenario and creates a .xml file
-
-        Attributes
+        
+        Parameters
         ----------
             header (FileHeader): the header of the scenario file
 
@@ -61,6 +61,29 @@ class Scenario():
 
             osc_minor_version (int): used to set if another than the newest version of OpenSCENARIO should be used
                 Default: 1
+
+            licence (License): optional license to the file header
+                Default: None
+
+            createtion_date (datetime.datetime): optional creation date of the scenario
+                Default: None (will be at the time of generation)
+
+        Attributes
+        ----------
+            header (FileHeader): the header of the scenario file
+
+            parameters (ParameterDeclarations): the parameters to be used in the scenario
+
+            entities (Entities): the entities in the scenario
+
+            storyboard (StoryBoard): the storyboard of the scenario
+
+            roadnetwork (RoadNetwork): the roadnetwork of the scenario
+
+            catalog (Catalog): the catalogs used in the scenario
+
+            header (FileHeader): header of the scenario
+
         Methods
         -------
             parse(element)
@@ -75,7 +98,8 @@ class Scenario():
     &#34;&#34;&#34;
     _XMLNS = XMLNS
     _XSI = XSI
-    def __init__(self,name,author,parameters,entities,storyboard,roadnetwork,catalog,osc_minor_version=1):
+    def __init__(self,name,author,parameters,entities,storyboard,roadnetwork,catalog,osc_minor_version=1,license=None,creation_date=None):
+
         &#34;&#34;&#34; Initalizes the Scenario class, and creates the header.
 
         Parameters
@@ -96,6 +120,13 @@ class Scenario():
 
             osc_minor_version (int): used to set if another than the newest version of OpenSCENARIO should be used
                 Default: 1
+            
+            licence (License): optional license to the file header
+                Default: None
+
+            createtion_date (datetime.datetime): optional creation date of the scenario
+                Default: None (will be at the time of generation)
+
         &#34;&#34;&#34;
         if not isinstance(entities,Entities):
             raise TypeError(&#39;entities input is not of type Entities&#39;)
@@ -113,7 +144,7 @@ class Scenario():
         self.roadnetwork = roadnetwork
         self.catalog = catalog 
         self.parameters = parameters
-        self.header = FileHeader(author,name,revMinor=osc_minor_version)
+        self.header = FileHeader(author,name,revMinor=osc_minor_version,license=license,creation_date=creation_date)
 
     def __eq__(self,other):
         if isinstance(other,Scenario):
@@ -656,11 +687,11 @@ Atleast 2 positions are required.</p>
 </dd>
 <dt id="scenariogeneration.xosc.scenario.Scenario"><code class="flex name class">
 <span>class <span class="ident">Scenario</span></span>
-<span>(</span><span>name, author, parameters, entities, storyboard, roadnetwork, catalog, osc_minor_version=1)</span>
+<span>(</span><span>name, author, parameters, entities, storyboard, roadnetwork, catalog, osc_minor_version=1, license=None, creation_date=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>The Scenario class collects all parts of OpenScenario and creates a .xml file</p>
-<h2 id="attributes">Attributes</h2>
+<h2 id="parameters">Parameters</h2>
 <pre><code>header (FileHeader): the header of the scenario file
 
 parameters (ParameterDeclarations): the parameters to be used in the scenario
@@ -675,6 +706,27 @@ catalog (Catalog): the catalogs used in the scenario
 
 osc_minor_version (int): used to set if another than the newest version of OpenSCENARIO should be used
     Default: 1
+
+licence (License): optional license to the file header
+    Default: None
+
+createtion_date (datetime.datetime): optional creation date of the scenario
+    Default: None (will be at the time of generation)
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>header (FileHeader): the header of the scenario file
+
+parameters (ParameterDeclarations): the parameters to be used in the scenario
+
+entities (Entities): the entities in the scenario
+
+storyboard (StoryBoard): the storyboard of the scenario
+
+roadnetwork (RoadNetwork): the roadnetwork of the scenario
+
+catalog (Catalog): the catalogs used in the scenario
+
+header (FileHeader): header of the scenario
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>parse(element)
@@ -687,7 +739,7 @@ write_xml(filename)
     write a open scenario xml
 </code></pre>
 <p>Initalizes the Scenario class, and creates the header.</p>
-<h2 id="parameters">Parameters</h2>
+<h2 id="parameters_1">Parameters</h2>
 <pre><code>name (str): name of the scenario
 
 author (str): the author fo the scenario
@@ -704,6 +756,12 @@ catalog (Catalog): the catalogs used in the scenario
 
 osc_minor_version (int): used to set if another than the newest version of OpenSCENARIO should be used
     Default: 1
+
+licence (License): optional license to the file header
+    Default: None
+
+createtion_date (datetime.datetime): optional creation date of the scenario
+    Default: None (will be at the time of generation)
 </code></pre></div>
 <details class="source">
 <summary>
@@ -711,8 +769,8 @@ osc_minor_version (int): used to set if another than the newest version of OpenS
 </summary>
 <pre><code class="python">class Scenario():
     &#34;&#34;&#34; The Scenario class collects all parts of OpenScenario and creates a .xml file
-
-        Attributes
+        
+        Parameters
         ----------
             header (FileHeader): the header of the scenario file
 
@@ -728,6 +786,29 @@ osc_minor_version (int): used to set if another than the newest version of OpenS
 
             osc_minor_version (int): used to set if another than the newest version of OpenSCENARIO should be used
                 Default: 1
+
+            licence (License): optional license to the file header
+                Default: None
+
+            createtion_date (datetime.datetime): optional creation date of the scenario
+                Default: None (will be at the time of generation)
+
+        Attributes
+        ----------
+            header (FileHeader): the header of the scenario file
+
+            parameters (ParameterDeclarations): the parameters to be used in the scenario
+
+            entities (Entities): the entities in the scenario
+
+            storyboard (StoryBoard): the storyboard of the scenario
+
+            roadnetwork (RoadNetwork): the roadnetwork of the scenario
+
+            catalog (Catalog): the catalogs used in the scenario
+
+            header (FileHeader): header of the scenario
+
         Methods
         -------
             parse(element)
@@ -742,7 +823,8 @@ osc_minor_version (int): used to set if another than the newest version of OpenS
     &#34;&#34;&#34;
     _XMLNS = XMLNS
     _XSI = XSI
-    def __init__(self,name,author,parameters,entities,storyboard,roadnetwork,catalog,osc_minor_version=1):
+    def __init__(self,name,author,parameters,entities,storyboard,roadnetwork,catalog,osc_minor_version=1,license=None,creation_date=None):
+
         &#34;&#34;&#34; Initalizes the Scenario class, and creates the header.
 
         Parameters
@@ -763,6 +845,13 @@ osc_minor_version (int): used to set if another than the newest version of OpenS
 
             osc_minor_version (int): used to set if another than the newest version of OpenSCENARIO should be used
                 Default: 1
+            
+            licence (License): optional license to the file header
+                Default: None
+
+            createtion_date (datetime.datetime): optional creation date of the scenario
+                Default: None (will be at the time of generation)
+
         &#34;&#34;&#34;
         if not isinstance(entities,Entities):
             raise TypeError(&#39;entities input is not of type Entities&#39;)
@@ -780,7 +869,7 @@ osc_minor_version (int): used to set if another than the newest version of OpenS
         self.roadnetwork = roadnetwork
         self.catalog = catalog 
         self.parameters = parameters
-        self.header = FileHeader(author,name,revMinor=osc_minor_version)
+        self.header = FileHeader(author,name,revMinor=osc_minor_version,license=license,creation_date=creation_date)
 
     def __eq__(self,other):
         if isinstance(other,Scenario):
