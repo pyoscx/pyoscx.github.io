@@ -666,9 +666,13 @@ def create_junction_roads(roads , angles, R, junction=1, arc_part = 1/3, startnu
                 default: (1/3)
 
             startnum (int): start number of the roads in the junctions (will increase with 1 for each road)
+                default: 100
 
             inner_road_marks (RoadMark): the RoadMark that all lanes inside the junction will have (outer will be solid)
+                Default: None
 
+            outer_road_marks (RoadMark): the roadmark that will be on the edge of the connecting roads (limit the junction)
+                Default: STD_ROADMARK_SOLID
         Returns
         -------
             junction_roads (list of Road): a list of all roads needed for all traffic connecting the roads
@@ -1564,8 +1568,13 @@ spiral_part (float): the part of the curve that should be spirals (two of these)
     default: (1/3)
 
 startnum (int): start number of the roads in the junctions (will increase with 1 for each road)
+    default: 100
 
 inner_road_marks (RoadMark): the RoadMark that all lanes inside the junction will have (outer will be solid)
+    Default: None
+
+outer_road_marks (RoadMark): the roadmark that will be on the edge of the connecting roads (limit the junction)
+    Default: STD_ROADMARK_SOLID
 </code></pre>
 <h2 id="returns">Returns</h2>
 <pre><code>junction_roads (list of Road): a list of all roads needed for all traffic connecting the roads
@@ -1595,9 +1604,13 @@ inner_road_marks (RoadMark): the RoadMark that all lanes inside the junction wil
                 default: (1/3)
 
             startnum (int): start number of the roads in the junctions (will increase with 1 for each road)
+                default: 100
 
             inner_road_marks (RoadMark): the RoadMark that all lanes inside the junction will have (outer will be solid)
+                Default: None
 
+            outer_road_marks (RoadMark): the roadmark that will be on the edge of the connecting roads (limit the junction)
+                Default: STD_ROADMARK_SOLID
         Returns
         -------
             junction_roads (list of Road): a list of all roads needed for all traffic connecting the roads

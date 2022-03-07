@@ -169,10 +169,10 @@ class Road():
             get_attributes()
                 Returns a dictionary of all attributes of the class
 
-            add_successor (element_type,element_id,contact_point,lane_offset)
+            add_successor (element_type,element_id,contact_point,lane_offset,direct_junction)
                 adds a successor for the road
 
-            add_predecessor (element_type,element_id,contact_point,lane_offset)
+            add_predecessor (element_type,element_id,contact_point,lane_offset,direct_junction)
                 adds a predecessor for the road          
 
             add_neighbor (element_type,element_id,direction)
@@ -271,6 +271,8 @@ class Road():
 
             contact_point (ContactPoint): the contact point of the link
 
+            direct_juction (list of int): road id that are successors to this road in a direct junction
+
         &#34;&#34;&#34;
         if self.successor:
             raise ValueError(&#39;only one successor is allowed&#39;)
@@ -291,6 +293,8 @@ class Road():
             element_id (str/int): name of the linked road
 
             contact_point (ContactPoint): the contact point of the link
+
+            direct_juction (list of int): road id that are predecessors to this road in a direct junction
 
         &#34;&#34;&#34;
         if self.predecessor:
@@ -1640,10 +1644,10 @@ lateralprofile (LateralProfile): the lateral profile of the road
 get_attributes()
     Returns a dictionary of all attributes of the class
 
-add_successor (element_type,element_id,contact_point,lane_offset)
+add_successor (element_type,element_id,contact_point,lane_offset,direct_junction)
     adds a successor for the road
 
-add_predecessor (element_type,element_id,contact_point,lane_offset)
+add_predecessor (element_type,element_id,contact_point,lane_offset,direct_junction)
     adds a predecessor for the road
 
 add_neighbor (element_type,element_id,direction)
@@ -1741,10 +1745,10 @@ rule (TrafficRule): traffic rule (optional)
             get_attributes()
                 Returns a dictionary of all attributes of the class
 
-            add_successor (element_type,element_id,contact_point,lane_offset)
+            add_successor (element_type,element_id,contact_point,lane_offset,direct_junction)
                 adds a successor for the road
 
-            add_predecessor (element_type,element_id,contact_point,lane_offset)
+            add_predecessor (element_type,element_id,contact_point,lane_offset,direct_junction)
                 adds a predecessor for the road          
 
             add_neighbor (element_type,element_id,direction)
@@ -1843,6 +1847,8 @@ rule (TrafficRule): traffic rule (optional)
 
             contact_point (ContactPoint): the contact point of the link
 
+            direct_juction (list of int): road id that are successors to this road in a direct junction
+
         &#34;&#34;&#34;
         if self.successor:
             raise ValueError(&#39;only one successor is allowed&#39;)
@@ -1863,6 +1869,8 @@ rule (TrafficRule): traffic rule (optional)
             element_id (str/int): name of the linked road
 
             contact_point (ContactPoint): the contact point of the link
+
+            direct_juction (list of int): road id that are predecessors to this road in a direct junction
 
         &#34;&#34;&#34;
         if self.predecessor:
@@ -2288,6 +2296,8 @@ default: both
 element_id (str/int): name of the linked road
 
 contact_point (ContactPoint): the contact point of the link
+
+direct_juction (list of int): road id that are predecessors to this road in a direct junction
 </code></pre></div>
 <details class="source">
 <summary>
@@ -2303,6 +2313,8 @@ contact_point (ContactPoint): the contact point of the link
         element_id (str/int): name of the linked road
 
         contact_point (ContactPoint): the contact point of the link
+
+        direct_juction (list of int): road id that are predecessors to this road in a direct junction
 
     &#34;&#34;&#34;
     if self.predecessor:
@@ -2391,6 +2403,8 @@ d (float): d coefficient of the polynomial
 element_id (str/int): name of the linked road
 
 contact_point (ContactPoint): the contact point of the link
+
+direct_juction (list of int): road id that are successors to this road in a direct junction
 </code></pre></div>
 <details class="source">
 <summary>
@@ -2406,6 +2420,8 @@ contact_point (ContactPoint): the contact point of the link
         element_id (str/int): name of the linked road
 
         contact_point (ContactPoint): the contact point of the link
+
+        direct_juction (list of int): road id that are successors to this road in a direct junction
 
     &#34;&#34;&#34;
     if self.successor:
