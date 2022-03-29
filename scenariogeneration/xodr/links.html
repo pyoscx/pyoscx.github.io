@@ -32,7 +32,7 @@ import xml.etree.ElementTree as ET
 from ..helpers import enum2str
 from .enumerations import ElementType, JunctionGroupType, JunctionType, Orientation
 
-from .exceptions import NotEnoughInputArguments, NotSameAmountOfLanesError
+from .exceptions import NotEnoughInputArguments, NotSameAmountOfLanesError, GeneralIssueInputArguments
 import warnings
 
 class _Links():
@@ -615,6 +615,43 @@ def are_roads_connected(road1,road2):
                 return True, &#39;predecessor&#39;
     return False, &#39;&#39;
 
+
+def create_lane_links_unequal(road1, road2, road1_land_ids, road2_land_ids):
+    &#34;&#34;&#34; Experimantal funciton to connect roads with hardcoded lane numbers
+        NOTE: only use this when you have don&#39;t have the same amount of lanes between the edge of two roads
+
+        Parameters
+        ----------
+            road1 (Road): the first road 
+
+            road2 (Road): the second road
+
+            road1_land_ids (list of int): list of the ids of road1
+
+            road2_land_ids (list of int): list of the ids of road2
+    
+    &#34;&#34;&#34;
+    if len(road1_land_ids) != len(road2_land_ids):
+        raise GeneralIssueInputArguments(&#39;Length of the lane id lists is not the same.&#39;)
+    if road1.road_type == -1 and road2.road_type == -1:
+        
+        first_linktype, _, first_connecting_lanesec =  _get_related_lanesection(road1,road2)
+        second_linktype, _, second_connecting_lanesec =  _get_related_lanesection(road2,road1)
+        for i in range(len(road1_land_ids)):
+            if road1_land_ids[i] &lt; 0:
+                road1.lanes.lanesections[first_connecting_lanesec].rightlanes[road1_land_ids[i]].add_link(first_linktype,road2_land_ids[i])
+            else:
+                road1.lanes.lanesections[first_connecting_lanesec].leftlanes[road1_land_ids[i]].add_link(first_linktype,road2_land_ids[i])
+
+            if road2_land_ids[i] &lt; 0:
+                road2.lanes.lanesections[first_connecting_lanesec].rightlanes[road2_land_ids[i]].add_link(second_connecting_lanesec,road1_land_ids[i])
+            else:
+                road2.lanes.lanesections[first_connecting_lanesec].leftlanes[road2_land_ids[i]].add_link(second_connecting_lanesec,road1_land_ids[i])
+
+    else:
+        raise NotImplementedError(&#39;linking connecting roads like this is not implemented yet.&#39;)
+
+
 def create_lane_links(road1,road2):
     &#34;&#34;&#34; create_lane_links takes two roads and if they are connected, match their lanes 
         and creates lane links. 
@@ -1002,6 +1039,61 @@ road2 (Road): second road to be lane linked
     elif road2.road_type != -1:
 
         _create_links_connecting_road(road2,road1)</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.links.create_lane_links_unequal"><code class="name flex">
+<span>def <span class="ident">create_lane_links_unequal</span></span>(<span>road1, road2, road1_land_ids, road2_land_ids)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Experimantal funciton to connect roads with hardcoded lane numbers
+NOTE: only use this when you have don't have the same amount of lanes between the edge of two roads</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>road1 (Road): the first road
+
+road2 (Road): the second road
+
+road1_land_ids (list of int): list of the ids of road1
+
+road2_land_ids (list of int): list of the ids of road2
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_lane_links_unequal(road1, road2, road1_land_ids, road2_land_ids):
+    &#34;&#34;&#34; Experimantal funciton to connect roads with hardcoded lane numbers
+        NOTE: only use this when you have don&#39;t have the same amount of lanes between the edge of two roads
+
+        Parameters
+        ----------
+            road1 (Road): the first road 
+
+            road2 (Road): the second road
+
+            road1_land_ids (list of int): list of the ids of road1
+
+            road2_land_ids (list of int): list of the ids of road2
+    
+    &#34;&#34;&#34;
+    if len(road1_land_ids) != len(road2_land_ids):
+        raise GeneralIssueInputArguments(&#39;Length of the lane id lists is not the same.&#39;)
+    if road1.road_type == -1 and road2.road_type == -1:
+        
+        first_linktype, _, first_connecting_lanesec =  _get_related_lanesection(road1,road2)
+        second_linktype, _, second_connecting_lanesec =  _get_related_lanesection(road2,road1)
+        for i in range(len(road1_land_ids)):
+            if road1_land_ids[i] &lt; 0:
+                road1.lanes.lanesections[first_connecting_lanesec].rightlanes[road1_land_ids[i]].add_link(first_linktype,road2_land_ids[i])
+            else:
+                road1.lanes.lanesections[first_connecting_lanesec].leftlanes[road1_land_ids[i]].add_link(first_linktype,road2_land_ids[i])
+
+            if road2_land_ids[i] &lt; 0:
+                road2.lanes.lanesections[first_connecting_lanesec].rightlanes[road2_land_ids[i]].add_link(second_connecting_lanesec,road1_land_ids[i])
+            else:
+                road2.lanes.lanesections[first_connecting_lanesec].leftlanes[road2_land_ids[i]].add_link(second_connecting_lanesec,road1_land_ids[i])
+
+    else:
+        raise NotImplementedError(&#39;linking connecting roads like this is not implemented yet.&#39;)</code></pre>
 </details>
 </dd>
 </dl>
@@ -1861,6 +1953,7 @@ connecting_road (id): id of a connecting road (used for junctions)
 <li><code><a title="scenariogeneration.xodr.links.are_roads_connected" href="#scenariogeneration.xodr.links.are_roads_connected">are_roads_connected</a></code></li>
 <li><code><a title="scenariogeneration.xodr.links.are_roads_consecutive" href="#scenariogeneration.xodr.links.are_roads_consecutive">are_roads_consecutive</a></code></li>
 <li><code><a title="scenariogeneration.xodr.links.create_lane_links" href="#scenariogeneration.xodr.links.create_lane_links">create_lane_links</a></code></li>
+<li><code><a title="scenariogeneration.xodr.links.create_lane_links_unequal" href="#scenariogeneration.xodr.links.create_lane_links_unequal">create_lane_links_unequal</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>

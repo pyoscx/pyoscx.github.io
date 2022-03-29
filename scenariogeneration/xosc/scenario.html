@@ -171,7 +171,9 @@ class Scenario():
 
         &#34;&#34;&#34;
         header = FileHeader.parse(element.find(&#39;FileHeader&#39;))
-        parameters = ParameterDeclarations.parse(element.find(&#39;ParameterDeclarations&#39;))
+        parameters = ParameterDeclarations()
+        if element.find(&#39;ParameterDeclarations&#39;) is not None:
+            parameters = ParameterDeclarations.parse(element.find(&#39;ParameterDeclarations&#39;))
         catalog = Catalog.parse(element.find(&#39;CatalogLocations&#39;))
         storyboard = StoryBoard.parse(element.find(&#39;Storyboard&#39;))
         entities = Entities.parse(element.find(&#39;Entities&#39;))
@@ -896,7 +898,9 @@ createtion_date (datetime.datetime): optional creation date of the scenario
 
         &#34;&#34;&#34;
         header = FileHeader.parse(element.find(&#39;FileHeader&#39;))
-        parameters = ParameterDeclarations.parse(element.find(&#39;ParameterDeclarations&#39;))
+        parameters = ParameterDeclarations()
+        if element.find(&#39;ParameterDeclarations&#39;) is not None:
+            parameters = ParameterDeclarations.parse(element.find(&#39;ParameterDeclarations&#39;))
         catalog = Catalog.parse(element.find(&#39;CatalogLocations&#39;))
         storyboard = StoryBoard.parse(element.find(&#39;Storyboard&#39;))
         entities = Entities.parse(element.find(&#39;Entities&#39;))
@@ -967,7 +971,9 @@ def parse(element):
 
     &#34;&#34;&#34;
     header = FileHeader.parse(element.find(&#39;FileHeader&#39;))
-    parameters = ParameterDeclarations.parse(element.find(&#39;ParameterDeclarations&#39;))
+    parameters = ParameterDeclarations()
+    if element.find(&#39;ParameterDeclarations&#39;) is not None:
+        parameters = ParameterDeclarations.parse(element.find(&#39;ParameterDeclarations&#39;))
     catalog = Catalog.parse(element.find(&#39;CatalogLocations&#39;))
     storyboard = StoryBoard.parse(element.find(&#39;Storyboard&#39;))
     entities = Entities.parse(element.find(&#39;Entities&#39;))
