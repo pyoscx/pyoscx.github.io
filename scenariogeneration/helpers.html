@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.8.0" />
 <title>scenariogeneration.helpers API documentation</title>
-<meta name="description" content="helpers contains a launcher of esmini and a simple print function for the xmls" />
+<meta name="description" content="scenariogeneration
+https://github.com/pyoscx/scenariogeneration …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -20,12 +21,25 @@
 <h1 class="title">Module <code>scenariogeneration.helpers</code></h1>
 </header>
 <section id="section-intro">
-<p>helpers contains a launcher of esmini and a simple print function for the xmls</p>
+<p>scenariogeneration
+<a href="https://github.com/pyoscx/scenariogeneration">https://github.com/pyoscx/scenariogeneration</a></p>
+<p>This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
+<p>Copyright (c) 2022 The scenariogeneration Authors.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34; helpers contains a launcher of esmini and a simple print function for the xmls
+<pre><code class="python">&#34;&#34;&#34;
+  scenariogeneration
+  https://github.com/pyoscx/scenariogeneration
+ 
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ 
+  Copyright (c) 2022 The scenariogeneration Authors.
 
 &#34;&#34;&#34;
 
@@ -33,78 +47,85 @@ import xml.etree.ElementTree as ET
 import xml.dom.minidom as mini
 
 
-def prettify(element, encoding=&#39;utf-8&#39;):
-    &#34;&#34;&#34; prints the element to the commandline
+def prettify(element, encoding=&#34;utf-8&#34;):
+    &#34;&#34;&#34;prints the element to the commandline
 
-        Parameters
-        ----------
-            element (Element, or any generation class of scenariogeneration): element to print
-            
-            encoding (str): specifies the output encoding
-                Default: &#39;utf-8&#39;
+    Parameters
+    ----------
+        element (Element, or any generation class of scenariogeneration): element to print
+
+        encoding (str): specifies the output encoding
+            Default: &#39;utf-8&#39;
 
     &#34;&#34;&#34;
-    if not isinstance(element,ET.Element):
+    if not isinstance(element, ET.Element):
         element = element.get_element()
-    rough = ET.tostring(element, &#39;utf-8&#39;).replace(b&#39;\n&#39;, b&#39;&#39;).replace(b&#39;\t&#39;, b&#39;&#39;).replace(b&#39;    &#39;, b&#39;&#39;)
+    rough = (
+        ET.tostring(element, &#34;utf-8&#34;)
+        .replace(b&#34;\n&#34;, b&#34;&#34;)
+        .replace(b&#34;\t&#34;, b&#34;&#34;)
+        .replace(b&#34;    &#34;, b&#34;&#34;)
+    )
     reparsed = mini.parseString(rough)
-    return (reparsed.toprettyxml(indent=&#34;    &#34;, encoding=encoding))
+    return reparsed.toprettyxml(indent=&#34;    &#34;, encoding=encoding)
+
 
 def prettyprint(element, encoding=None):
-    &#34;&#34;&#34; returns the element prettyfied for writing to file or printing to the commandline
+    &#34;&#34;&#34;returns the element prettyfied for writing to file or printing to the commandline
 
-        Parameters
-        ----------
-            element (Element, or any generation class of scenariogeneration): element to print
-            
-            encoding (str): specify the output encoding
-                Default: None (works best for printing in terminal on ubuntu atleast)
+    Parameters
+    ----------
+        element (Element, or any generation class of scenariogeneration): element to print
+
+        encoding (str): specify the output encoding
+            Default: None (works best for printing in terminal on ubuntu atleast)
 
     &#34;&#34;&#34;
-    print (prettify(element, encoding=encoding))
+    print(prettify(element, encoding=encoding))
 
 
-def printToFile(element, filename, prettyprint=True, encoding=&#39;utf-8&#39;):
-    &#34;&#34;&#34; prints the element to a xml file
+def printToFile(element, filename, prettyprint=True, encoding=&#34;utf-8&#34;):
+    &#34;&#34;&#34;prints the element to a xml file
 
-        Parameters
-        ----------
-            element (Element): element to print
+    Parameters
+    ----------
+        element (Element): element to print
 
-            filename (str): file to save to
+        filename (str): file to save to
 
-            prettyprint (bool): pretty or &#34;ugly&#34; print
+        prettyprint (bool): pretty or &#34;ugly&#34; print
 
-            encoding (str): specify the output encoding
-                Default: &#39;utf-8&#39;
+        encoding (str): specify the output encoding
+            Default: &#39;utf-8&#39;
     &#34;&#34;&#34;
-    if prettyprint:    
+    if prettyprint:
         try:
-            with open(filename,&#39;wb&#39;) as file_handle:
+            with open(filename, &#34;wb&#34;) as file_handle:
                 file_handle.write(prettify(element, encoding=encoding))
         except LookupError:
-            print (&#34;%s is not a valid encoding option.&#34; % encoding)
-            
+            print(&#34;%s is not a valid encoding option.&#34; % encoding)
+
     else:
         tree = ET.ElementTree(element)
         try:
             tree.write(filename, encoding=encoding)
         except LookupError:
-            print (&#34;%s is not a valid encoding option.&#34; % encoding)
+            print(&#34;%s is not a valid encoding option.&#34; % encoding)
+
 
 def enum2str(enum):
-    &#34;&#34;&#34; helper to create strings from enums that should contain space but have to have _
+    &#34;&#34;&#34;helper to create strings from enums that should contain space but have to have _
 
-        Parameters
-        ----------
-            enum (Enum): a enum of pyodrx
+    Parameters
+    ----------
+        enum (Enum): a enum of pyodrx
 
-        Returns
-        -------
-            enumstr (str): the enum as a string replacing _ with &#39; &#39;
+    Returns
+    -------
+        enumstr (str): the enum as a string replacing _ with &#39; &#39;
 
     &#34;&#34;&#34;
-    return enum.name.replace(&#39;_&#39;,&#39; &#39;)</code></pre>
+    return enum.name.replace(&#34;_&#34;, &#34; &#34;)</code></pre>
 </details>
 </section>
 <section>
@@ -130,18 +151,18 @@ def enum2str(enum):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def enum2str(enum):
-    &#34;&#34;&#34; helper to create strings from enums that should contain space but have to have _
+    &#34;&#34;&#34;helper to create strings from enums that should contain space but have to have _
 
-        Parameters
-        ----------
-            enum (Enum): a enum of pyodrx
+    Parameters
+    ----------
+        enum (Enum): a enum of pyodrx
 
-        Returns
-        -------
-            enumstr (str): the enum as a string replacing _ with &#39; &#39;
+    Returns
+    -------
+        enumstr (str): the enum as a string replacing _ with &#39; &#39;
 
     &#34;&#34;&#34;
-    return enum.name.replace(&#39;_&#39;,&#39; &#39;)</code></pre>
+    return enum.name.replace(&#34;_&#34;, &#34; &#34;)</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.helpers.prettify"><code class="name flex">
@@ -159,22 +180,27 @@ encoding (str): specifies the output encoding
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def prettify(element, encoding=&#39;utf-8&#39;):
-    &#34;&#34;&#34; prints the element to the commandline
+<pre><code class="python">def prettify(element, encoding=&#34;utf-8&#34;):
+    &#34;&#34;&#34;prints the element to the commandline
 
-        Parameters
-        ----------
-            element (Element, or any generation class of scenariogeneration): element to print
-            
-            encoding (str): specifies the output encoding
-                Default: &#39;utf-8&#39;
+    Parameters
+    ----------
+        element (Element, or any generation class of scenariogeneration): element to print
+
+        encoding (str): specifies the output encoding
+            Default: &#39;utf-8&#39;
 
     &#34;&#34;&#34;
-    if not isinstance(element,ET.Element):
+    if not isinstance(element, ET.Element):
         element = element.get_element()
-    rough = ET.tostring(element, &#39;utf-8&#39;).replace(b&#39;\n&#39;, b&#39;&#39;).replace(b&#39;\t&#39;, b&#39;&#39;).replace(b&#39;    &#39;, b&#39;&#39;)
+    rough = (
+        ET.tostring(element, &#34;utf-8&#34;)
+        .replace(b&#34;\n&#34;, b&#34;&#34;)
+        .replace(b&#34;\t&#34;, b&#34;&#34;)
+        .replace(b&#34;    &#34;, b&#34;&#34;)
+    )
     reparsed = mini.parseString(rough)
-    return (reparsed.toprettyxml(indent=&#34;    &#34;, encoding=encoding))</code></pre>
+    return reparsed.toprettyxml(indent=&#34;    &#34;, encoding=encoding)</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.helpers.prettyprint"><code class="name flex">
@@ -193,17 +219,17 @@ encoding (str): specify the output encoding
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def prettyprint(element, encoding=None):
-    &#34;&#34;&#34; returns the element prettyfied for writing to file or printing to the commandline
+    &#34;&#34;&#34;returns the element prettyfied for writing to file or printing to the commandline
 
-        Parameters
-        ----------
-            element (Element, or any generation class of scenariogeneration): element to print
-            
-            encoding (str): specify the output encoding
-                Default: None (works best for printing in terminal on ubuntu atleast)
+    Parameters
+    ----------
+        element (Element, or any generation class of scenariogeneration): element to print
+
+        encoding (str): specify the output encoding
+            Default: None (works best for printing in terminal on ubuntu atleast)
 
     &#34;&#34;&#34;
-    print (prettify(element, encoding=encoding))</code></pre>
+    print(prettify(element, encoding=encoding))</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.helpers.printToFile"><code class="name flex">
@@ -225,33 +251,33 @@ encoding (str): specify the output encoding
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def printToFile(element, filename, prettyprint=True, encoding=&#39;utf-8&#39;):
-    &#34;&#34;&#34; prints the element to a xml file
+<pre><code class="python">def printToFile(element, filename, prettyprint=True, encoding=&#34;utf-8&#34;):
+    &#34;&#34;&#34;prints the element to a xml file
 
-        Parameters
-        ----------
-            element (Element): element to print
+    Parameters
+    ----------
+        element (Element): element to print
 
-            filename (str): file to save to
+        filename (str): file to save to
 
-            prettyprint (bool): pretty or &#34;ugly&#34; print
+        prettyprint (bool): pretty or &#34;ugly&#34; print
 
-            encoding (str): specify the output encoding
-                Default: &#39;utf-8&#39;
+        encoding (str): specify the output encoding
+            Default: &#39;utf-8&#39;
     &#34;&#34;&#34;
-    if prettyprint:    
+    if prettyprint:
         try:
-            with open(filename,&#39;wb&#39;) as file_handle:
+            with open(filename, &#34;wb&#34;) as file_handle:
                 file_handle.write(prettify(element, encoding=encoding))
         except LookupError:
-            print (&#34;%s is not a valid encoding option.&#34; % encoding)
-            
+            print(&#34;%s is not a valid encoding option.&#34; % encoding)
+
     else:
         tree = ET.ElementTree(element)
         try:
             tree.write(filename, encoding=encoding)
         except LookupError:
-            print (&#34;%s is not a valid encoding option.&#34; % encoding)</code></pre>
+            print(&#34;%s is not a valid encoding option.&#34; % encoding)</code></pre>
 </details>
 </dd>
 </dl>

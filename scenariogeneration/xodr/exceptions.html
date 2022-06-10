@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.8.0" />
 <title>scenariogeneration.xodr.exceptions API documentation</title>
-<meta name="description" content="Some custom exceptions" />
+<meta name="description" content="scenariogeneration
+https://github.com/pyoscx/scenariogeneration …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -20,49 +21,80 @@
 <h1 class="title">Module <code>scenariogeneration.xodr.exceptions</code></h1>
 </header>
 <section id="section-intro">
-<p>Some custom exceptions</p>
+<p>scenariogeneration
+<a href="https://github.com/pyoscx/scenariogeneration">https://github.com/pyoscx/scenariogeneration</a></p>
+<p>This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
+<p>Copyright (c) 2022 The scenariogeneration Authors.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34; Some custom exceptions
+<pre><code class="python">&#34;&#34;&#34;
+  scenariogeneration
+  https://github.com/pyoscx/scenariogeneration
+ 
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ 
+  Copyright (c) 2022 The scenariogeneration Authors.
 
 &#34;&#34;&#34;
 
 
 class NotSameAmountOfLanesError(Exception):
-    &#34;&#34;&#34; Raised when the amount of Lanes are not the same (used for the automation of linking)
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raised when the amount of Lanes are not the same (used for the automation of linking)&#34;&#34;&#34;
+
     pass
+
 
 class NotEnoughInputArguments(Exception):
-    &#34;&#34;&#34; Raised when one of the needed &#34;optional&#34; inputs are not used
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raised when one of the needed &#34;optional&#34; inputs are not used&#34;&#34;&#34;
+
     pass
+
 
 class ToManyOptionalArguments(Exception):
-    &#34;&#34;&#34; Raised when one of the needed &#34;optional&#34; inputs are not used
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raised when one of the needed &#34;optional&#34; inputs are not used&#34;&#34;&#34;
+
     pass
+
 
 class UndefinedRoadNetwork(Exception):
-    &#34;&#34;&#34; Raised when the user haven&#39;t connected the roads in a correct way
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raised when the user haven&#39;t connected the roads in a correct way&#34;&#34;&#34;
+
     pass
+
 
 class RoadsAndLanesNotAdjusted(Exception):
-    &#34;&#34;&#34; Raised when the user tries to perform an action on non-adjusted lanes and roads that requires adjusted lanes and roads
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raised when the user tries to perform an action on non-adjusted lanes and roads that requires adjusted lanes and roads&#34;&#34;&#34;
+
     pass
+
 
 class MixOfGeometryAddition(Exception):
-    &#34;&#34;&#34; Raise when the wrong way of adding geometires are used for the planview
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raise when the wrong way of adding geometires are used for the planview&#34;&#34;&#34;
+
     pass
 
+
 class GeneralIssueInputArguments(Exception):
-    &#34;&#34;&#34; Raise when there is something wrong in the input arguments 
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raise when there is something wrong in the input arguments&#34;&#34;&#34;
+
+    pass
+
+
+class IdAlreadyExists(Exception):
+    &#34;&#34;&#34;Raise when there is a clash between ids&#34;&#34;&#34;
+
+    pass
+
+
+class RemovedFunctionality(Exception):
+    &#34;&#34;&#34;Raise when a function has been removed&#34;&#34;&#34;
+
     pass</code></pre>
 </details>
 </section>
@@ -86,8 +118,29 @@ class GeneralIssueInputArguments(Exception):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class GeneralIssueInputArguments(Exception):
-    &#34;&#34;&#34; Raise when there is something wrong in the input arguments 
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raise when there is something wrong in the input arguments&#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="scenariogeneration.xodr.exceptions.IdAlreadyExists"><code class="flex name class">
+<span>class <span class="ident">IdAlreadyExists</span></span>
+<span>(</span><span>...)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Raise when there is a clash between ids</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class IdAlreadyExists(Exception):
+    &#34;&#34;&#34;Raise when there is a clash between ids&#34;&#34;&#34;
+
     pass</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -107,8 +160,8 @@ class GeneralIssueInputArguments(Exception):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class MixOfGeometryAddition(Exception):
-    &#34;&#34;&#34; Raise when the wrong way of adding geometires are used for the planview
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raise when the wrong way of adding geometires are used for the planview&#34;&#34;&#34;
+
     pass</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -128,8 +181,8 @@ class GeneralIssueInputArguments(Exception):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class NotEnoughInputArguments(Exception):
-    &#34;&#34;&#34; Raised when one of the needed &#34;optional&#34; inputs are not used
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raised when one of the needed &#34;optional&#34; inputs are not used&#34;&#34;&#34;
+
     pass</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -149,8 +202,29 @@ class GeneralIssueInputArguments(Exception):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class NotSameAmountOfLanesError(Exception):
-    &#34;&#34;&#34; Raised when the amount of Lanes are not the same (used for the automation of linking)
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raised when the amount of Lanes are not the same (used for the automation of linking)&#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="scenariogeneration.xodr.exceptions.RemovedFunctionality"><code class="flex name class">
+<span>class <span class="ident">RemovedFunctionality</span></span>
+<span>(</span><span>...)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Raise when a function has been removed</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class RemovedFunctionality(Exception):
+    &#34;&#34;&#34;Raise when a function has been removed&#34;&#34;&#34;
+
     pass</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -170,8 +244,8 @@ class GeneralIssueInputArguments(Exception):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class RoadsAndLanesNotAdjusted(Exception):
-    &#34;&#34;&#34; Raised when the user tries to perform an action on non-adjusted lanes and roads that requires adjusted lanes and roads
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raised when the user tries to perform an action on non-adjusted lanes and roads that requires adjusted lanes and roads&#34;&#34;&#34;
+
     pass</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -191,8 +265,8 @@ class GeneralIssueInputArguments(Exception):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ToManyOptionalArguments(Exception):
-    &#34;&#34;&#34; Raised when one of the needed &#34;optional&#34; inputs are not used
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raised when one of the needed &#34;optional&#34; inputs are not used&#34;&#34;&#34;
+
     pass</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -212,8 +286,8 @@ class GeneralIssueInputArguments(Exception):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class UndefinedRoadNetwork(Exception):
-    &#34;&#34;&#34; Raised when the user haven&#39;t connected the roads in a correct way
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raised when the user haven&#39;t connected the roads in a correct way&#34;&#34;&#34;
+
     pass</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -242,6 +316,9 @@ class GeneralIssueInputArguments(Exception):
 <h4><code><a title="scenariogeneration.xodr.exceptions.GeneralIssueInputArguments" href="#scenariogeneration.xodr.exceptions.GeneralIssueInputArguments">GeneralIssueInputArguments</a></code></h4>
 </li>
 <li>
+<h4><code><a title="scenariogeneration.xodr.exceptions.IdAlreadyExists" href="#scenariogeneration.xodr.exceptions.IdAlreadyExists">IdAlreadyExists</a></code></h4>
+</li>
+<li>
 <h4><code><a title="scenariogeneration.xodr.exceptions.MixOfGeometryAddition" href="#scenariogeneration.xodr.exceptions.MixOfGeometryAddition">MixOfGeometryAddition</a></code></h4>
 </li>
 <li>
@@ -249,6 +326,9 @@ class GeneralIssueInputArguments(Exception):
 </li>
 <li>
 <h4><code><a title="scenariogeneration.xodr.exceptions.NotSameAmountOfLanesError" href="#scenariogeneration.xodr.exceptions.NotSameAmountOfLanesError">NotSameAmountOfLanesError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xodr.exceptions.RemovedFunctionality" href="#scenariogeneration.xodr.exceptions.RemovedFunctionality">RemovedFunctionality</a></code></h4>
 </li>
 <li>
 <h4><code><a title="scenariogeneration.xodr.exceptions.RoadsAndLanesNotAdjusted" href="#scenariogeneration.xodr.exceptions.RoadsAndLanesNotAdjusted">RoadsAndLanesNotAdjusted</a></code></h4>

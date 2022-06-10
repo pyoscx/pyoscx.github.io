@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.8.0" />
 <title>scenariogeneration.xosc.enumerations API documentation</title>
-<meta name="description" content="Collection of the enumerations defined in OpenSCENARIO, and used in the xosc module" />
+<meta name="description" content="scenariogeneration
+https://github.com/pyoscx/scenariogeneration …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -20,37 +21,86 @@
 <h1 class="title">Module <code>scenariogeneration.xosc.enumerations</code></h1>
 </header>
 <section id="section-intro">
-<p>Collection of the enumerations defined in OpenSCENARIO, and used in the xosc module</p>
+<p>scenariogeneration
+<a href="https://github.com/pyoscx/scenariogeneration">https://github.com/pyoscx/scenariogeneration</a></p>
+<p>This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
+<p>Copyright (c) 2022 The scenariogeneration Authors.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34; Collection of the enumerations defined in OpenSCENARIO, and used in the xosc module
+<pre><code class="python">&#34;&#34;&#34;
+  scenariogeneration
+  https://github.com/pyoscx/scenariogeneration
+ 
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ 
+  Copyright (c) 2022 The scenariogeneration Authors.
 
 &#34;&#34;&#34;
-XMLNS = &#39;http://www.w3.org/2001/XMLSchema-instance&#39;
-XSI = &#39;OpenScenario.xsd&#39;
+XMLNS = &#34;http://www.w3.org/2001/XMLSchema-instance&#34;
+XSI = &#34;OpenScenario.xsd&#34;
 
 from .exceptions import OpenSCENARIOVersionError
 from os import error
 
 _MINOR_VERSION = 1
 
-class VersionBase():
-    &#34;&#34;&#34; base class for checking different versions of OpenSCENARIO
-    &#34;&#34;&#34;
+
+class VersionBase:
+    &#34;&#34;&#34;base class for checking different versions of OpenSCENARIO&#34;&#34;&#34;
+
     version_major = 1
     version_minor = _MINOR_VERSION
 
-    def isVersion(self,major=1,minor=1):
+    def isVersion(self, major=1, minor=1):
         return major &gt;= self.version_major and minor &gt;= self.version_minor
-    
-    def setVersion(self,major=1,minor=0):
+
+    def setVersion(self, major=1, minor=0):
         VersionBase.version_major = major
         VersionBase.version_minor = minor
 
+
 class _OscEnum(VersionBase):
-    &#34;&#34;&#34; custom &#34;enum&#34; class to be able to handle different versions of the enums in OpenSCENARIO
+    &#34;&#34;&#34;custom &#34;enum&#34; class to be able to handle different versions of the enums in OpenSCENARIO
+
+    Parameters
+    ----------
+        name (str): enum name
+
+        classname (str): name of the enum class (only used for printouts to help debugging)
+
+        min_minor_version (int): how the relative distance should be calculated
+            Default: 0
+
+        max_minor_version (int): the max &#34;minor version&#34; where the enum is valid
+            Default: Current Supported Version
+
+    Attributes
+    ----------
+        name (str): enum name
+
+        classname (str): name of the enum class (only used for printouts to help debugging)
+
+        min_minor_version (int): how the relative distance should be calculated
+
+        max_minor_version (int): the max &#34;minor version&#34; where the enum is valid
+
+    Methods
+    -------
+        get_name()
+            Returns the correct string of the Enum, will take care of versions
+
+    &#34;&#34;&#34;
+
+    def __init__(
+        self, classname, name, min_minor_version=0, max_minor_version=_MINOR_VERSION
+    ):
+        &#34;&#34;&#34;initalize the _OscEnum
 
         Parameters
         ----------
@@ -63,37 +113,6 @@ class _OscEnum(VersionBase):
 
             max_minor_version (int): the max &#34;minor version&#34; where the enum is valid
                 Default: Current Supported Version
-
-        Attributes
-        ----------
-            name (str): enum name
-
-            classname (str): name of the enum class (only used for printouts to help debugging)
-
-            min_minor_version (int): how the relative distance should be calculated
-
-            max_minor_version (int): the max &#34;minor version&#34; where the enum is valid
-
-        Methods
-        -------
-            get_name()
-                Returns the correct string of the Enum, will take care of versions
-
-    &#34;&#34;&#34;
-    def __init__(self, classname, name, min_minor_version=0, max_minor_version=_MINOR_VERSION):
-        &#34;&#34;&#34; initalize the _OscEnum
-
-            Parameters
-            ----------
-                name (str): enum name
-
-                classname (str): name of the enum class (only used for printouts to help debugging)
-
-                min_minor_version (int): how the relative distance should be calculated
-                    Default: 0
-
-                max_minor_version (int): the max &#34;minor version&#34; where the enum is valid
-                    Default: Current Supported Version
         &#34;&#34;&#34;
 
         self.name = name
@@ -101,227 +120,283 @@ class _OscEnum(VersionBase):
         self.min_minor_version = min_minor_version
         self.max_minor_version = max_minor_version
 
-    def __eq__(self,other):
-        if isinstance(other,_OscEnum):
-            if self.name == other.name and \
-            self.classname == other.classname:
+    def __eq__(self, other):
+        if isinstance(other, _OscEnum):
+            if self.name == other.name and self.classname == other.classname:
                 return True
         return False
 
     def get_name(self):
-        &#34;&#34;&#34; method that should be used when using the _OscEnum to get the string, will check version of the enum to see if it is used correctly with the used version
+        &#34;&#34;&#34;method that should be used when using the _OscEnum to get the string, will check version of the enum to see if it is used correctly with the used version
 
-            Returns
-            -------
-            name (str)
+        Returns
+        -------
+        name (str)
         &#34;&#34;&#34;
-        
+
         if self.min_minor_version &gt; self.version_minor:
-            raise OpenSCENARIOVersionError(self.classname + &#39;.&#39; + self.name + &#39; is not part of OpenSCENARIO V&#39; + str(self.version_major) + &#39;.&#39; + str(self.version_minor) + &#39;, was introduced in V&#39; + str(self.version_major) + &#39;.&#39; + str(self.min_minor_version))
+            raise OpenSCENARIOVersionError(
+                self.classname
+                + &#34;.&#34;
+                + self.name
+                + &#34; is not part of OpenSCENARIO V&#34;
+                + str(self.version_major)
+                + &#34;.&#34;
+                + str(self.version_minor)
+                + &#34;, was introduced in V&#34;
+                + str(self.version_major)
+                + &#34;.&#34;
+                + str(self.min_minor_version)
+            )
         elif self.max_minor_version &lt; self.version_minor:
-            raise OpenSCENARIOVersionError(self.classname + &#39;.&#39; + self.name + &#39; is not part of OpenSCENARIO V&#39; + str(self.version_major) + &#39;.&#39; + str(self.version_minor) + &#39;, was deprecated in V&#39; + str(self.version_major) + &#39;.&#39; + str(self.max_minor_version))
+            raise OpenSCENARIOVersionError(
+                self.classname
+                + &#34;.&#34;
+                + self.name
+                + &#34; is not part of OpenSCENARIO V&#34;
+                + str(self.version_major)
+                + &#34;.&#34;
+                + str(self.version_minor)
+                + &#34;, was deprecated in V&#34;
+                + str(self.version_major)
+                + &#34;.&#34;
+                + str(self.max_minor_version)
+            )
         return self.name
 
     def __str__(self):
         return self.name
 
-class CloudState():
-    &#34;&#34;&#34; Enum for CloudState
-    &#34;&#34;&#34;
-    skyOff = _OscEnum(&#39;CloudState&#39;,&#39;skyOff&#39;)
-    free = _OscEnum(&#39;CloudState&#39;,&#39;free&#39;)
-    cloudy = _OscEnum(&#39;CloudState&#39;,&#39;cloudy&#39;)
-    overcast = _OscEnum(&#39;CloudState&#39;,&#39;overcast&#39;)
-    rainy = _OscEnum(&#39;CloudState&#39;,&#39;rainy&#39;)
 
-class ConditionEdge():
-    &#34;&#34;&#34; Enum for ConditionEdge
-    &#34;&#34;&#34;
-    rising = _OscEnum(&#39;ConditionEdge&#39;,&#39;rising&#39;)
-    falling = _OscEnum(&#39;ConditionEdge&#39;,&#39;falling&#39;)
-    risingOrFalling = _OscEnum(&#39;ConditionEdge&#39;,&#39;risingOrFalling&#39;)
-    none = _OscEnum(&#39;ConditionEdge&#39;,&#39;none&#39;)
+class CloudState:
+    &#34;&#34;&#34;Enum for CloudState&#34;&#34;&#34;
 
-class DynamicsDimension():
-    &#34;&#34;&#34; Enum for DynamicsDimension
-    &#34;&#34;&#34;
-    rate = _OscEnum(&#39;DynamicsDimension&#39;,&#39;rate&#39;)
-    time = _OscEnum(&#39;DynamicsDimension&#39;,&#39;time&#39;)
-    distance = _OscEnum(&#39;DynamicsDimension&#39;,&#39;distance&#39;)
-
-class DynamicsShapes():
-    &#34;&#34;&#34; Enum for DynamicsShapes
-    &#34;&#34;&#34;
-    linear = _OscEnum(&#39;DynamicsShapes&#39;,&#39;linear&#39;)
-    cubic = _OscEnum(&#39;DynamicsShapes&#39;,&#39;cubic&#39;)
-    sinusoidal = _OscEnum(&#39;DynamicsShapes&#39;,&#39;sinusoidal&#39;)
-    step = _OscEnum(&#39;DynamicsShapes&#39;,&#39;step&#39;)
-
-class FollowMode():
-    &#34;&#34;&#34; Enum for FollowMode
-    &#34;&#34;&#34;
-    position = _OscEnum(&#39;FollowMode&#39;,&#39;position&#39;)
-    follow = _OscEnum(&#39;FollowMode&#39;,&#39;follow&#39;)
-
-class MiscObjectCategory():
-    &#34;&#34;&#34; Enum for MiscObjectCategory
-    &#34;&#34;&#34;
-    
-    none = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;none&#39;)
-    obstacle = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;obstacle&#39;)
-    pole = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;pole&#39;)
-    tree = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;tree&#39;)
-    vegetation = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;vegetation&#39;)
-    barrier = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;barrier&#39;)
-    building = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;building&#39;)
-    parkingSpace = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;parkingSpace&#39;)
-    patch = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;patch&#39;)
-    railing = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;railing&#39;)
-    grafficIsland = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;grafficIsland&#39;)
-    crosswalk = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;crosswalk&#39;)
-    streetLamp = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;streetLamp&#39;)
-    gantry = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;gantry&#39;)
-    soundBarrier = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;soundBarrier&#39;)
-    wind = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;wind&#39;,max_minor_version=0)
-    roadMark = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;roadMark&#39;)
-
-class ObjectType():
-    &#34;&#34;&#34; Enum for ObjectType
-    &#34;&#34;&#34;
-    pedestrian = _OscEnum(&#39;ObjectType&#39;,&#39;pedestrian&#39;)
-    vehicle = _OscEnum(&#39;ObjectType&#39;,&#39;vehicle&#39;)
-    miscellaneous = _OscEnum(&#39;ObjectType&#39;,&#39;miscellaneous&#39;)
-    external = _OscEnum(&#39;ObjectType&#39;,&#39;external&#39;,min_minor_version=1)
-
-class ParameterType():
-    &#34;&#34;&#34; Enum for ParameterType
-    &#34;&#34;&#34;
-    integer = _OscEnum(&#39;ParameterType&#39;,&#39;integer&#39;)
-    double = _OscEnum(&#39;ParameterType&#39;,&#39;double&#39;)
-    string = _OscEnum(&#39;ParameterType&#39;,&#39;string&#39;)
-    unsighedInt = _OscEnum(&#39;ParameterType&#39;,&#39;unsighedInt&#39;)
-    unsighedShort = _OscEnum(&#39;ParameterType&#39;,&#39;unsighedShort&#39;)
-    boolean = _OscEnum(&#39;ParameterType&#39;,&#39;boolean&#39;)
-    dateTime = _OscEnum(&#39;ParameterType&#39;,&#39;dateTime&#39;)
-
-class PedestrianCategory():
-    &#34;&#34;&#34; Enum for PedestrianCategory
-    &#34;&#34;&#34;
-    pedestrian = _OscEnum(&#39;PedestrianCategory&#39;,&#39;pedestrian&#39;)
-    wheelchair = _OscEnum(&#39;PedestrianCategory&#39;,&#39;wheelchair&#39;)
-    animal = _OscEnum(&#39;PedestrianCategory&#39;,&#39;animal&#39;)
-
-class PrecipitationType():
-    &#34;&#34;&#34; Enum for PercipitationType
-    &#34;&#34;&#34;
-    dry = _OscEnum(&#39;PrecipitationType&#39;,&#39;dry&#39;)
-    rain = _OscEnum(&#39;PrecipitationType&#39;,&#39;rain&#39;)
-    snow = _OscEnum(&#39;PrecipitationType&#39;,&#39;snow&#39;)
-
-class Priority():
-    &#34;&#34;&#34; Enum for Priority
-    &#34;&#34;&#34;
-    overwrite = _OscEnum(&#39;Priority&#39;,&#39;overwrite&#39;)
-    skip = _OscEnum(&#39;Priority&#39;,&#39;skip&#39;)
-    parallel = _OscEnum(&#39;Priority&#39;,&#39;parallel&#39;)
-
-class ReferenceContext():
-    &#34;&#34;&#34; Enum for ReferenceContext
-    &#34;&#34;&#34;
-    relative = _OscEnum(&#39;ReferenceContext&#39;,&#39;relative&#39;)
-    absolute = _OscEnum(&#39;ReferenceContext&#39;,&#39;absolute&#39;)
-
-class RelativeDistanceType():
-    &#34;&#34;&#34; Enum for RelativeDistanceType
-    &#34;&#34;&#34;
-    longitudinal = _OscEnum(&#39;RelativeDistanceType&#39;,&#39;longitudinal&#39;)
-    lateral = _OscEnum(&#39;RelativeDistanceType&#39;,&#39;lateral&#39;)
-    cartesianDistance = _OscEnum(&#39;RelativeDistanceType&#39;,&#39;cartesianDistance&#39;,max_minor_version=0)
-    euclidianDistance = _OscEnum(&#39;RelativeDistanceType&#39;,&#39;euclidianDistance&#39;,min_minor_version=1)
-
-class RouteStrategy():
-    &#34;&#34;&#34; Enum for RouteStrategy
-    &#34;&#34;&#34;
-    fastest = _OscEnum(&#39;RouteStrategy&#39;,&#39;fastest&#39;)
-    shortest = _OscEnum(&#39;RouteStrategy&#39;,&#39;shortest&#39;)
-    leastIntersections = _OscEnum(&#39;RouteStrategy&#39;,&#39;leastIntersections&#39;)
-    random = _OscEnum(&#39;RouteStrategy&#39;,&#39;random&#39;)
-
-class Rule():
-    &#34;&#34;&#34; Enum for Rule
-    &#34;&#34;&#34;
-    greaterThan = _OscEnum(&#39;Rule&#39;,&#39;greaterThan&#39;)
-    lessThan = _OscEnum(&#39;Rule&#39;,&#39;lessThan&#39;)
-    equalTo = _OscEnum(&#39;Rule&#39;,&#39;equalTo&#39;)
-    greaterOrEqual = _OscEnum(&#39;Rule&#39;,&#39;greaterOrEqual&#39;,min_minor_version=1)
-    lessOrEqual = _OscEnum(&#39;Rule&#39;,&#39;lessOrEqual&#39;,min_minor_version=1)
-    notEqualTo = _OscEnum(&#39;Rule&#39;,&#39;notEqualTo&#39;,min_minor_version=1)
-
-class SpeedTargetValueType():
-    &#34;&#34;&#34; Enum for SpeedTargetValueType
-    &#34;&#34;&#34;
-    delta = _OscEnum(&#39;SpeedTargetValueType&#39;,&#39;delta&#39;)
-    factor = _OscEnum(&#39;SpeedTargetValueType&#39;,&#39;factor&#39;)
-
-class StoryboardElementState():
-    &#34;&#34;&#34; Enum for StoryboardElementState
-    &#34;&#34;&#34;
-    startTransition = _OscEnum(&#39;StoryboardElementState&#39;,&#39;startTransition&#39;)
-    endTransition = _OscEnum(&#39;StoryboardElementState&#39;,&#39;endTransition&#39;)
-    stopTransition = _OscEnum(&#39;StoryboardElementState&#39;,&#39;stopTransition&#39;)
-    skipTransition = _OscEnum(&#39;StoryboardElementState&#39;,&#39;skipTransition&#39;)
-    completeState = _OscEnum(&#39;StoryboardElementState&#39;,&#39;completeState&#39;)
-    runningState = _OscEnum(&#39;StoryboardElementState&#39;,&#39;runningState&#39;)
-    standbyState = _OscEnum(&#39;StoryboardElementState&#39;,&#39;standbyState&#39;)
-
-class StoryboardElementType():
-    &#34;&#34;&#34; Enum for StoryboardElementType
-    &#34;&#34;&#34;
-    story = _OscEnum(&#39;StoryboardElementType&#39;,&#39;story&#39;)
-    act = _OscEnum(&#39;StoryboardElementType&#39;,&#39;act&#39;)
-    maneuver = _OscEnum(&#39;StoryboardElementType&#39;,&#39;maneuver&#39;)
-    event = _OscEnum(&#39;StoryboardElementType&#39;,&#39;event&#39;)
-    action = _OscEnum(&#39;StoryboardElementType&#39;,&#39;action&#39;)
-    maneuverGroup = _OscEnum(&#39;StoryboardElementType&#39;,&#39;maneuverGroup&#39;)
-
-class TriggeringEntitiesRule():
-    &#34;&#34;&#34; Enum for TriggeringEntitiesRule
-    &#34;&#34;&#34;
-    any = _OscEnum(&#39;TriggeringEntitiesRule&#39;,&#39;any&#39;)
-    all = _OscEnum(&#39;TriggeringEntitiesRule&#39;,&#39;all&#39;)
-
-class VehicleCategory():
-    &#34;&#34;&#34; Enum for VehicleCategory
-    &#34;&#34;&#34;
-    car = _OscEnum(&#39;VehicleCategory&#39;,&#39;car&#39;)
-    van = _OscEnum(&#39;VehicleCategory&#39;,&#39;van&#39;)
-    truck = _OscEnum(&#39;VehicleCategory&#39;,&#39;truck&#39;)
-    trailer = _OscEnum(&#39;VehicleCategory&#39;,&#39;trailer&#39;)
-    semitrailer = _OscEnum(&#39;VehicleCategory&#39;,&#39;semitrailer&#39;)
-    bus = _OscEnum(&#39;VehicleCategory&#39;,&#39;bus&#39;)
-    motorbike = _OscEnum(&#39;VehicleCategory&#39;,&#39;motorbike&#39;)
-    bicycle = _OscEnum(&#39;VehicleCategory&#39;,&#39;bicycle&#39;)
-    train = _OscEnum(&#39;VehicleCategory&#39;,&#39;train&#39;)
-    tram = _OscEnum(&#39;VehicleCategory&#39;,&#39;tram&#39;)
+    skyOff = _OscEnum(&#34;CloudState&#34;, &#34;skyOff&#34;)
+    free = _OscEnum(&#34;CloudState&#34;, &#34;free&#34;)
+    cloudy = _OscEnum(&#34;CloudState&#34;, &#34;cloudy&#34;)
+    overcast = _OscEnum(&#34;CloudState&#34;, &#34;overcast&#34;)
+    rainy = _OscEnum(&#34;CloudState&#34;, &#34;rainy&#34;)
 
 
-class CoordinateSystem():
-    &#34;&#34;&#34; Enum for CoordinateSystem
-    &#34;&#34;&#34;
-    entity = _OscEnum(&#39;CoordinateSystem&#39;,&#39;entity&#39;,min_minor_version=1)
-    lane = _OscEnum(&#39;CoordinateSystem&#39;,&#39;lane&#39;,min_minor_version=1)
-    road = _OscEnum(&#39;CoordinateSystem&#39;,&#39;road&#39;,min_minor_version=1)
-    trajectory = _OscEnum(&#39;CoordinateSystem&#39;,&#39;trajectory&#39;,min_minor_version=1)
+class ConditionEdge:
+    &#34;&#34;&#34;Enum for ConditionEdge&#34;&#34;&#34;
 
-class LateralDisplacement():
-    any = _OscEnum(&#39;LateralDisplacement&#39;,&#39;any&#39;,min_minor_version=1)
-    leftToReferencedEntity = _OscEnum(&#39;LateralDisplacement&#39;,&#39;leftToReferencedEntity&#39;,min_minor_version=1)
-    rightToReferencedEntity = _OscEnum(&#39;LateralDisplacement&#39;,&#39;rightToReferencedEntity&#39;,min_minor_version=1)
+    rising = _OscEnum(&#34;ConditionEdge&#34;, &#34;rising&#34;)
+    falling = _OscEnum(&#34;ConditionEdge&#34;, &#34;falling&#34;)
+    risingOrFalling = _OscEnum(&#34;ConditionEdge&#34;, &#34;risingOrFalling&#34;)
+    none = _OscEnum(&#34;ConditionEdge&#34;, &#34;none&#34;)
 
-class LongitudinalDisplacement():
-    any = _OscEnum(&#39;LongitudinalDisplacement&#39;,&#39;any&#39;,min_minor_version=1)
-    trailingReferencedEntity = _OscEnum(&#39;LongitudinalDisplacement&#39;,&#39;trailingReferencedEntity&#39;,min_minor_version=1)
-    leadingReferencedEntity = _OscEnum(&#39;LongitudinalDisplacement&#39;,&#39;leadingReferencedEntity&#39;,min_minor_version=1)</code></pre>
+
+class DynamicsDimension:
+    &#34;&#34;&#34;Enum for DynamicsDimension&#34;&#34;&#34;
+
+    rate = _OscEnum(&#34;DynamicsDimension&#34;, &#34;rate&#34;)
+    time = _OscEnum(&#34;DynamicsDimension&#34;, &#34;time&#34;)
+    distance = _OscEnum(&#34;DynamicsDimension&#34;, &#34;distance&#34;)
+
+
+class DynamicsShapes:
+    &#34;&#34;&#34;Enum for DynamicsShapes&#34;&#34;&#34;
+
+    linear = _OscEnum(&#34;DynamicsShapes&#34;, &#34;linear&#34;)
+    cubic = _OscEnum(&#34;DynamicsShapes&#34;, &#34;cubic&#34;)
+    sinusoidal = _OscEnum(&#34;DynamicsShapes&#34;, &#34;sinusoidal&#34;)
+    step = _OscEnum(&#34;DynamicsShapes&#34;, &#34;step&#34;)
+
+
+class FollowMode:
+    &#34;&#34;&#34;Enum for FollowMode&#34;&#34;&#34;
+
+    position = _OscEnum(&#34;FollowMode&#34;, &#34;position&#34;)
+    follow = _OscEnum(&#34;FollowMode&#34;, &#34;follow&#34;)
+
+
+class MiscObjectCategory:
+    &#34;&#34;&#34;Enum for MiscObjectCategory&#34;&#34;&#34;
+
+    none = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;none&#34;)
+    obstacle = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;obstacle&#34;)
+    pole = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;pole&#34;)
+    tree = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;tree&#34;)
+    vegetation = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;vegetation&#34;)
+    barrier = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;barrier&#34;)
+    building = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;building&#34;)
+    parkingSpace = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;parkingSpace&#34;)
+    patch = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;patch&#34;)
+    railing = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;railing&#34;)
+    grafficIsland = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;grafficIsland&#34;)
+    crosswalk = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;crosswalk&#34;)
+    streetLamp = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;streetLamp&#34;)
+    gantry = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;gantry&#34;)
+    soundBarrier = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;soundBarrier&#34;)
+    wind = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;wind&#34;, max_minor_version=0)
+    roadMark = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;roadMark&#34;)
+
+
+class ObjectType:
+    &#34;&#34;&#34;Enum for ObjectType&#34;&#34;&#34;
+
+    pedestrian = _OscEnum(&#34;ObjectType&#34;, &#34;pedestrian&#34;)
+    vehicle = _OscEnum(&#34;ObjectType&#34;, &#34;vehicle&#34;)
+    miscellaneous = _OscEnum(&#34;ObjectType&#34;, &#34;miscellaneous&#34;)
+    external = _OscEnum(&#34;ObjectType&#34;, &#34;external&#34;, min_minor_version=1)
+
+
+class ParameterType:
+    &#34;&#34;&#34;Enum for ParameterType&#34;&#34;&#34;
+
+    integer = _OscEnum(&#34;ParameterType&#34;, &#34;integer&#34;)
+    double = _OscEnum(&#34;ParameterType&#34;, &#34;double&#34;)
+    string = _OscEnum(&#34;ParameterType&#34;, &#34;string&#34;)
+    unsighedInt = _OscEnum(&#34;ParameterType&#34;, &#34;unsighedInt&#34;)
+    unsighedShort = _OscEnum(&#34;ParameterType&#34;, &#34;unsighedShort&#34;)
+    boolean = _OscEnum(&#34;ParameterType&#34;, &#34;boolean&#34;)
+    dateTime = _OscEnum(&#34;ParameterType&#34;, &#34;dateTime&#34;)
+
+
+class PedestrianCategory:
+    &#34;&#34;&#34;Enum for PedestrianCategory&#34;&#34;&#34;
+
+    pedestrian = _OscEnum(&#34;PedestrianCategory&#34;, &#34;pedestrian&#34;)
+    wheelchair = _OscEnum(&#34;PedestrianCategory&#34;, &#34;wheelchair&#34;)
+    animal = _OscEnum(&#34;PedestrianCategory&#34;, &#34;animal&#34;)
+
+
+class PrecipitationType:
+    &#34;&#34;&#34;Enum for PercipitationType&#34;&#34;&#34;
+
+    dry = _OscEnum(&#34;PrecipitationType&#34;, &#34;dry&#34;)
+    rain = _OscEnum(&#34;PrecipitationType&#34;, &#34;rain&#34;)
+    snow = _OscEnum(&#34;PrecipitationType&#34;, &#34;snow&#34;)
+
+
+class Priority:
+    &#34;&#34;&#34;Enum for Priority&#34;&#34;&#34;
+
+    overwrite = _OscEnum(&#34;Priority&#34;, &#34;overwrite&#34;)
+    skip = _OscEnum(&#34;Priority&#34;, &#34;skip&#34;)
+    parallel = _OscEnum(&#34;Priority&#34;, &#34;parallel&#34;)
+
+
+class ReferenceContext:
+    &#34;&#34;&#34;Enum for ReferenceContext&#34;&#34;&#34;
+
+    relative = _OscEnum(&#34;ReferenceContext&#34;, &#34;relative&#34;)
+    absolute = _OscEnum(&#34;ReferenceContext&#34;, &#34;absolute&#34;)
+
+
+class RelativeDistanceType:
+    &#34;&#34;&#34;Enum for RelativeDistanceType&#34;&#34;&#34;
+
+    longitudinal = _OscEnum(&#34;RelativeDistanceType&#34;, &#34;longitudinal&#34;)
+    lateral = _OscEnum(&#34;RelativeDistanceType&#34;, &#34;lateral&#34;)
+    cartesianDistance = _OscEnum(
+        &#34;RelativeDistanceType&#34;, &#34;cartesianDistance&#34;, max_minor_version=0
+    )
+    euclidianDistance = _OscEnum(
+        &#34;RelativeDistanceType&#34;, &#34;euclidianDistance&#34;, min_minor_version=1
+    )
+
+
+class RouteStrategy:
+    &#34;&#34;&#34;Enum for RouteStrategy&#34;&#34;&#34;
+
+    fastest = _OscEnum(&#34;RouteStrategy&#34;, &#34;fastest&#34;)
+    shortest = _OscEnum(&#34;RouteStrategy&#34;, &#34;shortest&#34;)
+    leastIntersections = _OscEnum(&#34;RouteStrategy&#34;, &#34;leastIntersections&#34;)
+    random = _OscEnum(&#34;RouteStrategy&#34;, &#34;random&#34;)
+
+
+class Rule:
+    &#34;&#34;&#34;Enum for Rule&#34;&#34;&#34;
+
+    greaterThan = _OscEnum(&#34;Rule&#34;, &#34;greaterThan&#34;)
+    lessThan = _OscEnum(&#34;Rule&#34;, &#34;lessThan&#34;)
+    equalTo = _OscEnum(&#34;Rule&#34;, &#34;equalTo&#34;)
+    greaterOrEqual = _OscEnum(&#34;Rule&#34;, &#34;greaterOrEqual&#34;, min_minor_version=1)
+    lessOrEqual = _OscEnum(&#34;Rule&#34;, &#34;lessOrEqual&#34;, min_minor_version=1)
+    notEqualTo = _OscEnum(&#34;Rule&#34;, &#34;notEqualTo&#34;, min_minor_version=1)
+
+
+class SpeedTargetValueType:
+    &#34;&#34;&#34;Enum for SpeedTargetValueType&#34;&#34;&#34;
+
+    delta = _OscEnum(&#34;SpeedTargetValueType&#34;, &#34;delta&#34;)
+    factor = _OscEnum(&#34;SpeedTargetValueType&#34;, &#34;factor&#34;)
+
+
+class StoryboardElementState:
+    &#34;&#34;&#34;Enum for StoryboardElementState&#34;&#34;&#34;
+
+    startTransition = _OscEnum(&#34;StoryboardElementState&#34;, &#34;startTransition&#34;)
+    endTransition = _OscEnum(&#34;StoryboardElementState&#34;, &#34;endTransition&#34;)
+    stopTransition = _OscEnum(&#34;StoryboardElementState&#34;, &#34;stopTransition&#34;)
+    skipTransition = _OscEnum(&#34;StoryboardElementState&#34;, &#34;skipTransition&#34;)
+    completeState = _OscEnum(&#34;StoryboardElementState&#34;, &#34;completeState&#34;)
+    runningState = _OscEnum(&#34;StoryboardElementState&#34;, &#34;runningState&#34;)
+    standbyState = _OscEnum(&#34;StoryboardElementState&#34;, &#34;standbyState&#34;)
+
+
+class StoryboardElementType:
+    &#34;&#34;&#34;Enum for StoryboardElementType&#34;&#34;&#34;
+
+    story = _OscEnum(&#34;StoryboardElementType&#34;, &#34;story&#34;)
+    act = _OscEnum(&#34;StoryboardElementType&#34;, &#34;act&#34;)
+    maneuver = _OscEnum(&#34;StoryboardElementType&#34;, &#34;maneuver&#34;)
+    event = _OscEnum(&#34;StoryboardElementType&#34;, &#34;event&#34;)
+    action = _OscEnum(&#34;StoryboardElementType&#34;, &#34;action&#34;)
+    maneuverGroup = _OscEnum(&#34;StoryboardElementType&#34;, &#34;maneuverGroup&#34;)
+
+
+class TriggeringEntitiesRule:
+    &#34;&#34;&#34;Enum for TriggeringEntitiesRule&#34;&#34;&#34;
+
+    any = _OscEnum(&#34;TriggeringEntitiesRule&#34;, &#34;any&#34;)
+    all = _OscEnum(&#34;TriggeringEntitiesRule&#34;, &#34;all&#34;)
+
+
+class VehicleCategory:
+    &#34;&#34;&#34;Enum for VehicleCategory&#34;&#34;&#34;
+
+    car = _OscEnum(&#34;VehicleCategory&#34;, &#34;car&#34;)
+    van = _OscEnum(&#34;VehicleCategory&#34;, &#34;van&#34;)
+    truck = _OscEnum(&#34;VehicleCategory&#34;, &#34;truck&#34;)
+    trailer = _OscEnum(&#34;VehicleCategory&#34;, &#34;trailer&#34;)
+    semitrailer = _OscEnum(&#34;VehicleCategory&#34;, &#34;semitrailer&#34;)
+    bus = _OscEnum(&#34;VehicleCategory&#34;, &#34;bus&#34;)
+    motorbike = _OscEnum(&#34;VehicleCategory&#34;, &#34;motorbike&#34;)
+    bicycle = _OscEnum(&#34;VehicleCategory&#34;, &#34;bicycle&#34;)
+    train = _OscEnum(&#34;VehicleCategory&#34;, &#34;train&#34;)
+    tram = _OscEnum(&#34;VehicleCategory&#34;, &#34;tram&#34;)
+
+
+class CoordinateSystem:
+    &#34;&#34;&#34;Enum for CoordinateSystem&#34;&#34;&#34;
+
+    entity = _OscEnum(&#34;CoordinateSystem&#34;, &#34;entity&#34;, min_minor_version=1)
+    lane = _OscEnum(&#34;CoordinateSystem&#34;, &#34;lane&#34;, min_minor_version=1)
+    road = _OscEnum(&#34;CoordinateSystem&#34;, &#34;road&#34;, min_minor_version=1)
+    trajectory = _OscEnum(&#34;CoordinateSystem&#34;, &#34;trajectory&#34;, min_minor_version=1)
+
+
+class LateralDisplacement:
+    any = _OscEnum(&#34;LateralDisplacement&#34;, &#34;any&#34;, min_minor_version=1)
+    leftToReferencedEntity = _OscEnum(
+        &#34;LateralDisplacement&#34;, &#34;leftToReferencedEntity&#34;, min_minor_version=1
+    )
+    rightToReferencedEntity = _OscEnum(
+        &#34;LateralDisplacement&#34;, &#34;rightToReferencedEntity&#34;, min_minor_version=1
+    )
+
+
+class LongitudinalDisplacement:
+    any = _OscEnum(&#34;LongitudinalDisplacement&#34;, &#34;any&#34;, min_minor_version=1)
+    trailingReferencedEntity = _OscEnum(
+        &#34;LongitudinalDisplacement&#34;, &#34;trailingReferencedEntity&#34;, min_minor_version=1
+    )
+    leadingReferencedEntity = _OscEnum(
+        &#34;LongitudinalDisplacement&#34;, &#34;leadingReferencedEntity&#34;, min_minor_version=1
+    )</code></pre>
 </details>
 </section>
 <section>
@@ -342,14 +417,14 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class CloudState():
-    &#34;&#34;&#34; Enum for CloudState
-    &#34;&#34;&#34;
-    skyOff = _OscEnum(&#39;CloudState&#39;,&#39;skyOff&#39;)
-    free = _OscEnum(&#39;CloudState&#39;,&#39;free&#39;)
-    cloudy = _OscEnum(&#39;CloudState&#39;,&#39;cloudy&#39;)
-    overcast = _OscEnum(&#39;CloudState&#39;,&#39;overcast&#39;)
-    rainy = _OscEnum(&#39;CloudState&#39;,&#39;rainy&#39;)</code></pre>
+<pre><code class="python">class CloudState:
+    &#34;&#34;&#34;Enum for CloudState&#34;&#34;&#34;
+
+    skyOff = _OscEnum(&#34;CloudState&#34;, &#34;skyOff&#34;)
+    free = _OscEnum(&#34;CloudState&#34;, &#34;free&#34;)
+    cloudy = _OscEnum(&#34;CloudState&#34;, &#34;cloudy&#34;)
+    overcast = _OscEnum(&#34;CloudState&#34;, &#34;overcast&#34;)
+    rainy = _OscEnum(&#34;CloudState&#34;, &#34;rainy&#34;)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -384,13 +459,13 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class ConditionEdge():
-    &#34;&#34;&#34; Enum for ConditionEdge
-    &#34;&#34;&#34;
-    rising = _OscEnum(&#39;ConditionEdge&#39;,&#39;rising&#39;)
-    falling = _OscEnum(&#39;ConditionEdge&#39;,&#39;falling&#39;)
-    risingOrFalling = _OscEnum(&#39;ConditionEdge&#39;,&#39;risingOrFalling&#39;)
-    none = _OscEnum(&#39;ConditionEdge&#39;,&#39;none&#39;)</code></pre>
+<pre><code class="python">class ConditionEdge:
+    &#34;&#34;&#34;Enum for ConditionEdge&#34;&#34;&#34;
+
+    rising = _OscEnum(&#34;ConditionEdge&#34;, &#34;rising&#34;)
+    falling = _OscEnum(&#34;ConditionEdge&#34;, &#34;falling&#34;)
+    risingOrFalling = _OscEnum(&#34;ConditionEdge&#34;, &#34;risingOrFalling&#34;)
+    none = _OscEnum(&#34;ConditionEdge&#34;, &#34;none&#34;)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -421,13 +496,13 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class CoordinateSystem():
-    &#34;&#34;&#34; Enum for CoordinateSystem
-    &#34;&#34;&#34;
-    entity = _OscEnum(&#39;CoordinateSystem&#39;,&#39;entity&#39;,min_minor_version=1)
-    lane = _OscEnum(&#39;CoordinateSystem&#39;,&#39;lane&#39;,min_minor_version=1)
-    road = _OscEnum(&#39;CoordinateSystem&#39;,&#39;road&#39;,min_minor_version=1)
-    trajectory = _OscEnum(&#39;CoordinateSystem&#39;,&#39;trajectory&#39;,min_minor_version=1)</code></pre>
+<pre><code class="python">class CoordinateSystem:
+    &#34;&#34;&#34;Enum for CoordinateSystem&#34;&#34;&#34;
+
+    entity = _OscEnum(&#34;CoordinateSystem&#34;, &#34;entity&#34;, min_minor_version=1)
+    lane = _OscEnum(&#34;CoordinateSystem&#34;, &#34;lane&#34;, min_minor_version=1)
+    road = _OscEnum(&#34;CoordinateSystem&#34;, &#34;road&#34;, min_minor_version=1)
+    trajectory = _OscEnum(&#34;CoordinateSystem&#34;, &#34;trajectory&#34;, min_minor_version=1)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -458,12 +533,12 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class DynamicsDimension():
-    &#34;&#34;&#34; Enum for DynamicsDimension
-    &#34;&#34;&#34;
-    rate = _OscEnum(&#39;DynamicsDimension&#39;,&#39;rate&#39;)
-    time = _OscEnum(&#39;DynamicsDimension&#39;,&#39;time&#39;)
-    distance = _OscEnum(&#39;DynamicsDimension&#39;,&#39;distance&#39;)</code></pre>
+<pre><code class="python">class DynamicsDimension:
+    &#34;&#34;&#34;Enum for DynamicsDimension&#34;&#34;&#34;
+
+    rate = _OscEnum(&#34;DynamicsDimension&#34;, &#34;rate&#34;)
+    time = _OscEnum(&#34;DynamicsDimension&#34;, &#34;time&#34;)
+    distance = _OscEnum(&#34;DynamicsDimension&#34;, &#34;distance&#34;)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -490,13 +565,13 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class DynamicsShapes():
-    &#34;&#34;&#34; Enum for DynamicsShapes
-    &#34;&#34;&#34;
-    linear = _OscEnum(&#39;DynamicsShapes&#39;,&#39;linear&#39;)
-    cubic = _OscEnum(&#39;DynamicsShapes&#39;,&#39;cubic&#39;)
-    sinusoidal = _OscEnum(&#39;DynamicsShapes&#39;,&#39;sinusoidal&#39;)
-    step = _OscEnum(&#39;DynamicsShapes&#39;,&#39;step&#39;)</code></pre>
+<pre><code class="python">class DynamicsShapes:
+    &#34;&#34;&#34;Enum for DynamicsShapes&#34;&#34;&#34;
+
+    linear = _OscEnum(&#34;DynamicsShapes&#34;, &#34;linear&#34;)
+    cubic = _OscEnum(&#34;DynamicsShapes&#34;, &#34;cubic&#34;)
+    sinusoidal = _OscEnum(&#34;DynamicsShapes&#34;, &#34;sinusoidal&#34;)
+    step = _OscEnum(&#34;DynamicsShapes&#34;, &#34;step&#34;)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -527,11 +602,11 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class FollowMode():
-    &#34;&#34;&#34; Enum for FollowMode
-    &#34;&#34;&#34;
-    position = _OscEnum(&#39;FollowMode&#39;,&#39;position&#39;)
-    follow = _OscEnum(&#39;FollowMode&#39;,&#39;follow&#39;)</code></pre>
+<pre><code class="python">class FollowMode:
+    &#34;&#34;&#34;Enum for FollowMode&#34;&#34;&#34;
+
+    position = _OscEnum(&#34;FollowMode&#34;, &#34;position&#34;)
+    follow = _OscEnum(&#34;FollowMode&#34;, &#34;follow&#34;)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -554,10 +629,14 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class LateralDisplacement():
-    any = _OscEnum(&#39;LateralDisplacement&#39;,&#39;any&#39;,min_minor_version=1)
-    leftToReferencedEntity = _OscEnum(&#39;LateralDisplacement&#39;,&#39;leftToReferencedEntity&#39;,min_minor_version=1)
-    rightToReferencedEntity = _OscEnum(&#39;LateralDisplacement&#39;,&#39;rightToReferencedEntity&#39;,min_minor_version=1)</code></pre>
+<pre><code class="python">class LateralDisplacement:
+    any = _OscEnum(&#34;LateralDisplacement&#34;, &#34;any&#34;, min_minor_version=1)
+    leftToReferencedEntity = _OscEnum(
+        &#34;LateralDisplacement&#34;, &#34;leftToReferencedEntity&#34;, min_minor_version=1
+    )
+    rightToReferencedEntity = _OscEnum(
+        &#34;LateralDisplacement&#34;, &#34;rightToReferencedEntity&#34;, min_minor_version=1
+    )</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -584,10 +663,14 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class LongitudinalDisplacement():
-    any = _OscEnum(&#39;LongitudinalDisplacement&#39;,&#39;any&#39;,min_minor_version=1)
-    trailingReferencedEntity = _OscEnum(&#39;LongitudinalDisplacement&#39;,&#39;trailingReferencedEntity&#39;,min_minor_version=1)
-    leadingReferencedEntity = _OscEnum(&#39;LongitudinalDisplacement&#39;,&#39;leadingReferencedEntity&#39;,min_minor_version=1)</code></pre>
+<pre><code class="python">class LongitudinalDisplacement:
+    any = _OscEnum(&#34;LongitudinalDisplacement&#34;, &#34;any&#34;, min_minor_version=1)
+    trailingReferencedEntity = _OscEnum(
+        &#34;LongitudinalDisplacement&#34;, &#34;trailingReferencedEntity&#34;, min_minor_version=1
+    )
+    leadingReferencedEntity = _OscEnum(
+        &#34;LongitudinalDisplacement&#34;, &#34;leadingReferencedEntity&#34;, min_minor_version=1
+    )</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -614,27 +697,26 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class MiscObjectCategory():
-    &#34;&#34;&#34; Enum for MiscObjectCategory
-    &#34;&#34;&#34;
-    
-    none = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;none&#39;)
-    obstacle = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;obstacle&#39;)
-    pole = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;pole&#39;)
-    tree = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;tree&#39;)
-    vegetation = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;vegetation&#39;)
-    barrier = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;barrier&#39;)
-    building = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;building&#39;)
-    parkingSpace = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;parkingSpace&#39;)
-    patch = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;patch&#39;)
-    railing = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;railing&#39;)
-    grafficIsland = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;grafficIsland&#39;)
-    crosswalk = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;crosswalk&#39;)
-    streetLamp = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;streetLamp&#39;)
-    gantry = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;gantry&#39;)
-    soundBarrier = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;soundBarrier&#39;)
-    wind = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;wind&#39;,max_minor_version=0)
-    roadMark = _OscEnum(&#39;MiscObjectCategory&#39;,&#39;roadMark&#39;)</code></pre>
+<pre><code class="python">class MiscObjectCategory:
+    &#34;&#34;&#34;Enum for MiscObjectCategory&#34;&#34;&#34;
+
+    none = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;none&#34;)
+    obstacle = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;obstacle&#34;)
+    pole = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;pole&#34;)
+    tree = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;tree&#34;)
+    vegetation = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;vegetation&#34;)
+    barrier = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;barrier&#34;)
+    building = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;building&#34;)
+    parkingSpace = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;parkingSpace&#34;)
+    patch = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;patch&#34;)
+    railing = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;railing&#34;)
+    grafficIsland = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;grafficIsland&#34;)
+    crosswalk = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;crosswalk&#34;)
+    streetLamp = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;streetLamp&#34;)
+    gantry = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;gantry&#34;)
+    soundBarrier = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;soundBarrier&#34;)
+    wind = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;wind&#34;, max_minor_version=0)
+    roadMark = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;roadMark&#34;)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -717,13 +799,13 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class ObjectType():
-    &#34;&#34;&#34; Enum for ObjectType
-    &#34;&#34;&#34;
-    pedestrian = _OscEnum(&#39;ObjectType&#39;,&#39;pedestrian&#39;)
-    vehicle = _OscEnum(&#39;ObjectType&#39;,&#39;vehicle&#39;)
-    miscellaneous = _OscEnum(&#39;ObjectType&#39;,&#39;miscellaneous&#39;)
-    external = _OscEnum(&#39;ObjectType&#39;,&#39;external&#39;,min_minor_version=1)</code></pre>
+<pre><code class="python">class ObjectType:
+    &#34;&#34;&#34;Enum for ObjectType&#34;&#34;&#34;
+
+    pedestrian = _OscEnum(&#34;ObjectType&#34;, &#34;pedestrian&#34;)
+    vehicle = _OscEnum(&#34;ObjectType&#34;, &#34;vehicle&#34;)
+    miscellaneous = _OscEnum(&#34;ObjectType&#34;, &#34;miscellaneous&#34;)
+    external = _OscEnum(&#34;ObjectType&#34;, &#34;external&#34;, min_minor_version=1)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -754,16 +836,16 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class ParameterType():
-    &#34;&#34;&#34; Enum for ParameterType
-    &#34;&#34;&#34;
-    integer = _OscEnum(&#39;ParameterType&#39;,&#39;integer&#39;)
-    double = _OscEnum(&#39;ParameterType&#39;,&#39;double&#39;)
-    string = _OscEnum(&#39;ParameterType&#39;,&#39;string&#39;)
-    unsighedInt = _OscEnum(&#39;ParameterType&#39;,&#39;unsighedInt&#39;)
-    unsighedShort = _OscEnum(&#39;ParameterType&#39;,&#39;unsighedShort&#39;)
-    boolean = _OscEnum(&#39;ParameterType&#39;,&#39;boolean&#39;)
-    dateTime = _OscEnum(&#39;ParameterType&#39;,&#39;dateTime&#39;)</code></pre>
+<pre><code class="python">class ParameterType:
+    &#34;&#34;&#34;Enum for ParameterType&#34;&#34;&#34;
+
+    integer = _OscEnum(&#34;ParameterType&#34;, &#34;integer&#34;)
+    double = _OscEnum(&#34;ParameterType&#34;, &#34;double&#34;)
+    string = _OscEnum(&#34;ParameterType&#34;, &#34;string&#34;)
+    unsighedInt = _OscEnum(&#34;ParameterType&#34;, &#34;unsighedInt&#34;)
+    unsighedShort = _OscEnum(&#34;ParameterType&#34;, &#34;unsighedShort&#34;)
+    boolean = _OscEnum(&#34;ParameterType&#34;, &#34;boolean&#34;)
+    dateTime = _OscEnum(&#34;ParameterType&#34;, &#34;dateTime&#34;)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -806,12 +888,12 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class PedestrianCategory():
-    &#34;&#34;&#34; Enum for PedestrianCategory
-    &#34;&#34;&#34;
-    pedestrian = _OscEnum(&#39;PedestrianCategory&#39;,&#39;pedestrian&#39;)
-    wheelchair = _OscEnum(&#39;PedestrianCategory&#39;,&#39;wheelchair&#39;)
-    animal = _OscEnum(&#39;PedestrianCategory&#39;,&#39;animal&#39;)</code></pre>
+<pre><code class="python">class PedestrianCategory:
+    &#34;&#34;&#34;Enum for PedestrianCategory&#34;&#34;&#34;
+
+    pedestrian = _OscEnum(&#34;PedestrianCategory&#34;, &#34;pedestrian&#34;)
+    wheelchair = _OscEnum(&#34;PedestrianCategory&#34;, &#34;wheelchair&#34;)
+    animal = _OscEnum(&#34;PedestrianCategory&#34;, &#34;animal&#34;)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -838,12 +920,12 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class PrecipitationType():
-    &#34;&#34;&#34; Enum for PercipitationType
-    &#34;&#34;&#34;
-    dry = _OscEnum(&#39;PrecipitationType&#39;,&#39;dry&#39;)
-    rain = _OscEnum(&#39;PrecipitationType&#39;,&#39;rain&#39;)
-    snow = _OscEnum(&#39;PrecipitationType&#39;,&#39;snow&#39;)</code></pre>
+<pre><code class="python">class PrecipitationType:
+    &#34;&#34;&#34;Enum for PercipitationType&#34;&#34;&#34;
+
+    dry = _OscEnum(&#34;PrecipitationType&#34;, &#34;dry&#34;)
+    rain = _OscEnum(&#34;PrecipitationType&#34;, &#34;rain&#34;)
+    snow = _OscEnum(&#34;PrecipitationType&#34;, &#34;snow&#34;)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -870,12 +952,12 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Priority():
-    &#34;&#34;&#34; Enum for Priority
-    &#34;&#34;&#34;
-    overwrite = _OscEnum(&#39;Priority&#39;,&#39;overwrite&#39;)
-    skip = _OscEnum(&#39;Priority&#39;,&#39;skip&#39;)
-    parallel = _OscEnum(&#39;Priority&#39;,&#39;parallel&#39;)</code></pre>
+<pre><code class="python">class Priority:
+    &#34;&#34;&#34;Enum for Priority&#34;&#34;&#34;
+
+    overwrite = _OscEnum(&#34;Priority&#34;, &#34;overwrite&#34;)
+    skip = _OscEnum(&#34;Priority&#34;, &#34;skip&#34;)
+    parallel = _OscEnum(&#34;Priority&#34;, &#34;parallel&#34;)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -902,11 +984,11 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class ReferenceContext():
-    &#34;&#34;&#34; Enum for ReferenceContext
-    &#34;&#34;&#34;
-    relative = _OscEnum(&#39;ReferenceContext&#39;,&#39;relative&#39;)
-    absolute = _OscEnum(&#39;ReferenceContext&#39;,&#39;absolute&#39;)</code></pre>
+<pre><code class="python">class ReferenceContext:
+    &#34;&#34;&#34;Enum for ReferenceContext&#34;&#34;&#34;
+
+    relative = _OscEnum(&#34;ReferenceContext&#34;, &#34;relative&#34;)
+    absolute = _OscEnum(&#34;ReferenceContext&#34;, &#34;absolute&#34;)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -929,13 +1011,17 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class RelativeDistanceType():
-    &#34;&#34;&#34; Enum for RelativeDistanceType
-    &#34;&#34;&#34;
-    longitudinal = _OscEnum(&#39;RelativeDistanceType&#39;,&#39;longitudinal&#39;)
-    lateral = _OscEnum(&#39;RelativeDistanceType&#39;,&#39;lateral&#39;)
-    cartesianDistance = _OscEnum(&#39;RelativeDistanceType&#39;,&#39;cartesianDistance&#39;,max_minor_version=0)
-    euclidianDistance = _OscEnum(&#39;RelativeDistanceType&#39;,&#39;euclidianDistance&#39;,min_minor_version=1)</code></pre>
+<pre><code class="python">class RelativeDistanceType:
+    &#34;&#34;&#34;Enum for RelativeDistanceType&#34;&#34;&#34;
+
+    longitudinal = _OscEnum(&#34;RelativeDistanceType&#34;, &#34;longitudinal&#34;)
+    lateral = _OscEnum(&#34;RelativeDistanceType&#34;, &#34;lateral&#34;)
+    cartesianDistance = _OscEnum(
+        &#34;RelativeDistanceType&#34;, &#34;cartesianDistance&#34;, max_minor_version=0
+    )
+    euclidianDistance = _OscEnum(
+        &#34;RelativeDistanceType&#34;, &#34;euclidianDistance&#34;, min_minor_version=1
+    )</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -966,13 +1052,13 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class RouteStrategy():
-    &#34;&#34;&#34; Enum for RouteStrategy
-    &#34;&#34;&#34;
-    fastest = _OscEnum(&#39;RouteStrategy&#39;,&#39;fastest&#39;)
-    shortest = _OscEnum(&#39;RouteStrategy&#39;,&#39;shortest&#39;)
-    leastIntersections = _OscEnum(&#39;RouteStrategy&#39;,&#39;leastIntersections&#39;)
-    random = _OscEnum(&#39;RouteStrategy&#39;,&#39;random&#39;)</code></pre>
+<pre><code class="python">class RouteStrategy:
+    &#34;&#34;&#34;Enum for RouteStrategy&#34;&#34;&#34;
+
+    fastest = _OscEnum(&#34;RouteStrategy&#34;, &#34;fastest&#34;)
+    shortest = _OscEnum(&#34;RouteStrategy&#34;, &#34;shortest&#34;)
+    leastIntersections = _OscEnum(&#34;RouteStrategy&#34;, &#34;leastIntersections&#34;)
+    random = _OscEnum(&#34;RouteStrategy&#34;, &#34;random&#34;)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -1003,15 +1089,15 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Rule():
-    &#34;&#34;&#34; Enum for Rule
-    &#34;&#34;&#34;
-    greaterThan = _OscEnum(&#39;Rule&#39;,&#39;greaterThan&#39;)
-    lessThan = _OscEnum(&#39;Rule&#39;,&#39;lessThan&#39;)
-    equalTo = _OscEnum(&#39;Rule&#39;,&#39;equalTo&#39;)
-    greaterOrEqual = _OscEnum(&#39;Rule&#39;,&#39;greaterOrEqual&#39;,min_minor_version=1)
-    lessOrEqual = _OscEnum(&#39;Rule&#39;,&#39;lessOrEqual&#39;,min_minor_version=1)
-    notEqualTo = _OscEnum(&#39;Rule&#39;,&#39;notEqualTo&#39;,min_minor_version=1)</code></pre>
+<pre><code class="python">class Rule:
+    &#34;&#34;&#34;Enum for Rule&#34;&#34;&#34;
+
+    greaterThan = _OscEnum(&#34;Rule&#34;, &#34;greaterThan&#34;)
+    lessThan = _OscEnum(&#34;Rule&#34;, &#34;lessThan&#34;)
+    equalTo = _OscEnum(&#34;Rule&#34;, &#34;equalTo&#34;)
+    greaterOrEqual = _OscEnum(&#34;Rule&#34;, &#34;greaterOrEqual&#34;, min_minor_version=1)
+    lessOrEqual = _OscEnum(&#34;Rule&#34;, &#34;lessOrEqual&#34;, min_minor_version=1)
+    notEqualTo = _OscEnum(&#34;Rule&#34;, &#34;notEqualTo&#34;, min_minor_version=1)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -1050,11 +1136,11 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class SpeedTargetValueType():
-    &#34;&#34;&#34; Enum for SpeedTargetValueType
-    &#34;&#34;&#34;
-    delta = _OscEnum(&#39;SpeedTargetValueType&#39;,&#39;delta&#39;)
-    factor = _OscEnum(&#39;SpeedTargetValueType&#39;,&#39;factor&#39;)</code></pre>
+<pre><code class="python">class SpeedTargetValueType:
+    &#34;&#34;&#34;Enum for SpeedTargetValueType&#34;&#34;&#34;
+
+    delta = _OscEnum(&#34;SpeedTargetValueType&#34;, &#34;delta&#34;)
+    factor = _OscEnum(&#34;SpeedTargetValueType&#34;, &#34;factor&#34;)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -1077,16 +1163,16 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class StoryboardElementState():
-    &#34;&#34;&#34; Enum for StoryboardElementState
-    &#34;&#34;&#34;
-    startTransition = _OscEnum(&#39;StoryboardElementState&#39;,&#39;startTransition&#39;)
-    endTransition = _OscEnum(&#39;StoryboardElementState&#39;,&#39;endTransition&#39;)
-    stopTransition = _OscEnum(&#39;StoryboardElementState&#39;,&#39;stopTransition&#39;)
-    skipTransition = _OscEnum(&#39;StoryboardElementState&#39;,&#39;skipTransition&#39;)
-    completeState = _OscEnum(&#39;StoryboardElementState&#39;,&#39;completeState&#39;)
-    runningState = _OscEnum(&#39;StoryboardElementState&#39;,&#39;runningState&#39;)
-    standbyState = _OscEnum(&#39;StoryboardElementState&#39;,&#39;standbyState&#39;)</code></pre>
+<pre><code class="python">class StoryboardElementState:
+    &#34;&#34;&#34;Enum for StoryboardElementState&#34;&#34;&#34;
+
+    startTransition = _OscEnum(&#34;StoryboardElementState&#34;, &#34;startTransition&#34;)
+    endTransition = _OscEnum(&#34;StoryboardElementState&#34;, &#34;endTransition&#34;)
+    stopTransition = _OscEnum(&#34;StoryboardElementState&#34;, &#34;stopTransition&#34;)
+    skipTransition = _OscEnum(&#34;StoryboardElementState&#34;, &#34;skipTransition&#34;)
+    completeState = _OscEnum(&#34;StoryboardElementState&#34;, &#34;completeState&#34;)
+    runningState = _OscEnum(&#34;StoryboardElementState&#34;, &#34;runningState&#34;)
+    standbyState = _OscEnum(&#34;StoryboardElementState&#34;, &#34;standbyState&#34;)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -1129,15 +1215,15 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class StoryboardElementType():
-    &#34;&#34;&#34; Enum for StoryboardElementType
-    &#34;&#34;&#34;
-    story = _OscEnum(&#39;StoryboardElementType&#39;,&#39;story&#39;)
-    act = _OscEnum(&#39;StoryboardElementType&#39;,&#39;act&#39;)
-    maneuver = _OscEnum(&#39;StoryboardElementType&#39;,&#39;maneuver&#39;)
-    event = _OscEnum(&#39;StoryboardElementType&#39;,&#39;event&#39;)
-    action = _OscEnum(&#39;StoryboardElementType&#39;,&#39;action&#39;)
-    maneuverGroup = _OscEnum(&#39;StoryboardElementType&#39;,&#39;maneuverGroup&#39;)</code></pre>
+<pre><code class="python">class StoryboardElementType:
+    &#34;&#34;&#34;Enum for StoryboardElementType&#34;&#34;&#34;
+
+    story = _OscEnum(&#34;StoryboardElementType&#34;, &#34;story&#34;)
+    act = _OscEnum(&#34;StoryboardElementType&#34;, &#34;act&#34;)
+    maneuver = _OscEnum(&#34;StoryboardElementType&#34;, &#34;maneuver&#34;)
+    event = _OscEnum(&#34;StoryboardElementType&#34;, &#34;event&#34;)
+    action = _OscEnum(&#34;StoryboardElementType&#34;, &#34;action&#34;)
+    maneuverGroup = _OscEnum(&#34;StoryboardElementType&#34;, &#34;maneuverGroup&#34;)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -1176,11 +1262,11 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class TriggeringEntitiesRule():
-    &#34;&#34;&#34; Enum for TriggeringEntitiesRule
-    &#34;&#34;&#34;
-    any = _OscEnum(&#39;TriggeringEntitiesRule&#39;,&#39;any&#39;)
-    all = _OscEnum(&#39;TriggeringEntitiesRule&#39;,&#39;all&#39;)</code></pre>
+<pre><code class="python">class TriggeringEntitiesRule:
+    &#34;&#34;&#34;Enum for TriggeringEntitiesRule&#34;&#34;&#34;
+
+    any = _OscEnum(&#34;TriggeringEntitiesRule&#34;, &#34;any&#34;)
+    all = _OscEnum(&#34;TriggeringEntitiesRule&#34;, &#34;all&#34;)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -1203,19 +1289,19 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class VehicleCategory():
-    &#34;&#34;&#34; Enum for VehicleCategory
-    &#34;&#34;&#34;
-    car = _OscEnum(&#39;VehicleCategory&#39;,&#39;car&#39;)
-    van = _OscEnum(&#39;VehicleCategory&#39;,&#39;van&#39;)
-    truck = _OscEnum(&#39;VehicleCategory&#39;,&#39;truck&#39;)
-    trailer = _OscEnum(&#39;VehicleCategory&#39;,&#39;trailer&#39;)
-    semitrailer = _OscEnum(&#39;VehicleCategory&#39;,&#39;semitrailer&#39;)
-    bus = _OscEnum(&#39;VehicleCategory&#39;,&#39;bus&#39;)
-    motorbike = _OscEnum(&#39;VehicleCategory&#39;,&#39;motorbike&#39;)
-    bicycle = _OscEnum(&#39;VehicleCategory&#39;,&#39;bicycle&#39;)
-    train = _OscEnum(&#39;VehicleCategory&#39;,&#39;train&#39;)
-    tram = _OscEnum(&#39;VehicleCategory&#39;,&#39;tram&#39;)</code></pre>
+<pre><code class="python">class VehicleCategory:
+    &#34;&#34;&#34;Enum for VehicleCategory&#34;&#34;&#34;
+
+    car = _OscEnum(&#34;VehicleCategory&#34;, &#34;car&#34;)
+    van = _OscEnum(&#34;VehicleCategory&#34;, &#34;van&#34;)
+    truck = _OscEnum(&#34;VehicleCategory&#34;, &#34;truck&#34;)
+    trailer = _OscEnum(&#34;VehicleCategory&#34;, &#34;trailer&#34;)
+    semitrailer = _OscEnum(&#34;VehicleCategory&#34;, &#34;semitrailer&#34;)
+    bus = _OscEnum(&#34;VehicleCategory&#34;, &#34;bus&#34;)
+    motorbike = _OscEnum(&#34;VehicleCategory&#34;, &#34;motorbike&#34;)
+    bicycle = _OscEnum(&#34;VehicleCategory&#34;, &#34;bicycle&#34;)
+    train = _OscEnum(&#34;VehicleCategory&#34;, &#34;train&#34;)
+    tram = _OscEnum(&#34;VehicleCategory&#34;, &#34;tram&#34;)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -1270,16 +1356,16 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class VersionBase():
-    &#34;&#34;&#34; base class for checking different versions of OpenSCENARIO
-    &#34;&#34;&#34;
+<pre><code class="python">class VersionBase:
+    &#34;&#34;&#34;base class for checking different versions of OpenSCENARIO&#34;&#34;&#34;
+
     version_major = 1
     version_minor = _MINOR_VERSION
 
-    def isVersion(self,major=1,minor=1):
+    def isVersion(self, major=1, minor=1):
         return major &gt;= self.version_major and minor &gt;= self.version_minor
-    
-    def setVersion(self,major=1,minor=0):
+
+    def setVersion(self, major=1, minor=0):
         VersionBase.version_major = major
         VersionBase.version_minor = minor</code></pre>
 </details>
@@ -1367,7 +1453,7 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def isVersion(self,major=1,minor=1):
+<pre><code class="python">def isVersion(self, major=1, minor=1):
     return major &gt;= self.version_major and minor &gt;= self.version_minor</code></pre>
 </details>
 </dd>
@@ -1380,7 +1466,7 @@ class LongitudinalDisplacement():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def setVersion(self,major=1,minor=0):
+<pre><code class="python">def setVersion(self, major=1, minor=0):
     VersionBase.version_major = major
     VersionBase.version_minor = minor</code></pre>
 </details>

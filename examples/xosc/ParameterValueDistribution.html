@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.8.0" />
 <title>examples.xosc.ParameterValueDistribution API documentation</title>
-<meta name="description" content="Example showing how one vehicle triggers based on the acceleration of another vehcile, then changes it speed …" />
+<meta name="description" content="scenariogeneration
+https://github.com/pyoscx/scenariogeneration …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -20,7 +21,13 @@
 <h1 class="title">Module <code>examples.xosc.ParameterValueDistribution</code></h1>
 </header>
 <section id="section-intro">
-<p>Example showing how one vehicle triggers based on the acceleration of another vehcile, then changes it speed.</p>
+<p>scenariogeneration
+<a href="https://github.com/pyoscx/scenariogeneration">https://github.com/pyoscx/scenariogeneration</a></p>
+<p>This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
+<p>Copyright (c) 2022 The scenariogeneration Authors.</p>
+<p>Example showing how one vehicle triggers based on the acceleration of another vehicle, then changes its speed.</p>
 <p>Some features used:</p>
 <ul>
 <li>
@@ -40,9 +47,18 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34; 
-    Example showing how one vehicle triggers based on the acceleration of another vehcile, then changes it speed.
-    
+<pre><code class="python">&#34;&#34;&#34;
+  scenariogeneration
+  https://github.com/pyoscx/scenariogeneration
+ 
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ 
+  Copyright (c) 2022 The scenariogeneration Authors.
+  
+    Example showing how one vehicle triggers based on the acceleration of another vehicle, then changes its speed.
+
     Some features used:
 
     - ParameterValueDistribution
@@ -52,53 +68,78 @@
     - NormalDistribution
 
     - Histogram
-        
+
 &#34;&#34;&#34;
 import os
-from scenariogeneration import xosc, prettyprint  
+from scenariogeneration import xosc, prettyprint
 
-# some names used in both scenario and 
-scenario_filename = &#39;base_scenario.xosc&#39;
-ego_param_name = &#39;$egospeed&#39;
-target_param_name = &#39;$targetspeed&#39;
+# some names used in both scenario and
+scenario_filename = &#34;base_scenario.xosc&#34;
+ego_param_name = &#34;$egospeed&#34;
+target_param_name = &#34;$targetspeed&#34;
 
 ### create a simple parametrized scenario
 
 ## create catalogs
 catalog = xosc.Catalog()
-catalog.add_catalog(&#39;VehicleCatalog&#39;,&#39;../xosc/Catalogs/Vehicles&#39;)
+catalog.add_catalog(&#34;VehicleCatalog&#34;, &#34;../xosc/Catalogs/Vehicles&#34;)
 
 ## create road
-road = xosc.RoadNetwork(roadfile=&#39;../xodr/e6mini.xodr&#39;)
+road = xosc.RoadNetwork(roadfile=&#34;../xodr/e6mini.xodr&#34;)
 
 ## create parameters
 paramdec = xosc.ParameterDeclarations()
-paramdec.add_parameter(xosc.Parameter(ego_param_name,xosc.ParameterType.double,&#39;10&#39;))
-paramdec.add_parameter(xosc.Parameter(target_param_name,xosc.ParameterType.double,&#39;10&#39;))
+paramdec.add_parameter(xosc.Parameter(ego_param_name, xosc.ParameterType.double, &#34;10&#34;))
+paramdec.add_parameter(
+    xosc.Parameter(target_param_name, xosc.ParameterType.double, &#34;10&#34;)
+)
 
 ## create entities
 
-egoname = &#39;Ego&#39;
-redname = &#39;Target1&#39;
+egoname = &#34;Ego&#34;
+redname = &#34;Target1&#34;
 
 entities = xosc.Entities()
-entities.add_scenario_object(egoname,xosc.CatalogReference(&#39;VehicleCatalog&#39;,&#39;car_white&#39;))
-entities.add_scenario_object(redname,xosc.CatalogReference(&#39;VehicleCatalog&#39;,&#39;car_red&#39;))
+entities.add_scenario_object(
+    egoname, xosc.CatalogReference(&#34;VehicleCatalog&#34;, &#34;car_white&#34;)
+)
+entities.add_scenario_object(
+    redname, xosc.CatalogReference(&#34;VehicleCatalog&#34;, &#34;car_red&#34;)
+)
 
 ## create a parametrized init
 init = xosc.Init()
-step_time = xosc.TransitionDynamics(xosc.DynamicsShapes.step,xosc.DynamicsDimension.time,1)
+step_time = xosc.TransitionDynamics(
+    xosc.DynamicsShapes.step, xosc.DynamicsDimension.time, 1
+)
 
-init.add_init_action(egoname,xosc.AbsoluteSpeedAction(ego_param_name,step_time))
-init.add_init_action(egoname,xosc.TeleportAction(xosc.LanePosition(25,0,-3,0)))
-init.add_init_action(redname,xosc.AbsoluteSpeedAction(target_param_name,step_time))
-init.add_init_action(redname,xosc.TeleportAction(xosc.LanePosition(15,0,-2,0)))
+init.add_init_action(egoname, xosc.AbsoluteSpeedAction(ego_param_name, step_time))
+init.add_init_action(egoname, xosc.TeleportAction(xosc.LanePosition(25, 0, -3, 0)))
+init.add_init_action(redname, xosc.AbsoluteSpeedAction(target_param_name, step_time))
+init.add_init_action(redname, xosc.TeleportAction(xosc.LanePosition(15, 0, -2, 0)))
 
 ## create storyboard
-sb = xosc.StoryBoard(init,xosc.ValueTrigger(&#39;stop_simulation&#39;,0,xosc.ConditionEdge.rising,xosc.SimulationTimeCondition(10,xosc.Rule.greaterThan),&#39;stop&#39;))
+sb = xosc.StoryBoard(
+    init,
+    xosc.ValueTrigger(
+        &#34;stop_simulation&#34;,
+        0,
+        xosc.ConditionEdge.rising,
+        xosc.SimulationTimeCondition(10, xosc.Rule.greaterThan),
+        &#34;stop&#34;,
+    ),
+)
 
 ## create the scenario file
-sce = xosc.Scenario(&#39;Parameter_example&#39;,&#39;Mandolin&#39;,paramdec,entities=entities,storyboard = sb,roadnetwork=road,catalog=catalog)
+sce = xosc.Scenario(
+    &#34;Parameter_example&#34;,
+    &#34;Mandolin&#34;,
+    paramdec,
+    entities=entities,
+    storyboard=sb,
+    roadnetwork=road,
+    catalog=catalog,
+)
 
 ## write and print the scenario
 sce.write_xml(scenario_filename)
@@ -108,26 +149,28 @@ prettyprint(sce.get_element())
 ### create the paramtrization
 
 ## create a stocastic distribution with 100 runs
-stoc = xosc.Stochastic(50,1.234)
+stoc = xosc.Stochastic(50, 1.234)
 
 ## add a Normal distribution for the ego
-nd = xosc.NormalDistribution(25,1)
-stoc.add_distribution(ego_param_name,nd)
+nd = xosc.NormalDistribution(25, 1)
+stoc.add_distribution(ego_param_name, nd)
 
-## add a histogram for the target 
+## add a histogram for the target
 hg = xosc.Histogram()
-hg.add_bin(0.3,xosc.Range(15,25))
-hg.add_bin(0.7,xosc.Range(25,35))
-stoc.add_distribution(target_param_name,hg)
+hg.add_bin(0.3, xosc.Range(15, 25))
+hg.add_bin(0.7, xosc.Range(25, 35))
+stoc.add_distribution(target_param_name, hg)
 
 ## create the ParameterValueDistribution
-pvd = xosc.ParameterValueDistribution(&#39;my_parametrization&#39;,&#39;Mandolin&#39;,scenario_filename,stoc)
+pvd = xosc.ParameterValueDistribution(
+    &#34;my_parametrization&#34;, &#34;Mandolin&#34;, scenario_filename, stoc
+)
 
 ## Print the resulting xml
 prettyprint(pvd.get_element())
 
 ## write the OpenSCENARIO file as xosc using current script name
-pvd.write_xml(os.path.basename(__file__).replace(&#39;.py&#39;,&#39;.xosc&#39;))</code></pre>
+pvd.write_xml(os.path.basename(__file__).replace(&#34;.py&#34;, &#34;.xosc&#34;))</code></pre>
 </details>
 </section>
 <section>

@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.8.0" />
 <title>examples.generator.CCRb API documentation</title>
-<meta name="description" content="example of how to write the EUNCAP2020 CCRb tests in a parametrized maner …" />
+<meta name="description" content="scenariogeneration
+https://github.com/pyoscx/scenariogeneration …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -20,6 +21,12 @@
 <h1 class="title">Module <code>examples.generator.CCRb</code></h1>
 </header>
 <section id="section-intro">
+<p>scenariogeneration
+<a href="https://github.com/pyoscx/scenariogeneration">https://github.com/pyoscx/scenariogeneration</a></p>
+<p>This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
+<p>Copyright (c) 2022 The scenariogeneration Authors.</p>
 <p>example of how to write the EUNCAP2020 CCRb tests in a parametrized maner</p>
 <p>Some features used:</p>
 <ul>
@@ -40,11 +47,20 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34; example of how to write the EUNCAP2020 CCRb tests in a parametrized maner
-
+<pre><code class="python">&#34;&#34;&#34;
+  scenariogeneration
+  https://github.com/pyoscx/scenariogeneration
+ 
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ 
+  Copyright (c) 2022 The scenariogeneration Authors.
+  
+    example of how to write the EUNCAP2020 CCRb tests in a parametrized maner
 
     Some features used:
-    
+
     - ScenarioGenerator
 
     - (ScenarioGenerator).naming
@@ -53,12 +69,11 @@
 
     - (ScenarioGenerator).parameters
 
-    
+
 &#34;&#34;&#34;
 from scenariogeneration import xosc, prettyprint
 import numpy as np
 import os
-
 
 
 acceleration_time = 5
@@ -68,32 +83,28 @@ from scenariogeneration import xodr
 from scenariogeneration import xosc, prettyprint
 from scenariogeneration import ScenarioGenerator
 
+
 class Scenario(ScenarioGenerator):
     def __init__(self):
         ScenarioGenerator.__init__(self)
         # set a numerical value as ending to all scenarios
-        self.naming = &#39;numerical&#39;
+        self.naming = &#34;numerical&#34;
         # only one road is used, so all roads does not have to be generated
         self.generate_all_roads = False
 
-
         # parameters for the scenario
-        self.parameters[&#39;distance&#39;] = [12, 40]
-        self.parameters[&#39;decel&#39;] = [-2,-6]
-    
-    
+        self.parameters[&#34;distance&#34;] = [12, 40]
+        self.parameters[&#34;decel&#34;] = [-2, -6]
 
-    def road(self,**kwargs):
+    def road(self, **kwargs):
 
-        road = xodr.create_road([xodr.Line(500)],id =1,left_lanes=2,right_lanes=2)
-        odr = xodr.OpenDrive(&#39;myroad&#39;)
+        road = xodr.create_road([xodr.Line(500)], id=1, left_lanes=2, right_lanes=2)
+        odr = xodr.OpenDrive(&#34;myroad&#34;)
         odr.add_road(road)
         odr.adjust_roads_and_lanes()
         return odr
 
-    def scenario(self,**kwargs):
-
-
+    def scenario(self, **kwargs):
 
         # create empty catalog
         catalog = xosc.Catalog()
@@ -104,115 +115,181 @@ class Scenario(ScenarioGenerator):
         # create empty paramdeclaration
         paramdec = xosc.ParameterDeclarations()
 
-        egoname = &#39;Ego&#39;
-        targetname = &#39;Target1&#39;
+        egoname = &#34;Ego&#34;
+        targetname = &#34;Target1&#34;
 
         ### create vehicles
         ego_width = 2
         target_width = 1.8
 
-        bb = xosc.BoundingBox(ego_width,5,1.8,2.0,0,0.9)
-        fa = xosc.Axle(0.523598775598,0.8,1.68,2.98,0.4)
-        ba = xosc.Axle(0.523598775598,0.8,1.68,0,0.4)
-        white_veh = xosc.Vehicle(&#39;car_white&#39;,xosc.VehicleCategory.car,bb,fa,ba,69,10,10)
+        bb = xosc.BoundingBox(ego_width, 5, 1.8, 2.0, 0, 0.9)
+        fa = xosc.Axle(0.523598775598, 0.8, 1.68, 2.98, 0.4)
+        ba = xosc.Axle(0.523598775598, 0.8, 1.68, 0, 0.4)
+        white_veh = xosc.Vehicle(
+            &#34;car_white&#34;, xosc.VehicleCategory.car, bb, fa, ba, 69, 10, 10
+        )
 
-        white_veh.add_property_file(&#39;../models/car_white.osgb&#39;)
-        white_veh.add_property(&#39;model_id&#39;,&#39;0&#39;)
+        white_veh.add_property_file(&#34;../models/car_white.osgb&#34;)
+        white_veh.add_property(&#34;model_id&#34;, &#34;0&#34;)
 
-        bb = xosc.BoundingBox(target_width,4.5,1.5,1.3,0,0.8)
-        fa = xosc.Axle(0.523598775598,0.8,1.68,2.98,0.4)
-        ba = xosc.Axle(0.523598775598,0.8,1.68,0,0.4)
-        red_veh = xosc.Vehicle(&#39;car_red&#39;,xosc.VehicleCategory.car,bb,fa,ba,69,10,10)
+        bb = xosc.BoundingBox(target_width, 4.5, 1.5, 1.3, 0, 0.8)
+        fa = xosc.Axle(0.523598775598, 0.8, 1.68, 2.98, 0.4)
+        ba = xosc.Axle(0.523598775598, 0.8, 1.68, 0, 0.4)
+        red_veh = xosc.Vehicle(
+            &#34;car_red&#34;, xosc.VehicleCategory.car, bb, fa, ba, 69, 10, 10
+        )
 
-        red_veh.add_property_file(&#39;../models/car_red.osgb&#39;)
-        red_veh.add_property(&#39;model_id&#39;,&#39;2&#39;)
+        red_veh.add_property_file(&#34;../models/car_red.osgb&#34;)
+        red_veh.add_property(&#34;model_id&#34;, &#34;2&#34;)
 
         ## create entities
         entities = xosc.Entities()
-        entities.add_scenario_object(egoname,white_veh)
-        entities.add_scenario_object(targetname,red_veh)
-
+        entities.add_scenario_object(egoname, white_veh)
+        entities.add_scenario_object(targetname, red_veh)
 
         # create init (0 starting speed)
         init = xosc.Init()
-        step_time = xosc.TransitionDynamics(xosc.DynamicsShapes.step,xosc.DynamicsDimension.time,1)
-        
+        step_time = xosc.TransitionDynamics(
+            xosc.DynamicsShapes.step, xosc.DynamicsDimension.time, 1
+        )
+
         # caluclate correct offset based on target vehicle width
         cal_offset = 0
 
-        egospeed = xosc.AbsoluteSpeedAction(0,step_time)
-        egostart = xosc.TeleportAction(xosc.LanePosition(25,cal_offset,-1,1))
+        egospeed = xosc.AbsoluteSpeedAction(0, step_time)
+        egostart = xosc.TeleportAction(xosc.LanePosition(25, cal_offset, -1, 1))
 
-        targetspeed = xosc.AbsoluteSpeedAction(0,step_time)
-        targetstart = xosc.TeleportAction(xosc.LanePosition(25+kwargs[&#39;distance&#39;],0,-1,1))
+        targetspeed = xosc.AbsoluteSpeedAction(0, step_time)
+        targetstart = xosc.TeleportAction(
+            xosc.LanePosition(25 + kwargs[&#34;distance&#34;], 0, -1, 1)
+        )
 
-        init.add_init_action(egoname,egospeed)
-        init.add_init_action(egoname,egostart)
-        init.add_init_action(targetname,targetspeed)
-        init.add_init_action(targetname,targetstart)
+        init.add_init_action(egoname, egospeed)
+        init.add_init_action(egoname, egostart)
+        init.add_init_action(targetname, targetspeed)
+        init.add_init_action(targetname, targetstart)
 
         # create start trigger
-        trigger = xosc.ValueTrigger(&#39;starttrigger&#39;,0,xosc.ConditionEdge.rising,xosc.SimulationTimeCondition(1,xosc.Rule.greaterThan))
+        trigger = xosc.ValueTrigger(
+            &#34;starttrigger&#34;,
+            0,
+            xosc.ConditionEdge.rising,
+            xosc.SimulationTimeCondition(1, xosc.Rule.greaterThan),
+        )
 
         # accelerate cars to wanted velocity
-        eventego = xosc.Event(&#39;egospeedchange&#39;,xosc.Priority.overwrite)
+        eventego = xosc.Event(&#34;egospeedchange&#34;, xosc.Priority.overwrite)
         eventego.add_trigger(trigger)
 
-        ego_action = xosc.AbsoluteSpeedAction(50/3.6,xosc.TransitionDynamics(xosc.DynamicsShapes.linear,xosc.DynamicsDimension.time,acceleration_time))
-        eventego.add_action(&#39;newspeed&#39;,ego_action)
+        ego_action = xosc.AbsoluteSpeedAction(
+            50 / 3.6,
+            xosc.TransitionDynamics(
+                xosc.DynamicsShapes.linear,
+                xosc.DynamicsDimension.time,
+                acceleration_time,
+            ),
+        )
+        eventego.add_action(&#34;newspeed&#34;, ego_action)
 
-        event_tar = xosc.Event(&#39;targetspeedchange&#39;,xosc.Priority.overwrite)
+        event_tar = xosc.Event(&#34;targetspeedchange&#34;, xosc.Priority.overwrite)
         event_tar.add_trigger(trigger)
 
-        target_action = xosc.LongitudinalDistanceAction(egoname, distance=-kwargs[&#39;distance&#39;], freespace=False)
-        event_tar.add_action(&#39;targetspeed&#39;,target_action)
+        target_action = xosc.LongitudinalDistanceAction(
+            egoname, distance=-kwargs[&#34;distance&#34;], freespace=False
+        )
+        event_tar.add_action(&#34;targetspeed&#34;, target_action)
 
         # trigger here could be changed to speed but tested for esmini at the point where speed condition was not implemented
-        target_slowingdown_trigger = xosc.ValueTrigger(&#39;slowingdowntrigger&#39;,0,xosc.ConditionEdge.rising,xosc.SimulationTimeCondition(6,xosc.Rule.greaterThan))
-        target_slowingdown_action = xosc.AbsoluteSpeedAction(0,xosc.TransitionDynamics(xosc.DynamicsShapes.linear,xosc.DynamicsDimension.rate,abs(kwargs[&#39;decel&#39;])))
-        event_tar_slowdown = xosc.Event(&#39;target slowing down&#39;,xosc.Priority.overwrite)
+        target_slowingdown_trigger = xosc.ValueTrigger(
+            &#34;slowingdowntrigger&#34;,
+            0,
+            xosc.ConditionEdge.rising,
+            xosc.SimulationTimeCondition(6, xosc.Rule.greaterThan),
+        )
+        target_slowingdown_action = xosc.AbsoluteSpeedAction(
+            0,
+            xosc.TransitionDynamics(
+                xosc.DynamicsShapes.linear,
+                xosc.DynamicsDimension.rate,
+                abs(kwargs[&#34;decel&#34;]),
+            ),
+        )
+        event_tar_slowdown = xosc.Event(&#34;target slowing down&#34;, xosc.Priority.overwrite)
         event_tar_slowdown.add_trigger(target_slowingdown_trigger)
-        event_tar_slowdown.add_action(&#39;slowdownaction&#39;,target_slowingdown_action)
+        event_tar_slowdown.add_action(&#34;slowdownaction&#34;, target_slowingdown_action)
 
         # create maneuvers/maneuvergroups
-        ego_man = xosc.Maneuver(&#39;ego man&#39;)
+        ego_man = xosc.Maneuver(&#34;ego man&#34;)
         ego_man.add_event(eventego)
 
-        tar_man = xosc.Maneuver(&#39;target man&#39;)
+        tar_man = xosc.Maneuver(&#34;target man&#34;)
         tar_man.add_event(event_tar)
         tar_man.add_event(event_tar_slowdown)
-        
 
-        egomangr = xosc.ManeuverGroup(&#39;egomangr&#39;)
+        egomangr = xosc.ManeuverGroup(&#34;egomangr&#34;)
         egomangr.add_actor(egoname)
         egomangr.add_maneuver(ego_man)
 
-        tarmangr = xosc.ManeuverGroup(&#39;tarmangr&#39;)
+        tarmangr = xosc.ManeuverGroup(&#34;tarmangr&#34;)
         tarmangr.add_actor(targetname)
         tarmangr.add_maneuver(tar_man)
 
-        # create act 
-        act = xosc.Act(&#39;ccrm act&#39;,xosc.ValueTrigger(&#39;starttrigger&#39;,0,xosc.ConditionEdge.rising,xosc.SimulationTimeCondition(0,xosc.Rule.greaterThan)))
+        # create act
+        act = xosc.Act(
+            &#34;ccrm act&#34;,
+            xosc.ValueTrigger(
+                &#34;starttrigger&#34;,
+                0,
+                xosc.ConditionEdge.rising,
+                xosc.SimulationTimeCondition(0, xosc.Rule.greaterThan),
+            ),
+        )
 
         act.add_maneuver_group(egomangr)
         act.add_maneuver_group(tarmangr)
 
         # create story
-        story = xosc.Story(&#39;mystory&#39;)
+        story = xosc.Story(&#34;mystory&#34;)
         story.add_act(act)
 
         ## create the storyboard
-        sb = xosc.StoryBoard(init,xosc.ValueTrigger(&#39;stop_simulation&#39;,2,xosc.ConditionEdge.rising,xosc.SimulationTimeCondition(acceleration_time + np.ceil(np.sqrt(2*kwargs[&#39;distance&#39;]/abs(kwargs[&#39;decel&#39;]))) + kwargs[&#39;distance&#39;]/50 ,xosc.Rule.greaterThan),&#39;stop&#39;))
+        sb = xosc.StoryBoard(
+            init,
+            xosc.ValueTrigger(
+                &#34;stop_simulation&#34;,
+                2,
+                xosc.ConditionEdge.rising,
+                xosc.SimulationTimeCondition(
+                    acceleration_time
+                    + np.ceil(np.sqrt(2 * kwargs[&#34;distance&#34;] / abs(kwargs[&#34;decel&#34;])))
+                    + kwargs[&#34;distance&#34;] / 50,
+                    xosc.Rule.greaterThan,
+                ),
+                &#34;stop&#34;,
+            ),
+        )
         sb.add_story(story)
 
         ## create and return the scenario
-        sce = xosc.Scenario(&#39;CCRb, distance: &#39; +str(kwargs[&#39;distance&#39;]) + &#39;, decelleration: &#39; + str(kwargs[&#39;decel&#39;]),&#39;Mandolin&#39;,paramdec,entities=entities,storyboard = sb,roadnetwork=road,catalog=catalog)
+        sce = xosc.Scenario(
+            &#34;CCRb, distance: &#34;
+            + str(kwargs[&#34;distance&#34;])
+            + &#34;, decelleration: &#34;
+            + str(kwargs[&#34;decel&#34;]),
+            &#34;Mandolin&#34;,
+            paramdec,
+            entities=entities,
+            storyboard=sb,
+            roadnetwork=road,
+            catalog=catalog,
+        )
         return sce
 
-if __name__ == &#39;__main__&#39;:
+
+if __name__ == &#34;__main__&#34;:
     sce = Scenario()
     # s.print_permutations()
-    files = sce.generate(&#39;CCRb_scenarios&#39;)
+    files = sce.generate(&#34;CCRb_scenarios&#34;)
 
     # uncomment the following lines to display the scenario using esmini
     # from scenariogeneration import esmini
@@ -253,28 +330,23 @@ generate_all_roads (bool): will only generate unique roads
     def __init__(self):
         ScenarioGenerator.__init__(self)
         # set a numerical value as ending to all scenarios
-        self.naming = &#39;numerical&#39;
+        self.naming = &#34;numerical&#34;
         # only one road is used, so all roads does not have to be generated
         self.generate_all_roads = False
 
-
         # parameters for the scenario
-        self.parameters[&#39;distance&#39;] = [12, 40]
-        self.parameters[&#39;decel&#39;] = [-2,-6]
-    
-    
+        self.parameters[&#34;distance&#34;] = [12, 40]
+        self.parameters[&#34;decel&#34;] = [-2, -6]
 
-    def road(self,**kwargs):
+    def road(self, **kwargs):
 
-        road = xodr.create_road([xodr.Line(500)],id =1,left_lanes=2,right_lanes=2)
-        odr = xodr.OpenDrive(&#39;myroad&#39;)
+        road = xodr.create_road([xodr.Line(500)], id=1, left_lanes=2, right_lanes=2)
+        odr = xodr.OpenDrive(&#34;myroad&#34;)
         odr.add_road(road)
         odr.adjust_roads_and_lanes()
         return odr
 
-    def scenario(self,**kwargs):
-
-
+    def scenario(self, **kwargs):
 
         # create empty catalog
         catalog = xosc.Catalog()
@@ -285,109 +357,174 @@ generate_all_roads (bool): will only generate unique roads
         # create empty paramdeclaration
         paramdec = xosc.ParameterDeclarations()
 
-        egoname = &#39;Ego&#39;
-        targetname = &#39;Target1&#39;
+        egoname = &#34;Ego&#34;
+        targetname = &#34;Target1&#34;
 
         ### create vehicles
         ego_width = 2
         target_width = 1.8
 
-        bb = xosc.BoundingBox(ego_width,5,1.8,2.0,0,0.9)
-        fa = xosc.Axle(0.523598775598,0.8,1.68,2.98,0.4)
-        ba = xosc.Axle(0.523598775598,0.8,1.68,0,0.4)
-        white_veh = xosc.Vehicle(&#39;car_white&#39;,xosc.VehicleCategory.car,bb,fa,ba,69,10,10)
+        bb = xosc.BoundingBox(ego_width, 5, 1.8, 2.0, 0, 0.9)
+        fa = xosc.Axle(0.523598775598, 0.8, 1.68, 2.98, 0.4)
+        ba = xosc.Axle(0.523598775598, 0.8, 1.68, 0, 0.4)
+        white_veh = xosc.Vehicle(
+            &#34;car_white&#34;, xosc.VehicleCategory.car, bb, fa, ba, 69, 10, 10
+        )
 
-        white_veh.add_property_file(&#39;../models/car_white.osgb&#39;)
-        white_veh.add_property(&#39;model_id&#39;,&#39;0&#39;)
+        white_veh.add_property_file(&#34;../models/car_white.osgb&#34;)
+        white_veh.add_property(&#34;model_id&#34;, &#34;0&#34;)
 
-        bb = xosc.BoundingBox(target_width,4.5,1.5,1.3,0,0.8)
-        fa = xosc.Axle(0.523598775598,0.8,1.68,2.98,0.4)
-        ba = xosc.Axle(0.523598775598,0.8,1.68,0,0.4)
-        red_veh = xosc.Vehicle(&#39;car_red&#39;,xosc.VehicleCategory.car,bb,fa,ba,69,10,10)
+        bb = xosc.BoundingBox(target_width, 4.5, 1.5, 1.3, 0, 0.8)
+        fa = xosc.Axle(0.523598775598, 0.8, 1.68, 2.98, 0.4)
+        ba = xosc.Axle(0.523598775598, 0.8, 1.68, 0, 0.4)
+        red_veh = xosc.Vehicle(
+            &#34;car_red&#34;, xosc.VehicleCategory.car, bb, fa, ba, 69, 10, 10
+        )
 
-        red_veh.add_property_file(&#39;../models/car_red.osgb&#39;)
-        red_veh.add_property(&#39;model_id&#39;,&#39;2&#39;)
+        red_veh.add_property_file(&#34;../models/car_red.osgb&#34;)
+        red_veh.add_property(&#34;model_id&#34;, &#34;2&#34;)
 
         ## create entities
         entities = xosc.Entities()
-        entities.add_scenario_object(egoname,white_veh)
-        entities.add_scenario_object(targetname,red_veh)
-
+        entities.add_scenario_object(egoname, white_veh)
+        entities.add_scenario_object(targetname, red_veh)
 
         # create init (0 starting speed)
         init = xosc.Init()
-        step_time = xosc.TransitionDynamics(xosc.DynamicsShapes.step,xosc.DynamicsDimension.time,1)
-        
+        step_time = xosc.TransitionDynamics(
+            xosc.DynamicsShapes.step, xosc.DynamicsDimension.time, 1
+        )
+
         # caluclate correct offset based on target vehicle width
         cal_offset = 0
 
-        egospeed = xosc.AbsoluteSpeedAction(0,step_time)
-        egostart = xosc.TeleportAction(xosc.LanePosition(25,cal_offset,-1,1))
+        egospeed = xosc.AbsoluteSpeedAction(0, step_time)
+        egostart = xosc.TeleportAction(xosc.LanePosition(25, cal_offset, -1, 1))
 
-        targetspeed = xosc.AbsoluteSpeedAction(0,step_time)
-        targetstart = xosc.TeleportAction(xosc.LanePosition(25+kwargs[&#39;distance&#39;],0,-1,1))
+        targetspeed = xosc.AbsoluteSpeedAction(0, step_time)
+        targetstart = xosc.TeleportAction(
+            xosc.LanePosition(25 + kwargs[&#34;distance&#34;], 0, -1, 1)
+        )
 
-        init.add_init_action(egoname,egospeed)
-        init.add_init_action(egoname,egostart)
-        init.add_init_action(targetname,targetspeed)
-        init.add_init_action(targetname,targetstart)
+        init.add_init_action(egoname, egospeed)
+        init.add_init_action(egoname, egostart)
+        init.add_init_action(targetname, targetspeed)
+        init.add_init_action(targetname, targetstart)
 
         # create start trigger
-        trigger = xosc.ValueTrigger(&#39;starttrigger&#39;,0,xosc.ConditionEdge.rising,xosc.SimulationTimeCondition(1,xosc.Rule.greaterThan))
+        trigger = xosc.ValueTrigger(
+            &#34;starttrigger&#34;,
+            0,
+            xosc.ConditionEdge.rising,
+            xosc.SimulationTimeCondition(1, xosc.Rule.greaterThan),
+        )
 
         # accelerate cars to wanted velocity
-        eventego = xosc.Event(&#39;egospeedchange&#39;,xosc.Priority.overwrite)
+        eventego = xosc.Event(&#34;egospeedchange&#34;, xosc.Priority.overwrite)
         eventego.add_trigger(trigger)
 
-        ego_action = xosc.AbsoluteSpeedAction(50/3.6,xosc.TransitionDynamics(xosc.DynamicsShapes.linear,xosc.DynamicsDimension.time,acceleration_time))
-        eventego.add_action(&#39;newspeed&#39;,ego_action)
+        ego_action = xosc.AbsoluteSpeedAction(
+            50 / 3.6,
+            xosc.TransitionDynamics(
+                xosc.DynamicsShapes.linear,
+                xosc.DynamicsDimension.time,
+                acceleration_time,
+            ),
+        )
+        eventego.add_action(&#34;newspeed&#34;, ego_action)
 
-        event_tar = xosc.Event(&#39;targetspeedchange&#39;,xosc.Priority.overwrite)
+        event_tar = xosc.Event(&#34;targetspeedchange&#34;, xosc.Priority.overwrite)
         event_tar.add_trigger(trigger)
 
-        target_action = xosc.LongitudinalDistanceAction(egoname, distance=-kwargs[&#39;distance&#39;], freespace=False)
-        event_tar.add_action(&#39;targetspeed&#39;,target_action)
+        target_action = xosc.LongitudinalDistanceAction(
+            egoname, distance=-kwargs[&#34;distance&#34;], freespace=False
+        )
+        event_tar.add_action(&#34;targetspeed&#34;, target_action)
 
         # trigger here could be changed to speed but tested for esmini at the point where speed condition was not implemented
-        target_slowingdown_trigger = xosc.ValueTrigger(&#39;slowingdowntrigger&#39;,0,xosc.ConditionEdge.rising,xosc.SimulationTimeCondition(6,xosc.Rule.greaterThan))
-        target_slowingdown_action = xosc.AbsoluteSpeedAction(0,xosc.TransitionDynamics(xosc.DynamicsShapes.linear,xosc.DynamicsDimension.rate,abs(kwargs[&#39;decel&#39;])))
-        event_tar_slowdown = xosc.Event(&#39;target slowing down&#39;,xosc.Priority.overwrite)
+        target_slowingdown_trigger = xosc.ValueTrigger(
+            &#34;slowingdowntrigger&#34;,
+            0,
+            xosc.ConditionEdge.rising,
+            xosc.SimulationTimeCondition(6, xosc.Rule.greaterThan),
+        )
+        target_slowingdown_action = xosc.AbsoluteSpeedAction(
+            0,
+            xosc.TransitionDynamics(
+                xosc.DynamicsShapes.linear,
+                xosc.DynamicsDimension.rate,
+                abs(kwargs[&#34;decel&#34;]),
+            ),
+        )
+        event_tar_slowdown = xosc.Event(&#34;target slowing down&#34;, xosc.Priority.overwrite)
         event_tar_slowdown.add_trigger(target_slowingdown_trigger)
-        event_tar_slowdown.add_action(&#39;slowdownaction&#39;,target_slowingdown_action)
+        event_tar_slowdown.add_action(&#34;slowdownaction&#34;, target_slowingdown_action)
 
         # create maneuvers/maneuvergroups
-        ego_man = xosc.Maneuver(&#39;ego man&#39;)
+        ego_man = xosc.Maneuver(&#34;ego man&#34;)
         ego_man.add_event(eventego)
 
-        tar_man = xosc.Maneuver(&#39;target man&#39;)
+        tar_man = xosc.Maneuver(&#34;target man&#34;)
         tar_man.add_event(event_tar)
         tar_man.add_event(event_tar_slowdown)
-        
 
-        egomangr = xosc.ManeuverGroup(&#39;egomangr&#39;)
+        egomangr = xosc.ManeuverGroup(&#34;egomangr&#34;)
         egomangr.add_actor(egoname)
         egomangr.add_maneuver(ego_man)
 
-        tarmangr = xosc.ManeuverGroup(&#39;tarmangr&#39;)
+        tarmangr = xosc.ManeuverGroup(&#34;tarmangr&#34;)
         tarmangr.add_actor(targetname)
         tarmangr.add_maneuver(tar_man)
 
-        # create act 
-        act = xosc.Act(&#39;ccrm act&#39;,xosc.ValueTrigger(&#39;starttrigger&#39;,0,xosc.ConditionEdge.rising,xosc.SimulationTimeCondition(0,xosc.Rule.greaterThan)))
+        # create act
+        act = xosc.Act(
+            &#34;ccrm act&#34;,
+            xosc.ValueTrigger(
+                &#34;starttrigger&#34;,
+                0,
+                xosc.ConditionEdge.rising,
+                xosc.SimulationTimeCondition(0, xosc.Rule.greaterThan),
+            ),
+        )
 
         act.add_maneuver_group(egomangr)
         act.add_maneuver_group(tarmangr)
 
         # create story
-        story = xosc.Story(&#39;mystory&#39;)
+        story = xosc.Story(&#34;mystory&#34;)
         story.add_act(act)
 
         ## create the storyboard
-        sb = xosc.StoryBoard(init,xosc.ValueTrigger(&#39;stop_simulation&#39;,2,xosc.ConditionEdge.rising,xosc.SimulationTimeCondition(acceleration_time + np.ceil(np.sqrt(2*kwargs[&#39;distance&#39;]/abs(kwargs[&#39;decel&#39;]))) + kwargs[&#39;distance&#39;]/50 ,xosc.Rule.greaterThan),&#39;stop&#39;))
+        sb = xosc.StoryBoard(
+            init,
+            xosc.ValueTrigger(
+                &#34;stop_simulation&#34;,
+                2,
+                xosc.ConditionEdge.rising,
+                xosc.SimulationTimeCondition(
+                    acceleration_time
+                    + np.ceil(np.sqrt(2 * kwargs[&#34;distance&#34;] / abs(kwargs[&#34;decel&#34;])))
+                    + kwargs[&#34;distance&#34;] / 50,
+                    xosc.Rule.greaterThan,
+                ),
+                &#34;stop&#34;,
+            ),
+        )
         sb.add_story(story)
 
         ## create and return the scenario
-        sce = xosc.Scenario(&#39;CCRb, distance: &#39; +str(kwargs[&#39;distance&#39;]) + &#39;, decelleration: &#39; + str(kwargs[&#39;decel&#39;]),&#39;Mandolin&#39;,paramdec,entities=entities,storyboard = sb,roadnetwork=road,catalog=catalog)
+        sce = xosc.Scenario(
+            &#34;CCRb, distance: &#34;
+            + str(kwargs[&#34;distance&#34;])
+            + &#34;, decelleration: &#34;
+            + str(kwargs[&#34;decel&#34;]),
+            &#34;Mandolin&#34;,
+            paramdec,
+            entities=entities,
+            storyboard=sb,
+            roadnetwork=road,
+            catalog=catalog,
+        )
         return sce</code></pre>
 </details>
 <h3>Ancestors</h3>

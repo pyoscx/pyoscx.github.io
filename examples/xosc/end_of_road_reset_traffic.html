@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.8.0" />
 <title>examples.xosc.end_of_road_reset_traffic API documentation</title>
-<meta name="description" content="Example showing how to create &#34;repeating traffic&#34; if a car goes to the end of the road …" />
+<meta name="description" content="scenariogeneration
+https://github.com/pyoscx/scenariogeneration …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -20,91 +21,141 @@
 <h1 class="title">Module <code>examples.xosc.end_of_road_reset_traffic</code></h1>
 </header>
 <section id="section-intro">
+<p>scenariogeneration
+<a href="https://github.com/pyoscx/scenariogeneration">https://github.com/pyoscx/scenariogeneration</a></p>
+<p>This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
+<p>Copyright (c) 2022 The scenariogeneration Authors.</p>
 <p>Example showing how to create "repeating traffic" if a car goes to the end of the road</p>
 <p>Some features used:</p>
-<pre><code>- multiple execusions
+<pre><code>  - multiple execusions
 
-- EndOfRoadCondition
+  - EndOfRoadCondition
 
-- Teleport
+  - Teleport
 
-- LanePosition
+  - LanePosition
 </code></pre>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34; 
+<pre><code class="python">&#34;&#34;&#34;
+  scenariogeneration
+  https://github.com/pyoscx/scenariogeneration
+ 
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ 
+  Copyright (c) 2022 The scenariogeneration Authors.
+  
     Example showing how to create &#34;repeating traffic&#34; if a car goes to the end of the road
-    
+
     Some features used:
-        
-        - multiple execusions 
-        
+
+        - multiple execusions
+
         - EndOfRoadCondition
-        
+
         - Teleport
-        
+
         - LanePosition
-        
+
 &#34;&#34;&#34;
 import os
 from scenariogeneration import xosc, prettyprint
 
 ### create catalogs
 catalog = xosc.Catalog()
-catalog.add_catalog(&#39;VehicleCatalog&#39;,&#39;../xosc/Catalogs/Vehicles&#39;)
+catalog.add_catalog(&#34;VehicleCatalog&#34;, &#34;../xosc/Catalogs/Vehicles&#34;)
 
 ### create road
-road = xosc.RoadNetwork(roadfile=&#39;../xodr/straight_500m.xodr&#39;,scenegraph=&#39;../models/straight_500m.osgb&#39;)
+road = xosc.RoadNetwork(
+    roadfile=&#34;../xodr/straight_500m.xodr&#34;, scenegraph=&#34;../models/straight_500m.osgb&#34;
+)
 
 ### create parameters
 paramdec = xosc.ParameterDeclarations()
 
 ## loop to create cars, init and their reset actions
 
-egoname = &#39;Ego&#39;
+egoname = &#34;Ego&#34;
 
-targetname = &#39;Target&#39;
+targetname = &#34;Target&#34;
 entities = xosc.Entities()
 init = xosc.Init()
-act = xosc.Act(&#39;indef traffic&#39;)
+act = xosc.Act(&#34;indef traffic&#34;)
 
 for i in range(20):
-    entities.add_scenario_object(targetname+str(i),xosc.CatalogReference(&#39;VehicleCatalog&#39;,&#39;car_yellow&#39;))
+    entities.add_scenario_object(
+        targetname + str(i), xosc.CatalogReference(&#34;VehicleCatalog&#34;, &#34;car_yellow&#34;)
+    )
 
-    init.add_init_action(targetname+str(i),xosc.TeleportAction(xosc.LanePosition(100+i*20,0,-1,1)))
-    init.add_init_action(targetname+str(i),xosc.AbsoluteSpeedAction(60,xosc.TransitionDynamics(xosc.DynamicsShapes.step,xosc.DynamicsDimension.time,1)))
+    init.add_init_action(
+        targetname + str(i),
+        xosc.TeleportAction(xosc.LanePosition(100 + i * 20, 0, -1, 1)),
+    )
+    init.add_init_action(
+        targetname + str(i),
+        xosc.AbsoluteSpeedAction(
+            60,
+            xosc.TransitionDynamics(
+                xosc.DynamicsShapes.step, xosc.DynamicsDimension.time, 1
+            ),
+        ),
+    )
 
-    event = xosc.Event(&#39;speedchange&#39;,xosc.Priority.overwrite,maxexecution=10)
-    event.add_action(&#39;restart&#39;,xosc.TeleportAction(xosc.LanePosition(0,0,-1,1)))
-    
+    event = xosc.Event(&#34;speedchange&#34;, xosc.Priority.overwrite, maxexecution=10)
+    event.add_action(&#34;restart&#34;, xosc.TeleportAction(xosc.LanePosition(0, 0, -1, 1)))
+
     trig_cond = xosc.EndOfRoadCondition(0)
 
-    event.add_trigger(xosc.EntityTrigger(&#39;trigger&#39;,0,xosc.ConditionEdge.rising,trig_cond,targetname+str(i)))
+    event.add_trigger(
+        xosc.EntityTrigger(
+            &#34;trigger&#34;, 0, xosc.ConditionEdge.rising, trig_cond, targetname + str(i)
+        )
+    )
 
-    man = xosc.Maneuver(&#39;mymaneuver&#39;)
+    man = xosc.Maneuver(&#34;mymaneuver&#34;)
     man.add_event(event)
 
-
-    mangr = xosc.ManeuverGroup(&#39;mangr&#39;,maxexecution=3)
+    mangr = xosc.ManeuverGroup(&#34;mangr&#34;, maxexecution=3)
     mangr.add_maneuver(man)
-    mangr.add_actor(targetname+str(i))
+    mangr.add_actor(targetname + str(i))
     act.add_maneuver_group(mangr)
-    
+
 
 ## create the storyboard
-sb = xosc.StoryBoard(init,xosc.ValueTrigger(&#39;stop_simulation&#39;,0,xosc.ConditionEdge.rising,xosc.SimulationTimeCondition(100,xosc.Rule.greaterThan),&#39;stop&#39;))
+sb = xosc.StoryBoard(
+    init,
+    xosc.ValueTrigger(
+        &#34;stop_simulation&#34;,
+        0,
+        xosc.ConditionEdge.rising,
+        xosc.SimulationTimeCondition(100, xosc.Rule.greaterThan),
+        &#34;stop&#34;,
+    ),
+)
 
 sb.add_act(act)
 ## create the scenario
-sce = xosc.Scenario(&#39;adaptspeed_example&#39;,&#39;User&#39;,paramdec,entities=entities,storyboard = sb,roadnetwork=road,catalog=catalog)
+sce = xosc.Scenario(
+    &#34;adaptspeed_example&#34;,
+    &#34;User&#34;,
+    paramdec,
+    entities=entities,
+    storyboard=sb,
+    roadnetwork=road,
+    catalog=catalog,
+)
 
 # Print the resulting xml
 prettyprint(sce.get_element())
 
 # write the OpenSCENARIO file as xosc using current script name
-sce.write_xml(os.path.basename(__file__).replace(&#39;.py&#39;,&#39;.xosc&#39;))
+sce.write_xml(os.path.basename(__file__).replace(&#34;.py&#34;, &#34;.xosc&#34;))
 
 # uncomment the following lines to display the scenario using esmini
 # from scenariogeneration import esmini

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.8.0" />
-<title>examples.xodr.road_with_custom_roadmarkers API documentation</title>
+<title>examples.xodr.common_junction_creator API documentation</title>
 <meta name="description" content="scenariogeneration
 https://github.com/pyoscx/scenariogeneration …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
@@ -18,7 +18,7 @@ https://github.com/pyoscx/scenariogeneration …" />
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>examples.xodr.road_with_custom_roadmarkers</code></h1>
+<h1 class="title">Module <code>examples.xodr.common_junction_creator</code></h1>
 </header>
 <section id="section-intro">
 <p>scenariogeneration
@@ -27,20 +27,17 @@ https://github.com/pyoscx/scenariogeneration …" />
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
 <p>Copyright (c) 2022 The scenariogeneration Authors.</p>
-<p>Example how to create roads with customized centerline for double road markers</p>
-<p>Some features used</p>
+<p>Example of how to create a highway entry using CommonJunctionCreator</p>
+<p>Some features used:</p>
 <ul>
 <li>
-<p>PlanView</p>
+<p>create_road</p>
 </li>
 <li>
-<p>LaneSection</p>
+<p>add_successor/add_predecessor with and without the lane_offset option, and the direct_junction input</p>
 </li>
 <li>
-<p>RoadMark</p>
-</li>
-<li>
-<p>RoadLine</p>
+<p>CommonJunctionCreator</p>
 </li>
 </ul>
 <details class="source">
@@ -56,77 +53,69 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
   file, You can obtain one at https://mozilla.org/MPL/2.0/.
  
   Copyright (c) 2022 The scenariogeneration Authors.
-  
-    Example how to create roads with customized centerline for double road markers
 
-    Some features used
 
-    - PlanView
+    Example of how to create a highway entry using CommonJunctionCreator
 
-    - LaneSection
+    Some features used:
 
-    - RoadMark
+    - create_road
 
-    - RoadLine
+    - add_successor/add_predecessor with and without the lane_offset option, and the direct_junction input
 
+    - CommonJunctionCreator
 &#34;&#34;&#34;
-
 
 import os
 from scenariogeneration import xodr
 
+# initalize the junction creator
+junction_id = 100
+junction_creator = xodr.DirectJunctionCreator(id=junction_id, name=&#34;my direct junction&#34;)
 
-# create a simple planview
-planview = xodr.PlanView()
-planview.add_geometry(xodr.Line(300))
+# create 3 roads, and add the successor/predecessor junction
 
-## create the customized centerlanes with different lanemarkings
-centerlanes = []
-# standard solid solid
+road1 = xodr.create_road(xodr.Line(100), id=1, left_lanes=2, right_lanes=2)
+road2 = xodr.create_road(xodr.Line(100), id=2, left_lanes=1, right_lanes=1)
+road3 = xodr.create_road(xodr.Line(100), id=3, left_lanes=2, right_lanes=2)
 
-solid_solid = xodr.Lane()
-solid_solid.add_roadmark(xodr.STD_ROADMARK_SOLID_SOLID)
-centerlanes.append(solid_solid)
+# create direct junction connection to all common lanes between the main roads
 
-# standard solid broken
-solid_broken = xodr.Lane()
-solid_broken.add_roadmark(xodr.STD_ROADMARK_SOLID_BROKEN)
-centerlanes.append(solid_broken)
+junction_creator = xodr.CommonJunctionCreator(id=100, name=&#34;my_junction&#34;)
 
-# customized broken broken
-broken_broken_roadmark = xodr.RoadMark(xodr.RoadMarkType.broken_broken)
-broken_broken_roadmark.add_specific_road_line(xodr.RoadLine(0.2, 9, 3, 0.2))
-broken_broken_roadmark.add_specific_road_line(xodr.RoadLine(0.2, 3, 9, -0.2, 3))
-broken_broken = xodr.Lane()
-broken_broken.add_roadmark(broken_broken_roadmark)
-centerlanes.append(broken_broken)
+junction_creator.add_incoming_road_cartesian_geometry(
+    road1, x=0, y=0, heading=0, road_connection=&#34;successor&#34;
+)
 
+junction_creator.add_incoming_road_cartesian_geometry(
+    road2, x=50, y=50, heading=3.1415 * 3 / 2, road_connection=&#34;predecessor&#34;
+)
 
-# create the different lanesections and add them to the lanes
-lanes = xodr.Lanes()
-ls_start = 0
-for i in centerlanes:
-    lanesection = xodr.LaneSection(ls_start, i)
-    left_lane_with_roadmark = xodr.Lane(a=4)
-    left_lane_with_roadmark.add_roadmark(xodr.STD_ROADMARK_BROKEN)
-
-    right_lane_with_roadmark = xodr.Lane(a=4)
-    right_lane_with_roadmark.add_roadmark(xodr.STD_ROADMARK_SOLID)
-    lanesection.add_left_lane(left_lane_with_roadmark)
-    lanesection.add_right_lane(right_lane_with_roadmark)
-    ls_start += 100
-
-    lanes.add_lanesection(lanesection)
+junction_creator.add_incoming_road_cartesian_geometry(
+    road3, x=100, y=0, heading=-3.1415, road_connection=&#34;predecessor&#34;
+)
 
 
-# create the road
-road = xodr.Road(0, planview, lanes)
+# create the opendrive
+odr = xodr.OpenDrive(&#34;my_road&#34;)
 
-# create the opendrive and add the road
-odr = xodr.OpenDrive(&#34;road with custom lanes&#34;)
-odr.add_road(road)
+# add the roads
+junction_creator.add_connection(road_one_id=1, road_two_id=3)
+junction_creator.add_connection(
+    road_one_id=1, road_two_id=2, lane_one_id=2, lane_two_id=1
+)
+junction_creator.add_connection(
+    road_one_id=2, road_two_id=3, lane_one_id=-1, lane_two_id=2
+)
 
-# adjust the road
+odr.add_road(road1)
+odr.add_road(road2)
+odr.add_road(road3)
+
+# add the junction creator
+odr.add_junction_creator(junction_creator)
+
+# adjust the roads and lanes
 odr.adjust_roads_and_lanes()
 
 # write the OpenDRIVE file as xodr using current script name

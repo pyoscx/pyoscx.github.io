@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.8.0" />
 <title>examples.xodr.junction_trippel_twoway API documentation</title>
-<meta name="description" content="This example shows how to make a very simple junction from &#34;scratch&#34; without using any generators …" />
+<meta name="description" content="scenariogeneration
+https://github.com/pyoscx/scenariogeneration …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -20,33 +21,48 @@
 <h1 class="title">Module <code>examples.xodr.junction_trippel_twoway</code></h1>
 </header>
 <section id="section-intro">
+<p>scenariogeneration
+<a href="https://github.com/pyoscx/scenariogeneration">https://github.com/pyoscx/scenariogeneration</a></p>
+<p>This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
+<p>Copyright (c) 2022 The scenariogeneration Authors.</p>
 <p>This example shows how to make a very simple junction from "scratch" without using any generators.</p>
 <p>NOTE: This is more of a reference example and should not be considered a "user example" more of a "developer example".</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34; This example shows how to make a very simple junction from &#34;scratch&#34; without using any generators.
-    
+<pre><code class="python">&#34;&#34;&#34;
+  scenariogeneration
+  https://github.com/pyoscx/scenariogeneration
+ 
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ 
+  Copyright (c) 2022 The scenariogeneration Authors.
+  
+  This example shows how to make a very simple junction from &#34;scratch&#34; without using any generators.
+
     NOTE: This is more of a reference example and should not be considered a &#34;user example&#34; more of a &#34;developer example&#34;.
 
-    
+
 &#34;&#34;&#34;
 from scenariogeneration import xodr
 import numpy as np
 import os
 
 
-
-rm = xodr.RoadMark(xodr.RoadMarkType.solid,0.2)
+rm = xodr.RoadMark(xodr.RoadMarkType.solid, 0.2)
 
 # create geometries
 
 geoms = []
 geoms.append(xodr.Line(100))
-geoms.append(xodr.Spiral(0.001,0.019,30))
+geoms.append(xodr.Spiral(0.001, 0.019, 30))
 geoms.append(xodr.Line(100))
-geoms.append(xodr.Spiral(-0.001,-0.1,30))
+geoms.append(xodr.Spiral(-0.001, -0.1, 30))
 geoms.append(xodr.Line(100))
 geoms.append(xodr.Line(20))
 geoms.append(xodr.Line(100))
@@ -58,7 +74,6 @@ for g in geoms:
     pv = xodr.PlanView()
     pv.add_geometry(g)
     planviews.append(pv)
-
 
 
 # create centerlanes
@@ -82,7 +97,7 @@ for i in range(numberofroads):
 # create lanesections
 lanesections = []
 for i in range(numberofroads):
-    lsec = xodr.LaneSection(0,lanecenters[i])
+    lsec = xodr.LaneSection(0, lanecenters[i])
     lsec.add_right_lane(rightlanes[i])
     lsec.add_left_lane(leftlanes[i])
     lanesections.append(lsec)
@@ -95,49 +110,49 @@ for l in lanesections:
     lanes.append(lanes1)
 
 
-# finally create the roads 
+# finally create the roads
 roads = []
-roadtypes = [-1,1,-1,1,-1,1,-1]
+roadtypes = [-1, 1, -1, 1, -1, 1, -1]
 for i in range(numberofroads):
-    roads.append(xodr.Road(i,planviews[i],lanes[i],road_type=roadtypes[i]))
+    roads.append(xodr.Road(i, planviews[i], lanes[i], road_type=roadtypes[i]))
 
-roads[0].add_successor(xodr.ElementType.junction,1)
+roads[0].add_successor(xodr.ElementType.junction, 1)
 
-roads[1].add_predecessor(xodr.ElementType.road,0,xodr.ContactPoint.end)
-roads[1].add_successor(xodr.ElementType.road,2,xodr.ContactPoint.start)
+roads[1].add_predecessor(xodr.ElementType.road, 0, xodr.ContactPoint.end)
+roads[1].add_successor(xodr.ElementType.road, 2, xodr.ContactPoint.start)
 
-roads[2].add_predecessor(xodr.ElementType.junction,1)
+roads[2].add_predecessor(xodr.ElementType.junction, 1)
 
-roads[3].add_predecessor(xodr.ElementType.road,0,xodr.ContactPoint.end)
-roads[3].add_successor(xodr.ElementType.road,4,xodr.ContactPoint.start)
+roads[3].add_predecessor(xodr.ElementType.road, 0, xodr.ContactPoint.end)
+roads[3].add_successor(xodr.ElementType.road, 4, xodr.ContactPoint.start)
 
-roads[4].add_predecessor(xodr.ElementType.junction,1)
+roads[4].add_predecessor(xodr.ElementType.junction, 1)
 
-roads[5].add_predecessor(xodr.ElementType.road,0,xodr.ContactPoint.end)
-roads[5].add_successor(xodr.ElementType.road,6,xodr.ContactPoint.start)
+roads[5].add_predecessor(xodr.ElementType.road, 0, xodr.ContactPoint.end)
+roads[5].add_successor(xodr.ElementType.road, 6, xodr.ContactPoint.start)
 
-roads[6].add_predecessor(xodr.ElementType.junction,1)
+roads[6].add_predecessor(xodr.ElementType.junction, 1)
 
 # create the opendrive
-odr = xodr.OpenDrive(&#39;myroad&#39;)
+odr = xodr.OpenDrive(&#34;myroad&#34;)
 for r in roads:
     odr.add_road(r)
 
 # create junction
-junction = xodr.Junction(&#39;test&#39;,1)
-con1 = xodr.Connection(0,1,xodr.ContactPoint.start)
-con1.add_lanelink(-1,-1)
-con2 = xodr.Connection(0,3,xodr.ContactPoint.start)
-con2.add_lanelink(-1,-1)
-con3 = xodr.Connection(0,5,xodr.ContactPoint.start)
-con3.add_lanelink(-1,-1)
+junction = xodr.Junction(&#34;test&#34;, 1)
+con1 = xodr.Connection(0, 1, xodr.ContactPoint.start)
+con1.add_lanelink(-1, -1)
+con2 = xodr.Connection(0, 3, xodr.ContactPoint.start)
+con2.add_lanelink(-1, -1)
+con3 = xodr.Connection(0, 5, xodr.ContactPoint.start)
+con3.add_lanelink(-1, -1)
 
-con4 = xodr.Connection(2,1,xodr.ContactPoint.end)
-con4.add_lanelink(1,1)
-con5 = xodr.Connection(4,3,xodr.ContactPoint.end)
-con5.add_lanelink(1,1)
-con6 = xodr.Connection(6,5,xodr.ContactPoint.end)
-con6.add_lanelink(1,1)
+con4 = xodr.Connection(2, 1, xodr.ContactPoint.end)
+con4.add_lanelink(1, 1)
+con5 = xodr.Connection(4, 3, xodr.ContactPoint.end)
+con5.add_lanelink(1, 1)
+con6 = xodr.Connection(6, 5, xodr.ContactPoint.end)
+con6.add_lanelink(1, 1)
 
 junction.add_connection(con1)
 junction.add_connection(con2)
@@ -152,11 +167,11 @@ odr.adjust_roads_and_lanes()
 # xodr.prettyprint(odr.get_element())
 
 # write the OpenDRIVE file as xodr using current script name
-odr.write_xml(os.path.basename(__file__).replace(&#39;.py&#39;,&#39;.xodr&#39;))
+odr.write_xml(os.path.basename(__file__).replace(&#34;.py&#34;, &#34;.xodr&#34;))
 
 # uncomment the following lines to display the road using esmini
-#from scenariogeneration import esmini
-#esmini(odr,os.path.join(&#39;esmini&#39;))</code></pre>
+# from scenariogeneration import esmini
+# esmini(odr,os.path.join(&#39;esmini&#39;))</code></pre>
 </details>
 </section>
 <section>

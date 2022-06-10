@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.8.0" />
 <title>scenariogeneration.scenario_generator API documentation</title>
-<meta name="description" content="scenario_generator contains the ScenarioGenerator class that can be used to combine the xosc and xodr modules to generate related roads and scenarios." />
+<meta name="description" content="scenariogeneration
+https://github.com/pyoscx/scenariogeneration …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -20,12 +21,25 @@
 <h1 class="title">Module <code>scenariogeneration.scenario_generator</code></h1>
 </header>
 <section id="section-intro">
-<p>scenario_generator contains the ScenarioGenerator class that can be used to combine the xosc and xodr modules to generate related roads and scenarios.</p>
+<p>scenariogeneration
+<a href="https://github.com/pyoscx/scenariogeneration">https://github.com/pyoscx/scenariogeneration</a></p>
+<p>This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
+<p>Copyright (c) 2022 The scenariogeneration Authors.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34; scenario_generator contains the ScenarioGenerator class that can be used to combine the xosc and xodr modules to generate related roads and scenarios.
+<pre><code class="python">&#34;&#34;&#34;
+  scenariogeneration
+  https://github.com/pyoscx/scenariogeneration
+ 
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ 
+  Copyright (c) 2022 The scenariogeneration Authors.
 
 &#34;&#34;&#34;
 import itertools
@@ -34,69 +48,71 @@ import numpy as np
 import sys
 
 
-class ScenarioGenerator():
-    &#34;&#34;&#34; ScenarioTemplate is a class that should be inherited by a Scenario class in order to generate xodr and xosc files based on pyoscx and pyodrx
+class ScenarioGenerator:
+    &#34;&#34;&#34;ScenarioTemplate is a class that should be inherited by a Scenario class in order to generate xodr and xosc files based on pyoscx and pyodrx
 
-        Two main uses, in your generation class define self.parameters as either as
-         - a dict of lists, where the lists are the values you want to sweep over, all permutations of these sets will be generated
-         - a list of dicts, where the dicts are identical and each element in the list is one scenario
+    Two main uses, in your generation class define self.parameters as either as
+     - a dict of lists, where the lists are the values you want to sweep over, all permutations of these sets will be generated
+     - a list of dicts, where the dicts are identical and each element in the list is one scenario
 
-        Attributes
-        ----------
-            road_file (str): name of the roadfile,
+    Attributes
+    ----------
+        road_file (str): name of the roadfile,
 
-            parameters (dict of lists, or list of dicts): parameter sets to be used
+        parameters (dict of lists, or list of dicts): parameter sets to be used
 
-            naming (str): two options &#34;numerical&#34; or &#34;parameter&#34;
+        naming (str): two options &#34;numerical&#34; or &#34;parameter&#34;
 
-            generate_all_roads (bool): will only generate unique roads 
+        generate_all_roads (bool): will only generate unique roads
     &#34;&#34;&#34;
+
     def __init__(self):
-        self.road_file = &#39;&#39;
+        self.road_file = &#34;&#34;
         self.parameters = {}
-        self.naming = &#39;numerical&#39; # can be &#39;numerical&#39;, &#39;parameter&#39;
+        self.naming = &#34;numerical&#34;  # can be &#39;numerical&#39;, &#39;parameter&#39;
         self._it = 0
-        self._generation_folder = &#39;&#39;
-        
+        self._generation_folder = &#34;&#34;
+
         self.generate_all_roads = True
         self._created_roads = {}
-        self._name_separator = &#39;_&#39;
-    def road(self,**kwargs):
-        &#34;&#34;&#34; Dummy method for generating an OpenDRIVE road
+        self._name_separator = &#34;_&#34;
 
-            Should be overwritten by the user, and return a pyodrx.OpenDrive object
+    def road(self, **kwargs):
+        &#34;&#34;&#34;Dummy method for generating an OpenDRIVE road
 
-            Return
-            ------
-                sce (pyodrx.OpenDrive): a road on pyodrx format
+        Should be overwritten by the user, and return a pyodrx.OpenDrive object
+
+        Return
+        ------
+            sce (pyodrx.OpenDrive): a road on pyodrx format
         &#34;&#34;&#34;
         return []
 
-    def scenario(self,**kwargs):
-        &#34;&#34;&#34; Dummy method for generating a OpenScenario file
-            
-            Should be overwritten by the user, and return a pyoscx.Scenario object
+    def scenario(self, **kwargs):
+        &#34;&#34;&#34;Dummy method for generating a OpenScenario file
 
-            Return
-            ------
-                sce (pyoscx.Scenario): a scenario on pyoscx format
+        Should be overwritten by the user, and return a pyoscx.Scenario object
+
+        Return
+        ------
+            sce (pyoscx.Scenario): a scenario on pyoscx format
         &#34;&#34;&#34;
         return []
+
     def _reset_name_counter(self):
-        &#34;&#34;&#34; method to reset the counter if numerical naming is used. 
-
-        &#34;&#34;&#34;
+        &#34;&#34;&#34;method to reset the counter if numerical naming is used.&#34;&#34;&#34;
         self._it = 0
-    def _create_folder_structure(self,generation_folder):
-        &#34;&#34;&#34; method to create a folder structure (if needed) to generate the scenarios and roads in
 
-            Parameters
-            ----------
-                generation_folder (str): the path to a folder where the files should be generated
+    def _create_folder_structure(self, generation_folder):
+        &#34;&#34;&#34;method to create a folder structure (if needed) to generate the scenarios and roads in
+
+        Parameters
+        ----------
+            generation_folder (str): the path to a folder where the files should be generated
 
         &#34;&#34;&#34;
-        xosc_folder = os.path.join(generation_folder,&#39;xosc&#39;)
-        xodr_folder = os.path.join(generation_folder,&#39;xodr&#39;)
+        xosc_folder = os.path.join(generation_folder, &#34;xosc&#34;)
+        xodr_folder = os.path.join(generation_folder, &#34;xodr&#34;)
 
         if not os.path.exists(generation_folder):
             os.mkdir(generation_folder)
@@ -107,12 +123,12 @@ class ScenarioGenerator():
 
         self._generation_folder = generation_folder
 
-    def print_permutations(self,override_parameters = None):
+    def print_permutations(self, override_parameters=None):
         &#34;&#34;&#34;print_permutations will create a printout to view all permutations created
 
-            Parameters
-            ----------               
-                override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute
+        Parameters
+        ----------
+            override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute
 
         &#34;&#34;&#34;
         if override_parameters:
@@ -120,38 +136,36 @@ class ScenarioGenerator():
         self._handle_input_parameters()
         it = 0
         for p in self.all_permutations:
-            print(&#39;Permutation: &#39; + str(it))
-            printstr = &#39;&#39;
+            print(&#34;Permutation: &#34; + str(it))
+            printstr = &#34;&#34;
             for key, value in p.items():
-                printstr += key + &#39;: &#39; + str(value) + &#39;, &#39;
+                printstr += key + &#34;: &#34; + str(value) + &#34;, &#34;
             print(printstr)
             it += 1
 
     def _handle_input_parameters(self):
-        &#34;&#34;&#34; _handle_input_parameters takes care of different types of parameters inputs, such as list of dicts or a dict of lists
+        &#34;&#34;&#34;_handle_input_parameters takes care of different types of parameters inputs, such as list of dicts or a dict of lists&#34;&#34;&#34;
 
-        &#34;&#34;&#34;
-
-        if isinstance(self.parameters,dict):
+        if isinstance(self.parameters, dict):
             self._create_permutations()
 
-        elif isinstance(self.parameters,list):
+        elif isinstance(self.parameters, list):
             self.all_permutations = self.parameters
-    
-    def _generate_road_and_scenario(self,permutation):
-        &#34;&#34;&#34; _generate_road_and_scenario takes a permutation and generates the road/scenario (if specified)
 
-            Parameters
-            ----------
-                permutation (dict): the parameter dict of the wanted scenario
+    def _generate_road_and_scenario(self, permutation):
+        &#34;&#34;&#34;_generate_road_and_scenario takes a permutation and generates the road/scenario (if specified)
 
-            Returns
-            -------
-                open_scenario_file (str), open_drive_file (str)
+        Parameters
+        ----------
+            permutation (dict): the parameter dict of the wanted scenario
+
+        Returns
+        -------
+            open_scenario_file (str), open_drive_file (str)
         &#34;&#34;&#34;
         scenario_name = self._get_scenario_name(permutation)
-        self.road_file = &#39;&#39;
-        scenario_file = &#39;&#39;
+        self.road_file = &#34;&#34;
+        scenario_file = &#34;&#34;
 
         road = self.road(**permutation)
         if road:
@@ -161,69 +175,95 @@ class ScenarioGenerator():
                     if self._created_roads[previous_road] == road:
                         self.road_file = previous_road
                         new_unique_road = False
-            
-                
+
             if new_unique_road:
-                self.road_file = os.path.abspath(os.path.join(self._generation_folder,&#39;xodr&#39;,scenario_name+&#39;.xodr&#39;))
+                self.road_file = os.path.abspath(
+                    os.path.join(
+                        self._generation_folder, &#34;xodr&#34;, scenario_name + &#34;.xodr&#34;
+                    )
+                )
                 road.write_xml(self.road_file)
                 if self.write_relative_road_path:
-                    self.road_file = self.road_file.replace(os.path.abspath(self._generation_folder),os.path.pardir)
+                    self.road_file = self.road_file.replace(
+                        os.path.abspath(self._generation_folder), os.path.pardir
+                    )
 
                 self._created_roads[self.road_file] = road
 
         sce = self.scenario(**permutation)
         if sce:
-            scenario_file = os.path.join(self._generation_folder,&#39;xosc&#39;,scenario_name+&#39;.xosc&#39;)
+            scenario_file = os.path.join(
+                self._generation_folder, &#34;xosc&#34;, scenario_name + &#34;.xosc&#34;
+            )
             sce.write_xml(scenario_file)
         return scenario_file, self.road_file
 
-    def _get_scenario_name(self,permutation):
-        &#34;&#34;&#34; _get_scenario_name generates the name of the wanted file, based on the permutation
+    def _get_scenario_name(self, permutation):
+        &#34;&#34;&#34;_get_scenario_name generates the name of the wanted file, based on the permutation
 
-            Parameters
-            ----------
-                permutation (dict): a permutation to create name from (used for the parameter naming option)
+        Parameters
+        ----------
+            permutation (dict): a permutation to create name from (used for the parameter naming option)
 
-            Returns
-            -------
-                scenario_name (str)
+        Returns
+        -------
+            scenario_name (str)
         &#34;&#34;&#34;
-        name_prefix = &#39;&#39;
+        name_prefix = &#34;&#34;
 
-        if self.naming == &#39;numerical&#39;:
+        if self.naming == &#34;numerical&#34;:
             name_prefix = str(self._it)
             self._it += 1
-        elif self.naming == &#39;parameter&#39;:
-            for  key, value in permutation.items():
-                name_prefix += self._name_separator + key.replace(&#39;\\&#39;,&#39;-&#39;).replace(&#39;/&#39;,&#39;-&#39;) + &#39;-&#39; + str(value).replace(&#39;\\&#39;,&#39;-&#39;).replace(&#39;/&#39;,&#39;-&#39;)
+        elif self.naming == &#34;parameter&#34;:
+            for key, value in permutation.items():
+                name_prefix += (
+                    self._name_separator
+                    + key.replace(&#34;\\&#34;, &#34;-&#34;).replace(&#34;/&#34;, &#34;-&#34;)
+                    + &#34;-&#34;
+                    + str(value).replace(&#34;\\&#34;, &#34;-&#34;).replace(&#34;/&#34;, &#34;-&#34;)
+                )
         else:
-            raise NameError(&#39;Attribute naming, can only be &#34;numerical&#34; or &#34;parameter&#34;, not &#39; + self.naming)
+            raise NameError(
+                &#39;Attribute naming, can only be &#34;numerical&#34; or &#34;parameter&#34;, not &#39;
+                + self.naming
+            )
 
-        return os.path.basename(sys.modules[self.__class__.__module__].__file__).split(&#39;.&#39;)[0]+name_prefix
+        return (
+            os.path.basename(sys.modules[self.__class__.__module__].__file__).split(
+                &#34;.&#34;
+            )[0]
+            + name_prefix
+        )
 
+    def generate_single(
+        self,
+        generation_folder,
+        order=&#34;first&#34;,
+        override_parameters=None,
+        write_relative_road_path=True,
+        name_separator=None,
+    ):
+        &#34;&#34;&#34;generate_single will generate only one scenario
 
-    def generate_single(self,generation_folder, order = &#39;first&#39;,override_parameters = None, write_relative_road_path = True, name_separator=None):
-        &#34;&#34;&#34; generate_single will generate only one scenario
+        Parameters
+        ----------
+            generation_folder (str): the path to a folder where the files should be generated
 
-            Parameters
-            ----------
-                generation_folder (str): the path to a folder where the files should be generated
+            order (str, or int): if multiple permutations are defined, this enables the picking of different permutations
+                                 int - the number of that permutation
+                                 str - first: first permutation
+                                       middle: the permutation in the middle
+                                       random: a random permutation
+                Default: &#39;first&#39;
 
-                order (str, or int): if multiple permutations are defined, this enables the picking of different permutations
-                                     int - the number of that permutation
-                                     str - first: first permutation
-                                           middle: the permutation in the middle
-                                           random: a random permutation
-                    Default: &#39;first&#39;
+            override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute (optional)
 
-                override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute (optional)
+            write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true),
+                                             or the absolute path to the xodr (false)
+                Default: True
 
-                write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true), 
-                                                 or the absolute path to the xodr (false)
-                    Default: True
-
-                name_separator (str): for generation with multiple parameters, this will change the separator between the variables
-                    Default: &#39;_&#39;
+            name_separator (str): for generation with multiple parameters, this will change the separator between the variables
+                Default: &#39;_&#39;
         &#34;&#34;&#34;
         if name_separator:
             self._name_separator = name_separator
@@ -233,36 +273,41 @@ class ScenarioGenerator():
             self.parameters = override_parameters
         self._handle_input_parameters()
 
-        if isinstance(order,str):
-            if order == &#39;first&#39;:
+        if isinstance(order, str):
+            if order == &#34;first&#34;:
                 it = 0
-            elif order == &#39;middle&#39;:
-                it = int(np.floor(len(self.all_permutations)/2))
-            elif order == &#39;random&#39;:
-                it = int(np.floor(np.random.rand()*len(self.all_permutations)))
+            elif order == &#34;middle&#34;:
+                it = int(np.floor(len(self.all_permutations) / 2))
+            elif order == &#34;random&#34;:
+                it = int(np.floor(np.random.rand() * len(self.all_permutations)))
         else:
             it = order
         osc, odr = self._generate_road_and_scenario(self.all_permutations[it])
         self._reset_name_counter()
         return osc, odr
 
+    def generate(
+        self,
+        generation_folder,
+        override_parameters=None,
+        write_relative_road_path=True,
+        name_separator=None,
+    ):
+        &#34;&#34;&#34;generate uses the xosc.Scenario defined in the method scenario and the xodr.OpenDrive (optional) in the road method
+        together with the parameters attribute to generate scenarios and roads for all permutations defined and save those files
+        in the generation_folder.
 
-    def generate(self,generation_folder,override_parameters = None, write_relative_road_path = True, name_separator = None):
-        &#34;&#34;&#34; generate uses the xosc.Scenario defined in the method scenario and the xodr.OpenDrive (optional) in the road method
-            together with the parameters attribute to generate scenarios and roads for all permutations defined and save those files
-            in the generation_folder.
-        
-            Parameters
-            ----------
-                generation_folder (str): the path to a folder where the files should be generated
-                
-                override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute (optional)
+        Parameters
+        ----------
+            generation_folder (str): the path to a folder where the files should be generated
 
-                write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true), or the absolute path to the xodr (false)
-                    Default: True
-                
-                name_separator (str): for generation with multiple parameters, this will change the separator between the variables
-                    Default: &#39;_&#39;
+            override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute (optional)
+
+            write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true), or the absolute path to the xodr (false)
+                Default: True
+
+            name_separator (str): for generation with multiple parameters, this will change the separator between the variables
+                Default: &#39;_&#39;
         &#34;&#34;&#34;
         if name_separator:
             self._name_separator = name_separator
@@ -274,21 +319,21 @@ class ScenarioGenerator():
         if override_parameters:
             self.parameters = override_parameters
         self._handle_input_parameters()
-    
+
         for p in self.all_permutations:
-            
-            scenario_file,road_file = self._generate_road_and_scenario(p)
+
+            scenario_file, road_file = self._generate_road_and_scenario(p)
             scenario_files.append(scenario_file)
             road_files.append(road_file)
         self._reset_name_counter()
         return scenario_files, road_files
 
     def _create_permutations(self):
-        &#34;&#34;&#34; generates all permutations of the defined parameters.
+        &#34;&#34;&#34;generates all permutations of the defined parameters.
 
-            Returns
-            -------
-                scenario_files (list of str): all scenenario files generated
+        Returns
+        -------
+            scenario_files (list of str): all scenenario files generated
         &#34;&#34;&#34;
         parameterlist = []
         for key in self.parameters:
@@ -334,69 +379,71 @@ generate_all_roads (bool): will only generate unique roads
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class ScenarioGenerator():
-    &#34;&#34;&#34; ScenarioTemplate is a class that should be inherited by a Scenario class in order to generate xodr and xosc files based on pyoscx and pyodrx
+<pre><code class="python">class ScenarioGenerator:
+    &#34;&#34;&#34;ScenarioTemplate is a class that should be inherited by a Scenario class in order to generate xodr and xosc files based on pyoscx and pyodrx
 
-        Two main uses, in your generation class define self.parameters as either as
-         - a dict of lists, where the lists are the values you want to sweep over, all permutations of these sets will be generated
-         - a list of dicts, where the dicts are identical and each element in the list is one scenario
+    Two main uses, in your generation class define self.parameters as either as
+     - a dict of lists, where the lists are the values you want to sweep over, all permutations of these sets will be generated
+     - a list of dicts, where the dicts are identical and each element in the list is one scenario
 
-        Attributes
-        ----------
-            road_file (str): name of the roadfile,
+    Attributes
+    ----------
+        road_file (str): name of the roadfile,
 
-            parameters (dict of lists, or list of dicts): parameter sets to be used
+        parameters (dict of lists, or list of dicts): parameter sets to be used
 
-            naming (str): two options &#34;numerical&#34; or &#34;parameter&#34;
+        naming (str): two options &#34;numerical&#34; or &#34;parameter&#34;
 
-            generate_all_roads (bool): will only generate unique roads 
+        generate_all_roads (bool): will only generate unique roads
     &#34;&#34;&#34;
+
     def __init__(self):
-        self.road_file = &#39;&#39;
+        self.road_file = &#34;&#34;
         self.parameters = {}
-        self.naming = &#39;numerical&#39; # can be &#39;numerical&#39;, &#39;parameter&#39;
+        self.naming = &#34;numerical&#34;  # can be &#39;numerical&#39;, &#39;parameter&#39;
         self._it = 0
-        self._generation_folder = &#39;&#39;
-        
+        self._generation_folder = &#34;&#34;
+
         self.generate_all_roads = True
         self._created_roads = {}
-        self._name_separator = &#39;_&#39;
-    def road(self,**kwargs):
-        &#34;&#34;&#34; Dummy method for generating an OpenDRIVE road
+        self._name_separator = &#34;_&#34;
 
-            Should be overwritten by the user, and return a pyodrx.OpenDrive object
+    def road(self, **kwargs):
+        &#34;&#34;&#34;Dummy method for generating an OpenDRIVE road
 
-            Return
-            ------
-                sce (pyodrx.OpenDrive): a road on pyodrx format
+        Should be overwritten by the user, and return a pyodrx.OpenDrive object
+
+        Return
+        ------
+            sce (pyodrx.OpenDrive): a road on pyodrx format
         &#34;&#34;&#34;
         return []
 
-    def scenario(self,**kwargs):
-        &#34;&#34;&#34; Dummy method for generating a OpenScenario file
-            
-            Should be overwritten by the user, and return a pyoscx.Scenario object
+    def scenario(self, **kwargs):
+        &#34;&#34;&#34;Dummy method for generating a OpenScenario file
 
-            Return
-            ------
-                sce (pyoscx.Scenario): a scenario on pyoscx format
+        Should be overwritten by the user, and return a pyoscx.Scenario object
+
+        Return
+        ------
+            sce (pyoscx.Scenario): a scenario on pyoscx format
         &#34;&#34;&#34;
         return []
+
     def _reset_name_counter(self):
-        &#34;&#34;&#34; method to reset the counter if numerical naming is used. 
-
-        &#34;&#34;&#34;
+        &#34;&#34;&#34;method to reset the counter if numerical naming is used.&#34;&#34;&#34;
         self._it = 0
-    def _create_folder_structure(self,generation_folder):
-        &#34;&#34;&#34; method to create a folder structure (if needed) to generate the scenarios and roads in
 
-            Parameters
-            ----------
-                generation_folder (str): the path to a folder where the files should be generated
+    def _create_folder_structure(self, generation_folder):
+        &#34;&#34;&#34;method to create a folder structure (if needed) to generate the scenarios and roads in
+
+        Parameters
+        ----------
+            generation_folder (str): the path to a folder where the files should be generated
 
         &#34;&#34;&#34;
-        xosc_folder = os.path.join(generation_folder,&#39;xosc&#39;)
-        xodr_folder = os.path.join(generation_folder,&#39;xodr&#39;)
+        xosc_folder = os.path.join(generation_folder, &#34;xosc&#34;)
+        xodr_folder = os.path.join(generation_folder, &#34;xodr&#34;)
 
         if not os.path.exists(generation_folder):
             os.mkdir(generation_folder)
@@ -407,12 +454,12 @@ generate_all_roads (bool): will only generate unique roads
 
         self._generation_folder = generation_folder
 
-    def print_permutations(self,override_parameters = None):
+    def print_permutations(self, override_parameters=None):
         &#34;&#34;&#34;print_permutations will create a printout to view all permutations created
 
-            Parameters
-            ----------               
-                override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute
+        Parameters
+        ----------
+            override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute
 
         &#34;&#34;&#34;
         if override_parameters:
@@ -420,38 +467,36 @@ generate_all_roads (bool): will only generate unique roads
         self._handle_input_parameters()
         it = 0
         for p in self.all_permutations:
-            print(&#39;Permutation: &#39; + str(it))
-            printstr = &#39;&#39;
+            print(&#34;Permutation: &#34; + str(it))
+            printstr = &#34;&#34;
             for key, value in p.items():
-                printstr += key + &#39;: &#39; + str(value) + &#39;, &#39;
+                printstr += key + &#34;: &#34; + str(value) + &#34;, &#34;
             print(printstr)
             it += 1
 
     def _handle_input_parameters(self):
-        &#34;&#34;&#34; _handle_input_parameters takes care of different types of parameters inputs, such as list of dicts or a dict of lists
+        &#34;&#34;&#34;_handle_input_parameters takes care of different types of parameters inputs, such as list of dicts or a dict of lists&#34;&#34;&#34;
 
-        &#34;&#34;&#34;
-
-        if isinstance(self.parameters,dict):
+        if isinstance(self.parameters, dict):
             self._create_permutations()
 
-        elif isinstance(self.parameters,list):
+        elif isinstance(self.parameters, list):
             self.all_permutations = self.parameters
-    
-    def _generate_road_and_scenario(self,permutation):
-        &#34;&#34;&#34; _generate_road_and_scenario takes a permutation and generates the road/scenario (if specified)
 
-            Parameters
-            ----------
-                permutation (dict): the parameter dict of the wanted scenario
+    def _generate_road_and_scenario(self, permutation):
+        &#34;&#34;&#34;_generate_road_and_scenario takes a permutation and generates the road/scenario (if specified)
 
-            Returns
-            -------
-                open_scenario_file (str), open_drive_file (str)
+        Parameters
+        ----------
+            permutation (dict): the parameter dict of the wanted scenario
+
+        Returns
+        -------
+            open_scenario_file (str), open_drive_file (str)
         &#34;&#34;&#34;
         scenario_name = self._get_scenario_name(permutation)
-        self.road_file = &#39;&#39;
-        scenario_file = &#39;&#39;
+        self.road_file = &#34;&#34;
+        scenario_file = &#34;&#34;
 
         road = self.road(**permutation)
         if road:
@@ -461,69 +506,95 @@ generate_all_roads (bool): will only generate unique roads
                     if self._created_roads[previous_road] == road:
                         self.road_file = previous_road
                         new_unique_road = False
-            
-                
+
             if new_unique_road:
-                self.road_file = os.path.abspath(os.path.join(self._generation_folder,&#39;xodr&#39;,scenario_name+&#39;.xodr&#39;))
+                self.road_file = os.path.abspath(
+                    os.path.join(
+                        self._generation_folder, &#34;xodr&#34;, scenario_name + &#34;.xodr&#34;
+                    )
+                )
                 road.write_xml(self.road_file)
                 if self.write_relative_road_path:
-                    self.road_file = self.road_file.replace(os.path.abspath(self._generation_folder),os.path.pardir)
+                    self.road_file = self.road_file.replace(
+                        os.path.abspath(self._generation_folder), os.path.pardir
+                    )
 
                 self._created_roads[self.road_file] = road
 
         sce = self.scenario(**permutation)
         if sce:
-            scenario_file = os.path.join(self._generation_folder,&#39;xosc&#39;,scenario_name+&#39;.xosc&#39;)
+            scenario_file = os.path.join(
+                self._generation_folder, &#34;xosc&#34;, scenario_name + &#34;.xosc&#34;
+            )
             sce.write_xml(scenario_file)
         return scenario_file, self.road_file
 
-    def _get_scenario_name(self,permutation):
-        &#34;&#34;&#34; _get_scenario_name generates the name of the wanted file, based on the permutation
+    def _get_scenario_name(self, permutation):
+        &#34;&#34;&#34;_get_scenario_name generates the name of the wanted file, based on the permutation
 
-            Parameters
-            ----------
-                permutation (dict): a permutation to create name from (used for the parameter naming option)
+        Parameters
+        ----------
+            permutation (dict): a permutation to create name from (used for the parameter naming option)
 
-            Returns
-            -------
-                scenario_name (str)
+        Returns
+        -------
+            scenario_name (str)
         &#34;&#34;&#34;
-        name_prefix = &#39;&#39;
+        name_prefix = &#34;&#34;
 
-        if self.naming == &#39;numerical&#39;:
+        if self.naming == &#34;numerical&#34;:
             name_prefix = str(self._it)
             self._it += 1
-        elif self.naming == &#39;parameter&#39;:
-            for  key, value in permutation.items():
-                name_prefix += self._name_separator + key.replace(&#39;\\&#39;,&#39;-&#39;).replace(&#39;/&#39;,&#39;-&#39;) + &#39;-&#39; + str(value).replace(&#39;\\&#39;,&#39;-&#39;).replace(&#39;/&#39;,&#39;-&#39;)
+        elif self.naming == &#34;parameter&#34;:
+            for key, value in permutation.items():
+                name_prefix += (
+                    self._name_separator
+                    + key.replace(&#34;\\&#34;, &#34;-&#34;).replace(&#34;/&#34;, &#34;-&#34;)
+                    + &#34;-&#34;
+                    + str(value).replace(&#34;\\&#34;, &#34;-&#34;).replace(&#34;/&#34;, &#34;-&#34;)
+                )
         else:
-            raise NameError(&#39;Attribute naming, can only be &#34;numerical&#34; or &#34;parameter&#34;, not &#39; + self.naming)
+            raise NameError(
+                &#39;Attribute naming, can only be &#34;numerical&#34; or &#34;parameter&#34;, not &#39;
+                + self.naming
+            )
 
-        return os.path.basename(sys.modules[self.__class__.__module__].__file__).split(&#39;.&#39;)[0]+name_prefix
+        return (
+            os.path.basename(sys.modules[self.__class__.__module__].__file__).split(
+                &#34;.&#34;
+            )[0]
+            + name_prefix
+        )
 
+    def generate_single(
+        self,
+        generation_folder,
+        order=&#34;first&#34;,
+        override_parameters=None,
+        write_relative_road_path=True,
+        name_separator=None,
+    ):
+        &#34;&#34;&#34;generate_single will generate only one scenario
 
-    def generate_single(self,generation_folder, order = &#39;first&#39;,override_parameters = None, write_relative_road_path = True, name_separator=None):
-        &#34;&#34;&#34; generate_single will generate only one scenario
+        Parameters
+        ----------
+            generation_folder (str): the path to a folder where the files should be generated
 
-            Parameters
-            ----------
-                generation_folder (str): the path to a folder where the files should be generated
+            order (str, or int): if multiple permutations are defined, this enables the picking of different permutations
+                                 int - the number of that permutation
+                                 str - first: first permutation
+                                       middle: the permutation in the middle
+                                       random: a random permutation
+                Default: &#39;first&#39;
 
-                order (str, or int): if multiple permutations are defined, this enables the picking of different permutations
-                                     int - the number of that permutation
-                                     str - first: first permutation
-                                           middle: the permutation in the middle
-                                           random: a random permutation
-                    Default: &#39;first&#39;
+            override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute (optional)
 
-                override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute (optional)
+            write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true),
+                                             or the absolute path to the xodr (false)
+                Default: True
 
-                write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true), 
-                                                 or the absolute path to the xodr (false)
-                    Default: True
-
-                name_separator (str): for generation with multiple parameters, this will change the separator between the variables
-                    Default: &#39;_&#39;
+            name_separator (str): for generation with multiple parameters, this will change the separator between the variables
+                Default: &#39;_&#39;
         &#34;&#34;&#34;
         if name_separator:
             self._name_separator = name_separator
@@ -533,36 +604,41 @@ generate_all_roads (bool): will only generate unique roads
             self.parameters = override_parameters
         self._handle_input_parameters()
 
-        if isinstance(order,str):
-            if order == &#39;first&#39;:
+        if isinstance(order, str):
+            if order == &#34;first&#34;:
                 it = 0
-            elif order == &#39;middle&#39;:
-                it = int(np.floor(len(self.all_permutations)/2))
-            elif order == &#39;random&#39;:
-                it = int(np.floor(np.random.rand()*len(self.all_permutations)))
+            elif order == &#34;middle&#34;:
+                it = int(np.floor(len(self.all_permutations) / 2))
+            elif order == &#34;random&#34;:
+                it = int(np.floor(np.random.rand() * len(self.all_permutations)))
         else:
             it = order
         osc, odr = self._generate_road_and_scenario(self.all_permutations[it])
         self._reset_name_counter()
         return osc, odr
 
+    def generate(
+        self,
+        generation_folder,
+        override_parameters=None,
+        write_relative_road_path=True,
+        name_separator=None,
+    ):
+        &#34;&#34;&#34;generate uses the xosc.Scenario defined in the method scenario and the xodr.OpenDrive (optional) in the road method
+        together with the parameters attribute to generate scenarios and roads for all permutations defined and save those files
+        in the generation_folder.
 
-    def generate(self,generation_folder,override_parameters = None, write_relative_road_path = True, name_separator = None):
-        &#34;&#34;&#34; generate uses the xosc.Scenario defined in the method scenario and the xodr.OpenDrive (optional) in the road method
-            together with the parameters attribute to generate scenarios and roads for all permutations defined and save those files
-            in the generation_folder.
-        
-            Parameters
-            ----------
-                generation_folder (str): the path to a folder where the files should be generated
-                
-                override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute (optional)
+        Parameters
+        ----------
+            generation_folder (str): the path to a folder where the files should be generated
 
-                write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true), or the absolute path to the xodr (false)
-                    Default: True
-                
-                name_separator (str): for generation with multiple parameters, this will change the separator between the variables
-                    Default: &#39;_&#39;
+            override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute (optional)
+
+            write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true), or the absolute path to the xodr (false)
+                Default: True
+
+            name_separator (str): for generation with multiple parameters, this will change the separator between the variables
+                Default: &#39;_&#39;
         &#34;&#34;&#34;
         if name_separator:
             self._name_separator = name_separator
@@ -574,21 +650,21 @@ generate_all_roads (bool): will only generate unique roads
         if override_parameters:
             self.parameters = override_parameters
         self._handle_input_parameters()
-    
+
         for p in self.all_permutations:
-            
-            scenario_file,road_file = self._generate_road_and_scenario(p)
+
+            scenario_file, road_file = self._generate_road_and_scenario(p)
             scenario_files.append(scenario_file)
             road_files.append(road_file)
         self._reset_name_counter()
         return scenario_files, road_files
 
     def _create_permutations(self):
-        &#34;&#34;&#34; generates all permutations of the defined parameters.
+        &#34;&#34;&#34;generates all permutations of the defined parameters.
 
-            Returns
-            -------
-                scenario_files (list of str): all scenenario files generated
+        Returns
+        -------
+            scenario_files (list of str): all scenenario files generated
         &#34;&#34;&#34;
         parameterlist = []
         for key in self.parameters:
@@ -636,22 +712,28 @@ name_separator (str): for generation with multiple parameters, this will change 
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def generate(self,generation_folder,override_parameters = None, write_relative_road_path = True, name_separator = None):
-    &#34;&#34;&#34; generate uses the xosc.Scenario defined in the method scenario and the xodr.OpenDrive (optional) in the road method
-        together with the parameters attribute to generate scenarios and roads for all permutations defined and save those files
-        in the generation_folder.
-    
-        Parameters
-        ----------
-            generation_folder (str): the path to a folder where the files should be generated
-            
-            override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute (optional)
+<pre><code class="python">def generate(
+    self,
+    generation_folder,
+    override_parameters=None,
+    write_relative_road_path=True,
+    name_separator=None,
+):
+    &#34;&#34;&#34;generate uses the xosc.Scenario defined in the method scenario and the xodr.OpenDrive (optional) in the road method
+    together with the parameters attribute to generate scenarios and roads for all permutations defined and save those files
+    in the generation_folder.
 
-            write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true), or the absolute path to the xodr (false)
-                Default: True
-            
-            name_separator (str): for generation with multiple parameters, this will change the separator between the variables
-                Default: &#39;_&#39;
+    Parameters
+    ----------
+        generation_folder (str): the path to a folder where the files should be generated
+
+        override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute (optional)
+
+        write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true), or the absolute path to the xodr (false)
+            Default: True
+
+        name_separator (str): for generation with multiple parameters, this will change the separator between the variables
+            Default: &#39;_&#39;
     &#34;&#34;&#34;
     if name_separator:
         self._name_separator = name_separator
@@ -665,8 +747,8 @@ name_separator (str): for generation with multiple parameters, this will change 
     self._handle_input_parameters()
 
     for p in self.all_permutations:
-        
-        scenario_file,road_file = self._generate_road_and_scenario(p)
+
+        scenario_file, road_file = self._generate_road_and_scenario(p)
         scenario_files.append(scenario_file)
         road_files.append(road_file)
     self._reset_name_counter()
@@ -690,7 +772,7 @@ order (str, or int): if multiple permutations are defined, this enables the pick
 
 override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute (optional)
 
-write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true), 
+write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true),
                                  or the absolute path to the xodr (false)
     Default: True
 
@@ -701,28 +783,35 @@ name_separator (str): for generation with multiple parameters, this will change 
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def generate_single(self,generation_folder, order = &#39;first&#39;,override_parameters = None, write_relative_road_path = True, name_separator=None):
-    &#34;&#34;&#34; generate_single will generate only one scenario
+<pre><code class="python">def generate_single(
+    self,
+    generation_folder,
+    order=&#34;first&#34;,
+    override_parameters=None,
+    write_relative_road_path=True,
+    name_separator=None,
+):
+    &#34;&#34;&#34;generate_single will generate only one scenario
 
-        Parameters
-        ----------
-            generation_folder (str): the path to a folder where the files should be generated
+    Parameters
+    ----------
+        generation_folder (str): the path to a folder where the files should be generated
 
-            order (str, or int): if multiple permutations are defined, this enables the picking of different permutations
-                                 int - the number of that permutation
-                                 str - first: first permutation
-                                       middle: the permutation in the middle
-                                       random: a random permutation
-                Default: &#39;first&#39;
+        order (str, or int): if multiple permutations are defined, this enables the picking of different permutations
+                             int - the number of that permutation
+                             str - first: first permutation
+                                   middle: the permutation in the middle
+                                   random: a random permutation
+            Default: &#39;first&#39;
 
-            override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute (optional)
+        override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute (optional)
 
-            write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true), 
-                                             or the absolute path to the xodr (false)
-                Default: True
+        write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true),
+                                         or the absolute path to the xodr (false)
+            Default: True
 
-            name_separator (str): for generation with multiple parameters, this will change the separator between the variables
-                Default: &#39;_&#39;
+        name_separator (str): for generation with multiple parameters, this will change the separator between the variables
+            Default: &#39;_&#39;
     &#34;&#34;&#34;
     if name_separator:
         self._name_separator = name_separator
@@ -732,13 +821,13 @@ name_separator (str): for generation with multiple parameters, this will change 
         self.parameters = override_parameters
     self._handle_input_parameters()
 
-    if isinstance(order,str):
-        if order == &#39;first&#39;:
+    if isinstance(order, str):
+        if order == &#34;first&#34;:
             it = 0
-        elif order == &#39;middle&#39;:
-            it = int(np.floor(len(self.all_permutations)/2))
-        elif order == &#39;random&#39;:
-            it = int(np.floor(np.random.rand()*len(self.all_permutations)))
+        elif order == &#34;middle&#34;:
+            it = int(np.floor(len(self.all_permutations) / 2))
+        elif order == &#34;random&#34;:
+            it = int(np.floor(np.random.rand() * len(self.all_permutations)))
     else:
         it = order
     osc, odr = self._generate_road_and_scenario(self.all_permutations[it])
@@ -758,12 +847,12 @@ name_separator (str): for generation with multiple parameters, this will change 
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def print_permutations(self,override_parameters = None):
+<pre><code class="python">def print_permutations(self, override_parameters=None):
     &#34;&#34;&#34;print_permutations will create a printout to view all permutations created
 
-        Parameters
-        ----------               
-            override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute
+    Parameters
+    ----------
+        override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute
 
     &#34;&#34;&#34;
     if override_parameters:
@@ -771,10 +860,10 @@ name_separator (str): for generation with multiple parameters, this will change 
     self._handle_input_parameters()
     it = 0
     for p in self.all_permutations:
-        print(&#39;Permutation: &#39; + str(it))
-        printstr = &#39;&#39;
+        print(&#34;Permutation: &#34; + str(it))
+        printstr = &#34;&#34;
         for key, value in p.items():
-            printstr += key + &#39;: &#39; + str(value) + &#39;, &#39;
+            printstr += key + &#34;: &#34; + str(value) + &#34;, &#34;
         print(printstr)
         it += 1</code></pre>
 </details>
@@ -792,14 +881,14 @@ name_separator (str): for generation with multiple parameters, this will change 
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def road(self,**kwargs):
-    &#34;&#34;&#34; Dummy method for generating an OpenDRIVE road
+<pre><code class="python">def road(self, **kwargs):
+    &#34;&#34;&#34;Dummy method for generating an OpenDRIVE road
 
-        Should be overwritten by the user, and return a pyodrx.OpenDrive object
+    Should be overwritten by the user, and return a pyodrx.OpenDrive object
 
-        Return
-        ------
-            sce (pyodrx.OpenDrive): a road on pyodrx format
+    Return
+    ------
+        sce (pyodrx.OpenDrive): a road on pyodrx format
     &#34;&#34;&#34;
     return []</code></pre>
 </details>
@@ -817,14 +906,14 @@ name_separator (str): for generation with multiple parameters, this will change 
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def scenario(self,**kwargs):
-    &#34;&#34;&#34; Dummy method for generating a OpenScenario file
-        
-        Should be overwritten by the user, and return a pyoscx.Scenario object
+<pre><code class="python">def scenario(self, **kwargs):
+    &#34;&#34;&#34;Dummy method for generating a OpenScenario file
 
-        Return
-        ------
-            sce (pyoscx.Scenario): a scenario on pyoscx format
+    Should be overwritten by the user, and return a pyoscx.Scenario object
+
+    Return
+    ------
+        sce (pyoscx.Scenario): a scenario on pyoscx format
     &#34;&#34;&#34;
     return []</code></pre>
 </details>

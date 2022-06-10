@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.8.0" />
-<title>examples.xodr.road_with_custom_roadmarkers API documentation</title>
+<title>examples.xodr.road_link_unequal_number_of_lanes API documentation</title>
 <meta name="description" content="scenariogeneration
 https://github.com/pyoscx/scenariogeneration …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
@@ -18,7 +18,7 @@ https://github.com/pyoscx/scenariogeneration …" />
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>examples.xodr.road_with_custom_roadmarkers</code></h1>
+<h1 class="title">Module <code>examples.xodr.road_link_unequal_number_of_lanes</code></h1>
 </header>
 <section id="section-intro">
 <p>scenariogeneration
@@ -27,22 +27,10 @@ https://github.com/pyoscx/scenariogeneration …" />
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
 <p>Copyright (c) 2022 The scenariogeneration Authors.</p>
-<p>Example how to create roads with customized centerline for double road markers</p>
-<p>Some features used</p>
-<ul>
-<li>
-<p>PlanView</p>
-</li>
-<li>
-<p>LaneSection</p>
-</li>
-<li>
-<p>RoadMark</p>
-</li>
-<li>
-<p>RoadLine</p>
-</li>
-</ul>
+<p>Example for linking two roads with an unequal number of lanes.</p>
+<p>Note: This is possible and valid according to the OpenDRIVE standard. It is
+sometimes necessary to use this approach but it might often be prefered to begin
+a new lane section to change the number of lanes instead.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -57,84 +45,54 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
  
   Copyright (c) 2022 The scenariogeneration Authors.
   
-    Example how to create roads with customized centerline for double road markers
+    Example for linking two roads with an unequal number of lanes.
 
-    Some features used
-
-    - PlanView
-
-    - LaneSection
-
-    - RoadMark
-
-    - RoadLine
-
+    Note: This is possible and valid according to the OpenDRIVE standard. It is
+    sometimes necessary to use this approach but it might often be prefered to begin
+    a new lane section to change the number of lanes instead.
 &#34;&#34;&#34;
 
-
-import os
 from scenariogeneration import xodr
+import os
 
+# Create roads
+length_road = 100.0
+road_first = xodr.create_road([xodr.Line(length_road)], 1, 2, 3)
+road_second = xodr.create_road([xodr.Line(length_road)], 2, 2, 4)
+# Make a new lane open up/branch out
+new_lane_width = 3.0
+road_second.lanes.lanesections[0].rightlanes[2].a = 0.0
+road_second.lanes.lanesections[0].rightlanes[2].b = 0.0
+road_second.lanes.lanesections[0].rightlanes[2].c = (
+    3.0 / length_road**2 * new_lane_width
+)
+road_second.lanes.lanesections[0].rightlanes[2].d = (
+    -2.0 / length_road**3 * new_lane_width
+)
 
-# create a simple planview
-planview = xodr.PlanView()
-planview.add_geometry(xodr.Line(300))
+## Create the OpenDrive class (Master class)
+odr = xodr.OpenDrive(&#34;myroads&#34;)
 
-## create the customized centerlanes with different lanemarkings
-centerlanes = []
-# standard solid solid
+## Finally add roads to Opendrive
+odr.add_road(road_first)
+odr.add_road(road_second)
 
-solid_solid = xodr.Lane()
-solid_solid.add_roadmark(xodr.STD_ROADMARK_SOLID_SOLID)
-centerlanes.append(solid_solid)
+# Link roads
+road_first.add_successor(xodr.ElementType.road, 2, xodr.ContactPoint.start)
+road_second.add_predecessor(xodr.ElementType.road, 1, xodr.ContactPoint.end)
 
-# standard solid broken
-solid_broken = xodr.Lane()
-solid_broken.add_roadmark(xodr.STD_ROADMARK_SOLID_BROKEN)
-centerlanes.append(solid_broken)
+# Link lanes but do not link the newly beginning lane
+link_lane_ids_first = [2, 1, -1, -2, -3]
+link_lane_ids_second = [2, 1, -1, -2, -4]
+xodr.create_lane_links_from_ids(
+    road_first, road_second, link_lane_ids_first, link_lane_ids_second
+)
 
-# customized broken broken
-broken_broken_roadmark = xodr.RoadMark(xodr.RoadMarkType.broken_broken)
-broken_broken_roadmark.add_specific_road_line(xodr.RoadLine(0.2, 9, 3, 0.2))
-broken_broken_roadmark.add_specific_road_line(xodr.RoadLine(0.2, 3, 9, -0.2, 3))
-broken_broken = xodr.Lane()
-broken_broken.add_roadmark(broken_broken_roadmark)
-centerlanes.append(broken_broken)
-
-
-# create the different lanesections and add them to the lanes
-lanes = xodr.Lanes()
-ls_start = 0
-for i in centerlanes:
-    lanesection = xodr.LaneSection(ls_start, i)
-    left_lane_with_roadmark = xodr.Lane(a=4)
-    left_lane_with_roadmark.add_roadmark(xodr.STD_ROADMARK_BROKEN)
-
-    right_lane_with_roadmark = xodr.Lane(a=4)
-    right_lane_with_roadmark.add_roadmark(xodr.STD_ROADMARK_SOLID)
-    lanesection.add_left_lane(left_lane_with_roadmark)
-    lanesection.add_right_lane(right_lane_with_roadmark)
-    ls_start += 100
-
-    lanes.add_lanesection(lanesection)
-
-
-# create the road
-road = xodr.Road(0, planview, lanes)
-
-# create the opendrive and add the road
-odr = xodr.OpenDrive(&#34;road with custom lanes&#34;)
-odr.add_road(road)
-
-# adjust the road
-odr.adjust_roads_and_lanes()
+# Adjust initial positions of the roads looking at succ-pred logic
+odr.adjust_startpoints()
 
 # write the OpenDRIVE file as xodr using current script name
-odr.write_xml(os.path.basename(__file__).replace(&#34;.py&#34;, &#34;.xodr&#34;))
-
-# uncomment the following lines to display the road using esmini
-# from scenariogeneration import esmini
-# esmini(odr,os.path.join(&#39;esmini&#39;))</code></pre>
+odr.write_xml(os.path.basename(__file__).replace(&#34;.py&#34;, &#34;.xodr&#34;))</code></pre>
 </details>
 </section>
 <section>

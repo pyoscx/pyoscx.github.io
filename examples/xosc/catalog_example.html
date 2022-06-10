@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.8.0" />
 <title>examples.xosc.catalog_example API documentation</title>
-<meta name="description" content="Example of how to create a vehicle catalog
-The properties are added in order to work with esmini 1.5-1.7 …" />
+<meta name="description" content="scenariogeneration
+https://github.com/pyoscx/scenariogeneration …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -21,6 +21,12 @@ The properties are added in order to work with esmini 1.5-1.7 …" />
 <h1 class="title">Module <code>examples.xosc.catalog_example</code></h1>
 </header>
 <section id="section-intro">
+<p>scenariogeneration
+<a href="https://github.com/pyoscx/scenariogeneration">https://github.com/pyoscx/scenariogeneration</a></p>
+<p>This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
+<p>Copyright (c) 2022 The scenariogeneration Authors.</p>
 <p>Example of how to create a vehicle catalog
 The properties are added in order to work with esmini 1.5-1.7</p>
 <p>Some features used:</p>
@@ -39,11 +45,20 @@ The properties are added in order to work with esmini 1.5-1.7</p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34; 
+<pre><code class="python">&#34;&#34;&#34;
+  scenariogeneration
+  https://github.com/pyoscx/scenariogeneration
+ 
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ 
+  Copyright (c) 2022 The scenariogeneration Authors.
+  
     Example of how to create a vehicle catalog
     The properties are added in order to work with esmini 1.5-1.7
 
-    
+
     Some features used:
 
     - Vehicle
@@ -57,32 +72,33 @@ import os
 from scenariogeneration import xosc, prettyprint
 
 
-
 # create a vehicle
-bb = xosc.BoundingBox(2,5,1.8,2.0,0,0.9)
-fa = xosc.Axle(0.523598775598,0.8,1.68,2.98,0.4)
-ba = xosc.Axle(0.523598775598,0.8,1.68,0,0.4)
-white_veh = xosc.Vehicle(&#39;car_pink&#39;,xosc.VehicleCategory.car,bb,fa,ba,69,10,10)
+bb = xosc.BoundingBox(2, 5, 1.8, 2.0, 0, 0.9)
+fa = xosc.Axle(0.523598775598, 0.8, 1.68, 2.98, 0.4)
+ba = xosc.Axle(0.523598775598, 0.8, 1.68, 0, 0.4)
+white_veh = xosc.Vehicle(&#34;car_pink&#34;, xosc.VehicleCategory.car, bb, fa, ba, 69, 10, 10)
 
-white_veh.add_property_file(&#39;../models/car_white.osgb&#39;)
-white_veh.add_property(&#39;control&#39;,&#39;internal&#39;)
-white_veh.add_property(&#39;model_id&#39;,&#39;0&#39;)
+white_veh.add_property_file(&#34;../models/car_white.osgb&#34;)
+white_veh.add_property(&#34;control&#34;, &#34;internal&#34;)
+white_veh.add_property(&#34;model_id&#34;, &#34;0&#34;)
 
 # dump it and create a new catalog file
-white_veh.dump_to_catalog(&#39;my_vehicles.xosc&#39;,&#39;VehicleCatalog&#39;,&#39;My vehicle catalog&#39;,&#39;Mandolin&#39;)
+white_veh.dump_to_catalog(
+    &#34;my_vehicles.xosc&#34;, &#34;VehicleCatalog&#34;, &#34;My vehicle catalog&#34;, &#34;Mandolin&#34;
+)
 
 # create a new vehicle
-bb = xosc.BoundingBox(2,5.1,1.9,2.0,0,0.9)
-fa = xosc.Axle(0.523598775598,0.8,1.68,2.98,0.4)
-ba = xosc.Axle(0.523598775598,0.8,1.68,0,0.4)
-red_veh = xosc.Vehicle(&#39;car_pink&#39;,xosc.VehicleCategory.car,bb,fa,ba,69,10,10)
+bb = xosc.BoundingBox(2, 5.1, 1.9, 2.0, 0, 0.9)
+fa = xosc.Axle(0.523598775598, 0.8, 1.68, 2.98, 0.4)
+ba = xosc.Axle(0.523598775598, 0.8, 1.68, 0, 0.4)
+red_veh = xosc.Vehicle(&#34;car_pink&#34;, xosc.VehicleCategory.car, bb, fa, ba, 69, 10, 10)
 
-red_veh.add_property_file(&#39;../models/car_red.osgb&#39;)
-red_veh.add_property(&#39;control&#39;,&#39;internal&#39;)
-red_veh.add_property(&#39;model_id&#39;,&#39;0&#39;)
+red_veh.add_property_file(&#34;../models/car_red.osgb&#34;)
+red_veh.add_property(&#34;control&#34;, &#34;internal&#34;)
+red_veh.add_property(&#34;model_id&#34;, &#34;0&#34;)
 
 # add it to the newly created catalog
-red_veh.append_to_catalog(&#39;my_vehicles.xosc&#39;)</code></pre>
+red_veh.append_to_catalog(&#34;my_vehicles.xosc&#34;)</code></pre>
 </details>
 </section>
 <section>

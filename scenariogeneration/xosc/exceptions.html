@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.8.0" />
 <title>scenariogeneration.xosc.exceptions API documentation</title>
-<meta name="description" content="Some custom exceptions" />
+<meta name="description" content="scenariogeneration
+https://github.com/pyoscx/scenariogeneration …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -20,45 +21,62 @@
 <h1 class="title">Module <code>scenariogeneration.xosc.exceptions</code></h1>
 </header>
 <section id="section-intro">
-<p>Some custom exceptions</p>
+<p>scenariogeneration
+<a href="https://github.com/pyoscx/scenariogeneration">https://github.com/pyoscx/scenariogeneration</a></p>
+<p>This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
+<p>Copyright (c) 2022 The scenariogeneration Authors.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34; Some custom exceptions
+<pre><code class="python">&#34;&#34;&#34;
+  scenariogeneration
+  https://github.com/pyoscx/scenariogeneration
+ 
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ 
+  Copyright (c) 2022 The scenariogeneration Authors.
 
 &#34;&#34;&#34;
 
 
 class NoActionsDefinedError(Exception):
-    &#34;&#34;&#34; Raised when no actions are defined in a class
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raised when no actions are defined in a class&#34;&#34;&#34;
+
     pass
+
 
 class NoCatalogFoundError(Exception):
-    &#34;&#34;&#34; Raised when no catalog is found with the given name
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raised when no catalog is found with the given name&#34;&#34;&#34;
+
     pass
+
 
 class OpenSCENARIOVersionError(Exception):
-    &#34;&#34;&#34; Raised when trying to use features from a newer version of OpenSCENARIO than the desiered version
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raised when trying to use features from a newer version of OpenSCENARIO than the desiered version&#34;&#34;&#34;
+
     pass
 
+
 class ToManyOptionalArguments(Exception):
-    &#34;&#34;&#34; Raised when one of the needed &#34;optional&#34; inputs are not used
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raised when one of the needed &#34;optional&#34; inputs are not used&#34;&#34;&#34;
+
     pass
 
 
 class NotEnoughInputArguments(Exception):
-    &#34;&#34;&#34; Raised when one of the needed &#34;optional&#34; inputs are not used
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raised when one of the needed &#34;optional&#34; inputs are not used&#34;&#34;&#34;
+
     pass
 
+
 class NotAValidElement(Exception):
-    &#34;&#34;&#34; Raised when one of the needed &#34;optional&#34; inputs are not used
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raised when one of the needed &#34;optional&#34; inputs are not used&#34;&#34;&#34;
+
     pass</code></pre>
 </details>
 </section>
@@ -82,8 +100,8 @@ class NotAValidElement(Exception):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class NoActionsDefinedError(Exception):
-    &#34;&#34;&#34; Raised when no actions are defined in a class
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raised when no actions are defined in a class&#34;&#34;&#34;
+
     pass</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -103,8 +121,8 @@ class NotAValidElement(Exception):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class NoCatalogFoundError(Exception):
-    &#34;&#34;&#34; Raised when no catalog is found with the given name
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raised when no catalog is found with the given name&#34;&#34;&#34;
+
     pass</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -124,8 +142,8 @@ class NotAValidElement(Exception):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class NotAValidElement(Exception):
-    &#34;&#34;&#34; Raised when one of the needed &#34;optional&#34; inputs are not used
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raised when one of the needed &#34;optional&#34; inputs are not used&#34;&#34;&#34;
+
     pass</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -145,8 +163,8 @@ class NotAValidElement(Exception):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class NotEnoughInputArguments(Exception):
-    &#34;&#34;&#34; Raised when one of the needed &#34;optional&#34; inputs are not used
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raised when one of the needed &#34;optional&#34; inputs are not used&#34;&#34;&#34;
+
     pass</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -166,8 +184,8 @@ class NotAValidElement(Exception):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class OpenSCENARIOVersionError(Exception):
-    &#34;&#34;&#34; Raised when trying to use features from a newer version of OpenSCENARIO than the desiered version
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raised when trying to use features from a newer version of OpenSCENARIO than the desiered version&#34;&#34;&#34;
+
     pass</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -187,8 +205,8 @@ class NotAValidElement(Exception):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ToManyOptionalArguments(Exception):
-    &#34;&#34;&#34; Raised when one of the needed &#34;optional&#34; inputs are not used
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Raised when one of the needed &#34;optional&#34; inputs are not used&#34;&#34;&#34;
+
     pass</code></pre>
 </details>
 <h3>Ancestors</h3>

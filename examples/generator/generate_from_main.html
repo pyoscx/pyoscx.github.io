@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.8.0" />
 <title>examples.generator.generate_from_main API documentation</title>
-<meta name="description" content="example of creating OpenSCENARIO and OpenDRIVE file, with the parameters defined outside the class structure …" />
+<meta name="description" content="scenariogeneration
+https://github.com/pyoscx/scenariogeneration …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -20,6 +21,12 @@
 <h1 class="title">Module <code>examples.generator.generate_from_main</code></h1>
 </header>
 <section id="section-intro">
+<p>scenariogeneration
+<a href="https://github.com/pyoscx/scenariogeneration">https://github.com/pyoscx/scenariogeneration</a></p>
+<p>This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
+<p>Copyright (c) 2022 The scenariogeneration Authors.</p>
 <p>example of creating OpenSCENARIO and OpenDRIVE file, with the parameters defined outside the class structure</p>
 <p>Example usage: when a itterative procedure is defined and the parameters to the Scenario will change</p>
 <p>Will generate 9 scenarios</p>
@@ -27,7 +34,17 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34; example of creating OpenSCENARIO and OpenDRIVE file, with the parameters defined outside the class structure
+<pre><code class="python">&#34;&#34;&#34;
+  scenariogeneration
+  https://github.com/pyoscx/scenariogeneration
+ 
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ 
+  Copyright (c) 2022 The scenariogeneration Authors.
+
+    example of creating OpenSCENARIO and OpenDRIVE file, with the parameters defined outside the class structure
 
     Example usage: when a itterative procedure is defined and the parameters to the Scenario will change
 
@@ -38,56 +55,112 @@ from scenariogeneration import xodr
 from scenariogeneration import xosc, prettyprint
 from scenariogeneration import ScenarioGenerator
 
+
 class Scenario(ScenarioGenerator):
     def __init__(self):
         ScenarioGenerator.__init__(self)
-        self.naming = &#39;numerical&#39;
+        self.naming = &#34;numerical&#34;
 
-    def road(self,**kwargs):
+    def road(self, **kwargs):
 
-        road = xodr.create_road([xodr.Spiral(0.0000000001,kwargs[&#39;road_curvature&#39;],100), xodr.Arc(kwargs[&#39;road_curvature&#39;],50), xodr.Spiral(kwargs[&#39;road_curvature&#39;],0.0000000001,100), xodr.Line(100)],id =0,left_lanes=2,right_lanes=2)
-        odr = xodr.OpenDrive(&#39;myroad&#39;)
+        road = xodr.create_road(
+            [
+                xodr.Spiral(0.0000000001, kwargs[&#34;road_curvature&#34;], 100),
+                xodr.Arc(kwargs[&#34;road_curvature&#34;], 50),
+                xodr.Spiral(kwargs[&#34;road_curvature&#34;], 0.0000000001, 100),
+                xodr.Line(100),
+            ],
+            id=0,
+            left_lanes=2,
+            right_lanes=2,
+        )
+        odr = xodr.OpenDrive(&#34;myroad&#34;)
         odr.add_road(road)
         odr.adjust_roads_and_lanes()
         return odr
 
-    def scenario(self,**kwargs):
+    def scenario(self, **kwargs):
         road = xosc.RoadNetwork(self.road_file)
-        egoname = &#39;Ego&#39;
+        egoname = &#34;Ego&#34;
         entities = xosc.Entities()
-        entities.add_scenario_object(egoname,xosc.CatalogReference(&#39;VehicleCatalog&#39;,&#39;car_white&#39;))
+        entities.add_scenario_object(
+            egoname, xosc.CatalogReference(&#34;VehicleCatalog&#34;, &#34;car_white&#34;)
+        )
 
         catalog = xosc.Catalog()
-        catalog.add_catalog(&#39;VehicleCatalog&#39;,&#39;../xosc/Catalogs/Vehicles&#39;)
+        catalog.add_catalog(&#34;VehicleCatalog&#34;, &#34;../xosc/Catalogs/Vehicles&#34;)
 
         init = xosc.Init()
 
-        init.add_init_action(egoname,xosc.TeleportAction(xosc.LanePosition(50,0,-2,0)))
-        init.add_init_action(egoname,xosc.AbsoluteSpeedAction(kwargs[&#39;speed&#39;],xosc.TransitionDynamics(xosc.DynamicsShapes.step,xosc.DynamicsDimension.time,1)))
+        init.add_init_action(
+            egoname, xosc.TeleportAction(xosc.LanePosition(50, 0, -2, 0))
+        )
+        init.add_init_action(
+            egoname,
+            xosc.AbsoluteSpeedAction(
+                kwargs[&#34;speed&#34;],
+                xosc.TransitionDynamics(
+                    xosc.DynamicsShapes.step, xosc.DynamicsDimension.time, 1
+                ),
+            ),
+        )
 
-        event = xosc.Event(&#39;my event&#39;,xosc.Priority.overwrite)
-        event.add_action(&#39;lane change&#39;,xosc.AbsoluteLaneChangeAction(-1,xosc.TransitionDynamics(xosc.DynamicsShapes.sinusoidal,xosc.DynamicsDimension.time,4)))
-        event.add_trigger(xosc.ValueTrigger(&#39;start_trigger &#39;,0,xosc.ConditionEdge.none,xosc.SimulationTimeCondition(4,xosc.Rule.greaterThan)))
+        event = xosc.Event(&#34;my event&#34;, xosc.Priority.overwrite)
+        event.add_action(
+            &#34;lane change&#34;,
+            xosc.AbsoluteLaneChangeAction(
+                -1,
+                xosc.TransitionDynamics(
+                    xosc.DynamicsShapes.sinusoidal, xosc.DynamicsDimension.time, 4
+                ),
+            ),
+        )
+        event.add_trigger(
+            xosc.ValueTrigger(
+                &#34;start_trigger &#34;,
+                0,
+                xosc.ConditionEdge.none,
+                xosc.SimulationTimeCondition(4, xosc.Rule.greaterThan),
+            )
+        )
 
-        man = xosc.Maneuver(&#39;maneuver&#39;)
+        man = xosc.Maneuver(&#34;maneuver&#34;)
         man.add_event(event)
 
-        sb = xosc.StoryBoard(init,stoptrigger=xosc.ValueTrigger(&#39;start_trigger &#39;,0,xosc.ConditionEdge.none,xosc.SimulationTimeCondition(13,xosc.Rule.greaterThan),&#39;stop&#39;))
-        sb.add_maneuver(man,egoname)
-        sce = xosc.Scenario(&#39;my scenario&#39;,&#39;Mandolin&#39;,xosc.ParameterDeclarations(),entities,sb,road,catalog)
+        sb = xosc.StoryBoard(
+            init,
+            stoptrigger=xosc.ValueTrigger(
+                &#34;start_trigger &#34;,
+                0,
+                xosc.ConditionEdge.none,
+                xosc.SimulationTimeCondition(13, xosc.Rule.greaterThan),
+                &#34;stop&#34;,
+            ),
+        )
+        sb.add_maneuver(man, egoname)
+        sce = xosc.Scenario(
+            &#34;my scenario&#34;,
+            &#34;Mandolin&#34;,
+            xosc.ParameterDeclarations(),
+            entities,
+            sb,
+            road,
+            catalog,
+        )
 
         return sce
 
+
 if __name__ == &#34;__main__&#34;:
     s = Scenario()
-    
+
     parameters = {}
-    parameters[&#39;road_curvature&#39;] = [0.001, 0.002, 0.003]
-    parameters[&#39;speed&#39;] = [10, 20, 30]
+    parameters[&#34;road_curvature&#34;] = [0.001, 0.002, 0.003]
+    parameters[&#34;speed&#34;] = [10, 20, 30]
 
     s.print_permutations(parameters)
 
-    s.generate(&#39;my_scenarios&#39;,parameters)</code></pre>
+    s.generate(&#34;my_scenarios&#34;, parameters)</code></pre>
 </details>
 </section>
 <section>
@@ -123,40 +196,94 @@ generate_all_roads (bool): will only generate unique roads
 <pre><code class="python">class Scenario(ScenarioGenerator):
     def __init__(self):
         ScenarioGenerator.__init__(self)
-        self.naming = &#39;numerical&#39;
+        self.naming = &#34;numerical&#34;
 
-    def road(self,**kwargs):
+    def road(self, **kwargs):
 
-        road = xodr.create_road([xodr.Spiral(0.0000000001,kwargs[&#39;road_curvature&#39;],100), xodr.Arc(kwargs[&#39;road_curvature&#39;],50), xodr.Spiral(kwargs[&#39;road_curvature&#39;],0.0000000001,100), xodr.Line(100)],id =0,left_lanes=2,right_lanes=2)
-        odr = xodr.OpenDrive(&#39;myroad&#39;)
+        road = xodr.create_road(
+            [
+                xodr.Spiral(0.0000000001, kwargs[&#34;road_curvature&#34;], 100),
+                xodr.Arc(kwargs[&#34;road_curvature&#34;], 50),
+                xodr.Spiral(kwargs[&#34;road_curvature&#34;], 0.0000000001, 100),
+                xodr.Line(100),
+            ],
+            id=0,
+            left_lanes=2,
+            right_lanes=2,
+        )
+        odr = xodr.OpenDrive(&#34;myroad&#34;)
         odr.add_road(road)
         odr.adjust_roads_and_lanes()
         return odr
 
-    def scenario(self,**kwargs):
+    def scenario(self, **kwargs):
         road = xosc.RoadNetwork(self.road_file)
-        egoname = &#39;Ego&#39;
+        egoname = &#34;Ego&#34;
         entities = xosc.Entities()
-        entities.add_scenario_object(egoname,xosc.CatalogReference(&#39;VehicleCatalog&#39;,&#39;car_white&#39;))
+        entities.add_scenario_object(
+            egoname, xosc.CatalogReference(&#34;VehicleCatalog&#34;, &#34;car_white&#34;)
+        )
 
         catalog = xosc.Catalog()
-        catalog.add_catalog(&#39;VehicleCatalog&#39;,&#39;../xosc/Catalogs/Vehicles&#39;)
+        catalog.add_catalog(&#34;VehicleCatalog&#34;, &#34;../xosc/Catalogs/Vehicles&#34;)
 
         init = xosc.Init()
 
-        init.add_init_action(egoname,xosc.TeleportAction(xosc.LanePosition(50,0,-2,0)))
-        init.add_init_action(egoname,xosc.AbsoluteSpeedAction(kwargs[&#39;speed&#39;],xosc.TransitionDynamics(xosc.DynamicsShapes.step,xosc.DynamicsDimension.time,1)))
+        init.add_init_action(
+            egoname, xosc.TeleportAction(xosc.LanePosition(50, 0, -2, 0))
+        )
+        init.add_init_action(
+            egoname,
+            xosc.AbsoluteSpeedAction(
+                kwargs[&#34;speed&#34;],
+                xosc.TransitionDynamics(
+                    xosc.DynamicsShapes.step, xosc.DynamicsDimension.time, 1
+                ),
+            ),
+        )
 
-        event = xosc.Event(&#39;my event&#39;,xosc.Priority.overwrite)
-        event.add_action(&#39;lane change&#39;,xosc.AbsoluteLaneChangeAction(-1,xosc.TransitionDynamics(xosc.DynamicsShapes.sinusoidal,xosc.DynamicsDimension.time,4)))
-        event.add_trigger(xosc.ValueTrigger(&#39;start_trigger &#39;,0,xosc.ConditionEdge.none,xosc.SimulationTimeCondition(4,xosc.Rule.greaterThan)))
+        event = xosc.Event(&#34;my event&#34;, xosc.Priority.overwrite)
+        event.add_action(
+            &#34;lane change&#34;,
+            xosc.AbsoluteLaneChangeAction(
+                -1,
+                xosc.TransitionDynamics(
+                    xosc.DynamicsShapes.sinusoidal, xosc.DynamicsDimension.time, 4
+                ),
+            ),
+        )
+        event.add_trigger(
+            xosc.ValueTrigger(
+                &#34;start_trigger &#34;,
+                0,
+                xosc.ConditionEdge.none,
+                xosc.SimulationTimeCondition(4, xosc.Rule.greaterThan),
+            )
+        )
 
-        man = xosc.Maneuver(&#39;maneuver&#39;)
+        man = xosc.Maneuver(&#34;maneuver&#34;)
         man.add_event(event)
 
-        sb = xosc.StoryBoard(init,stoptrigger=xosc.ValueTrigger(&#39;start_trigger &#39;,0,xosc.ConditionEdge.none,xosc.SimulationTimeCondition(13,xosc.Rule.greaterThan),&#39;stop&#39;))
-        sb.add_maneuver(man,egoname)
-        sce = xosc.Scenario(&#39;my scenario&#39;,&#39;Mandolin&#39;,xosc.ParameterDeclarations(),entities,sb,road,catalog)
+        sb = xosc.StoryBoard(
+            init,
+            stoptrigger=xosc.ValueTrigger(
+                &#34;start_trigger &#34;,
+                0,
+                xosc.ConditionEdge.none,
+                xosc.SimulationTimeCondition(13, xosc.Rule.greaterThan),
+                &#34;stop&#34;,
+            ),
+        )
+        sb.add_maneuver(man, egoname)
+        sce = xosc.Scenario(
+            &#34;my scenario&#34;,
+            &#34;Mandolin&#34;,
+            xosc.ParameterDeclarations(),
+            entities,
+            sb,
+            road,
+            catalog,
+        )
 
         return sce</code></pre>
 </details>

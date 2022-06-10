@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.8.0" />
 <title>scenariogeneration.xodr.enumerations API documentation</title>
-<meta name="description" content="the enumerations module contains the enumerations of OpenDRIVE" />
+<meta name="description" content="scenariogeneration
+https://github.com/pyoscx/scenariogeneration …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -20,34 +21,52 @@
 <h1 class="title">Module <code>scenariogeneration.xodr.enumerations</code></h1>
 </header>
 <section id="section-intro">
-<p>the enumerations module contains the enumerations of OpenDRIVE</p>
+<p>scenariogeneration
+<a href="https://github.com/pyoscx/scenariogeneration">https://github.com/pyoscx/scenariogeneration</a></p>
+<p>This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
+<p>Copyright (c) 2022 The scenariogeneration Authors.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34; the enumerations module contains the enumerations of OpenDRIVE
+<pre><code class="python">&#34;&#34;&#34;
+  scenariogeneration
+  https://github.com/pyoscx/scenariogeneration
+ 
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ 
+  Copyright (c) 2022 The scenariogeneration Authors.
+
+&#34;&#34;&#34;
+&#34;&#34;&#34; the enumerations module contains the enumerations of OpenDRIVE
 
 &#34;&#34;&#34;
 from enum import Enum, auto
 
 
 class TrafficRule(Enum):
-    &#34;&#34;&#34; Enum for MarkRule
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for MarkRule&#34;&#34;&#34;
+
     RHT = auto()
     LHT = auto()
     none = auto()
 
+
 class MarkRule(Enum):
-    &#34;&#34;&#34; Enum for MarkRule
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for MarkRule&#34;&#34;&#34;
+
     no_passing = auto()
     caution = auto()
     none = auto()
-    
+
+
 class LaneType(Enum):
-    &#34;&#34;&#34; Enum for LaneType
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for LaneType&#34;&#34;&#34;
+
     none = auto()
     driving = auto()
     stop = auto()
@@ -77,9 +96,10 @@ class LaneType(Enum):
     mwyEntry = auto()
     mwyExit = auto()
 
+
 class RoadMarkColor(Enum):
-    &#34;&#34;&#34; Enum for RoadMarkColor
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for RoadMarkColor&#34;&#34;&#34;
+
     standard = auto()
     blue = auto()
     green = auto()
@@ -89,16 +109,16 @@ class RoadMarkColor(Enum):
     orange = auto()
 
 
-
 class RoadMarkWeight(Enum):
-    &#34;&#34;&#34; Enum for RoadMarkWeight
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for RoadMarkWeight&#34;&#34;&#34;
+
     standard = auto()
     bold = auto()
 
+
 class RoadMarkType(Enum):
-    &#34;&#34;&#34; Enum for RoadMarkType
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for RoadMarkType&#34;&#34;&#34;
+
     none = auto()
     solid = auto()
     broken = auto()
@@ -112,9 +132,10 @@ class RoadMarkType(Enum):
     custom = auto()
     edge = auto()
 
+
 class RoadType(Enum):
-    &#34;&#34;&#34; Enum for RoadType
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for RoadType&#34;&#34;&#34;
+
     unknown = auto()
     rural = auto()
     motorway = auto()
@@ -131,41 +152,46 @@ class RoadType(Enum):
 
 
 class LaneChange(Enum):
-    &#34;&#34;&#34; Enum for LaneChange
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for LaneChange&#34;&#34;&#34;
+
     increase = auto()
     decrease = auto()
     both = auto()
-    none = auto()    
+    none = auto()
+
 
 class ElementType(Enum):
-    &#34;&#34;&#34; Enum for LaneChange
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for LaneChange&#34;&#34;&#34;
+
     road = auto()
     junction = auto()
 
+
 class ContactPoint(Enum):
-    &#34;&#34;&#34; Enum for ContactPoint
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for ContactPoint&#34;&#34;&#34;
+
     start = auto()
     end = auto()
 
+
 class Direction(Enum):
-    &#34;&#34;&#34; Enum for Direction
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for Direction&#34;&#34;&#34;
+
     same = auto()
     opposite = auto()
-    
+
+
 class Orientation(Enum):
-    &#34;&#34;&#34; Enum for Orientation
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for Orientation&#34;&#34;&#34;
+
     positive = auto()
     negative = auto()
     none = auto()
 
+
 class ObjectType(Enum):
-    &#34;&#34;&#34; Enum for ObjectType taken from OpenDRIVE 1.6 without deprecated types
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for ObjectType taken from OpenDRIVE 1.6 without deprecated types&#34;&#34;&#34;
+
     none = auto()
     obstacle = auto()
     pole = auto()
@@ -182,30 +208,33 @@ class ObjectType(Enum):
     gantry = auto()
     soundBarrier = auto()
     roadMark = auto()
-    
+
+
 class Dynamic(Enum):
-    &#34;&#34;&#34; Enum for Dynamic
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for Dynamic&#34;&#34;&#34;
+
     yes = auto()
     no = auto()
-    
+
+
 class RoadSide(Enum):
-    &#34;&#34;&#34; Enum for RoadSide
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for RoadSide&#34;&#34;&#34;
+
     both = auto()
     left = auto()
     right = auto()
 
+
 class JunctionGroupType(Enum):
-    &#34;&#34;&#34; Enum for JunctionGroup
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for JunctionGroup&#34;&#34;&#34;
+
     roundabout = auto()
     unknown = auto()
 
-class JunctionType(Enum):
-    &#34;&#34;&#34; Enum for JunctionType
 
-    &#34;&#34;&#34;
+class JunctionType(Enum):
+    &#34;&#34;&#34;Enum for JunctionType&#34;&#34;&#34;
+
     default = auto()
     virtual = auto()
     direct = auto()</code></pre>
@@ -231,8 +260,8 @@ class JunctionType(Enum):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ContactPoint(Enum):
-    &#34;&#34;&#34; Enum for ContactPoint
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for ContactPoint&#34;&#34;&#34;
+
     start = auto()
     end = auto()</code></pre>
 </details>
@@ -263,8 +292,8 @@ class JunctionType(Enum):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Direction(Enum):
-    &#34;&#34;&#34; Enum for Direction
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for Direction&#34;&#34;&#34;
+
     same = auto()
     opposite = auto()</code></pre>
 </details>
@@ -295,8 +324,8 @@ class JunctionType(Enum):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Dynamic(Enum):
-    &#34;&#34;&#34; Enum for Dynamic
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for Dynamic&#34;&#34;&#34;
+
     yes = auto()
     no = auto()</code></pre>
 </details>
@@ -327,8 +356,8 @@ class JunctionType(Enum):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ElementType(Enum):
-    &#34;&#34;&#34; Enum for LaneChange
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for LaneChange&#34;&#34;&#34;
+
     road = auto()
     junction = auto()</code></pre>
 </details>
@@ -359,8 +388,8 @@ class JunctionType(Enum):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class JunctionGroupType(Enum):
-    &#34;&#34;&#34; Enum for JunctionGroup
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for JunctionGroup&#34;&#34;&#34;
+
     roundabout = auto()
     unknown = auto()</code></pre>
 </details>
@@ -391,9 +420,8 @@ class JunctionType(Enum):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class JunctionType(Enum):
-    &#34;&#34;&#34; Enum for JunctionType
+    &#34;&#34;&#34;Enum for JunctionType&#34;&#34;&#34;
 
-    &#34;&#34;&#34;
     default = auto()
     virtual = auto()
     direct = auto()</code></pre>
@@ -429,12 +457,12 @@ class JunctionType(Enum):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class LaneChange(Enum):
-    &#34;&#34;&#34; Enum for LaneChange
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for LaneChange&#34;&#34;&#34;
+
     increase = auto()
     decrease = auto()
     both = auto()
-    none = auto()    </code></pre>
+    none = auto()</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -471,8 +499,8 @@ class JunctionType(Enum):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class LaneType(Enum):
-    &#34;&#34;&#34; Enum for LaneType
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for LaneType&#34;&#34;&#34;
+
     none = auto()
     driving = auto()
     stop = auto()
@@ -633,8 +661,8 @@ class JunctionType(Enum):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class MarkRule(Enum):
-    &#34;&#34;&#34; Enum for MarkRule
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for MarkRule&#34;&#34;&#34;
+
     no_passing = auto()
     caution = auto()
     none = auto()</code></pre>
@@ -670,8 +698,8 @@ class JunctionType(Enum):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ObjectType(Enum):
-    &#34;&#34;&#34; Enum for ObjectType taken from OpenDRIVE 1.6 without deprecated types
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for ObjectType taken from OpenDRIVE 1.6 without deprecated types&#34;&#34;&#34;
+
     none = auto()
     obstacle = auto()
     pole = auto()
@@ -772,8 +800,8 @@ class JunctionType(Enum):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Orientation(Enum):
-    &#34;&#34;&#34; Enum for Orientation
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for Orientation&#34;&#34;&#34;
+
     positive = auto()
     negative = auto()
     none = auto()</code></pre>
@@ -809,8 +837,8 @@ class JunctionType(Enum):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class RoadMarkColor(Enum):
-    &#34;&#34;&#34; Enum for RoadMarkColor
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for RoadMarkColor&#34;&#34;&#34;
+
     standard = auto()
     blue = auto()
     green = auto()
@@ -866,8 +894,8 @@ class JunctionType(Enum):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class RoadMarkType(Enum):
-    &#34;&#34;&#34; Enum for RoadMarkType
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for RoadMarkType&#34;&#34;&#34;
+
     none = auto()
     solid = auto()
     broken = auto()
@@ -948,8 +976,8 @@ class JunctionType(Enum):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class RoadMarkWeight(Enum):
-    &#34;&#34;&#34; Enum for RoadMarkWeight
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for RoadMarkWeight&#34;&#34;&#34;
+
     standard = auto()
     bold = auto()</code></pre>
 </details>
@@ -980,8 +1008,8 @@ class JunctionType(Enum):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class RoadSide(Enum):
-    &#34;&#34;&#34; Enum for RoadSide
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for RoadSide&#34;&#34;&#34;
+
     both = auto()
     left = auto()
     right = auto()</code></pre>
@@ -1017,8 +1045,8 @@ class JunctionType(Enum):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class RoadType(Enum):
-    &#34;&#34;&#34; Enum for RoadType
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for RoadType&#34;&#34;&#34;
+
     unknown = auto()
     rural = auto()
     motorway = auto()
@@ -1104,8 +1132,8 @@ class JunctionType(Enum):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class TrafficRule(Enum):
-    &#34;&#34;&#34; Enum for MarkRule
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for MarkRule&#34;&#34;&#34;
+
     RHT = auto()
     LHT = auto()
     none = auto()</code></pre>

@@ -80,16 +80,123 @@ Some example usage of this can be seen in <a href="examples/xodr/highway_example
 <em>create_cloth_arc_cloth</em> function creates road with a smooth curve based on a clothoid + arc + clothoid. This is often used since the curvature of the road will change continiously (and resulting in nice steering wheel changes for a driver).</p>
 <h4 id="create_3cloths">create_3cloths</h4>
 <p>Similarly to <em>create_cloth_arc_cloth</em>, the <em>create_3cloths</em> function creates a smooth curve based on 3 consecutive spiral geoemtries (using pyclothoids)</p>
-<h4 id="create_junction_roads">create_junction_roads</h4>
-<ul>
-<li>The <em>create_junction_roads</em> generates all the roads for a simple intersection. The position of roads around a junction is defined by <em>R</em>, the distance of each road form the center of the junction, and by <em>angles</em>, defining how the roads around the junction are spanned. With these inputs, <em>create_junction_roads</em> generates all the roads in the junction, which are connecting the surrounding roads. </li>
-</ul>
-<h4 id="create_junction">create_junction</h4>
-<p>The <em>create_junction</em> function creates the "junction" element of OpenDRIVE, based on a list of "roads in the junction" (that can be generated from <em>create_junction_roads</em>) and a list of "roads going into the junction" </p>
-<h4 id="create_direct_junction">create_direct_junction</h4>
-<p>Similar to <em>create_junction</em>, create_direct_junction can be used to create the junction element for a direct junction. This is possible when using the direct_junction input in add_predecessor/add_successor, see <a href="examples/xodr/direct_junction_exit.html">direct_junction_exit</a> or <a href="examples/xodr/direct_junction_entry.html">direct_junction_entry</a></p>
 <h4 id="lanedef">LaneDef</h4>
 <p>LaneDef is a helper class that enables simple lane merge/split roads to be created, this definition can be used together with the create_road generator (see <a href="examples/xodr/highway_example_with_merge_and_split.html">highway_example_with_merge_and_split</a>).</p>
+<h3 id="junctioncreators">JunctionCreators</h3>
+<p>Since version 0.8.0 the xodr module contains two JunctionCreators. The JunctionCreators replaces the create_junction, create_direct_junction, and create_junction_roads, which had some limmitations when it came to create custom junctions. </p>
+<h4 id="commonjunctioncreator">CommonJunctionCreator</h4>
+<p>The <em>CommonJunctionCreator</em> is the class that helps the user to create the <em>common</em> junctions in OpenDRIVE, this is done in two steps: (1) adding the road to connect to the junction and its position, (2) adding connections between roads and optionally lanes. </p>
+<p>First of all, the roads needs a predecessor or successor pointing to the junction. This can be done in two different ways: (1) with the <em>add_successor/add_predecessor</em>, or (2) with the <em>add_incoming_road</em> functions in the junction creator. </p>
+<p>When adding a road to the junction two functions are available, <em>add_incoming_road_cartesian_geometry</em> and <em>add_incoming_road_circular_geometry</em>, both uses a local coordinate system for that junciton that will help to connect the roads together.
+- The <em>add_incoming_road_cartesian_geometry</em> uses a <em>x-y</em> coordinate system with an arbitrary origin, the incomming road is added with an <em>x-y-h</em> input, where <em>h</em> is the heading of the road <strong>into</strong> the junction. </p>
+<p><img alt="Cartesian" src="https://github.com/esmini/esmini/blob/master/docu/cartesian.png?raw=true" title="Cartesian geometry">
+- The <em>add_incoming_road_circular_geometry</em> uses a <em>r-h</em> coordinate system where the origin is in the middle of the junction and <em>r</em> is the radius and <em>h</em> the heading from the center where to connect the road.</p>
+<p><img alt="Circular" src="https://github.com/esmini/esmini/blob/master/resources/circular.png?raw=true" title="Circular geometry"></p>
+<p>An example can be seen below:</p>
+<pre><code>from scenariogeneration import xodr
+
+road1 = xodr.create_road(xodr.Line(100), id=1, left_lanes=2, right_lanes=2)
+road2 = xodr.create_road(xodr.Line(100), id=2, left_lanes=1, right_lanes=1)
+road3 = xodr.create_road(xodr.Line(100), id=3, left_lanes=2, right_lanes=2)
+
+junction_creator = xodr.CommonJunctionCreator(id = 100, name='my_junction')
+
+junction_creator.add_incoming_road_cartesian_geometry(road1, 
+            x = 0, 
+            y = 0, 
+            heading=0, 
+            road_connection='successor')
+
+junction_creator.add_incoming_road_cartesian_geometry(road2, 
+            x = 50, 
+            y = 50, 
+            heading=3.1415*3/2, 
+            road_connection='predecessor')
+
+junction_creator.add_incoming_road_cartesian_geometry(road3, 
+            x = 100, 
+            y = 0, 
+            heading=-3.1415, 
+            road_connection='predecessor')
+
+</code></pre>
+<p>With all the roads added to the junction, connections can be added using the <em>add_connection</em> method. The minimum input of the <em>add_connection</em> method is the road ids (in the example above 1 and 2). This will generate a connecting road with the minimum equal number of lanes between the two roads (in the example above a road with one left and one right lanes). And simultaneously create the entries in the <em>junction</em> element. </p>
+<p>In some cases only some lanes should be connected between two roads, then the optional parameters to the <em>add_connection</em> method can be used, specifying the lanes that should be connected. This will generate a connecting road just between those two lanes. </p>
+<p>Continuing the example above:</p>
+<pre><code>junction_creator.add_connection(road_one_id = 1, 
+                                road_two_id = 3)
+
+junction_creator.add_connection(road_one_id = 1, 
+                                road_two_id = 2, 
+                                lane_one_id = 2,
+                                lane_two_id = 1)
+
+junction_creator.add_connection(road_one_id = 2, 
+                                road_two_id = 3, 
+                                lane_one_id = -1, 
+                                lane_two_id = 2)
+
+</code></pre>
+<p>Finally the roads and junction have to be added to the <em>OpenDrive</em> object, and for simplicity, the <em>add_junction_creator</em> can be used.
+The final part of the example will look like this</p>
+<pre><code>odr = xodr.OpenDrive('myroad')
+
+odr.add_road(road1)
+odr.add_road(road2)
+odr.add_road(road3)
+
+odr.add_junction_creator(junction_creator)
+odr.adjust_roads_and_lanes()
+
+</code></pre>
+<h4 id="directjunctioncreator">DirectJunctionCreator</h4>
+<p>To create <em>direct</em> type of junctions, the DirectJunctionCreator can be used. Since a <em>DirectJunction</em> has no need to generate roads in the junction, no geometrical description is needed. For each road connected to the <em>DirectJunction</em>, the successor/predecessor has to be added with the add_successor/add_predecessor methods.
+An example can be se below: </p>
+<pre><code>from scenariogeneration import xodr
+junction_id = 100
+direct_junction = xodr.DirectJunctionCreator(junction_id,'my_direct_junction')
+
+first_road = xodr.create_road([xodr.Line(300)],
+            id= 1,
+            left_lanes=3,
+            right_lanes=4)
+
+continuation_road = xodr.create_road([xodr.Line(300)],
+            id= 2,
+            left_lanes=3,
+            right_lanes=3)
+
+off_ramp = xodr.create_road([xodr.Spiral(-0.00001,-0.02,length=150)], 
+            id= 3,
+            left_lanes=0,
+            right_lanes=1)
+
+first_road.add_successor(xodr.ElementType.junction, junction_id)
+continuation_road.add_predecessor(xodr.ElementType.junction, junction_id)
+off_ramp.add_predecessor(xodr.ElementType.junction, junction_id)
+</code></pre>
+<p>To create the connections in the <em>DirectJunction</em> the <em>add_connection</em> method is used, taking the road objects as inputs. To connect only certain lanes, the optional inputs <em>incoming_lane_id</em> and <em>linked_lane_id</em> parameters. </p>
+<p>An example (continuation of the example above):</p>
+<pre><code>direct_junction.add_connection(
+            incoming_road = first_road,
+            linked_road = continuation_road)
+direct_junction.add_connection(
+            incoming_road = first_road,
+            linked_road = off_ramp,
+            incoming_lane_id=-4,
+            lined_lane_id = -1)
+</code></pre>
+<p>and finally adding the roads to opendrive:</p>
+<pre><code>odr = xodr.OpenDrive('myroad')
+
+odr.add_road(road1)
+odr.add_road(road2)
+odr.add_road(road3)
+
+odr.add_junction_creator(junction_creator)
+odr.adjust_roads_and_lanes()
+
+</code></pre>
 <h2 id="scenariogenerator">ScenarioGenerator</h2>
 <p>The ScenarioGenerator class can be used as a glue to parametrize and generate connected OpenSCENARIO and OpenDRIVE xmls, for large scale, parametrized simulations (Note that a similar feature is supported in the OpenSCENARIO standard since V1.1.0).</p>
 <p>To utilize this, let your Scenario class inherit ScenarioGenerator and initalize it.
@@ -155,7 +262,7 @@ To connect the scenario and the generated road, create the RoadNetwork object in
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34; 
+<pre><code class="python">&#34;&#34;&#34;
 .. include::Documentation.md
 &#34;&#34;&#34;</code></pre>
 </details>
@@ -187,10 +294,12 @@ To connect the scenario and the generated road, create the RoadNetwork object in
 <li><a href="#create_road">create_road</a></li>
 <li><a href="#create_cloth_arc_cloth">create_cloth_arc_cloth</a></li>
 <li><a href="#create_3cloths">create_3cloths</a></li>
-<li><a href="#create_junction_roads">create_junction_roads</a></li>
-<li><a href="#create_junction">create_junction</a></li>
-<li><a href="#create_direct_junction">create_direct_junction</a></li>
 <li><a href="#lanedef">LaneDef</a></li>
+</ul>
+</li>
+<li><a href="#junctioncreators">JunctionCreators</a><ul>
+<li><a href="#commonjunctioncreator">CommonJunctionCreator</a></li>
+<li><a href="#directjunctioncreator">DirectJunctionCreator</a></li>
 </ul>
 </li>
 </ul>

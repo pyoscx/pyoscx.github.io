@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.8.0" />
 <title>examples.xosc.syncronize_straight_example API documentation</title>
-<meta name="description" content="Example of a synchronizing two vehicles at one point …" />
+<meta name="description" content="scenariogeneration
+https://github.com/pyoscx/scenariogeneration …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -20,6 +21,12 @@
 <h1 class="title">Module <code>examples.xosc.syncronize_straight_example</code></h1>
 </header>
 <section id="section-intro">
+<p>scenariogeneration
+<a href="https://github.com/pyoscx/scenariogeneration">https://github.com/pyoscx/scenariogeneration</a></p>
+<p>This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
+<p>Copyright (c) 2022 The scenariogeneration Authors.</p>
 <p>Example of a synchronizing two vehicles at one point</p>
 <p>Some features used:</p>
 <ul>
@@ -29,83 +36,154 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34; 
+<pre><code class="python">&#34;&#34;&#34;
+  scenariogeneration
+  https://github.com/pyoscx/scenariogeneration
+ 
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ 
+  Copyright (c) 2022 The scenariogeneration Authors.
+  
     Example of a synchronizing two vehicles at one point
 
     Some features used:
-    
-    
+
+
     - AbsoluteSynchronizeAction
 
-        
+
 &#34;&#34;&#34;
 import os
 from scenariogeneration import xosc, prettyprint
 
 ### create catalogs
 catalog = xosc.Catalog()
-catalog.add_catalog(&#39;VehicleCatalog&#39;,&#39;../xosc/Catalogs/Vehicles&#39;)
+catalog.add_catalog(&#34;VehicleCatalog&#34;, &#34;../xosc/Catalogs/Vehicles&#34;)
 
 ### create road
-road = xosc.RoadNetwork(roadfile=&#34;../xodr/e6mini.xodr&#34;,scenegraph=&#34;../models/e6mini.osgb&#34;)
+road = xosc.RoadNetwork(
+    roadfile=&#34;../xodr/e6mini.xodr&#34;, scenegraph=&#34;../models/e6mini.osgb&#34;
+)
 
 ### create parameters
 paramdec = xosc.ParameterDeclarations()
 
 ## create entities
 
-egoname = &#39;Ego&#39;
-targetname = &#39;Target&#39;
+egoname = &#34;Ego&#34;
+targetname = &#34;Target&#34;
 
 entities = xosc.Entities()
-entities.add_scenario_object(egoname,xosc.CatalogReference(&#39;VehicleCatalog&#39;,&#39;car_red&#39;))
-entities.add_scenario_object(targetname,xosc.CatalogReference(&#39;VehicleCatalog&#39;,&#39;car_blue&#39;))
+entities.add_scenario_object(
+    egoname, xosc.CatalogReference(&#34;VehicleCatalog&#34;, &#34;car_red&#34;)
+)
+entities.add_scenario_object(
+    targetname, xosc.CatalogReference(&#34;VehicleCatalog&#34;, &#34;car_blue&#34;)
+)
 
 ### create init
 
 init = xosc.Init()
 
-init.add_init_action(egoname,xosc.TeleportAction(xosc.LanePosition(50,0,-2,0)))
-init.add_init_action(egoname,xosc.AbsoluteSpeedAction(10,xosc.TransitionDynamics(xosc.DynamicsShapes.step,xosc.DynamicsDimension.time,1)))
+init.add_init_action(egoname, xosc.TeleportAction(xosc.LanePosition(50, 0, -2, 0)))
+init.add_init_action(
+    egoname,
+    xosc.AbsoluteSpeedAction(
+        10,
+        xosc.TransitionDynamics(
+            xosc.DynamicsShapes.step, xosc.DynamicsDimension.time, 1
+        ),
+    ),
+)
 
-init.add_init_action(targetname,xosc.TeleportAction(xosc.LanePosition(30,0,-3,0)))
-init.add_init_action(targetname,xosc.AbsoluteSpeedAction(20,xosc.TransitionDynamics(xosc.DynamicsShapes.step,xosc.DynamicsDimension.time,1)))
+init.add_init_action(targetname, xosc.TeleportAction(xosc.LanePosition(30, 0, -3, 0)))
+init.add_init_action(
+    targetname,
+    xosc.AbsoluteSpeedAction(
+        20,
+        xosc.TransitionDynamics(
+            xosc.DynamicsShapes.step, xosc.DynamicsDimension.time, 1
+        ),
+    ),
+)
 
 
 ## target action
 
-tar_action = xosc.SynchronizeAction(egoname,xosc.LanePosition(200,0,-1,0),xosc.LanePosition(200,0,-2,0),target_tolerance_master=1,target_tolerance=1, final_speed=xosc.RelativeSpeedToMaster(10,xosc.SpeedTargetValueType.delta,xosc.TargetTimeSteadyState(10)))
+tar_action = xosc.SynchronizeAction(
+    egoname,
+    xosc.LanePosition(200, 0, -1, 0),
+    xosc.LanePosition(200, 0, -2, 0),
+    target_tolerance_master=1,
+    target_tolerance=1,
+    final_speed=xosc.RelativeSpeedToMaster(
+        10, xosc.SpeedTargetValueType.delta, xosc.TargetTimeSteadyState(10)
+    ),
+)
 
-tar_event = xosc.Event(&#39;target_event&#39;,xosc.Priority.overwrite)
-tar_event.add_trigger(xosc.ValueTrigger(&#39;ego_start&#39;,0,xosc.ConditionEdge.none,xosc.SimulationTimeCondition(3,xosc.Rule.greaterThan)))
-tar_event.add_action(&#39;tar_action&#39;,tar_action)
+tar_event = xosc.Event(&#34;target_event&#34;, xosc.Priority.overwrite)
+tar_event.add_trigger(
+    xosc.ValueTrigger(
+        &#34;ego_start&#34;,
+        0,
+        xosc.ConditionEdge.none,
+        xosc.SimulationTimeCondition(3, xosc.Rule.greaterThan),
+    )
+)
+tar_event.add_action(&#34;tar_action&#34;, tar_action)
 
-tar_man = xosc.Maneuver(&#39;target_man&#39;)
+tar_man = xosc.Maneuver(&#34;target_man&#34;)
 tar_man.add_event(tar_event)
 
-tar_man_gr = xosc.ManeuverGroup(&#39;target_man_gr&#39;)
+tar_man_gr = xosc.ManeuverGroup(&#34;target_man_gr&#34;)
 tar_man_gr.add_maneuver(tar_man)
 tar_man_gr.add_actor(targetname)
 
 
 ## act
-act = xosc.Act(&#39;myact&#39;,xosc.ValueTrigger(&#39;start&#39;,0,xosc.ConditionEdge.none,xosc.SimulationTimeCondition(0,xosc.Rule.greaterThan)))
+act = xosc.Act(
+    &#34;myact&#34;,
+    xosc.ValueTrigger(
+        &#34;start&#34;,
+        0,
+        xosc.ConditionEdge.none,
+        xosc.SimulationTimeCondition(0, xosc.Rule.greaterThan),
+    ),
+)
 
 act.add_maneuver_group(tar_man_gr)
 ## create the storyboard
-sb = xosc.StoryBoard(init,xosc.ValueTrigger(&#39;stop_simulation&#39;,0,xosc.ConditionEdge.rising,xosc.SimulationTimeCondition(20,xosc.Rule.greaterThan),&#39;stop&#39;))
+sb = xosc.StoryBoard(
+    init,
+    xosc.ValueTrigger(
+        &#34;stop_simulation&#34;,
+        0,
+        xosc.ConditionEdge.rising,
+        xosc.SimulationTimeCondition(20, xosc.Rule.greaterThan),
+        &#34;stop&#34;,
+    ),
+)
 sb.add_act(act)
 
 
-
 ## create the scenario
-sce = xosc.Scenario(&#39;adaptspeed_example&#39;,&#39;User&#39;,paramdec,entities=entities,storyboard = sb,roadnetwork=road,catalog=catalog)
+sce = xosc.Scenario(
+    &#34;adaptspeed_example&#34;,
+    &#34;User&#34;,
+    paramdec,
+    entities=entities,
+    storyboard=sb,
+    roadnetwork=road,
+    catalog=catalog,
+)
 
 # Print the resulting xml
 prettyprint(sce.get_element())
 
 # write the OpenSCENARIO file as xosc using current script name
-sce.write_xml(os.path.basename(__file__).replace(&#39;.py&#39;,&#39;.xosc&#39;))
+sce.write_xml(os.path.basename(__file__).replace(&#34;.py&#34;, &#34;.xosc&#34;))
 
 # uncomment the following lines to display the scenario using esmini
 # from scenariogeneration import esmini
