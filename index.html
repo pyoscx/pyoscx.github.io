@@ -89,9 +89,9 @@ Some example usage of this can be seen in <a href="examples/xodr/highway_example
 <p>First of all, the roads needs a predecessor or successor pointing to the junction. This can be done in two different ways: (1) with the <em>add_successor/add_predecessor</em>, or (2) with the <em>add_incoming_road</em> functions in the junction creator. </p>
 <p>When adding a road to the junction two functions are available, <em>add_incoming_road_cartesian_geometry</em> and <em>add_incoming_road_circular_geometry</em>, both uses a local coordinate system for that junciton that will help to connect the roads together.
 - The <em>add_incoming_road_cartesian_geometry</em> uses a <em>x-y</em> coordinate system with an arbitrary origin, the incomming road is added with an <em>x-y-h</em> input, where <em>h</em> is the heading of the road <strong>into</strong> the junction. </p>
-<p><img alt="Cartesian" src="https://github.com/esmini/esmini/blob/master/docu/cartesian.png?raw=true" title="Cartesian geometry">
+<p><img alt="Cartesian" src="https://github.com/pyoscx/scenariogeneration/blob/master/docu/cartesian.png?raw=true" title="Cartesian geometry">
 - The <em>add_incoming_road_circular_geometry</em> uses a <em>r-h</em> coordinate system where the origin is in the middle of the junction and <em>r</em> is the radius and <em>h</em> the heading from the center where to connect the road.</p>
-<p><img alt="Circular" src="https://github.com/esmini/esmini/blob/master/resources/circular.png?raw=true" title="Circular geometry"></p>
+<p><img alt="Circular" src="https://github.com/pyoscx/scenariogeneration/blob/master/resources/circular.png?raw=true" title="Circular geometry"></p>
 <p>An example can be seen below:</p>
 <pre><code>from scenariogeneration import xodr
 
