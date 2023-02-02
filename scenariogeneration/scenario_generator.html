@@ -48,6 +48,19 @@ import itertools
 import os
 import numpy as np
 import sys
+from multiprocessing import Pool
+from .helpers import printToFile
+
+
+class _generation_struct:
+    def __init__(self, data, filename, prettyprint):
+        self.data = data
+        self.filename = filename
+        self.prettyprint = prettyprint
+
+
+def _write_xml_file(data_struct):
+    printToFile(data_struct.data, data_struct.filename, data_struct.prettyprint)
 
 
 class ScenarioGenerator:
@@ -59,13 +72,16 @@ class ScenarioGenerator:
 
     Attributes
     ----------
-        road_file (str): name of the roadfile,
+        road_file (str): name of the roadfile
 
         parameters (dict of lists, or list of dicts): parameter sets to be used
 
         naming (str): two options &#34;numerical&#34; or &#34;parameter&#34;
 
         generate_all_roads (bool): will only generate unique roads
+
+        number_of_parallel_writings (int): parallelize the writing of the xml files
+            Default: 1 (no parallelization)
     &#34;&#34;&#34;
 
     def __init__(self):
@@ -78,6 +94,8 @@ class ScenarioGenerator:
         self.generate_all_roads = True
         self._created_roads = {}
         self._name_separator = &#34;_&#34;
+        self.number_of_parallel_writings = 1
+        self._prettyprint = True
 
     def road(self, **kwargs):
         &#34;&#34;&#34;Dummy method for generating an OpenDRIVE road
@@ -168,7 +186,7 @@ class ScenarioGenerator:
         scenario_name = self._get_scenario_name(permutation)
         self.road_file = &#34;&#34;
         scenario_file = &#34;&#34;
-
+        files_to_write = []
         road = self.road(**permutation)
         if road:
             new_unique_road = True
@@ -184,7 +202,15 @@ class ScenarioGenerator:
                         self._generation_folder, &#34;xodr&#34;, scenario_name + &#34;.xodr&#34;
                     )
                 )
-                road.write_xml(self.road_file)
+                if self.number_of_parallel_writings == 1:
+                    road.write_xml(self.road_file, prettyprint=self._prettyprint)
+                else:
+                    files_to_write.append(
+                        _generation_struct(
+                            road.get_element(), self.road_file, self._prettyprint
+                        )
+                    )
+
                 if self.write_relative_road_path:
                     self.road_file = self.road_file.replace(
                         os.path.abspath(self._generation_folder), os.path.pardir
@@ -197,8 +223,15 @@ class ScenarioGenerator:
             scenario_file = os.path.join(
                 self._generation_folder, &#34;xosc&#34;, scenario_name + &#34;.xosc&#34;
             )
-            sce.write_xml(scenario_file)
-        return scenario_file, self.road_file
+            if self.number_of_parallel_writings == 1:
+                sce.write_xml(scenario_file, prettyprint=self._prettyprint)
+            else:
+                files_to_write.append(
+                    _generation_struct(
+                        sce.get_element(), scenario_file, self._prettyprint
+                    )
+                )
+        return scenario_file, self.road_file, files_to_write
 
     def _get_scenario_name(self, permutation):
         &#34;&#34;&#34;_get_scenario_name generates the name of the wanted file, based on the permutation
@@ -244,6 +277,7 @@ class ScenarioGenerator:
         override_parameters=None,
         write_relative_road_path=True,
         name_separator=None,
+        prettyprint=True,
     ):
         &#34;&#34;&#34;generate_single will generate only one scenario
 
@@ -266,7 +300,11 @@ class ScenarioGenerator:
 
             name_separator (str): for generation with multiple parameters, this will change the separator between the variables
                 Default: &#39;_&#39;
+
+            prettyprint (bool): determins if the prettify funciton should be used while writing to xml (will take longer time)
+                Default: True
         &#34;&#34;&#34;
+        self._prettyprint = prettyprint
         if name_separator:
             self._name_separator = name_separator
         self.write_relative_road_path = write_relative_road_path
@@ -285,7 +323,8 @@ class ScenarioGenerator:
         else:
             it = order
             self._it = it
-        osc, odr = self._generate_road_and_scenario(self.all_permutations[it])
+        self.number_of_parallel_writings = 1
+        osc, odr, _ = self._generate_road_and_scenario(self.all_permutations[it])
         self._reset_name_counter()
         return osc, odr
 
@@ -295,6 +334,7 @@ class ScenarioGenerator:
         override_parameters=None,
         write_relative_road_path=True,
         name_separator=None,
+        prettyprint=True,
     ):
         &#34;&#34;&#34;generate uses the xosc.Scenario defined in the method scenario and the xodr.OpenDrive (optional) in the road method
         together with the parameters attribute to generate scenarios and roads for all permutations defined and save those files
@@ -311,7 +351,11 @@ class ScenarioGenerator:
 
             name_separator (str): for generation with multiple parameters, this will change the separator between the variables
                 Default: &#39;_&#39;
+
+            prettyprint (bool): determins if the prettify funciton should be used while writing to xml (will take longer time)
+                Default: True
         &#34;&#34;&#34;
+        self._prettyprint = prettyprint
         if name_separator:
             self._name_separator = name_separator
 
@@ -322,12 +366,16 @@ class ScenarioGenerator:
         if override_parameters:
             self.parameters = override_parameters
         self._handle_input_parameters()
-
+        files_to_write = []
         for p in self.all_permutations:
-
-            scenario_file, road_file = self._generate_road_and_scenario(p)
+            scenario_file, road_file, writables = self._generate_road_and_scenario(p)
             scenario_files.append(scenario_file)
             road_files.append(road_file)
+            files_to_write.extend(writables)
+
+        if self.number_of_parallel_writings != 1:
+            with Pool(self.number_of_parallel_writings) as p:
+                p.map(_write_xml_file, files_to_write)
         self._reset_name_counter()
         return scenario_files, road_files
 
@@ -370,13 +418,16 @@ class ScenarioGenerator:
 - a dict of lists, where the lists are the values you want to sweep over, all permutations of these sets will be generated
 - a list of dicts, where the dicts are identical and each element in the list is one scenario</p>
 <h2 id="attributes">Attributes</h2>
-<pre><code>road_file (str): name of the roadfile,
+<pre><code>road_file (str): name of the roadfile
 
 parameters (dict of lists, or list of dicts): parameter sets to be used
 
 naming (str): two options "numerical" or "parameter"
 
 generate_all_roads (bool): will only generate unique roads
+
+number_of_parallel_writings (int): parallelize the writing of the xml files
+    Default: 1 (no parallelization)
 </code></pre></div>
 <details class="source">
 <summary>
@@ -391,13 +442,16 @@ generate_all_roads (bool): will only generate unique roads
 
     Attributes
     ----------
-        road_file (str): name of the roadfile,
+        road_file (str): name of the roadfile
 
         parameters (dict of lists, or list of dicts): parameter sets to be used
 
         naming (str): two options &#34;numerical&#34; or &#34;parameter&#34;
 
         generate_all_roads (bool): will only generate unique roads
+
+        number_of_parallel_writings (int): parallelize the writing of the xml files
+            Default: 1 (no parallelization)
     &#34;&#34;&#34;
 
     def __init__(self):
@@ -410,6 +464,8 @@ generate_all_roads (bool): will only generate unique roads
         self.generate_all_roads = True
         self._created_roads = {}
         self._name_separator = &#34;_&#34;
+        self.number_of_parallel_writings = 1
+        self._prettyprint = True
 
     def road(self, **kwargs):
         &#34;&#34;&#34;Dummy method for generating an OpenDRIVE road
@@ -500,7 +556,7 @@ generate_all_roads (bool): will only generate unique roads
         scenario_name = self._get_scenario_name(permutation)
         self.road_file = &#34;&#34;
         scenario_file = &#34;&#34;
-
+        files_to_write = []
         road = self.road(**permutation)
         if road:
             new_unique_road = True
@@ -516,7 +572,15 @@ generate_all_roads (bool): will only generate unique roads
                         self._generation_folder, &#34;xodr&#34;, scenario_name + &#34;.xodr&#34;
                     )
                 )
-                road.write_xml(self.road_file)
+                if self.number_of_parallel_writings == 1:
+                    road.write_xml(self.road_file, prettyprint=self._prettyprint)
+                else:
+                    files_to_write.append(
+                        _generation_struct(
+                            road.get_element(), self.road_file, self._prettyprint
+                        )
+                    )
+
                 if self.write_relative_road_path:
                     self.road_file = self.road_file.replace(
                         os.path.abspath(self._generation_folder), os.path.pardir
@@ -529,8 +593,15 @@ generate_all_roads (bool): will only generate unique roads
             scenario_file = os.path.join(
                 self._generation_folder, &#34;xosc&#34;, scenario_name + &#34;.xosc&#34;
             )
-            sce.write_xml(scenario_file)
-        return scenario_file, self.road_file
+            if self.number_of_parallel_writings == 1:
+                sce.write_xml(scenario_file, prettyprint=self._prettyprint)
+            else:
+                files_to_write.append(
+                    _generation_struct(
+                        sce.get_element(), scenario_file, self._prettyprint
+                    )
+                )
+        return scenario_file, self.road_file, files_to_write
 
     def _get_scenario_name(self, permutation):
         &#34;&#34;&#34;_get_scenario_name generates the name of the wanted file, based on the permutation
@@ -576,6 +647,7 @@ generate_all_roads (bool): will only generate unique roads
         override_parameters=None,
         write_relative_road_path=True,
         name_separator=None,
+        prettyprint=True,
     ):
         &#34;&#34;&#34;generate_single will generate only one scenario
 
@@ -598,7 +670,11 @@ generate_all_roads (bool): will only generate unique roads
 
             name_separator (str): for generation with multiple parameters, this will change the separator between the variables
                 Default: &#39;_&#39;
+
+            prettyprint (bool): determins if the prettify funciton should be used while writing to xml (will take longer time)
+                Default: True
         &#34;&#34;&#34;
+        self._prettyprint = prettyprint
         if name_separator:
             self._name_separator = name_separator
         self.write_relative_road_path = write_relative_road_path
@@ -617,7 +693,8 @@ generate_all_roads (bool): will only generate unique roads
         else:
             it = order
             self._it = it
-        osc, odr = self._generate_road_and_scenario(self.all_permutations[it])
+        self.number_of_parallel_writings = 1
+        osc, odr, _ = self._generate_road_and_scenario(self.all_permutations[it])
         self._reset_name_counter()
         return osc, odr
 
@@ -627,6 +704,7 @@ generate_all_roads (bool): will only generate unique roads
         override_parameters=None,
         write_relative_road_path=True,
         name_separator=None,
+        prettyprint=True,
     ):
         &#34;&#34;&#34;generate uses the xosc.Scenario defined in the method scenario and the xodr.OpenDrive (optional) in the road method
         together with the parameters attribute to generate scenarios and roads for all permutations defined and save those files
@@ -643,7 +721,11 @@ generate_all_roads (bool): will only generate unique roads
 
             name_separator (str): for generation with multiple parameters, this will change the separator between the variables
                 Default: &#39;_&#39;
+
+            prettyprint (bool): determins if the prettify funciton should be used while writing to xml (will take longer time)
+                Default: True
         &#34;&#34;&#34;
+        self._prettyprint = prettyprint
         if name_separator:
             self._name_separator = name_separator
 
@@ -654,12 +736,16 @@ generate_all_roads (bool): will only generate unique roads
         if override_parameters:
             self.parameters = override_parameters
         self._handle_input_parameters()
-
+        files_to_write = []
         for p in self.all_permutations:
-
-            scenario_file, road_file = self._generate_road_and_scenario(p)
+            scenario_file, road_file, writables = self._generate_road_and_scenario(p)
             scenario_files.append(scenario_file)
             road_files.append(road_file)
+            files_to_write.extend(writables)
+
+        if self.number_of_parallel_writings != 1:
+            with Pool(self.number_of_parallel_writings) as p:
+                p.map(_write_xml_file, files_to_write)
         self._reset_name_counter()
         return scenario_files, road_files
 
@@ -695,7 +781,7 @@ generate_all_roads (bool): will only generate unique roads
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.scenario_generator.ScenarioGenerator.generate"><code class="name flex">
-<span>def <span class="ident">generate</span></span>(<span>self, generation_folder, override_parameters=None, write_relative_road_path=True, name_separator=None)</span>
+<span>def <span class="ident">generate</span></span>(<span>self, generation_folder, override_parameters=None, write_relative_road_path=True, name_separator=None, prettyprint=True)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>generate uses the xosc.Scenario defined in the method scenario and the xodr.OpenDrive (optional) in the road method
@@ -711,6 +797,9 @@ write_relative_road_path (bool): if the generator will write the path to a gener
 
 name_separator (str): for generation with multiple parameters, this will change the separator between the variables
     Default: '_'
+
+prettyprint (bool): determins if the prettify funciton should be used while writing to xml (will take longer time)
+    Default: True
 </code></pre></div>
 <details class="source">
 <summary>
@@ -722,6 +811,7 @@ name_separator (str): for generation with multiple parameters, this will change 
     override_parameters=None,
     write_relative_road_path=True,
     name_separator=None,
+    prettyprint=True,
 ):
     &#34;&#34;&#34;generate uses the xosc.Scenario defined in the method scenario and the xodr.OpenDrive (optional) in the road method
     together with the parameters attribute to generate scenarios and roads for all permutations defined and save those files
@@ -738,7 +828,11 @@ name_separator (str): for generation with multiple parameters, this will change 
 
         name_separator (str): for generation with multiple parameters, this will change the separator between the variables
             Default: &#39;_&#39;
+
+        prettyprint (bool): determins if the prettify funciton should be used while writing to xml (will take longer time)
+            Default: True
     &#34;&#34;&#34;
+    self._prettyprint = prettyprint
     if name_separator:
         self._name_separator = name_separator
 
@@ -749,18 +843,22 @@ name_separator (str): for generation with multiple parameters, this will change 
     if override_parameters:
         self.parameters = override_parameters
     self._handle_input_parameters()
-
+    files_to_write = []
     for p in self.all_permutations:
-
-        scenario_file, road_file = self._generate_road_and_scenario(p)
+        scenario_file, road_file, writables = self._generate_road_and_scenario(p)
         scenario_files.append(scenario_file)
         road_files.append(road_file)
+        files_to_write.extend(writables)
+
+    if self.number_of_parallel_writings != 1:
+        with Pool(self.number_of_parallel_writings) as p:
+            p.map(_write_xml_file, files_to_write)
     self._reset_name_counter()
     return scenario_files, road_files</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.scenario_generator.ScenarioGenerator.generate_single"><code class="name flex">
-<span>def <span class="ident">generate_single</span></span>(<span>self, generation_folder, order='first', override_parameters=None, write_relative_road_path=True, name_separator=None)</span>
+<span>def <span class="ident">generate_single</span></span>(<span>self, generation_folder, order='first', override_parameters=None, write_relative_road_path=True, name_separator=None, prettyprint=True)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>generate_single will generate only one scenario</p>
@@ -782,6 +880,9 @@ write_relative_road_path (bool): if the generator will write the path to a gener
 
 name_separator (str): for generation with multiple parameters, this will change the separator between the variables
     Default: '_'
+
+prettyprint (bool): determins if the prettify funciton should be used while writing to xml (will take longer time)
+    Default: True
 </code></pre></div>
 <details class="source">
 <summary>
@@ -794,6 +895,7 @@ name_separator (str): for generation with multiple parameters, this will change 
     override_parameters=None,
     write_relative_road_path=True,
     name_separator=None,
+    prettyprint=True,
 ):
     &#34;&#34;&#34;generate_single will generate only one scenario
 
@@ -816,7 +918,11 @@ name_separator (str): for generation with multiple parameters, this will change 
 
         name_separator (str): for generation with multiple parameters, this will change the separator between the variables
             Default: &#39;_&#39;
+
+        prettyprint (bool): determins if the prettify funciton should be used while writing to xml (will take longer time)
+            Default: True
     &#34;&#34;&#34;
+    self._prettyprint = prettyprint
     if name_separator:
         self._name_separator = name_separator
     self.write_relative_road_path = write_relative_road_path
@@ -835,7 +941,8 @@ name_separator (str): for generation with multiple parameters, this will change 
     else:
         it = order
         self._it = it
-    osc, odr = self._generate_road_and_scenario(self.all_permutations[it])
+    self.number_of_parallel_writings = 1
+    osc, odr, _ = self._generate_road_and_scenario(self.all_permutations[it])
     self._reset_name_counter()
     return osc, odr</code></pre>
 </details>

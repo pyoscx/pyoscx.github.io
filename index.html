@@ -33,22 +33,22 @@
 <p>For more detailed view of the new updates, please see the <a href="https://github.com/pyoscx/scenariogeneration/blob/main/release_notes.md">release notes</a></p>
 <h1 id="the-modules">The modules</h1>
 <h2 id="xosc">xosc</h2>
-<p>The <strong>xosc</strong> module handles the parts related to OpenSCENARIO, and covers all of OpenSCENARIO V 1.0.0 and most of OpenSCENARIO V 1.1.0 (except the parts related to UserDefined things). The module is a xml file generator which allows the user to easily generate a full OpenSCENARIO hierarchy without the need of explicity define all the levels of abstraction (if not needed). This has led to a couple of name changes compared to the standard (mostly adding Absolute or Relative to the name), in the description of the class, the OpenSCENARIO references are written for reference.</p>
+<p>The <strong>xosc</strong> module handles the parts related to OpenSCENARIO, and covers all of OpenSCENARIO V 1.0.0 and most of OpenSCENARIO V 1.1.0 and OpenSCENARIO V 1.2.0. The module is a xml file generator which allows the user to easily generate a full OpenSCENARIO hierarchy without the need of explicity define all the levels of abstraction (if not needed). This has led to a couple of name changes compared to the standard (mostly adding Absolute or Relative to the name), in the description of the class, the OpenSCENARIO references are written for reference.</p>
 <p>The idea with this module is to create easy access to the elements of OpenSCENARIO without having to expose the user to all the xml levels that does not carry any vital information for the user. Hence, some of the xml-elements that build up OpenSCENARIO are never seen in the class structure but compressed to a level where the user can set the required data.</p>
-<p>The module can generate xmls of both V1.0.0 and V1.1.0 of OpenSCENARIO.</p>
+<p>The module can generate xmls of both V1.0.0, V1.1.0 and V1.2.0 of OpenSCENARIO.</p>
 <p>In general the <strong>xosc</strong> module does not contain many "smart" functionality (except some default values), but the user can build up the scenario based on the classes available.</p>
 <h3 id="automatic-generation-of-story-act-and-maneuvergroup">Automatic generation of Story, Act, and ManeuverGroup</h3>
 <p>One of the few functionalities of the <strong>xosc</strong> module is for simple scenario generation and to create the <strong>StoryBoard</strong>.</p>
 <p>In short the <strong>StoryBoard</strong>, consists of alot of layers from the Story, down to the Actions and Triggers.
 For simple scenarios the multiple top level layers (like Story, Act or ManeuverGroup) are not needed, hence the <strong>StoryBoard</strong> has multiple ways of adding sub-classes (add_story, add_act, add_maneuvergroup, add_maneuver) and will generate the top levels to make the xml correct.</p>
-<p><strong>NOTE:</strong> Do not use more than one of these calls (except add_story), because each call will create a new story, and this in most cases are not what a user would like.</p>
+<p><strong>WARNING:</strong> Do not use more than one of these calls (except add_story), because each call will create a new story, and this in most cases are not what a user would like.</p>
 <h3 id="generate-different-versions-of-openscenario">Generate different versions of OpenSCENARIO</h3>
 <p>As of scenariogeneration V0.5.0, it is possible to generate different versions of the resulting OpenSCENARIO xml.
 This feature is enabled by one simple input to the Scenario class as:</p>
 <pre><code>sce = Scenario(... , osc_minor_version=0)
 </code></pre>
-<p>The default is 1 (V1.1.0), but with this V1.0.0 OpenSCENARIO xmls can be generated.</p>
-<p>The V1.1.0 will remove the depricated attributes, and have a pure V1.1.0 xml. If version specific elements are used together with the wrong version, a <strong>OpenSCENARIOVersionError</strong> will be raised.</p>
+<p>The default is 2 (V1.2.0), but with this V1.0.0 OpenSCENARIO xmls can be generated.</p>
+<p>The V1.2.0 will remove the depricated attributes, and have a pure V1.2.0 xml. If version specific elements are used together with the wrong version, a <strong>OpenSCENARIOVersionError</strong> will be raised.</p>
 <p>NOTE: as of V0.5.0 some interfaces had to be changed in order to fulfill the V1.1.0 standard, please see the <a href="https://github.com/pyoscx/scenariogeneration/blob/main/release_notes.md">release notes</a> for more info.</p>
 <h3 id="parsing-an-xosc-file-and-get-the-python-object-back">Parsing an .xosc file and get the Python object back</h3>
 <p>As of scenariogeneration V0.7.0, the <strong>xosc</strong> module supports parsing an existing .xosc file.
@@ -63,7 +63,7 @@ This enables modifying already exisisting xosc files, eg. from a Scenario editor
 <h3 id="automatic-calculation-of-geometries-and-links">Automatic calculation of geometries and links</h3>
 <p>The most important automation functionality is the <em>adjust_roads_and_lanes</em> method of the <em>OpenDRIVE</em> class, which does two main things:</p>
 <ol>
-<li><strong>Patch all Geometries and Roads Together</strong> This is done on two levels: the "RoadNetwork" level and the "PlanView" level. At the RoadNetwork level all defined roads are patched consecutively, and this is possible only if the "predecessor/successor" attributes of the roads have been set. This is done either by: fixing the first road added to (0,0,0) and patch all other roads to that one, or localize if any PlanView(s) created has a manually added start point (e.g. if multiple roads are not connected via predecessor/successor). At the PlanView level instead all geometries are patched together creating one continuous road, based at its start point. See the <a href="examples/xodr/highway_example.html">highway_example</a> for an example showing how to work on the RoadNetwork level and <a href="examples/xodr/multiple_geometries_one_road.html">multiple_geometries_one_road</a> for the PlanView level.</li>
+<li><strong>Patch all Geometries and Roads Together</strong> This is done on two levels: the "RoadNetwork" level and the "PlanView" level. At the RoadNetwork level all defined roads are patched consecutively, and this is possible only if the "predecessor/successor" attributes of the roads have been set. This is done either by: fixing the first road added to (0,0,0) and patch all other roads to that one, or localize if any PlanView(s) created has a manually added start point (e.g. if multiple roads are not connected via predecessor/successor). At the PlanView level, instead all geometries are patched together creating one continuous road, based at its start point. See the <a href="examples/xodr/highway_example.html">highway_example</a> for an example showing how to work on the RoadNetwork level and <a href="examples/xodr/multiple_geometries_one_road.html">multiple_geometries_one_road</a> for the PlanView level.</li>
 </ol>
 <p>Note: <em>adjust_roads_and_lanes</em> will assume that the heading is continious between different geometries and roads.</p>
 <ol>
@@ -79,7 +79,7 @@ Some example usage of this can be seen in <a href="examples/xodr/highway_example
 <p>The
 <em>create_cloth_arc_cloth</em> function creates road with a smooth curve based on a clothoid + arc + clothoid. This is often used since the curvature of the road will change continiously (and resulting in nice steering wheel changes for a driver).</p>
 <h4 id="create_3cloths">create_3cloths</h4>
-<p>Similarly to <em>create_cloth_arc_cloth</em>, the <em>create_3cloths</em> function creates a smooth curve based on 3 consecutive spiral geoemtries (using pyclothoids)</p>
+<p>Similarly to <em>create_cloth_arc_cloth</em>, the <em>create_3cloths</em> function creates a smooth curve based on 3 consecutive spiral geoemtries (using <a href="https://github.com/phillipd94/pyclothoids">pyclothoids</a>)</p>
 <h4 id="lanedef">LaneDef</h4>
 <p>LaneDef is a helper class that enables simple lane merge/split roads to be created, this definition can be used together with the create_road generator (see <a href="examples/xodr/highway_example_with_merge_and_split.html">highway_example_with_merge_and_split</a>).</p>
 <h3 id="junctioncreators">JunctionCreators</h3>

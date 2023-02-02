@@ -36,11 +36,11 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <pre><code class="python">&#34;&#34;&#34;
   scenariogeneration
   https://github.com/pyoscx/scenariogeneration
- 
+
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at https://mozilla.org/MPL/2.0/.
- 
+
   Copyright (c) 2022 The scenariogeneration Authors.
 
 &#34;&#34;&#34;
@@ -57,7 +57,13 @@ from .utils import (
     _EntityTriggerType,
     _ValueTriggerType,
 )
-from .utils import ParameterDeclarations, CatalogFile, convert_bool, convert_int
+from .utils import (
+    ParameterDeclarations,
+    CatalogFile,
+    convert_bool,
+    convert_int,
+    get_bool_string,
+)
 from .enumerations import Priority, Rule, ConditionEdge, VersionBase
 from .actions import _GlobalActionFactory, _PrivateActionFactory
 
@@ -274,7 +280,6 @@ class StoryBoard:
                 and self.stoptrigger == other.stoptrigger
                 and self.stories == other.stories
             ):
-
                 return True
         return False
 
@@ -870,7 +875,7 @@ class _Actors:
 
         &#34;&#34;&#34;
         self.actors = []
-        self.select = selectTriggeringEntities
+        self.select = convert_bool(selectTriggeringEntities)
 
     def __eq__(self, other):
         if isinstance(other, _Actors):
@@ -915,7 +920,7 @@ class _Actors:
 
     def get_attributes(self):
         &#34;&#34;&#34;returns the attributes of the _Actors as a dict&#34;&#34;&#34;
-        return {&#34;selectTriggeringEntities&#34;: convert_bool(self.select)}
+        return {&#34;selectTriggeringEntities&#34;: get_bool_string(self.select)}
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the _Actors&#34;&#34;&#34;
@@ -1134,7 +1139,6 @@ class Event(VersionBase):
 
     def __eq__(self, other):
         if isinstance(other, Event):
-
             if (
                 self.get_attributes() == other.get_attributes()
                 and self.trigger == other.trigger
@@ -1635,7 +1639,6 @@ get_attributes()
 
     def __eq__(self, other):
         if isinstance(other, Event):
-
             if (
                 self.get_attributes() == other.get_attributes()
                 and self.trigger == other.trigger
@@ -3298,7 +3301,6 @@ stoptrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigge
                 and self.stoptrigger == other.stoptrigger
                 and self.stories == other.stories
             ):
-
                 return True
         return False
 

@@ -36,21 +36,23 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <pre><code class="python">&#34;&#34;&#34;
   scenariogeneration
   https://github.com/pyoscx/scenariogeneration
- 
+
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at https://mozilla.org/MPL/2.0/.
- 
+
   Copyright (c) 2022 The scenariogeneration Authors.
 
 &#34;&#34;&#34;
 XMLNS = &#34;http://www.w3.org/2001/XMLSchema-instance&#34;
 XSI = &#34;OpenScenario.xsd&#34;
 
+import re
 from .exceptions import OpenSCENARIOVersionError
 from os import error
+import warnings
 
-_MINOR_VERSION = 1
+_MINOR_VERSION = 2
 
 
 class VersionBase:
@@ -59,10 +61,10 @@ class VersionBase:
     version_major = 1
     version_minor = _MINOR_VERSION
 
-    def isVersion(self, major=1, minor=1):
+    def isVersion(self, major=1, minor=_MINOR_VERSION):
         return major &gt;= self.version_major and minor &gt;= self.version_minor
 
-    def setVersion(self, major=1, minor=0):
+    def setVersion(self, major=1, minor=_MINOR_VERSION):
         VersionBase.version_major = major
         VersionBase.version_minor = minor
 
@@ -100,10 +102,14 @@ class _OscEnum(VersionBase):
     &#34;&#34;&#34;
 
     def __init__(
-        self, classname, name, min_minor_version=0, max_minor_version=_MINOR_VERSION
+        self,
+        classname,
+        name,
+        min_minor_version=0,
+        max_minor_version=_MINOR_VERSION,
+        replacement=None,
     ):
         &#34;&#34;&#34;initalize the _OscEnum
-
         Parameters
         ----------
             name (str): enum name
@@ -115,12 +121,15 @@ class _OscEnum(VersionBase):
 
             max_minor_version (int): the max &#34;minor version&#34; where the enum is valid
                 Default: Current Supported Version
+
+            replacement (str): can be used is the enum has been replaced to make transitions go easier
         &#34;&#34;&#34;
 
         self.name = name
         self.classname = classname
         self.min_minor_version = min_minor_version
         self.max_minor_version = max_minor_version
+        self.replacement = replacement
 
     def __eq__(self, other):
         if isinstance(other, _OscEnum):
@@ -135,7 +144,6 @@ class _OscEnum(VersionBase):
         -------
         name (str)
         &#34;&#34;&#34;
-
         if self.min_minor_version &gt; self.version_minor:
             raise OpenSCENARIOVersionError(
                 self.classname
@@ -151,6 +159,24 @@ class _OscEnum(VersionBase):
                 + str(self.min_minor_version)
             )
         elif self.max_minor_version &lt; self.version_minor:
+            if self.replacement:
+                warnings.warn(
+                    self.classname
+                    + &#34;.&#34;
+                    + self.name
+                    + &#34; is not part of OpenSCENARIO V&#34;
+                    + str(self.version_major)
+                    + &#34;.&#34;
+                    + str(self.version_minor)
+                    + &#34;, was deprecated in V&#34;
+                    + str(self.version_major)
+                    + &#34;.&#34;
+                    + str(self.max_minor_version)
+                    + &#34; and replaced with: &#34;
+                    + self.replacement
+                )
+                return self.name
+
             raise OpenSCENARIOVersionError(
                 self.classname
                 + &#34;.&#34;
@@ -170,7 +196,17 @@ class _OscEnum(VersionBase):
         return self.name
 
 
-class CloudState:
+class _EnumMeta(type):
+    &#34;&#34;&#34;This class is used to add functionality to the Enum classes in the xosc module
+    Note: this class should only be inherited
+
+    &#34;&#34;&#34;
+
+    def __getitem__(self, name):
+        return self.__dict__[name]
+
+
+class CloudState(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for CloudState&#34;&#34;&#34;
 
     skyOff = _OscEnum(&#34;CloudState&#34;, &#34;skyOff&#34;)
@@ -180,7 +216,7 @@ class CloudState:
     rainy = _OscEnum(&#34;CloudState&#34;, &#34;rainy&#34;)
 
 
-class ConditionEdge:
+class ConditionEdge(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for ConditionEdge&#34;&#34;&#34;
 
     rising = _OscEnum(&#34;ConditionEdge&#34;, &#34;rising&#34;)
@@ -189,7 +225,7 @@ class ConditionEdge:
     none = _OscEnum(&#34;ConditionEdge&#34;, &#34;none&#34;)
 
 
-class DynamicsDimension:
+class DynamicsDimension(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for DynamicsDimension&#34;&#34;&#34;
 
     rate = _OscEnum(&#34;DynamicsDimension&#34;, &#34;rate&#34;)
@@ -197,7 +233,7 @@ class DynamicsDimension:
     distance = _OscEnum(&#34;DynamicsDimension&#34;, &#34;distance&#34;)
 
 
-class DynamicsShapes:
+class DynamicsShapes(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for DynamicsShapes&#34;&#34;&#34;
 
     linear = _OscEnum(&#34;DynamicsShapes&#34;, &#34;linear&#34;)
@@ -206,14 +242,14 @@ class DynamicsShapes:
     step = _OscEnum(&#34;DynamicsShapes&#34;, &#34;step&#34;)
 
 
-class FollowMode:
-    &#34;&#34;&#34;Enum for FollowMode&#34;&#34;&#34;
+class FollowingMode(metaclass=_EnumMeta):
+    &#34;&#34;&#34;Enum for FollowingMode&#34;&#34;&#34;
 
-    position = _OscEnum(&#34;FollowMode&#34;, &#34;position&#34;)
-    follow = _OscEnum(&#34;FollowMode&#34;, &#34;follow&#34;)
+    position = _OscEnum(&#34;FollowingMode&#34;, &#34;position&#34;)
+    follow = _OscEnum(&#34;FollowingMode&#34;, &#34;follow&#34;)
 
 
-class MiscObjectCategory:
+class MiscObjectCategory(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for MiscObjectCategory&#34;&#34;&#34;
 
     none = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;none&#34;)
@@ -235,7 +271,7 @@ class MiscObjectCategory:
     roadMark = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;roadMark&#34;)
 
 
-class ObjectType:
+class ObjectType(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for ObjectType&#34;&#34;&#34;
 
     pedestrian = _OscEnum(&#34;ObjectType&#34;, &#34;pedestrian&#34;)
@@ -244,10 +280,13 @@ class ObjectType:
     external = _OscEnum(&#34;ObjectType&#34;, &#34;external&#34;, min_minor_version=1)
 
 
-class ParameterType:
+class ParameterType(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for ParameterType&#34;&#34;&#34;
 
-    integer = _OscEnum(&#34;ParameterType&#34;, &#34;integer&#34;)
+    integer = _OscEnum(
+        &#34;ParameterType&#34;, &#34;integer&#34;, max_minor_version=1, replacement=&#34;int&#34;
+    )
+    int = _OscEnum(&#34;ParameterType&#34;, &#34;int&#34;, min_minor_version=2)
     double = _OscEnum(&#34;ParameterType&#34;, &#34;double&#34;)
     string = _OscEnum(&#34;ParameterType&#34;, &#34;string&#34;)
     unsighedInt = _OscEnum(&#34;ParameterType&#34;, &#34;unsighedInt&#34;)
@@ -256,7 +295,7 @@ class ParameterType:
     dateTime = _OscEnum(&#34;ParameterType&#34;, &#34;dateTime&#34;)
 
 
-class PedestrianCategory:
+class PedestrianCategory(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for PedestrianCategory&#34;&#34;&#34;
 
     pedestrian = _OscEnum(&#34;PedestrianCategory&#34;, &#34;pedestrian&#34;)
@@ -264,7 +303,7 @@ class PedestrianCategory:
     animal = _OscEnum(&#34;PedestrianCategory&#34;, &#34;animal&#34;)
 
 
-class PrecipitationType:
+class PrecipitationType(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for PercipitationType&#34;&#34;&#34;
 
     dry = _OscEnum(&#34;PrecipitationType&#34;, &#34;dry&#34;)
@@ -272,22 +311,25 @@ class PrecipitationType:
     snow = _OscEnum(&#34;PrecipitationType&#34;, &#34;snow&#34;)
 
 
-class Priority:
+class Priority(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for Priority&#34;&#34;&#34;
 
-    overwrite = _OscEnum(&#34;Priority&#34;, &#34;overwrite&#34;)
+    overwrite = _OscEnum(
+        &#34;Priority&#34;, &#34;overwrite&#34;, max_minor_version=1, replacement=&#34;override&#34;
+    )
+    override = _OscEnum(&#34;Priority&#34;, &#34;override&#34;, min_minor_version=2)
     skip = _OscEnum(&#34;Priority&#34;, &#34;skip&#34;)
     parallel = _OscEnum(&#34;Priority&#34;, &#34;parallel&#34;)
 
 
-class ReferenceContext:
+class ReferenceContext(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for ReferenceContext&#34;&#34;&#34;
 
     relative = _OscEnum(&#34;ReferenceContext&#34;, &#34;relative&#34;)
     absolute = _OscEnum(&#34;ReferenceContext&#34;, &#34;absolute&#34;)
 
 
-class RelativeDistanceType:
+class RelativeDistanceType(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for RelativeDistanceType&#34;&#34;&#34;
 
     longitudinal = _OscEnum(&#34;RelativeDistanceType&#34;, &#34;longitudinal&#34;)
@@ -300,7 +342,7 @@ class RelativeDistanceType:
     )
 
 
-class RouteStrategy:
+class RouteStrategy(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for RouteStrategy&#34;&#34;&#34;
 
     fastest = _OscEnum(&#34;RouteStrategy&#34;, &#34;fastest&#34;)
@@ -309,7 +351,7 @@ class RouteStrategy:
     random = _OscEnum(&#34;RouteStrategy&#34;, &#34;random&#34;)
 
 
-class Rule:
+class Rule(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for Rule&#34;&#34;&#34;
 
     greaterThan = _OscEnum(&#34;Rule&#34;, &#34;greaterThan&#34;)
@@ -320,14 +362,14 @@ class Rule:
     notEqualTo = _OscEnum(&#34;Rule&#34;, &#34;notEqualTo&#34;, min_minor_version=1)
 
 
-class SpeedTargetValueType:
+class SpeedTargetValueType(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for SpeedTargetValueType&#34;&#34;&#34;
 
     delta = _OscEnum(&#34;SpeedTargetValueType&#34;, &#34;delta&#34;)
     factor = _OscEnum(&#34;SpeedTargetValueType&#34;, &#34;factor&#34;)
 
 
-class StoryboardElementState:
+class StoryboardElementState(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for StoryboardElementState&#34;&#34;&#34;
 
     startTransition = _OscEnum(&#34;StoryboardElementState&#34;, &#34;startTransition&#34;)
@@ -339,7 +381,7 @@ class StoryboardElementState:
     standbyState = _OscEnum(&#34;StoryboardElementState&#34;, &#34;standbyState&#34;)
 
 
-class StoryboardElementType:
+class StoryboardElementType(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for StoryboardElementType&#34;&#34;&#34;
 
     story = _OscEnum(&#34;StoryboardElementType&#34;, &#34;story&#34;)
@@ -350,14 +392,14 @@ class StoryboardElementType:
     maneuverGroup = _OscEnum(&#34;StoryboardElementType&#34;, &#34;maneuverGroup&#34;)
 
 
-class TriggeringEntitiesRule:
+class TriggeringEntitiesRule(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for TriggeringEntitiesRule&#34;&#34;&#34;
 
     any = _OscEnum(&#34;TriggeringEntitiesRule&#34;, &#34;any&#34;)
     all = _OscEnum(&#34;TriggeringEntitiesRule&#34;, &#34;all&#34;)
 
 
-class VehicleCategory:
+class VehicleCategory(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for VehicleCategory&#34;&#34;&#34;
 
     car = _OscEnum(&#34;VehicleCategory&#34;, &#34;car&#34;)
@@ -372,7 +414,7 @@ class VehicleCategory:
     tram = _OscEnum(&#34;VehicleCategory&#34;, &#34;tram&#34;)
 
 
-class CoordinateSystem:
+class CoordinateSystem(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for CoordinateSystem&#34;&#34;&#34;
 
     entity = _OscEnum(&#34;CoordinateSystem&#34;, &#34;entity&#34;, min_minor_version=1)
@@ -381,7 +423,7 @@ class CoordinateSystem:
     trajectory = _OscEnum(&#34;CoordinateSystem&#34;, &#34;trajectory&#34;, min_minor_version=1)
 
 
-class LateralDisplacement:
+class LateralDisplacement(metaclass=_EnumMeta):
     any = _OscEnum(&#34;LateralDisplacement&#34;, &#34;any&#34;, min_minor_version=1)
     leftToReferencedEntity = _OscEnum(
         &#34;LateralDisplacement&#34;, &#34;leftToReferencedEntity&#34;, min_minor_version=1
@@ -391,14 +433,212 @@ class LateralDisplacement:
     )
 
 
-class LongitudinalDisplacement:
+class LongitudinalDisplacement(metaclass=_EnumMeta):
     any = _OscEnum(&#34;LongitudinalDisplacement&#34;, &#34;any&#34;, min_minor_version=1)
     trailingReferencedEntity = _OscEnum(
         &#34;LongitudinalDisplacement&#34;, &#34;trailingReferencedEntity&#34;, min_minor_version=1
     )
     leadingReferencedEntity = _OscEnum(
         &#34;LongitudinalDisplacement&#34;, &#34;leadingReferencedEntity&#34;, min_minor_version=1
-    )</code></pre>
+    )
+
+
+class AutomaticGearType(metaclass=_EnumMeta):
+    n = _OscEnum(&#34;AutomaticGearType&#34;, &#34;n&#34;, min_minor_version=2)
+    p = _OscEnum(&#34;AutomaticGearType&#34;, &#34;p&#34;, min_minor_version=2)
+    r = _OscEnum(&#34;AutomaticGearType&#34;, &#34;r&#34;, min_minor_version=2)
+    d = _OscEnum(&#34;AutomaticGearType&#34;, &#34;d&#34;, min_minor_version=2)
+
+
+class ControllerType(metaclass=_EnumMeta):
+    lateral = _OscEnum(&#34;ControllerType&#34;, &#34;lateral&#34;, min_minor_version=2)
+    longitudinal = _OscEnum(&#34;ControllerType&#34;, &#34;longitudinal&#34;, min_minor_version=2)
+    lighting = _OscEnum(&#34;ControllerType&#34;, &#34;lighting&#34;, min_minor_version=2)
+    animation = _OscEnum(&#34;ControllerType&#34;, &#34;animation&#34;, min_minor_version=2)
+    movement = _OscEnum(&#34;ControllerType&#34;, &#34;movement&#34;, min_minor_version=2)
+    appearance = _OscEnum(&#34;ControllerType&#34;, &#34;appearance&#34;, min_minor_version=2)
+    all = _OscEnum(&#34;ControllerType&#34;, &#34;all&#34;, min_minor_version=2)
+
+
+class DirectionalDimension(metaclass=_EnumMeta):
+    longitudinal = _OscEnum(&#34;DirectionalDimension&#34;, &#34;longitudinal&#34;, min_minor_version=2)
+    lateral = _OscEnum(&#34;DirectionalDimension&#34;, &#34;lateral&#34;, min_minor_version=2)
+    vertical = _OscEnum(&#34;DirectionalDimension&#34;, &#34;vertical&#34;, min_minor_version=2)
+
+
+class FractionalCloudCover(metaclass=_EnumMeta):
+    zeroOktas = _OscEnum(&#34;FractionalCloudCover&#34;, &#34;zeroOktas&#34;, min_minor_version=2)
+    oneOktas = _OscEnum(&#34;FractionalCloudCover&#34;, &#34;oneOktas&#34;, min_minor_version=2)
+    twoOktas = _OscEnum(&#34;FractionalCloudCover&#34;, &#34;twoOktas&#34;, min_minor_version=2)
+    threeOktas = _OscEnum(&#34;FractionalCloudCover&#34;, &#34;threeOktas&#34;, min_minor_version=2)
+    fourOktas = _OscEnum(&#34;FractionalCloudCover&#34;, &#34;fourOktas&#34;, min_minor_version=2)
+    fiveOktas = _OscEnum(&#34;FractionalCloudCover&#34;, &#34;fiveOktas&#34;, min_minor_version=2)
+    sixOktas = _OscEnum(&#34;FractionalCloudCover&#34;, &#34;sixOktas&#34;, min_minor_version=2)
+    sevenOktas = _OscEnum(&#34;FractionalCloudCover&#34;, &#34;sevenOktas&#34;, min_minor_version=2)
+    eightOktas = _OscEnum(&#34;FractionalCloudCover&#34;, &#34;eightOktas&#34;, min_minor_version=2)
+    nineOktas = _OscEnum(&#34;FractionalCloudCover&#34;, &#34;nineOktas&#34;, min_minor_version=2)
+
+
+class LightMode(metaclass=_EnumMeta):
+    on = _OscEnum(&#34;LightMode&#34;, &#34;on&#34;, min_minor_version=2)
+    off = _OscEnum(&#34;LightMode&#34;, &#34;off&#34;, min_minor_version=2)
+    flashing = _OscEnum(&#34;LightMode&#34;, &#34;flashing&#34;, min_minor_version=2)
+
+
+class PedestrianGestureType(metaclass=_EnumMeta):
+    phoneCallRightHand = _OscEnum(
+        &#34;PedestrianGestureType&#34;, &#34;phoneCallRightHand&#34;, min_minor_version=2
+    )
+    phoneCallLeftHand = _OscEnum(
+        &#34;PedestrianGestureType&#34;, &#34;phoneCallLeftHand&#34;, min_minor_version=2
+    )
+    phoneTextRightHand = _OscEnum(
+        &#34;PedestrianGestureType&#34;, &#34;phoneTextRightHand&#34;, min_minor_version=2
+    )
+    phoneTextLeftHand = _OscEnum(
+        &#34;PedestrianGestureType&#34;, &#34;phoneTextLeftHand&#34;, min_minor_version=2
+    )
+    wavingRightArm = _OscEnum(
+        &#34;PedestrianGestureType&#34;, &#34;wavingRightArm&#34;, min_minor_version=2
+    )
+    wavingLeftArm = _OscEnum(
+        &#34;PedestrianGestureType&#34;, &#34;wavingLeftArm&#34;, min_minor_version=2
+    )
+    umbrellaRightHand = _OscEnum(
+        &#34;PedestrianGestureType&#34;, &#34;umbrellaRightHand&#34;, min_minor_version=2
+    )
+    umbrellaLeftHand = _OscEnum(
+        &#34;PedestrianGestureType&#34;, &#34;umbrellaLeftHand&#34;, min_minor_version=2
+    )
+    crossArms = _OscEnum(&#34;PedestrianGestureType&#34;, &#34;crossArms&#34;, min_minor_version=2)
+    coffeeRightHand = _OscEnum(
+        &#34;PedestrianGestureType&#34;, &#34;coffeeRightHand&#34;, min_minor_version=2
+    )
+    coffeeLeftHand = _OscEnum(
+        &#34;PedestrianGestureType&#34;, &#34;coffeeLeftHand&#34;, min_minor_version=2
+    )
+    sandwichRightHand = _OscEnum(
+        &#34;PedestrianGestureType&#34;, &#34;sandwichRightHand&#34;, min_minor_version=2
+    )
+    sandwichLeftHand = _OscEnum(
+        &#34;PedestrianGestureType&#34;, &#34;sandwichLeftHand&#34;, min_minor_version=2
+    )
+
+
+class PedestrianMotionType(metaclass=_EnumMeta):
+    standing = _OscEnum(&#34;PedestrianMotionType&#34;, &#34;standing&#34;, min_minor_version=2)
+    sitting = _OscEnum(&#34;PedestrianMotionType&#34;, &#34;sitting&#34;, min_minor_version=2)
+    lying = _OscEnum(&#34;PedestrianMotionType&#34;, &#34;lying&#34;, min_minor_version=2)
+    squatting = _OscEnum(&#34;PedestrianMotionType&#34;, &#34;squatting&#34;, min_minor_version=2)
+    walking = _OscEnum(&#34;PedestrianMotionType&#34;, &#34;walking&#34;, min_minor_version=2)
+    running = _OscEnum(&#34;PedestrianMotionType&#34;, &#34;running&#34;, min_minor_version=2)
+    reeling = _OscEnum(&#34;PedestrianMotionType&#34;, &#34;reeling&#34;, min_minor_version=2)
+    crawling = _OscEnum(&#34;PedestrianMotionType&#34;, &#34;crawling&#34;, min_minor_version=2)
+    cycling = _OscEnum(&#34;PedestrianMotionType&#34;, &#34;cycling&#34;, min_minor_version=2)
+    jumping = _OscEnum(&#34;PedestrianMotionType&#34;, &#34;jumping&#34;, min_minor_version=2)
+    ducking = _OscEnum(&#34;PedestrianMotionType&#34;, &#34;ducking&#34;, min_minor_version=2)
+    bendingDown = _OscEnum(&#34;PedestrianMotionType&#34;, &#34;bendingDown&#34;, min_minor_version=2)
+
+
+class RoutingAlgorithm(metaclass=_EnumMeta):
+    assignedRoute = _OscEnum(&#34;RoutingAlgorithm&#34;, &#34;assignedRoute&#34;, min_minor_version=2)
+    fastest = _OscEnum(&#34;RoutingAlgorithm&#34;, &#34;fastest&#34;, min_minor_version=2)
+    leastIntersections = _OscEnum(
+        &#34;RoutingAlgorithm&#34;, &#34;leastIntersections&#34;, min_minor_version=2
+    )
+    shortest = _OscEnum(&#34;RoutingAlgorithm&#34;, &#34;shortest&#34;, min_minor_version=2)
+    undefined = _OscEnum(&#34;RoutingAlgorithm&#34;, &#34;undefined&#34;, min_minor_version=2)
+
+
+class VehicleComponentType(metaclass=_EnumMeta):
+    hood = _OscEnum(&#34;VehicleComponentType&#34;, &#34;hood&#34;, min_minor_version=2)
+    trunk = _OscEnum(&#34;VehicleComponentType&#34;, &#34;trunk&#34;, min_minor_version=2)
+    doorFrontRight = _OscEnum(
+        &#34;VehicleComponentType&#34;, &#34;doorFrontRight&#34;, min_minor_version=2
+    )
+    doorFrontLeft = _OscEnum(
+        &#34;VehicleComponentType&#34;, &#34;doorFrontLeft&#34;, min_minor_version=2
+    )
+    doorRearRight = _OscEnum(
+        &#34;VehicleComponentType&#34;, &#34;doorRearRight&#34;, min_minor_version=2
+    )
+    doorRearLeft = _OscEnum(&#34;VehicleComponentType&#34;, &#34;doorRearLeft&#34;, min_minor_version=2)
+    windowFrontRight = _OscEnum(
+        &#34;VehicleComponentType&#34;, &#34;windowFrontRight&#34;, min_minor_version=2
+    )
+    windowFrontLeft = _OscEnum(
+        &#34;VehicleComponentType&#34;, &#34;windowFrontLeft&#34;, min_minor_version=2
+    )
+    windowRearRight = _OscEnum(
+        &#34;VehicleComponentType&#34;, &#34;windowRearRight&#34;, min_minor_version=2
+    )
+    windowRearLeft = _OscEnum(
+        &#34;VehicleComponentType&#34;, &#34;windowRearLeft&#34;, min_minor_version=2
+    )
+    sideMirrors = _OscEnum(&#34;VehicleComponentType&#34;, &#34;sideMirrors&#34;, min_minor_version=2)
+    sideMirrorRight = _OscEnum(
+        &#34;VehicleComponentType&#34;, &#34;sideMirrorRight&#34;, min_minor_version=2
+    )
+    sideMirrorLeft = _OscEnum(
+        &#34;VehicleComponentType&#34;, &#34;sideMirrorLeft&#34;, min_minor_version=2
+    )
+
+
+class VehicleLightType(metaclass=_EnumMeta):
+    daytimeRunningLights = _OscEnum(
+        &#34;VehicleLightType&#34;, &#34;daytimeRunningLights&#34;, min_minor_version=2
+    )
+    lowBeam = _OscEnum(&#34;VehicleLightType&#34;, &#34;lowBeam&#34;, min_minor_version=2)
+    highBeam = _OscEnum(&#34;VehicleLightType&#34;, &#34;highBeam&#34;, min_minor_version=2)
+    fogLights = _OscEnum(&#34;VehicleLightType&#34;, &#34;fogLights&#34;, min_minor_version=2)
+    fogLightsFront = _OscEnum(&#34;VehicleLightType&#34;, &#34;fogLightsFront&#34;, min_minor_version=2)
+    fogLightsRear = _OscEnum(&#34;VehicleLightType&#34;, &#34;fogLightsRear&#34;, min_minor_version=2)
+    brakeLights = _OscEnum(&#34;VehicleLightType&#34;, &#34;brakeLights&#34;, min_minor_version=2)
+    warningLights = _OscEnum(&#34;VehicleLightType&#34;, &#34;warningLights&#34;, min_minor_version=2)
+    indicatorLeft = _OscEnum(&#34;VehicleLightType&#34;, &#34;indicatorLeft&#34;, min_minor_version=2)
+    indicatorRight = _OscEnum(&#34;VehicleLightType&#34;, &#34;indicatorRight&#34;, min_minor_version=2)
+    reversingLights = _OscEnum(
+        &#34;VehicleLightType&#34;, &#34;reversingLights&#34;, min_minor_version=2
+    )
+    licensePlateIllumination = _OscEnum(
+        &#34;VehicleLightType&#34;, &#34;licensePlateIllumination&#34;, min_minor_version=2
+    )
+    specialPurposeLights = _OscEnum(
+        &#34;VehicleLightType&#34;, &#34;specialPurposeLights&#34;, min_minor_version=2
+    )
+
+
+class Role(metaclass=_EnumMeta):
+    none = _OscEnum(&#34;Role&#34;, &#34;none&#34;, min_minor_version=2)
+    ambulance = _OscEnum(&#34;Role&#34;, &#34;ambulance&#34;, min_minor_version=2)
+    civil = _OscEnum(&#34;Role&#34;, &#34;civil&#34;, min_minor_version=2)
+    fire = _OscEnum(&#34;Role&#34;, &#34;fire&#34;, min_minor_version=2)
+    military = _OscEnum(&#34;Role&#34;, &#34;military&#34;, min_minor_version=2)
+    police = _OscEnum(&#34;Role&#34;, &#34;police&#34;, min_minor_version=2)
+    publicTransport = _OscEnum(&#34;Role&#34;, &#34;publicTransport&#34;, min_minor_version=2)
+    roadAssistance = _OscEnum(&#34;Role&#34;, &#34;roadAssistance&#34;, min_minor_version=2)
+
+
+class Wetness(metaclass=_EnumMeta):
+    dry = _OscEnum(&#34;Wetness&#34;, &#34;dry&#34;, min_minor_version=2)
+    moist = _OscEnum(&#34;Wetness&#34;, &#34;moist&#34;, min_minor_version=2)
+    wetWithPuddles = _OscEnum(&#34;Wetness&#34;, &#34;wetWithPuddles&#34;, min_minor_version=2)
+    lowFlooded = _OscEnum(&#34;Wetness&#34;, &#34;lowFlooded&#34;, min_minor_version=2)
+    highFlooded = _OscEnum(&#34;Wetness&#34;, &#34;highFlooded&#34;, min_minor_version=2)
+
+
+class ColorType:
+    other = _OscEnum(&#34;ColorType&#34;, &#34;other&#34;, min_minor_version=2)
+    red = _OscEnum(&#34;ColorType&#34;, &#34;red&#34;, min_minor_version=2)
+    yellow = _OscEnum(&#34;ColorType&#34;, &#34;yellow&#34;, min_minor_version=2)
+    green = _OscEnum(&#34;ColorType&#34;, &#34;green&#34;, min_minor_version=2)
+    blue = _OscEnum(&#34;ColorType&#34;, &#34;blue&#34;, min_minor_version=2)
+    violet = _OscEnum(&#34;ColorType&#34;, &#34;violet&#34;, min_minor_version=2)
+    orange = _OscEnum(&#34;ColorType&#34;, &#34;orange&#34;, min_minor_version=2)
+    brown = _OscEnum(&#34;ColorType&#34;, &#34;brown&#34;, min_minor_version=2)
+    black = _OscEnum(&#34;ColorType&#34;, &#34;black&#34;, min_minor_version=2)
+    grey = _OscEnum(&#34;ColorType&#34;, &#34;grey&#34;, min_minor_version=2)
+    white = _OscEnum(&#34;ColorType&#34;, &#34;white&#34;, min_minor_version=2)</code></pre>
 </details>
 </section>
 <section>
@@ -410,6 +650,41 @@ class LongitudinalDisplacement:
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="scenariogeneration.xosc.enumerations.AutomaticGearType"><code class="flex name class">
+<span>class <span class="ident">AutomaticGearType</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AutomaticGearType(metaclass=_EnumMeta):
+    n = _OscEnum(&#34;AutomaticGearType&#34;, &#34;n&#34;, min_minor_version=2)
+    p = _OscEnum(&#34;AutomaticGearType&#34;, &#34;p&#34;, min_minor_version=2)
+    r = _OscEnum(&#34;AutomaticGearType&#34;, &#34;r&#34;, min_minor_version=2)
+    d = _OscEnum(&#34;AutomaticGearType&#34;, &#34;d&#34;, min_minor_version=2)</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="scenariogeneration.xosc.enumerations.AutomaticGearType.d"><code class="name">var <span class="ident">d</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.AutomaticGearType.n"><code class="name">var <span class="ident">n</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.AutomaticGearType.p"><code class="name">var <span class="ident">p</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.AutomaticGearType.r"><code class="name">var <span class="ident">r</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
 <dt id="scenariogeneration.xosc.enumerations.CloudState"><code class="flex name class">
 <span>class <span class="ident">CloudState</span></span>
 </code></dt>
@@ -419,7 +694,7 @@ class LongitudinalDisplacement:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class CloudState:
+<pre><code class="python">class CloudState(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for CloudState&#34;&#34;&#34;
 
     skyOff = _OscEnum(&#34;CloudState&#34;, &#34;skyOff&#34;)
@@ -452,6 +727,76 @@ class LongitudinalDisplacement:
 </dd>
 </dl>
 </dd>
+<dt id="scenariogeneration.xosc.enumerations.ColorType"><code class="flex name class">
+<span>class <span class="ident">ColorType</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ColorType:
+    other = _OscEnum(&#34;ColorType&#34;, &#34;other&#34;, min_minor_version=2)
+    red = _OscEnum(&#34;ColorType&#34;, &#34;red&#34;, min_minor_version=2)
+    yellow = _OscEnum(&#34;ColorType&#34;, &#34;yellow&#34;, min_minor_version=2)
+    green = _OscEnum(&#34;ColorType&#34;, &#34;green&#34;, min_minor_version=2)
+    blue = _OscEnum(&#34;ColorType&#34;, &#34;blue&#34;, min_minor_version=2)
+    violet = _OscEnum(&#34;ColorType&#34;, &#34;violet&#34;, min_minor_version=2)
+    orange = _OscEnum(&#34;ColorType&#34;, &#34;orange&#34;, min_minor_version=2)
+    brown = _OscEnum(&#34;ColorType&#34;, &#34;brown&#34;, min_minor_version=2)
+    black = _OscEnum(&#34;ColorType&#34;, &#34;black&#34;, min_minor_version=2)
+    grey = _OscEnum(&#34;ColorType&#34;, &#34;grey&#34;, min_minor_version=2)
+    white = _OscEnum(&#34;ColorType&#34;, &#34;white&#34;, min_minor_version=2)</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="scenariogeneration.xosc.enumerations.ColorType.black"><code class="name">var <span class="ident">black</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.ColorType.blue"><code class="name">var <span class="ident">blue</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.ColorType.brown"><code class="name">var <span class="ident">brown</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.ColorType.green"><code class="name">var <span class="ident">green</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.ColorType.grey"><code class="name">var <span class="ident">grey</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.ColorType.orange"><code class="name">var <span class="ident">orange</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.ColorType.other"><code class="name">var <span class="ident">other</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.ColorType.red"><code class="name">var <span class="ident">red</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.ColorType.violet"><code class="name">var <span class="ident">violet</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.ColorType.white"><code class="name">var <span class="ident">white</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.ColorType.yellow"><code class="name">var <span class="ident">yellow</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
 <dt id="scenariogeneration.xosc.enumerations.ConditionEdge"><code class="flex name class">
 <span>class <span class="ident">ConditionEdge</span></span>
 </code></dt>
@@ -461,7 +806,7 @@ class LongitudinalDisplacement:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class ConditionEdge:
+<pre><code class="python">class ConditionEdge(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for ConditionEdge&#34;&#34;&#34;
 
     rising = _OscEnum(&#34;ConditionEdge&#34;, &#34;rising&#34;)
@@ -489,6 +834,56 @@ class LongitudinalDisplacement:
 </dd>
 </dl>
 </dd>
+<dt id="scenariogeneration.xosc.enumerations.ControllerType"><code class="flex name class">
+<span>class <span class="ident">ControllerType</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ControllerType(metaclass=_EnumMeta):
+    lateral = _OscEnum(&#34;ControllerType&#34;, &#34;lateral&#34;, min_minor_version=2)
+    longitudinal = _OscEnum(&#34;ControllerType&#34;, &#34;longitudinal&#34;, min_minor_version=2)
+    lighting = _OscEnum(&#34;ControllerType&#34;, &#34;lighting&#34;, min_minor_version=2)
+    animation = _OscEnum(&#34;ControllerType&#34;, &#34;animation&#34;, min_minor_version=2)
+    movement = _OscEnum(&#34;ControllerType&#34;, &#34;movement&#34;, min_minor_version=2)
+    appearance = _OscEnum(&#34;ControllerType&#34;, &#34;appearance&#34;, min_minor_version=2)
+    all = _OscEnum(&#34;ControllerType&#34;, &#34;all&#34;, min_minor_version=2)</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="scenariogeneration.xosc.enumerations.ControllerType.all"><code class="name">var <span class="ident">all</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.ControllerType.animation"><code class="name">var <span class="ident">animation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.ControllerType.appearance"><code class="name">var <span class="ident">appearance</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.ControllerType.lateral"><code class="name">var <span class="ident">lateral</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.ControllerType.lighting"><code class="name">var <span class="ident">lighting</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.ControllerType.longitudinal"><code class="name">var <span class="ident">longitudinal</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.ControllerType.movement"><code class="name">var <span class="ident">movement</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
 <dt id="scenariogeneration.xosc.enumerations.CoordinateSystem"><code class="flex name class">
 <span>class <span class="ident">CoordinateSystem</span></span>
 </code></dt>
@@ -498,7 +893,7 @@ class LongitudinalDisplacement:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class CoordinateSystem:
+<pre><code class="python">class CoordinateSystem(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for CoordinateSystem&#34;&#34;&#34;
 
     entity = _OscEnum(&#34;CoordinateSystem&#34;, &#34;entity&#34;, min_minor_version=1)
@@ -526,6 +921,36 @@ class LongitudinalDisplacement:
 </dd>
 </dl>
 </dd>
+<dt id="scenariogeneration.xosc.enumerations.DirectionalDimension"><code class="flex name class">
+<span>class <span class="ident">DirectionalDimension</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class DirectionalDimension(metaclass=_EnumMeta):
+    longitudinal = _OscEnum(&#34;DirectionalDimension&#34;, &#34;longitudinal&#34;, min_minor_version=2)
+    lateral = _OscEnum(&#34;DirectionalDimension&#34;, &#34;lateral&#34;, min_minor_version=2)
+    vertical = _OscEnum(&#34;DirectionalDimension&#34;, &#34;vertical&#34;, min_minor_version=2)</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="scenariogeneration.xosc.enumerations.DirectionalDimension.lateral"><code class="name">var <span class="ident">lateral</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.DirectionalDimension.longitudinal"><code class="name">var <span class="ident">longitudinal</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.DirectionalDimension.vertical"><code class="name">var <span class="ident">vertical</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
 <dt id="scenariogeneration.xosc.enumerations.DynamicsDimension"><code class="flex name class">
 <span>class <span class="ident">DynamicsDimension</span></span>
 </code></dt>
@@ -535,7 +960,7 @@ class LongitudinalDisplacement:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class DynamicsDimension:
+<pre><code class="python">class DynamicsDimension(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for DynamicsDimension&#34;&#34;&#34;
 
     rate = _OscEnum(&#34;DynamicsDimension&#34;, &#34;rate&#34;)
@@ -567,7 +992,7 @@ class LongitudinalDisplacement:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class DynamicsShapes:
+<pre><code class="python">class DynamicsShapes(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for DynamicsShapes&#34;&#34;&#34;
 
     linear = _OscEnum(&#34;DynamicsShapes&#34;, &#34;linear&#34;)
@@ -595,28 +1020,93 @@ class LongitudinalDisplacement:
 </dd>
 </dl>
 </dd>
-<dt id="scenariogeneration.xosc.enumerations.FollowMode"><code class="flex name class">
-<span>class <span class="ident">FollowMode</span></span>
+<dt id="scenariogeneration.xosc.enumerations.FollowingMode"><code class="flex name class">
+<span>class <span class="ident">FollowingMode</span></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Enum for FollowMode</p></div>
+<div class="desc"><p>Enum for FollowingMode</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class FollowMode:
-    &#34;&#34;&#34;Enum for FollowMode&#34;&#34;&#34;
+<pre><code class="python">class FollowingMode(metaclass=_EnumMeta):
+    &#34;&#34;&#34;Enum for FollowingMode&#34;&#34;&#34;
 
-    position = _OscEnum(&#34;FollowMode&#34;, &#34;position&#34;)
-    follow = _OscEnum(&#34;FollowMode&#34;, &#34;follow&#34;)</code></pre>
+    position = _OscEnum(&#34;FollowingMode&#34;, &#34;position&#34;)
+    follow = _OscEnum(&#34;FollowingMode&#34;, &#34;follow&#34;)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
-<dt id="scenariogeneration.xosc.enumerations.FollowMode.follow"><code class="name">var <span class="ident">follow</span></code></dt>
+<dt id="scenariogeneration.xosc.enumerations.FollowingMode.follow"><code class="name">var <span class="ident">follow</span></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="scenariogeneration.xosc.enumerations.FollowMode.position"><code class="name">var <span class="ident">position</span></code></dt>
+<dt id="scenariogeneration.xosc.enumerations.FollowingMode.position"><code class="name">var <span class="ident">position</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.FractionalCloudCover"><code class="flex name class">
+<span>class <span class="ident">FractionalCloudCover</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class FractionalCloudCover(metaclass=_EnumMeta):
+    zeroOktas = _OscEnum(&#34;FractionalCloudCover&#34;, &#34;zeroOktas&#34;, min_minor_version=2)
+    oneOktas = _OscEnum(&#34;FractionalCloudCover&#34;, &#34;oneOktas&#34;, min_minor_version=2)
+    twoOktas = _OscEnum(&#34;FractionalCloudCover&#34;, &#34;twoOktas&#34;, min_minor_version=2)
+    threeOktas = _OscEnum(&#34;FractionalCloudCover&#34;, &#34;threeOktas&#34;, min_minor_version=2)
+    fourOktas = _OscEnum(&#34;FractionalCloudCover&#34;, &#34;fourOktas&#34;, min_minor_version=2)
+    fiveOktas = _OscEnum(&#34;FractionalCloudCover&#34;, &#34;fiveOktas&#34;, min_minor_version=2)
+    sixOktas = _OscEnum(&#34;FractionalCloudCover&#34;, &#34;sixOktas&#34;, min_minor_version=2)
+    sevenOktas = _OscEnum(&#34;FractionalCloudCover&#34;, &#34;sevenOktas&#34;, min_minor_version=2)
+    eightOktas = _OscEnum(&#34;FractionalCloudCover&#34;, &#34;eightOktas&#34;, min_minor_version=2)
+    nineOktas = _OscEnum(&#34;FractionalCloudCover&#34;, &#34;nineOktas&#34;, min_minor_version=2)</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="scenariogeneration.xosc.enumerations.FractionalCloudCover.eightOktas"><code class="name">var <span class="ident">eightOktas</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.FractionalCloudCover.fiveOktas"><code class="name">var <span class="ident">fiveOktas</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.FractionalCloudCover.fourOktas"><code class="name">var <span class="ident">fourOktas</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.FractionalCloudCover.nineOktas"><code class="name">var <span class="ident">nineOktas</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.FractionalCloudCover.oneOktas"><code class="name">var <span class="ident">oneOktas</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.FractionalCloudCover.sevenOktas"><code class="name">var <span class="ident">sevenOktas</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.FractionalCloudCover.sixOktas"><code class="name">var <span class="ident">sixOktas</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.FractionalCloudCover.threeOktas"><code class="name">var <span class="ident">threeOktas</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.FractionalCloudCover.twoOktas"><code class="name">var <span class="ident">twoOktas</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.FractionalCloudCover.zeroOktas"><code class="name">var <span class="ident">zeroOktas</span></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -631,7 +1121,7 @@ class LongitudinalDisplacement:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class LateralDisplacement:
+<pre><code class="python">class LateralDisplacement(metaclass=_EnumMeta):
     any = _OscEnum(&#34;LateralDisplacement&#34;, &#34;any&#34;, min_minor_version=1)
     leftToReferencedEntity = _OscEnum(
         &#34;LateralDisplacement&#34;, &#34;leftToReferencedEntity&#34;, min_minor_version=1
@@ -656,6 +1146,36 @@ class LongitudinalDisplacement:
 </dd>
 </dl>
 </dd>
+<dt id="scenariogeneration.xosc.enumerations.LightMode"><code class="flex name class">
+<span>class <span class="ident">LightMode</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LightMode(metaclass=_EnumMeta):
+    on = _OscEnum(&#34;LightMode&#34;, &#34;on&#34;, min_minor_version=2)
+    off = _OscEnum(&#34;LightMode&#34;, &#34;off&#34;, min_minor_version=2)
+    flashing = _OscEnum(&#34;LightMode&#34;, &#34;flashing&#34;, min_minor_version=2)</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="scenariogeneration.xosc.enumerations.LightMode.flashing"><code class="name">var <span class="ident">flashing</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.LightMode.off"><code class="name">var <span class="ident">off</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.LightMode.on"><code class="name">var <span class="ident">on</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
 <dt id="scenariogeneration.xosc.enumerations.LongitudinalDisplacement"><code class="flex name class">
 <span>class <span class="ident">LongitudinalDisplacement</span></span>
 </code></dt>
@@ -665,7 +1185,7 @@ class LongitudinalDisplacement:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class LongitudinalDisplacement:
+<pre><code class="python">class LongitudinalDisplacement(metaclass=_EnumMeta):
     any = _OscEnum(&#34;LongitudinalDisplacement&#34;, &#34;any&#34;, min_minor_version=1)
     trailingReferencedEntity = _OscEnum(
         &#34;LongitudinalDisplacement&#34;, &#34;trailingReferencedEntity&#34;, min_minor_version=1
@@ -699,7 +1219,7 @@ class LongitudinalDisplacement:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class MiscObjectCategory:
+<pre><code class="python">class MiscObjectCategory(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for MiscObjectCategory&#34;&#34;&#34;
 
     none = _OscEnum(&#34;MiscObjectCategory&#34;, &#34;none&#34;)
@@ -801,7 +1321,7 @@ class LongitudinalDisplacement:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class ObjectType:
+<pre><code class="python">class ObjectType(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for ObjectType&#34;&#34;&#34;
 
     pedestrian = _OscEnum(&#34;ObjectType&#34;, &#34;pedestrian&#34;)
@@ -838,10 +1358,13 @@ class LongitudinalDisplacement:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class ParameterType:
+<pre><code class="python">class ParameterType(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for ParameterType&#34;&#34;&#34;
 
-    integer = _OscEnum(&#34;ParameterType&#34;, &#34;integer&#34;)
+    integer = _OscEnum(
+        &#34;ParameterType&#34;, &#34;integer&#34;, max_minor_version=1, replacement=&#34;int&#34;
+    )
+    int = _OscEnum(&#34;ParameterType&#34;, &#34;int&#34;, min_minor_version=2)
     double = _OscEnum(&#34;ParameterType&#34;, &#34;double&#34;)
     string = _OscEnum(&#34;ParameterType&#34;, &#34;string&#34;)
     unsighedInt = _OscEnum(&#34;ParameterType&#34;, &#34;unsighedInt&#34;)
@@ -860,6 +1383,10 @@ class LongitudinalDisplacement:
 <div class="desc"></div>
 </dd>
 <dt id="scenariogeneration.xosc.enumerations.ParameterType.double"><code class="name">var <span class="ident">double</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.ParameterType.int"><code class="name">var <span class="ident">int</span></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -890,7 +1417,7 @@ class LongitudinalDisplacement:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class PedestrianCategory:
+<pre><code class="python">class PedestrianCategory(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for PedestrianCategory&#34;&#34;&#34;
 
     pedestrian = _OscEnum(&#34;PedestrianCategory&#34;, &#34;pedestrian&#34;)
@@ -913,6 +1440,185 @@ class LongitudinalDisplacement:
 </dd>
 </dl>
 </dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianGestureType"><code class="flex name class">
+<span>class <span class="ident">PedestrianGestureType</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class PedestrianGestureType(metaclass=_EnumMeta):
+    phoneCallRightHand = _OscEnum(
+        &#34;PedestrianGestureType&#34;, &#34;phoneCallRightHand&#34;, min_minor_version=2
+    )
+    phoneCallLeftHand = _OscEnum(
+        &#34;PedestrianGestureType&#34;, &#34;phoneCallLeftHand&#34;, min_minor_version=2
+    )
+    phoneTextRightHand = _OscEnum(
+        &#34;PedestrianGestureType&#34;, &#34;phoneTextRightHand&#34;, min_minor_version=2
+    )
+    phoneTextLeftHand = _OscEnum(
+        &#34;PedestrianGestureType&#34;, &#34;phoneTextLeftHand&#34;, min_minor_version=2
+    )
+    wavingRightArm = _OscEnum(
+        &#34;PedestrianGestureType&#34;, &#34;wavingRightArm&#34;, min_minor_version=2
+    )
+    wavingLeftArm = _OscEnum(
+        &#34;PedestrianGestureType&#34;, &#34;wavingLeftArm&#34;, min_minor_version=2
+    )
+    umbrellaRightHand = _OscEnum(
+        &#34;PedestrianGestureType&#34;, &#34;umbrellaRightHand&#34;, min_minor_version=2
+    )
+    umbrellaLeftHand = _OscEnum(
+        &#34;PedestrianGestureType&#34;, &#34;umbrellaLeftHand&#34;, min_minor_version=2
+    )
+    crossArms = _OscEnum(&#34;PedestrianGestureType&#34;, &#34;crossArms&#34;, min_minor_version=2)
+    coffeeRightHand = _OscEnum(
+        &#34;PedestrianGestureType&#34;, &#34;coffeeRightHand&#34;, min_minor_version=2
+    )
+    coffeeLeftHand = _OscEnum(
+        &#34;PedestrianGestureType&#34;, &#34;coffeeLeftHand&#34;, min_minor_version=2
+    )
+    sandwichRightHand = _OscEnum(
+        &#34;PedestrianGestureType&#34;, &#34;sandwichRightHand&#34;, min_minor_version=2
+    )
+    sandwichLeftHand = _OscEnum(
+        &#34;PedestrianGestureType&#34;, &#34;sandwichLeftHand&#34;, min_minor_version=2
+    )</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianGestureType.coffeeLeftHand"><code class="name">var <span class="ident">coffeeLeftHand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianGestureType.coffeeRightHand"><code class="name">var <span class="ident">coffeeRightHand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianGestureType.crossArms"><code class="name">var <span class="ident">crossArms</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianGestureType.phoneCallLeftHand"><code class="name">var <span class="ident">phoneCallLeftHand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianGestureType.phoneCallRightHand"><code class="name">var <span class="ident">phoneCallRightHand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianGestureType.phoneTextLeftHand"><code class="name">var <span class="ident">phoneTextLeftHand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianGestureType.phoneTextRightHand"><code class="name">var <span class="ident">phoneTextRightHand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianGestureType.sandwichLeftHand"><code class="name">var <span class="ident">sandwichLeftHand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianGestureType.sandwichRightHand"><code class="name">var <span class="ident">sandwichRightHand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianGestureType.umbrellaLeftHand"><code class="name">var <span class="ident">umbrellaLeftHand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianGestureType.umbrellaRightHand"><code class="name">var <span class="ident">umbrellaRightHand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianGestureType.wavingLeftArm"><code class="name">var <span class="ident">wavingLeftArm</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianGestureType.wavingRightArm"><code class="name">var <span class="ident">wavingRightArm</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianMotionType"><code class="flex name class">
+<span>class <span class="ident">PedestrianMotionType</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class PedestrianMotionType(metaclass=_EnumMeta):
+    standing = _OscEnum(&#34;PedestrianMotionType&#34;, &#34;standing&#34;, min_minor_version=2)
+    sitting = _OscEnum(&#34;PedestrianMotionType&#34;, &#34;sitting&#34;, min_minor_version=2)
+    lying = _OscEnum(&#34;PedestrianMotionType&#34;, &#34;lying&#34;, min_minor_version=2)
+    squatting = _OscEnum(&#34;PedestrianMotionType&#34;, &#34;squatting&#34;, min_minor_version=2)
+    walking = _OscEnum(&#34;PedestrianMotionType&#34;, &#34;walking&#34;, min_minor_version=2)
+    running = _OscEnum(&#34;PedestrianMotionType&#34;, &#34;running&#34;, min_minor_version=2)
+    reeling = _OscEnum(&#34;PedestrianMotionType&#34;, &#34;reeling&#34;, min_minor_version=2)
+    crawling = _OscEnum(&#34;PedestrianMotionType&#34;, &#34;crawling&#34;, min_minor_version=2)
+    cycling = _OscEnum(&#34;PedestrianMotionType&#34;, &#34;cycling&#34;, min_minor_version=2)
+    jumping = _OscEnum(&#34;PedestrianMotionType&#34;, &#34;jumping&#34;, min_minor_version=2)
+    ducking = _OscEnum(&#34;PedestrianMotionType&#34;, &#34;ducking&#34;, min_minor_version=2)
+    bendingDown = _OscEnum(&#34;PedestrianMotionType&#34;, &#34;bendingDown&#34;, min_minor_version=2)</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianMotionType.bendingDown"><code class="name">var <span class="ident">bendingDown</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianMotionType.crawling"><code class="name">var <span class="ident">crawling</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianMotionType.cycling"><code class="name">var <span class="ident">cycling</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianMotionType.ducking"><code class="name">var <span class="ident">ducking</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianMotionType.jumping"><code class="name">var <span class="ident">jumping</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianMotionType.lying"><code class="name">var <span class="ident">lying</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianMotionType.reeling"><code class="name">var <span class="ident">reeling</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianMotionType.running"><code class="name">var <span class="ident">running</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianMotionType.sitting"><code class="name">var <span class="ident">sitting</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianMotionType.squatting"><code class="name">var <span class="ident">squatting</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianMotionType.standing"><code class="name">var <span class="ident">standing</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.PedestrianMotionType.walking"><code class="name">var <span class="ident">walking</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
 <dt id="scenariogeneration.xosc.enumerations.PrecipitationType"><code class="flex name class">
 <span>class <span class="ident">PrecipitationType</span></span>
 </code></dt>
@@ -922,7 +1628,7 @@ class LongitudinalDisplacement:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class PrecipitationType:
+<pre><code class="python">class PrecipitationType(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for PercipitationType&#34;&#34;&#34;
 
     dry = _OscEnum(&#34;PrecipitationType&#34;, &#34;dry&#34;)
@@ -954,15 +1660,22 @@ class LongitudinalDisplacement:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Priority:
+<pre><code class="python">class Priority(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for Priority&#34;&#34;&#34;
 
-    overwrite = _OscEnum(&#34;Priority&#34;, &#34;overwrite&#34;)
+    overwrite = _OscEnum(
+        &#34;Priority&#34;, &#34;overwrite&#34;, max_minor_version=1, replacement=&#34;override&#34;
+    )
+    override = _OscEnum(&#34;Priority&#34;, &#34;override&#34;, min_minor_version=2)
     skip = _OscEnum(&#34;Priority&#34;, &#34;skip&#34;)
     parallel = _OscEnum(&#34;Priority&#34;, &#34;parallel&#34;)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
+<dt id="scenariogeneration.xosc.enumerations.Priority.override"><code class="name">var <span class="ident">override</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt id="scenariogeneration.xosc.enumerations.Priority.overwrite"><code class="name">var <span class="ident">overwrite</span></code></dt>
 <dd>
 <div class="desc"></div>
@@ -986,7 +1699,7 @@ class LongitudinalDisplacement:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class ReferenceContext:
+<pre><code class="python">class ReferenceContext(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for ReferenceContext&#34;&#34;&#34;
 
     relative = _OscEnum(&#34;ReferenceContext&#34;, &#34;relative&#34;)
@@ -1013,7 +1726,7 @@ class LongitudinalDisplacement:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class RelativeDistanceType:
+<pre><code class="python">class RelativeDistanceType(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for RelativeDistanceType&#34;&#34;&#34;
 
     longitudinal = _OscEnum(&#34;RelativeDistanceType&#34;, &#34;longitudinal&#34;)
@@ -1045,6 +1758,61 @@ class LongitudinalDisplacement:
 </dd>
 </dl>
 </dd>
+<dt id="scenariogeneration.xosc.enumerations.Role"><code class="flex name class">
+<span>class <span class="ident">Role</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Role(metaclass=_EnumMeta):
+    none = _OscEnum(&#34;Role&#34;, &#34;none&#34;, min_minor_version=2)
+    ambulance = _OscEnum(&#34;Role&#34;, &#34;ambulance&#34;, min_minor_version=2)
+    civil = _OscEnum(&#34;Role&#34;, &#34;civil&#34;, min_minor_version=2)
+    fire = _OscEnum(&#34;Role&#34;, &#34;fire&#34;, min_minor_version=2)
+    military = _OscEnum(&#34;Role&#34;, &#34;military&#34;, min_minor_version=2)
+    police = _OscEnum(&#34;Role&#34;, &#34;police&#34;, min_minor_version=2)
+    publicTransport = _OscEnum(&#34;Role&#34;, &#34;publicTransport&#34;, min_minor_version=2)
+    roadAssistance = _OscEnum(&#34;Role&#34;, &#34;roadAssistance&#34;, min_minor_version=2)</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="scenariogeneration.xosc.enumerations.Role.ambulance"><code class="name">var <span class="ident">ambulance</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.Role.civil"><code class="name">var <span class="ident">civil</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.Role.fire"><code class="name">var <span class="ident">fire</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.Role.military"><code class="name">var <span class="ident">military</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.Role.none"><code class="name">var <span class="ident">none</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.Role.police"><code class="name">var <span class="ident">police</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.Role.publicTransport"><code class="name">var <span class="ident">publicTransport</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.Role.roadAssistance"><code class="name">var <span class="ident">roadAssistance</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
 <dt id="scenariogeneration.xosc.enumerations.RouteStrategy"><code class="flex name class">
 <span>class <span class="ident">RouteStrategy</span></span>
 </code></dt>
@@ -1054,7 +1822,7 @@ class LongitudinalDisplacement:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class RouteStrategy:
+<pre><code class="python">class RouteStrategy(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for RouteStrategy&#34;&#34;&#34;
 
     fastest = _OscEnum(&#34;RouteStrategy&#34;, &#34;fastest&#34;)
@@ -1082,6 +1850,48 @@ class LongitudinalDisplacement:
 </dd>
 </dl>
 </dd>
+<dt id="scenariogeneration.xosc.enumerations.RoutingAlgorithm"><code class="flex name class">
+<span>class <span class="ident">RoutingAlgorithm</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class RoutingAlgorithm(metaclass=_EnumMeta):
+    assignedRoute = _OscEnum(&#34;RoutingAlgorithm&#34;, &#34;assignedRoute&#34;, min_minor_version=2)
+    fastest = _OscEnum(&#34;RoutingAlgorithm&#34;, &#34;fastest&#34;, min_minor_version=2)
+    leastIntersections = _OscEnum(
+        &#34;RoutingAlgorithm&#34;, &#34;leastIntersections&#34;, min_minor_version=2
+    )
+    shortest = _OscEnum(&#34;RoutingAlgorithm&#34;, &#34;shortest&#34;, min_minor_version=2)
+    undefined = _OscEnum(&#34;RoutingAlgorithm&#34;, &#34;undefined&#34;, min_minor_version=2)</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="scenariogeneration.xosc.enumerations.RoutingAlgorithm.assignedRoute"><code class="name">var <span class="ident">assignedRoute</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.RoutingAlgorithm.fastest"><code class="name">var <span class="ident">fastest</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.RoutingAlgorithm.leastIntersections"><code class="name">var <span class="ident">leastIntersections</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.RoutingAlgorithm.shortest"><code class="name">var <span class="ident">shortest</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.RoutingAlgorithm.undefined"><code class="name">var <span class="ident">undefined</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
 <dt id="scenariogeneration.xosc.enumerations.Rule"><code class="flex name class">
 <span>class <span class="ident">Rule</span></span>
 </code></dt>
@@ -1091,7 +1901,7 @@ class LongitudinalDisplacement:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Rule:
+<pre><code class="python">class Rule(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for Rule&#34;&#34;&#34;
 
     greaterThan = _OscEnum(&#34;Rule&#34;, &#34;greaterThan&#34;)
@@ -1138,7 +1948,7 @@ class LongitudinalDisplacement:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class SpeedTargetValueType:
+<pre><code class="python">class SpeedTargetValueType(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for SpeedTargetValueType&#34;&#34;&#34;
 
     delta = _OscEnum(&#34;SpeedTargetValueType&#34;, &#34;delta&#34;)
@@ -1165,7 +1975,7 @@ class LongitudinalDisplacement:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class StoryboardElementState:
+<pre><code class="python">class StoryboardElementState(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for StoryboardElementState&#34;&#34;&#34;
 
     startTransition = _OscEnum(&#34;StoryboardElementState&#34;, &#34;startTransition&#34;)
@@ -1217,7 +2027,7 @@ class LongitudinalDisplacement:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class StoryboardElementType:
+<pre><code class="python">class StoryboardElementType(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for StoryboardElementType&#34;&#34;&#34;
 
     story = _OscEnum(&#34;StoryboardElementType&#34;, &#34;story&#34;)
@@ -1264,7 +2074,7 @@ class LongitudinalDisplacement:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class TriggeringEntitiesRule:
+<pre><code class="python">class TriggeringEntitiesRule(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for TriggeringEntitiesRule&#34;&#34;&#34;
 
     any = _OscEnum(&#34;TriggeringEntitiesRule&#34;, &#34;any&#34;)
@@ -1291,7 +2101,7 @@ class LongitudinalDisplacement:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class VehicleCategory:
+<pre><code class="python">class VehicleCategory(metaclass=_EnumMeta):
     &#34;&#34;&#34;Enum for VehicleCategory&#34;&#34;&#34;
 
     car = _OscEnum(&#34;VehicleCategory&#34;, &#34;car&#34;)
@@ -1349,6 +2159,192 @@ class LongitudinalDisplacement:
 </dd>
 </dl>
 </dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleComponentType"><code class="flex name class">
+<span>class <span class="ident">VehicleComponentType</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class VehicleComponentType(metaclass=_EnumMeta):
+    hood = _OscEnum(&#34;VehicleComponentType&#34;, &#34;hood&#34;, min_minor_version=2)
+    trunk = _OscEnum(&#34;VehicleComponentType&#34;, &#34;trunk&#34;, min_minor_version=2)
+    doorFrontRight = _OscEnum(
+        &#34;VehicleComponentType&#34;, &#34;doorFrontRight&#34;, min_minor_version=2
+    )
+    doorFrontLeft = _OscEnum(
+        &#34;VehicleComponentType&#34;, &#34;doorFrontLeft&#34;, min_minor_version=2
+    )
+    doorRearRight = _OscEnum(
+        &#34;VehicleComponentType&#34;, &#34;doorRearRight&#34;, min_minor_version=2
+    )
+    doorRearLeft = _OscEnum(&#34;VehicleComponentType&#34;, &#34;doorRearLeft&#34;, min_minor_version=2)
+    windowFrontRight = _OscEnum(
+        &#34;VehicleComponentType&#34;, &#34;windowFrontRight&#34;, min_minor_version=2
+    )
+    windowFrontLeft = _OscEnum(
+        &#34;VehicleComponentType&#34;, &#34;windowFrontLeft&#34;, min_minor_version=2
+    )
+    windowRearRight = _OscEnum(
+        &#34;VehicleComponentType&#34;, &#34;windowRearRight&#34;, min_minor_version=2
+    )
+    windowRearLeft = _OscEnum(
+        &#34;VehicleComponentType&#34;, &#34;windowRearLeft&#34;, min_minor_version=2
+    )
+    sideMirrors = _OscEnum(&#34;VehicleComponentType&#34;, &#34;sideMirrors&#34;, min_minor_version=2)
+    sideMirrorRight = _OscEnum(
+        &#34;VehicleComponentType&#34;, &#34;sideMirrorRight&#34;, min_minor_version=2
+    )
+    sideMirrorLeft = _OscEnum(
+        &#34;VehicleComponentType&#34;, &#34;sideMirrorLeft&#34;, min_minor_version=2
+    )</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="scenariogeneration.xosc.enumerations.VehicleComponentType.doorFrontLeft"><code class="name">var <span class="ident">doorFrontLeft</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleComponentType.doorFrontRight"><code class="name">var <span class="ident">doorFrontRight</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleComponentType.doorRearLeft"><code class="name">var <span class="ident">doorRearLeft</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleComponentType.doorRearRight"><code class="name">var <span class="ident">doorRearRight</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleComponentType.hood"><code class="name">var <span class="ident">hood</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleComponentType.sideMirrorLeft"><code class="name">var <span class="ident">sideMirrorLeft</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleComponentType.sideMirrorRight"><code class="name">var <span class="ident">sideMirrorRight</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleComponentType.sideMirrors"><code class="name">var <span class="ident">sideMirrors</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleComponentType.trunk"><code class="name">var <span class="ident">trunk</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleComponentType.windowFrontLeft"><code class="name">var <span class="ident">windowFrontLeft</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleComponentType.windowFrontRight"><code class="name">var <span class="ident">windowFrontRight</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleComponentType.windowRearLeft"><code class="name">var <span class="ident">windowRearLeft</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleComponentType.windowRearRight"><code class="name">var <span class="ident">windowRearRight</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleLightType"><code class="flex name class">
+<span>class <span class="ident">VehicleLightType</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class VehicleLightType(metaclass=_EnumMeta):
+    daytimeRunningLights = _OscEnum(
+        &#34;VehicleLightType&#34;, &#34;daytimeRunningLights&#34;, min_minor_version=2
+    )
+    lowBeam = _OscEnum(&#34;VehicleLightType&#34;, &#34;lowBeam&#34;, min_minor_version=2)
+    highBeam = _OscEnum(&#34;VehicleLightType&#34;, &#34;highBeam&#34;, min_minor_version=2)
+    fogLights = _OscEnum(&#34;VehicleLightType&#34;, &#34;fogLights&#34;, min_minor_version=2)
+    fogLightsFront = _OscEnum(&#34;VehicleLightType&#34;, &#34;fogLightsFront&#34;, min_minor_version=2)
+    fogLightsRear = _OscEnum(&#34;VehicleLightType&#34;, &#34;fogLightsRear&#34;, min_minor_version=2)
+    brakeLights = _OscEnum(&#34;VehicleLightType&#34;, &#34;brakeLights&#34;, min_minor_version=2)
+    warningLights = _OscEnum(&#34;VehicleLightType&#34;, &#34;warningLights&#34;, min_minor_version=2)
+    indicatorLeft = _OscEnum(&#34;VehicleLightType&#34;, &#34;indicatorLeft&#34;, min_minor_version=2)
+    indicatorRight = _OscEnum(&#34;VehicleLightType&#34;, &#34;indicatorRight&#34;, min_minor_version=2)
+    reversingLights = _OscEnum(
+        &#34;VehicleLightType&#34;, &#34;reversingLights&#34;, min_minor_version=2
+    )
+    licensePlateIllumination = _OscEnum(
+        &#34;VehicleLightType&#34;, &#34;licensePlateIllumination&#34;, min_minor_version=2
+    )
+    specialPurposeLights = _OscEnum(
+        &#34;VehicleLightType&#34;, &#34;specialPurposeLights&#34;, min_minor_version=2
+    )</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="scenariogeneration.xosc.enumerations.VehicleLightType.brakeLights"><code class="name">var <span class="ident">brakeLights</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleLightType.daytimeRunningLights"><code class="name">var <span class="ident">daytimeRunningLights</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleLightType.fogLights"><code class="name">var <span class="ident">fogLights</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleLightType.fogLightsFront"><code class="name">var <span class="ident">fogLightsFront</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleLightType.fogLightsRear"><code class="name">var <span class="ident">fogLightsRear</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleLightType.highBeam"><code class="name">var <span class="ident">highBeam</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleLightType.indicatorLeft"><code class="name">var <span class="ident">indicatorLeft</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleLightType.indicatorRight"><code class="name">var <span class="ident">indicatorRight</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleLightType.licensePlateIllumination"><code class="name">var <span class="ident">licensePlateIllumination</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleLightType.lowBeam"><code class="name">var <span class="ident">lowBeam</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleLightType.reversingLights"><code class="name">var <span class="ident">reversingLights</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleLightType.specialPurposeLights"><code class="name">var <span class="ident">specialPurposeLights</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VehicleLightType.warningLights"><code class="name">var <span class="ident">warningLights</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
 <dt id="scenariogeneration.xosc.enumerations.VersionBase"><code class="flex name class">
 <span>class <span class="ident">VersionBase</span></span>
 </code></dt>
@@ -1364,10 +2360,10 @@ class LongitudinalDisplacement:
     version_major = 1
     version_minor = _MINOR_VERSION
 
-    def isVersion(self, major=1, minor=1):
+    def isVersion(self, major=1, minor=_MINOR_VERSION):
         return major &gt;= self.version_major and minor &gt;= self.version_minor
 
-    def setVersion(self, major=1, minor=0):
+    def setVersion(self, major=1, minor=_MINOR_VERSION):
         VersionBase.version_major = major
         VersionBase.version_minor = minor</code></pre>
 </details>
@@ -1397,8 +2393,10 @@ class LongitudinalDisplacement:
 <li><a title="scenariogeneration.xosc.utils.CatalogFile" href="utils.html#scenariogeneration.xosc.utils.CatalogFile">CatalogFile</a></li>
 <li><a title="scenariogeneration.xosc.utils.CatalogReference" href="utils.html#scenariogeneration.xosc.utils.CatalogReference">CatalogReference</a></li>
 <li><a title="scenariogeneration.xosc.utils.Center" href="utils.html#scenariogeneration.xosc.utils.Center">Center</a></li>
+<li><a title="scenariogeneration.xosc.utils.Color" href="utils.html#scenariogeneration.xosc.utils.Color">Color</a></li>
 <li><a title="scenariogeneration.xosc.utils.Controller" href="utils.html#scenariogeneration.xosc.utils.Controller">Controller</a></li>
 <li><a title="scenariogeneration.xosc.utils.Dimensions" href="utils.html#scenariogeneration.xosc.utils.Dimensions">Dimensions</a></li>
+<li><a title="scenariogeneration.xosc.utils.DirectionOfTravelDistribution" href="utils.html#scenariogeneration.xosc.utils.DirectionOfTravelDistribution">DirectionOfTravelDistribution</a></li>
 <li><a title="scenariogeneration.xosc.utils.DynamicsConstraints" href="utils.html#scenariogeneration.xosc.utils.DynamicsConstraints">DynamicsConstraints</a></li>
 <li><a title="scenariogeneration.xosc.utils.EntityRef" href="utils.html#scenariogeneration.xosc.utils.EntityRef">EntityRef</a></li>
 <li><a title="scenariogeneration.xosc.utils.Environment" href="utils.html#scenariogeneration.xosc.utils.Environment">Environment</a></li>
@@ -1422,16 +2420,23 @@ class LongitudinalDisplacement:
 <li><a title="scenariogeneration.xosc.utils.TrafficDefinition" href="utils.html#scenariogeneration.xosc.utils.TrafficDefinition">TrafficDefinition</a></li>
 <li><a title="scenariogeneration.xosc.utils.TrafficSignalController" href="utils.html#scenariogeneration.xosc.utils.TrafficSignalController">TrafficSignalController</a></li>
 <li><a title="scenariogeneration.xosc.utils.TransitionDynamics" href="utils.html#scenariogeneration.xosc.utils.TransitionDynamics">TransitionDynamics</a></li>
+<li><a title="scenariogeneration.xosc.utils.UserDefinedLight" href="utils.html#scenariogeneration.xosc.utils.UserDefinedLight">UserDefinedLight</a></li>
 <li><a title="scenariogeneration.xosc.utils.ValueConstraint" href="utils.html#scenariogeneration.xosc.utils.ValueConstraint">ValueConstraint</a></li>
 <li><a title="scenariogeneration.xosc.utils.ValueConstraintGroup" href="utils.html#scenariogeneration.xosc.utils.ValueConstraintGroup">ValueConstraintGroup</a></li>
+<li><a title="scenariogeneration.xosc.utils.Variable" href="utils.html#scenariogeneration.xosc.utils.Variable">Variable</a></li>
+<li><a title="scenariogeneration.xosc.utils.VariableDeclarations" href="utils.html#scenariogeneration.xosc.utils.VariableDeclarations">VariableDeclarations</a></li>
 <li><a title="scenariogeneration.xosc.utils.Weather" href="utils.html#scenariogeneration.xosc.utils.Weather">Weather</a></li>
 <li><a title="scenariogeneration.xosc.utils.Wind" href="utils.html#scenariogeneration.xosc.utils.Wind">Wind</a></li>
+<li>scenariogeneration.xosc.utils._AnimationType</li>
+<li>scenariogeneration.xosc.utils._ColorDefinition</li>
 <li>scenariogeneration.xosc.utils._EntityTriggerType</li>
+<li>scenariogeneration.xosc.utils._LightState</li>
 <li>scenariogeneration.xosc.utils._PositionType</li>
 <li>scenariogeneration.xosc.utils._StochasticDistributionType</li>
 <li>scenariogeneration.xosc.utils._TrafficSignalState</li>
 <li>scenariogeneration.xosc.utils._TriggerType</li>
 <li>scenariogeneration.xosc.utils._ValueTriggerType</li>
+<li>scenariogeneration.xosc.utils._VehicleComponent</li>
 </ul>
 <h3>Class variables</h3>
 <dl>
@@ -1447,7 +2452,7 @@ class LongitudinalDisplacement:
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.enumerations.VersionBase.isVersion"><code class="name flex">
-<span>def <span class="ident">isVersion</span></span>(<span>self, major=1, minor=1)</span>
+<span>def <span class="ident">isVersion</span></span>(<span>self, major=1, minor=2)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1455,12 +2460,12 @@ class LongitudinalDisplacement:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def isVersion(self, major=1, minor=1):
+<pre><code class="python">def isVersion(self, major=1, minor=_MINOR_VERSION):
     return major &gt;= self.version_major and minor &gt;= self.version_minor</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xosc.enumerations.VersionBase.setVersion"><code class="name flex">
-<span>def <span class="ident">setVersion</span></span>(<span>self, major=1, minor=0)</span>
+<span>def <span class="ident">setVersion</span></span>(<span>self, major=1, minor=2)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1468,10 +2473,50 @@ class LongitudinalDisplacement:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def setVersion(self, major=1, minor=0):
+<pre><code class="python">def setVersion(self, major=1, minor=_MINOR_VERSION):
     VersionBase.version_major = major
     VersionBase.version_minor = minor</code></pre>
 </details>
+</dd>
+</dl>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.Wetness"><code class="flex name class">
+<span>class <span class="ident">Wetness</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Wetness(metaclass=_EnumMeta):
+    dry = _OscEnum(&#34;Wetness&#34;, &#34;dry&#34;, min_minor_version=2)
+    moist = _OscEnum(&#34;Wetness&#34;, &#34;moist&#34;, min_minor_version=2)
+    wetWithPuddles = _OscEnum(&#34;Wetness&#34;, &#34;wetWithPuddles&#34;, min_minor_version=2)
+    lowFlooded = _OscEnum(&#34;Wetness&#34;, &#34;lowFlooded&#34;, min_minor_version=2)
+    highFlooded = _OscEnum(&#34;Wetness&#34;, &#34;highFlooded&#34;, min_minor_version=2)</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="scenariogeneration.xosc.enumerations.Wetness.dry"><code class="name">var <span class="ident">dry</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.Wetness.highFlooded"><code class="name">var <span class="ident">highFlooded</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.Wetness.lowFlooded"><code class="name">var <span class="ident">lowFlooded</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.Wetness.moist"><code class="name">var <span class="ident">moist</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.Wetness.wetWithPuddles"><code class="name">var <span class="ident">wetWithPuddles</span></code></dt>
+<dd>
+<div class="desc"></div>
 </dd>
 </dl>
 </dd>
@@ -1492,6 +2537,15 @@ class LongitudinalDisplacement:
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
+<h4><code><a title="scenariogeneration.xosc.enumerations.AutomaticGearType" href="#scenariogeneration.xosc.enumerations.AutomaticGearType">AutomaticGearType</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xosc.enumerations.AutomaticGearType.d" href="#scenariogeneration.xosc.enumerations.AutomaticGearType.d">d</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.AutomaticGearType.n" href="#scenariogeneration.xosc.enumerations.AutomaticGearType.n">n</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.AutomaticGearType.p" href="#scenariogeneration.xosc.enumerations.AutomaticGearType.p">p</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.AutomaticGearType.r" href="#scenariogeneration.xosc.enumerations.AutomaticGearType.r">r</a></code></li>
+</ul>
+</li>
+<li>
 <h4><code><a title="scenariogeneration.xosc.enumerations.CloudState" href="#scenariogeneration.xosc.enumerations.CloudState">CloudState</a></code></h4>
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.enumerations.CloudState.cloudy" href="#scenariogeneration.xosc.enumerations.CloudState.cloudy">cloudy</a></code></li>
@@ -1499,6 +2553,22 @@ class LongitudinalDisplacement:
 <li><code><a title="scenariogeneration.xosc.enumerations.CloudState.overcast" href="#scenariogeneration.xosc.enumerations.CloudState.overcast">overcast</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.CloudState.rainy" href="#scenariogeneration.xosc.enumerations.CloudState.rainy">rainy</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.CloudState.skyOff" href="#scenariogeneration.xosc.enumerations.CloudState.skyOff">skyOff</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xosc.enumerations.ColorType" href="#scenariogeneration.xosc.enumerations.ColorType">ColorType</a></code></h4>
+<ul class="two-column">
+<li><code><a title="scenariogeneration.xosc.enumerations.ColorType.black" href="#scenariogeneration.xosc.enumerations.ColorType.black">black</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.ColorType.blue" href="#scenariogeneration.xosc.enumerations.ColorType.blue">blue</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.ColorType.brown" href="#scenariogeneration.xosc.enumerations.ColorType.brown">brown</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.ColorType.green" href="#scenariogeneration.xosc.enumerations.ColorType.green">green</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.ColorType.grey" href="#scenariogeneration.xosc.enumerations.ColorType.grey">grey</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.ColorType.orange" href="#scenariogeneration.xosc.enumerations.ColorType.orange">orange</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.ColorType.other" href="#scenariogeneration.xosc.enumerations.ColorType.other">other</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.ColorType.red" href="#scenariogeneration.xosc.enumerations.ColorType.red">red</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.ColorType.violet" href="#scenariogeneration.xosc.enumerations.ColorType.violet">violet</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.ColorType.white" href="#scenariogeneration.xosc.enumerations.ColorType.white">white</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.ColorType.yellow" href="#scenariogeneration.xosc.enumerations.ColorType.yellow">yellow</a></code></li>
 </ul>
 </li>
 <li>
@@ -1511,12 +2581,32 @@ class LongitudinalDisplacement:
 </ul>
 </li>
 <li>
+<h4><code><a title="scenariogeneration.xosc.enumerations.ControllerType" href="#scenariogeneration.xosc.enumerations.ControllerType">ControllerType</a></code></h4>
+<ul class="two-column">
+<li><code><a title="scenariogeneration.xosc.enumerations.ControllerType.all" href="#scenariogeneration.xosc.enumerations.ControllerType.all">all</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.ControllerType.animation" href="#scenariogeneration.xosc.enumerations.ControllerType.animation">animation</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.ControllerType.appearance" href="#scenariogeneration.xosc.enumerations.ControllerType.appearance">appearance</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.ControllerType.lateral" href="#scenariogeneration.xosc.enumerations.ControllerType.lateral">lateral</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.ControllerType.lighting" href="#scenariogeneration.xosc.enumerations.ControllerType.lighting">lighting</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.ControllerType.longitudinal" href="#scenariogeneration.xosc.enumerations.ControllerType.longitudinal">longitudinal</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.ControllerType.movement" href="#scenariogeneration.xosc.enumerations.ControllerType.movement">movement</a></code></li>
+</ul>
+</li>
+<li>
 <h4><code><a title="scenariogeneration.xosc.enumerations.CoordinateSystem" href="#scenariogeneration.xosc.enumerations.CoordinateSystem">CoordinateSystem</a></code></h4>
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.enumerations.CoordinateSystem.entity" href="#scenariogeneration.xosc.enumerations.CoordinateSystem.entity">entity</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.CoordinateSystem.lane" href="#scenariogeneration.xosc.enumerations.CoordinateSystem.lane">lane</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.CoordinateSystem.road" href="#scenariogeneration.xosc.enumerations.CoordinateSystem.road">road</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.CoordinateSystem.trajectory" href="#scenariogeneration.xosc.enumerations.CoordinateSystem.trajectory">trajectory</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xosc.enumerations.DirectionalDimension" href="#scenariogeneration.xosc.enumerations.DirectionalDimension">DirectionalDimension</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xosc.enumerations.DirectionalDimension.lateral" href="#scenariogeneration.xosc.enumerations.DirectionalDimension.lateral">lateral</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.DirectionalDimension.longitudinal" href="#scenariogeneration.xosc.enumerations.DirectionalDimension.longitudinal">longitudinal</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.DirectionalDimension.vertical" href="#scenariogeneration.xosc.enumerations.DirectionalDimension.vertical">vertical</a></code></li>
 </ul>
 </li>
 <li>
@@ -1537,10 +2627,25 @@ class LongitudinalDisplacement:
 </ul>
 </li>
 <li>
-<h4><code><a title="scenariogeneration.xosc.enumerations.FollowMode" href="#scenariogeneration.xosc.enumerations.FollowMode">FollowMode</a></code></h4>
+<h4><code><a title="scenariogeneration.xosc.enumerations.FollowingMode" href="#scenariogeneration.xosc.enumerations.FollowingMode">FollowingMode</a></code></h4>
 <ul class="">
-<li><code><a title="scenariogeneration.xosc.enumerations.FollowMode.follow" href="#scenariogeneration.xosc.enumerations.FollowMode.follow">follow</a></code></li>
-<li><code><a title="scenariogeneration.xosc.enumerations.FollowMode.position" href="#scenariogeneration.xosc.enumerations.FollowMode.position">position</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.FollowingMode.follow" href="#scenariogeneration.xosc.enumerations.FollowingMode.follow">follow</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.FollowingMode.position" href="#scenariogeneration.xosc.enumerations.FollowingMode.position">position</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xosc.enumerations.FractionalCloudCover" href="#scenariogeneration.xosc.enumerations.FractionalCloudCover">FractionalCloudCover</a></code></h4>
+<ul class="two-column">
+<li><code><a title="scenariogeneration.xosc.enumerations.FractionalCloudCover.eightOktas" href="#scenariogeneration.xosc.enumerations.FractionalCloudCover.eightOktas">eightOktas</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.FractionalCloudCover.fiveOktas" href="#scenariogeneration.xosc.enumerations.FractionalCloudCover.fiveOktas">fiveOktas</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.FractionalCloudCover.fourOktas" href="#scenariogeneration.xosc.enumerations.FractionalCloudCover.fourOktas">fourOktas</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.FractionalCloudCover.nineOktas" href="#scenariogeneration.xosc.enumerations.FractionalCloudCover.nineOktas">nineOktas</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.FractionalCloudCover.oneOktas" href="#scenariogeneration.xosc.enumerations.FractionalCloudCover.oneOktas">oneOktas</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.FractionalCloudCover.sevenOktas" href="#scenariogeneration.xosc.enumerations.FractionalCloudCover.sevenOktas">sevenOktas</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.FractionalCloudCover.sixOktas" href="#scenariogeneration.xosc.enumerations.FractionalCloudCover.sixOktas">sixOktas</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.FractionalCloudCover.threeOktas" href="#scenariogeneration.xosc.enumerations.FractionalCloudCover.threeOktas">threeOktas</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.FractionalCloudCover.twoOktas" href="#scenariogeneration.xosc.enumerations.FractionalCloudCover.twoOktas">twoOktas</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.FractionalCloudCover.zeroOktas" href="#scenariogeneration.xosc.enumerations.FractionalCloudCover.zeroOktas">zeroOktas</a></code></li>
 </ul>
 </li>
 <li>
@@ -1549,6 +2654,14 @@ class LongitudinalDisplacement:
 <li><code><a title="scenariogeneration.xosc.enumerations.LateralDisplacement.any" href="#scenariogeneration.xosc.enumerations.LateralDisplacement.any">any</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.LateralDisplacement.leftToReferencedEntity" href="#scenariogeneration.xosc.enumerations.LateralDisplacement.leftToReferencedEntity">leftToReferencedEntity</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.LateralDisplacement.rightToReferencedEntity" href="#scenariogeneration.xosc.enumerations.LateralDisplacement.rightToReferencedEntity">rightToReferencedEntity</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xosc.enumerations.LightMode" href="#scenariogeneration.xosc.enumerations.LightMode">LightMode</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xosc.enumerations.LightMode.flashing" href="#scenariogeneration.xosc.enumerations.LightMode.flashing">flashing</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.LightMode.off" href="#scenariogeneration.xosc.enumerations.LightMode.off">off</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.LightMode.on" href="#scenariogeneration.xosc.enumerations.LightMode.on">on</a></code></li>
 </ul>
 </li>
 <li>
@@ -1596,6 +2709,7 @@ class LongitudinalDisplacement:
 <li><code><a title="scenariogeneration.xosc.enumerations.ParameterType.boolean" href="#scenariogeneration.xosc.enumerations.ParameterType.boolean">boolean</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.ParameterType.dateTime" href="#scenariogeneration.xosc.enumerations.ParameterType.dateTime">dateTime</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.ParameterType.double" href="#scenariogeneration.xosc.enumerations.ParameterType.double">double</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.ParameterType.int" href="#scenariogeneration.xosc.enumerations.ParameterType.int">int</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.ParameterType.integer" href="#scenariogeneration.xosc.enumerations.ParameterType.integer">integer</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.ParameterType.string" href="#scenariogeneration.xosc.enumerations.ParameterType.string">string</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.ParameterType.unsighedInt" href="#scenariogeneration.xosc.enumerations.ParameterType.unsighedInt">unsighedInt</a></code></li>
@@ -1611,6 +2725,41 @@ class LongitudinalDisplacement:
 </ul>
 </li>
 <li>
+<h4><code><a title="scenariogeneration.xosc.enumerations.PedestrianGestureType" href="#scenariogeneration.xosc.enumerations.PedestrianGestureType">PedestrianGestureType</a></code></h4>
+<ul class="two-column">
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianGestureType.coffeeLeftHand" href="#scenariogeneration.xosc.enumerations.PedestrianGestureType.coffeeLeftHand">coffeeLeftHand</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianGestureType.coffeeRightHand" href="#scenariogeneration.xosc.enumerations.PedestrianGestureType.coffeeRightHand">coffeeRightHand</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianGestureType.crossArms" href="#scenariogeneration.xosc.enumerations.PedestrianGestureType.crossArms">crossArms</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianGestureType.phoneCallLeftHand" href="#scenariogeneration.xosc.enumerations.PedestrianGestureType.phoneCallLeftHand">phoneCallLeftHand</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianGestureType.phoneCallRightHand" href="#scenariogeneration.xosc.enumerations.PedestrianGestureType.phoneCallRightHand">phoneCallRightHand</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianGestureType.phoneTextLeftHand" href="#scenariogeneration.xosc.enumerations.PedestrianGestureType.phoneTextLeftHand">phoneTextLeftHand</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianGestureType.phoneTextRightHand" href="#scenariogeneration.xosc.enumerations.PedestrianGestureType.phoneTextRightHand">phoneTextRightHand</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianGestureType.sandwichLeftHand" href="#scenariogeneration.xosc.enumerations.PedestrianGestureType.sandwichLeftHand">sandwichLeftHand</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianGestureType.sandwichRightHand" href="#scenariogeneration.xosc.enumerations.PedestrianGestureType.sandwichRightHand">sandwichRightHand</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianGestureType.umbrellaLeftHand" href="#scenariogeneration.xosc.enumerations.PedestrianGestureType.umbrellaLeftHand">umbrellaLeftHand</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianGestureType.umbrellaRightHand" href="#scenariogeneration.xosc.enumerations.PedestrianGestureType.umbrellaRightHand">umbrellaRightHand</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianGestureType.wavingLeftArm" href="#scenariogeneration.xosc.enumerations.PedestrianGestureType.wavingLeftArm">wavingLeftArm</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianGestureType.wavingRightArm" href="#scenariogeneration.xosc.enumerations.PedestrianGestureType.wavingRightArm">wavingRightArm</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xosc.enumerations.PedestrianMotionType" href="#scenariogeneration.xosc.enumerations.PedestrianMotionType">PedestrianMotionType</a></code></h4>
+<ul class="two-column">
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianMotionType.bendingDown" href="#scenariogeneration.xosc.enumerations.PedestrianMotionType.bendingDown">bendingDown</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianMotionType.crawling" href="#scenariogeneration.xosc.enumerations.PedestrianMotionType.crawling">crawling</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianMotionType.cycling" href="#scenariogeneration.xosc.enumerations.PedestrianMotionType.cycling">cycling</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianMotionType.ducking" href="#scenariogeneration.xosc.enumerations.PedestrianMotionType.ducking">ducking</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianMotionType.jumping" href="#scenariogeneration.xosc.enumerations.PedestrianMotionType.jumping">jumping</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianMotionType.lying" href="#scenariogeneration.xosc.enumerations.PedestrianMotionType.lying">lying</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianMotionType.reeling" href="#scenariogeneration.xosc.enumerations.PedestrianMotionType.reeling">reeling</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianMotionType.running" href="#scenariogeneration.xosc.enumerations.PedestrianMotionType.running">running</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianMotionType.sitting" href="#scenariogeneration.xosc.enumerations.PedestrianMotionType.sitting">sitting</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianMotionType.squatting" href="#scenariogeneration.xosc.enumerations.PedestrianMotionType.squatting">squatting</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianMotionType.standing" href="#scenariogeneration.xosc.enumerations.PedestrianMotionType.standing">standing</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.PedestrianMotionType.walking" href="#scenariogeneration.xosc.enumerations.PedestrianMotionType.walking">walking</a></code></li>
+</ul>
+</li>
+<li>
 <h4><code><a title="scenariogeneration.xosc.enumerations.PrecipitationType" href="#scenariogeneration.xosc.enumerations.PrecipitationType">PrecipitationType</a></code></h4>
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.enumerations.PrecipitationType.dry" href="#scenariogeneration.xosc.enumerations.PrecipitationType.dry">dry</a></code></li>
@@ -1621,6 +2770,7 @@ class LongitudinalDisplacement:
 <li>
 <h4><code><a title="scenariogeneration.xosc.enumerations.Priority" href="#scenariogeneration.xosc.enumerations.Priority">Priority</a></code></h4>
 <ul class="">
+<li><code><a title="scenariogeneration.xosc.enumerations.Priority.override" href="#scenariogeneration.xosc.enumerations.Priority.override">override</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.Priority.overwrite" href="#scenariogeneration.xosc.enumerations.Priority.overwrite">overwrite</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.Priority.parallel" href="#scenariogeneration.xosc.enumerations.Priority.parallel">parallel</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.Priority.skip" href="#scenariogeneration.xosc.enumerations.Priority.skip">skip</a></code></li>
@@ -1643,12 +2793,35 @@ class LongitudinalDisplacement:
 </ul>
 </li>
 <li>
+<h4><code><a title="scenariogeneration.xosc.enumerations.Role" href="#scenariogeneration.xosc.enumerations.Role">Role</a></code></h4>
+<ul class="two-column">
+<li><code><a title="scenariogeneration.xosc.enumerations.Role.ambulance" href="#scenariogeneration.xosc.enumerations.Role.ambulance">ambulance</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.Role.civil" href="#scenariogeneration.xosc.enumerations.Role.civil">civil</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.Role.fire" href="#scenariogeneration.xosc.enumerations.Role.fire">fire</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.Role.military" href="#scenariogeneration.xosc.enumerations.Role.military">military</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.Role.none" href="#scenariogeneration.xosc.enumerations.Role.none">none</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.Role.police" href="#scenariogeneration.xosc.enumerations.Role.police">police</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.Role.publicTransport" href="#scenariogeneration.xosc.enumerations.Role.publicTransport">publicTransport</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.Role.roadAssistance" href="#scenariogeneration.xosc.enumerations.Role.roadAssistance">roadAssistance</a></code></li>
+</ul>
+</li>
+<li>
 <h4><code><a title="scenariogeneration.xosc.enumerations.RouteStrategy" href="#scenariogeneration.xosc.enumerations.RouteStrategy">RouteStrategy</a></code></h4>
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.enumerations.RouteStrategy.fastest" href="#scenariogeneration.xosc.enumerations.RouteStrategy.fastest">fastest</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.RouteStrategy.leastIntersections" href="#scenariogeneration.xosc.enumerations.RouteStrategy.leastIntersections">leastIntersections</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.RouteStrategy.random" href="#scenariogeneration.xosc.enumerations.RouteStrategy.random">random</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.RouteStrategy.shortest" href="#scenariogeneration.xosc.enumerations.RouteStrategy.shortest">shortest</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xosc.enumerations.RoutingAlgorithm" href="#scenariogeneration.xosc.enumerations.RoutingAlgorithm">RoutingAlgorithm</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xosc.enumerations.RoutingAlgorithm.assignedRoute" href="#scenariogeneration.xosc.enumerations.RoutingAlgorithm.assignedRoute">assignedRoute</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.RoutingAlgorithm.fastest" href="#scenariogeneration.xosc.enumerations.RoutingAlgorithm.fastest">fastest</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.RoutingAlgorithm.leastIntersections" href="#scenariogeneration.xosc.enumerations.RoutingAlgorithm.leastIntersections">leastIntersections</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.RoutingAlgorithm.shortest" href="#scenariogeneration.xosc.enumerations.RoutingAlgorithm.shortest">shortest</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.RoutingAlgorithm.undefined" href="#scenariogeneration.xosc.enumerations.RoutingAlgorithm.undefined">undefined</a></code></li>
 </ul>
 </li>
 <li>
@@ -1715,12 +2888,58 @@ class LongitudinalDisplacement:
 </ul>
 </li>
 <li>
+<h4><code><a title="scenariogeneration.xosc.enumerations.VehicleComponentType" href="#scenariogeneration.xosc.enumerations.VehicleComponentType">VehicleComponentType</a></code></h4>
+<ul class="two-column">
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleComponentType.doorFrontLeft" href="#scenariogeneration.xosc.enumerations.VehicleComponentType.doorFrontLeft">doorFrontLeft</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleComponentType.doorFrontRight" href="#scenariogeneration.xosc.enumerations.VehicleComponentType.doorFrontRight">doorFrontRight</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleComponentType.doorRearLeft" href="#scenariogeneration.xosc.enumerations.VehicleComponentType.doorRearLeft">doorRearLeft</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleComponentType.doorRearRight" href="#scenariogeneration.xosc.enumerations.VehicleComponentType.doorRearRight">doorRearRight</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleComponentType.hood" href="#scenariogeneration.xosc.enumerations.VehicleComponentType.hood">hood</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleComponentType.sideMirrorLeft" href="#scenariogeneration.xosc.enumerations.VehicleComponentType.sideMirrorLeft">sideMirrorLeft</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleComponentType.sideMirrorRight" href="#scenariogeneration.xosc.enumerations.VehicleComponentType.sideMirrorRight">sideMirrorRight</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleComponentType.sideMirrors" href="#scenariogeneration.xosc.enumerations.VehicleComponentType.sideMirrors">sideMirrors</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleComponentType.trunk" href="#scenariogeneration.xosc.enumerations.VehicleComponentType.trunk">trunk</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleComponentType.windowFrontLeft" href="#scenariogeneration.xosc.enumerations.VehicleComponentType.windowFrontLeft">windowFrontLeft</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleComponentType.windowFrontRight" href="#scenariogeneration.xosc.enumerations.VehicleComponentType.windowFrontRight">windowFrontRight</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleComponentType.windowRearLeft" href="#scenariogeneration.xosc.enumerations.VehicleComponentType.windowRearLeft">windowRearLeft</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleComponentType.windowRearRight" href="#scenariogeneration.xosc.enumerations.VehicleComponentType.windowRearRight">windowRearRight</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xosc.enumerations.VehicleLightType" href="#scenariogeneration.xosc.enumerations.VehicleLightType">VehicleLightType</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleLightType.brakeLights" href="#scenariogeneration.xosc.enumerations.VehicleLightType.brakeLights">brakeLights</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleLightType.daytimeRunningLights" href="#scenariogeneration.xosc.enumerations.VehicleLightType.daytimeRunningLights">daytimeRunningLights</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleLightType.fogLights" href="#scenariogeneration.xosc.enumerations.VehicleLightType.fogLights">fogLights</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleLightType.fogLightsFront" href="#scenariogeneration.xosc.enumerations.VehicleLightType.fogLightsFront">fogLightsFront</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleLightType.fogLightsRear" href="#scenariogeneration.xosc.enumerations.VehicleLightType.fogLightsRear">fogLightsRear</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleLightType.highBeam" href="#scenariogeneration.xosc.enumerations.VehicleLightType.highBeam">highBeam</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleLightType.indicatorLeft" href="#scenariogeneration.xosc.enumerations.VehicleLightType.indicatorLeft">indicatorLeft</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleLightType.indicatorRight" href="#scenariogeneration.xosc.enumerations.VehicleLightType.indicatorRight">indicatorRight</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleLightType.licensePlateIllumination" href="#scenariogeneration.xosc.enumerations.VehicleLightType.licensePlateIllumination">licensePlateIllumination</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleLightType.lowBeam" href="#scenariogeneration.xosc.enumerations.VehicleLightType.lowBeam">lowBeam</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleLightType.reversingLights" href="#scenariogeneration.xosc.enumerations.VehicleLightType.reversingLights">reversingLights</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleLightType.specialPurposeLights" href="#scenariogeneration.xosc.enumerations.VehicleLightType.specialPurposeLights">specialPurposeLights</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VehicleLightType.warningLights" href="#scenariogeneration.xosc.enumerations.VehicleLightType.warningLights">warningLights</a></code></li>
+</ul>
+</li>
+<li>
 <h4><code><a title="scenariogeneration.xosc.enumerations.VersionBase" href="#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></code></h4>
 <ul class="">
 <li><code><a title="scenariogeneration.xosc.enumerations.VersionBase.isVersion" href="#scenariogeneration.xosc.enumerations.VersionBase.isVersion">isVersion</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.VersionBase.setVersion" href="#scenariogeneration.xosc.enumerations.VersionBase.setVersion">setVersion</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.VersionBase.version_major" href="#scenariogeneration.xosc.enumerations.VersionBase.version_major">version_major</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.VersionBase.version_minor" href="#scenariogeneration.xosc.enumerations.VersionBase.version_minor">version_minor</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xosc.enumerations.Wetness" href="#scenariogeneration.xosc.enumerations.Wetness">Wetness</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xosc.enumerations.Wetness.dry" href="#scenariogeneration.xosc.enumerations.Wetness.dry">dry</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.Wetness.highFlooded" href="#scenariogeneration.xosc.enumerations.Wetness.highFlooded">highFlooded</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.Wetness.lowFlooded" href="#scenariogeneration.xosc.enumerations.Wetness.lowFlooded">lowFlooded</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.Wetness.moist" href="#scenariogeneration.xosc.enumerations.Wetness.moist">moist</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.Wetness.wetWithPuddles" href="#scenariogeneration.xosc.enumerations.Wetness.wetWithPuddles">wetWithPuddles</a></code></li>
 </ul>
 </li>
 </ul>

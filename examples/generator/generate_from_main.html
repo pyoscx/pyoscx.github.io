@@ -64,7 +64,6 @@ class Scenario(ScenarioGenerator):
         self.naming = &#34;numerical&#34;
 
     def road(self, **kwargs):
-
         road = xodr.create_road(
             [
                 xodr.Spiral(0.0000000001, kwargs[&#34;road_curvature&#34;], 100),
@@ -183,13 +182,16 @@ if __name__ == &#34;__main__&#34;:
 - a dict of lists, where the lists are the values you want to sweep over, all permutations of these sets will be generated
 - a list of dicts, where the dicts are identical and each element in the list is one scenario</p>
 <h2 id="attributes">Attributes</h2>
-<pre><code>road_file (str): name of the roadfile,
+<pre><code>road_file (str): name of the roadfile
 
 parameters (dict of lists, or list of dicts): parameter sets to be used
 
 naming (str): two options "numerical" or "parameter"
 
 generate_all_roads (bool): will only generate unique roads
+
+number_of_parallel_writings (int): parallelize the writing of the xml files
+    Default: 1 (no parallelization)
 </code></pre></div>
 <details class="source">
 <summary>
@@ -201,7 +203,6 @@ generate_all_roads (bool): will only generate unique roads
         self.naming = &#34;numerical&#34;
 
     def road(self, **kwargs):
-
         road = xodr.create_road(
             [
                 xodr.Spiral(0.0000000001, kwargs[&#34;road_curvature&#34;], 100),

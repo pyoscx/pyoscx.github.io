@@ -337,9 +337,9 @@ class Range:
         retdict = {&#34;lowerLimit&#34;: str(self.lower), &#34;upperLimit&#34;: str(self.upper)}
         return retdict
 
-    def get_element(self):
+    def get_element(self, elementname=&#34;Range&#34;):
         &#34;&#34;&#34;returns the elementTree of the Range&#34;&#34;&#34;
-        element = ET.Element(&#34;Range&#34;, self.get_attributes())
+        element = ET.Element(elementname, self.get_attributes())
         return element
 
 
@@ -1355,6 +1355,8 @@ class ParameterValueDistribution(VersionBase):
         scenario_file,
         parameter_distribution,
         osc_minor_version=1,
+        header_properties=None,
+        license=None,
     ):
         &#34;&#34;&#34;initalizes the ParameterValueDistribution
 
@@ -1370,8 +1372,18 @@ class ParameterValueDistribution(VersionBase):
 
             osc_minor_version (int): the osi version wanted (Note: only available from OpenSCENARIO V1.1.0)
 
+            header_properties (Properties): properties that can be added to the header
+                Default: None
+
+            licence (License): optional license to the file header
+                Default: None
         &#34;&#34;&#34;
-        self.header = FileHeader(author, description, revMinor=osc_minor_version)
+        self.header = FileHeader(
+            author,
+            description,
+            revMinor=osc_minor_version,
+            properties=header_properties,
+        )
         if not isinstance(parameter_distribution, Stochastic) and not isinstance(
             parameter_distribution, Deterministic
         ):
@@ -2742,7 +2754,7 @@ def parse(element):
 </dd>
 <dt id="scenariogeneration.xosc.parameters.ParameterValueDistribution"><code class="flex name class">
 <span>class <span class="ident">ParameterValueDistribution</span></span>
-<span>(</span><span>description, author, scenario_file, parameter_distribution, osc_minor_version=1)</span>
+<span>(</span><span>description, author, scenario_file, parameter_distribution, osc_minor_version=1, header_properties=None, license=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Creates the the ParameterValueDistribution file for open scenario</p>
@@ -2780,6 +2792,12 @@ scenario_file (str): path to the scenario that the parameter distribution should
 parameter_distribution (Stochastic or Deterministic): the parameter distribution
 
 osc_minor_version (int): the osi version wanted (Note: only available from OpenSCENARIO V1.1.0)
+
+header_properties (Properties): properties that can be added to the header
+    Default: None
+
+licence (License): optional license to the file header
+    Default: None
 </code></pre></div>
 <details class="source">
 <summary>
@@ -2826,6 +2844,8 @@ osc_minor_version (int): the osi version wanted (Note: only available from OpenS
         scenario_file,
         parameter_distribution,
         osc_minor_version=1,
+        header_properties=None,
+        license=None,
     ):
         &#34;&#34;&#34;initalizes the ParameterValueDistribution
 
@@ -2841,8 +2861,18 @@ osc_minor_version (int): the osi version wanted (Note: only available from OpenS
 
             osc_minor_version (int): the osi version wanted (Note: only available from OpenSCENARIO V1.1.0)
 
+            header_properties (Properties): properties that can be added to the header
+                Default: None
+
+            licence (License): optional license to the file header
+                Default: None
         &#34;&#34;&#34;
-        self.header = FileHeader(author, description, revMinor=osc_minor_version)
+        self.header = FileHeader(
+            author,
+            description,
+            revMinor=osc_minor_version,
+            properties=header_properties,
+        )
         if not isinstance(parameter_distribution, Stochastic) and not isinstance(
             parameter_distribution, Deterministic
         ):
@@ -3749,9 +3779,9 @@ upper (float): upper limit of the range
         retdict = {&#34;lowerLimit&#34;: str(self.lower), &#34;upperLimit&#34;: str(self.upper)}
         return retdict
 
-    def get_element(self):
+    def get_element(self, elementname=&#34;Range&#34;):
         &#34;&#34;&#34;returns the elementTree of the Range&#34;&#34;&#34;
-        element = ET.Element(&#34;Range&#34;, self.get_attributes())
+        element = ET.Element(elementname, self.get_attributes())
         return element</code></pre>
 </details>
 <h3>Static methods</h3>
@@ -3810,7 +3840,7 @@ def parse(element):
 </details>
 </dd>
 <dt id="scenariogeneration.xosc.parameters.Range.get_element"><code class="name flex">
-<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+<span>def <span class="ident">get_element</span></span>(<span>self, elementname='Range')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>returns the elementTree of the Range</p></div>
@@ -3818,9 +3848,9 @@ def parse(element):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_element(self):
+<pre><code class="python">def get_element(self, elementname=&#34;Range&#34;):
     &#34;&#34;&#34;returns the elementTree of the Range&#34;&#34;&#34;
-    element = ET.Element(&#34;Range&#34;, self.get_attributes())
+    element = ET.Element(elementname, self.get_attributes())
     return element</code></pre>
 </details>
 </dd>

@@ -36,11 +36,11 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <pre><code class="python">&#34;&#34;&#34;
   scenariogeneration
   https://github.com/pyoscx/scenariogeneration
- 
+
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at https://mozilla.org/MPL/2.0/.
- 
+
   Copyright (c) 2022 The scenariogeneration Authors.
 
 &#34;&#34;&#34;
@@ -50,6 +50,9 @@ import xml.etree.ElementTree as ET
 from .utils import (
     EntityRef,
     convert_bool,
+    convert_int,
+    convert_float,
+    get_bool_string,
     _PositionType,
     _ValueTriggerType,
     _EntityTriggerType,
@@ -57,7 +60,9 @@ from .utils import (
 )
 from .enumerations import (
     CoordinateSystem,
+    DirectionalDimension,
     ObjectType,
+    RoutingAlgorithm,
     Rule,
     ConditionEdge,
     TriggeringEntitiesRule,
@@ -66,7 +71,11 @@ from .enumerations import (
     StoryboardElementState,
     VersionBase,
 )
-from .exceptions import ToManyOptionalArguments, NotAValidElement
+from .exceptions import (
+    OpenSCENARIOVersionError,
+    ToManyOptionalArguments,
+    NotAValidElement,
+)
 from .position import _PositionFactory
 
 
@@ -522,7 +531,7 @@ class EntityTrigger(_TriggerType):
         else:
             self._triggerpoint = &#34;StopTrigger&#34;
 
-        self.delay = delay
+        self.delay = convert_float(delay)
         if not hasattr(ConditionEdge, str(conditionedge)):
             raise ValueError(&#34;not a valid condition edge&#34;)
         self.conditionedge = conditionedge
@@ -582,7 +591,7 @@ class EntityTrigger(_TriggerType):
             )
 
         name = element.attrib[&#34;name&#34;]
-        delay = element.attrib[&#34;delay&#34;]
+        delay = convert_float(element.attrib[&#34;delay&#34;])
         conditionedge = getattr(ConditionEdge, element.attrib[&#34;conditionEdge&#34;])
         entityconditionelement = element.find(&#34;ByEntityCondition&#34;)
         triggering_entities = TriggeringEntities.parse(
@@ -708,7 +717,7 @@ class ValueTrigger(_TriggerType):
         else:
             self._triggerpoint = &#34;StopTrigger&#34;
 
-        self.delay = delay
+        self.delay = convert_float(delay)
         if not hasattr(ConditionEdge, str(conditionedge)):
             raise ValueError(&#34;not a valid condition edge&#34;)
         self.conditionedge = conditionedge
@@ -764,7 +773,7 @@ class ValueTrigger(_TriggerType):
             )
 
         name = element.attrib[&#34;name&#34;]
-        delay = element.attrib[&#34;delay&#34;]
+        delay = convert_float(element.attrib[&#34;delay&#34;])
         conditionedge = getattr(ConditionEdge, element.attrib[&#34;conditionEdge&#34;])
         condition = _ValueConditionFactory.parse_value_condition(
             element.find(&#34;ByValueCondition&#34;)
@@ -931,7 +940,7 @@ class EndOfRoadCondition(_EntityTriggerType):
             duration (float): the duration after the condition
 
         &#34;&#34;&#34;
-        self.duration = duration
+        self.duration = convert_float(duration)
 
     def __eq__(self, other):
         if isinstance(other, EndOfRoadCondition):
@@ -953,7 +962,7 @@ class EndOfRoadCondition(_EntityTriggerType):
 
         &#34;&#34;&#34;
         condition = element.find(&#34;EndOfRoadCondition&#34;)
-        duration = condition.attrib[&#34;duration&#34;]
+        duration = convert_float(condition.attrib[&#34;duration&#34;])
         return EndOfRoadCondition(duration)
 
     def get_attributes(self):
@@ -1073,7 +1082,7 @@ class OffroadCondition(_EntityTriggerType):
             duration (float): the duration of offroad
 
         &#34;&#34;&#34;
-        self.duration = duration
+        self.duration = convert_float(duration)
 
     def __eq__(self, other):
         if isinstance(other, OffroadCondition):
@@ -1095,7 +1104,7 @@ class OffroadCondition(_EntityTriggerType):
 
         &#34;&#34;&#34;
         condition = element.find(&#34;OffroadCondition&#34;)
-        duration = condition.attrib[&#34;duration&#34;]
+        duration = convert_float(condition.attrib[&#34;duration&#34;])
         return OffroadCondition(duration)
 
     def get_attributes(self):
@@ -1131,6 +1140,10 @@ class TimeHeadwayCondition(_EntityTriggerType):
 
         coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
             Default: CoordinateSystem.road
+
+        routing_algorithm (RoutingAlgorithm): the routing algorithm for the condition (valid from V1.2)
+            Default: None
+
     Attributes
     ----------
         entity (str): name of the entity for the headway
@@ -1146,6 +1159,8 @@ class TimeHeadwayCondition(_EntityTriggerType):
         distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
 
         coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+
+        routing_algorithm (RoutingAlgorithm): the routing algorithm for the condition (valid from V1.2)
 
     Methods
     -------
@@ -1169,6 +1184,7 @@ class TimeHeadwayCondition(_EntityTriggerType):
         freespace=True,
         distance_type=RelativeDistanceType.longitudinal,
         coordinate_system=CoordinateSystem.road,
+        routing_algorithm=None,
     ):
         &#34;&#34;&#34;initalize the TimeHeadwayCondition
 
@@ -1191,15 +1207,14 @@ class TimeHeadwayCondition(_EntityTriggerType):
 
             coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
                 Default: CoordinateSystem.road
+
+            routing_algorithm (RoutingAlgorithm): the routing algorithm for the condition (valid from V1.2)
+                Default: None
         &#34;&#34;&#34;
         self.entity = entity
-        self.value = value
-        if not isinstance(alongroute, bool):
-            raise TypeError(&#34;alongroute input not of type bool&#34;)
-        if not isinstance(freespace, bool):
-            raise TypeError(&#34;freespace input not of type bool&#34;)
-        self.alongroute = alongroute
-        self.freespace = freespace
+        self.value = convert_float(value)
+        self.alongroute = convert_bool(alongroute)
+        self.freespace = convert_bool(freespace)
         if not hasattr(Rule, str(rule)):
             raise ValueError(rule + &#34;; is not a valid rule.&#34;)
         self.rule = rule
@@ -1209,6 +1224,9 @@ class TimeHeadwayCondition(_EntityTriggerType):
             raise ValueError(coordinate_system + &#34;; is not a valid CoordinateSystem.&#34;)
         self.relative_distance_type = distance_type
         self.coordinate_system = coordinate_system
+        if routing_algorithm and not hasattr(RoutingAlgorithm, str(routing_algorithm)):
+            raise ValueError(routing_algorithm + &#34;; is not a valid RoutingAlgorithm.&#34;)
+        self.routing_algorithm = routing_algorithm
 
     def __eq__(self, other):
         if isinstance(other, TimeHeadwayCondition):
@@ -1233,6 +1251,7 @@ class TimeHeadwayCondition(_EntityTriggerType):
         entity = condition.attrib[&#34;entityRef&#34;]
         value = condition.attrib[&#34;value&#34;]
         rule = getattr(Rule, condition.attrib[&#34;rule&#34;])
+        routing_algorithm = None
         if &#34;alongRoute&#34; in condition.attrib:
             alongroute = convert_bool(condition.attrib[&#34;alongRoute&#34;])
         else:
@@ -1253,8 +1272,19 @@ class TimeHeadwayCondition(_EntityTriggerType):
             coordsystem = CoordinateSystem.road
         freespace = convert_bool(condition.attrib[&#34;freespace&#34;])
 
+        if &#34;routingAlgorithm&#34; in condition.attrib:
+            routing_algorithm = getattr(
+                RoutingAlgorithm, condition.attrib[&#34;routingAlgorithm&#34;]
+            )
         return TimeHeadwayCondition(
-            entity, value, rule, alongroute, freespace, reldisttype, coordsystem
+            entity,
+            value,
+            rule,
+            alongroute,
+            freespace,
+            reldisttype,
+            coordsystem,
+            routing_algorithm,
         )
 
     def get_attributes(self):
@@ -1263,12 +1293,18 @@ class TimeHeadwayCondition(_EntityTriggerType):
         basedict[&#34;entityRef&#34;] = self.entity
         basedict[&#34;value&#34;] = str(self.value)
         if self.isVersion(minor=0):
-            basedict[&#34;alongRoute&#34;] = convert_bool(self.alongroute)
+            basedict[&#34;alongRoute&#34;] = get_bool_string(self.alongroute)
         else:
             basedict[&#34;relativeDistanceType&#34;] = self.relative_distance_type.get_name()
             basedict[&#34;coordinateSystem&#34;] = self.coordinate_system.get_name()
-        basedict[&#34;freespace&#34;] = convert_bool(self.freespace)
+        basedict[&#34;freespace&#34;] = get_bool_string(self.freespace)
         basedict[&#34;rule&#34;] = self.rule.get_name()
+        if self.routing_algorithm:
+            if self.version_minor &lt; 2:
+                raise OpenSCENARIOVersionError(
+                    &#34;RoutingAlgorithm in TimeHeadwayCondition was added in OSC V1.2&#34;
+                )
+            basedict[&#34;routingAlgorithm&#34;] = self.routing_algorithm.get_name()
         return basedict
 
     def get_element(self):
@@ -1305,6 +1341,9 @@ class TimeToCollisionCondition(_EntityTriggerType):
         coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
             Default: CoordinateSystem.road
 
+        routing_algorithm (RoutingAlgorithm): the routing algorithm for the condition (valid from V1.2)
+            Default: None
+
     Attributes
     ----------
         value (float): time before collision
@@ -1324,6 +1363,8 @@ class TimeToCollisionCondition(_EntityTriggerType):
         distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
 
         coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+
+        routing_algorithm (RoutingAlgorithm): the routing algorithm for the condition (valid from V1.2)
 
     Methods
     -------
@@ -1348,6 +1389,7 @@ class TimeToCollisionCondition(_EntityTriggerType):
         position=None,
         distance_type=RelativeDistanceType.longitudinal,
         coordinate_system=CoordinateSystem.road,
+        routing_algorithm=None,
     ):
         &#34;&#34;&#34;initalize the TimeToCollisionCondition
 
@@ -1374,14 +1416,13 @@ class TimeToCollisionCondition(_EntityTriggerType):
 
             coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
                 Default: CoordinateSystem.road
+
+            routing_algorithm (RoutingAlgorithm): the routing algorithm for the condition (valid from V1.2)
+                Default: None
         &#34;&#34;&#34;
-        self.value = value
-        if not isinstance(alongroute, bool):
-            raise TypeError(&#34;alongroute input not of type bool&#34;)
-        if not isinstance(freespace, bool):
-            raise TypeError(&#34;freespace input not of type bool&#34;)
-        self.freespace = freespace
-        self.alongroute = alongroute
+        self.value = convert_float(value)
+        self.freespace = convert_bool(freespace)
+        self.alongroute = convert_bool(alongroute)
         if not hasattr(Rule, str(rule)):
             raise ValueError(rule + &#34;; is not a valid rule.&#34;)
         self.rule = rule
@@ -1408,6 +1449,9 @@ class TimeToCollisionCondition(_EntityTriggerType):
             raise ValueError(coordinate_system + &#34;; is not a valid CoordinateSystem.&#34;)
         self.relative_distance_type = distance_type
         self.coordinate_system = coordinate_system
+        if routing_algorithm and not hasattr(RoutingAlgorithm, str(routing_algorithm)):
+            raise ValueError(routing_algorithm + &#34;; is not a valid RoutingAlgorithm.&#34;)
+        self.routing_algorithm = routing_algorithm
 
     def __eq__(self, other):
         if isinstance(other, TimeToCollisionCondition):
@@ -1443,6 +1487,7 @@ class TimeToCollisionCondition(_EntityTriggerType):
         value = condition.attrib[&#34;value&#34;]
         rule = getattr(Rule, condition.attrib[&#34;rule&#34;])
         freespace = convert_bool(condition.attrib[&#34;freespace&#34;])
+        routing_algorithm = None
         if &#34;alongRoute&#34; in condition.attrib:
             alongroute = convert_bool(condition.attrib[&#34;alongRoute&#34;])
         else:
@@ -1476,6 +1521,10 @@ class TimeToCollisionCondition(_EntityTriggerType):
             raise ValueError(
                 &#34;No TimeToCollisionConditionTarget found while parsing TimeToCollisionCondition.&#34;
             )
+        if &#34;routingAlgorithm&#34; in condition.attrib:
+            routing_algorithm = getattr(
+                RoutingAlgorithm, condition.attrib[&#34;routingAlgorithm&#34;]
+            )
         return TimeToCollisionCondition(
             value,
             rule,
@@ -1485,6 +1534,7 @@ class TimeToCollisionCondition(_EntityTriggerType):
             position,
             reldisttype,
             coordsystem,
+            routing_algorithm,
         )
 
     def get_attributes(self):
@@ -1492,12 +1542,18 @@ class TimeToCollisionCondition(_EntityTriggerType):
         basedict = {}
         basedict[&#34;value&#34;] = str(self.value)
         if self.isVersion(minor=0):
-            basedict[&#34;alongRoute&#34;] = convert_bool(self.alongroute)
+            basedict[&#34;alongRoute&#34;] = get_bool_string(self.alongroute)
         else:
             basedict[&#34;relativeDistanceType&#34;] = self.relative_distance_type.name
             basedict[&#34;coordinateSystem&#34;] = self.coordinate_system.name
-        basedict[&#34;freespace&#34;] = convert_bool(self.freespace)
+        basedict[&#34;freespace&#34;] = get_bool_string(self.freespace)
         basedict[&#34;rule&#34;] = self.rule.get_name()
+        if self.routing_algorithm:
+            if self.version_minor &lt; 2:
+                raise OpenSCENARIOVersionError(
+                    &#34;RoutingAlgorithm in TimeHeadwayCondition was added in OSC V1.2&#34;
+                )
+            basedict[&#34;routingAlgorithm&#34;] = self.routing_algorithm.get_name()
         return basedict
 
     def get_element(self):
@@ -1526,11 +1582,16 @@ class AccelerationCondition(_EntityTriggerType):
 
         rule (Rule): condition rule of triggering
 
+        direction (DirectionalDimension) Direction of the acceleration (if not given, the total acceleration is considered)
+            Default: None
+
     Attributes
     ----------
         value (float): acceleration
 
         rule (Rule): condition rule of triggering
+
+        direction (DirectionalDimension) Direction of the acceleration (if not given, the total acceleration is considered)
 
     Methods
     -------
@@ -1545,7 +1606,7 @@ class AccelerationCondition(_EntityTriggerType):
 
     &#34;&#34;&#34;
 
-    def __init__(self, value, rule):
+    def __init__(self, value, rule, direction=None):
         &#34;&#34;&#34;the AccelerationCondition class is an Entity Condition used by the EntityTrigger
 
         Parameters
@@ -1553,11 +1614,16 @@ class AccelerationCondition(_EntityTriggerType):
             value (float): acceleration
 
             rule (Rule): condition rule of triggering
+
+            direction (DirectionalDimension) Direction of the acceleration (if not given, the total acceleration is considered)
         &#34;&#34;&#34;
-        self.value = value
+        self.value = convert_float(value)
         if not hasattr(Rule, str(rule)):
             raise ValueError(rule + &#34;; is not a valid rule.&#34;)
         self.rule = rule
+        if direction and not hasattr(DirectionalDimension, str(direction)):
+            raise ValueError(direction + &#34;; is not a valid direction&#34;)
+        self.direction = direction
 
     def __eq__(self, other):
         if isinstance(other, AccelerationCondition):
@@ -1578,14 +1644,22 @@ class AccelerationCondition(_EntityTriggerType):
             condition (AccelerationCondition): a AccelerationCondition object
 
         &#34;&#34;&#34;
+        direction = None
         condition = element.find(&#34;AccelerationCondition&#34;)
-        value = condition.attrib[&#34;value&#34;]
+        value = convert_float(condition.attrib[&#34;value&#34;])
         rule = getattr(Rule, condition.attrib[&#34;rule&#34;])
-        return AccelerationCondition(value, rule)
+        if &#34;direction&#34; in condition.attrib:
+            direction = getattr(DirectionalDimension, condition.attrib[&#34;direction&#34;])
+        return AccelerationCondition(value, rule, direction)
 
     def get_attributes(self):
         &#34;&#34;&#34;returns the attributes of the AccelerationCondition as a dict&#34;&#34;&#34;
-        return {&#34;value&#34;: str(self.value), &#34;rule&#34;: self.rule.get_name()}
+        retdict = {}
+        retdict[&#34;value&#34;] = str(self.value)
+        retdict[&#34;rule&#34;] = self.rule.get_name()
+        if self.direction is not None and self.isVersion(minor=2):
+            retdict[&#34;direction&#34;] = self.direction.get_name()
+        return retdict
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the AccelerationCondition&#34;&#34;&#34;
@@ -1626,7 +1700,7 @@ class StandStillCondition(_EntityTriggerType):
             duration (float): time of standstill
 
         &#34;&#34;&#34;
-        self.duration = duration
+        self.duration = convert_float(duration)
 
     def __eq__(self, other):
         if isinstance(other, StandStillCondition):
@@ -1648,7 +1722,7 @@ class StandStillCondition(_EntityTriggerType):
 
         &#34;&#34;&#34;
         condition = element.find(&#34;StandStillCondition&#34;)
-        duration = condition.attrib[&#34;duration&#34;]
+        duration = convert_float(condition.attrib[&#34;duration&#34;])
         return StandStillCondition(duration)
 
     def get_attributes(self):
@@ -1671,11 +1745,16 @@ class SpeedCondition(_EntityTriggerType):
 
         rule (Rule): condition rule of triggering
 
+        directional_dimension (DirectionalDimension): direction of the speed to compare (if not used, total speed is considered)
+            Default: None
+
     Attributes
     ----------
         value (float): speed to trigger on
 
         rule (Rule): condition rule of triggering
+
+        directional_dimension (DirectionalDimension): direction of the speed to compare (if not used, total speed is considered)
 
     Methods
     -------
@@ -1690,7 +1769,7 @@ class SpeedCondition(_EntityTriggerType):
 
     &#34;&#34;&#34;
 
-    def __init__(self, value, rule):
+    def __init__(self, value, rule, directional_dimension=None):
         &#34;&#34;&#34;initalize the SpeedCondition class is an Entity Condition used by the EntityTrigger
 
         Parameters
@@ -1698,11 +1777,21 @@ class SpeedCondition(_EntityTriggerType):
             value (float): speed to trigger on
 
             rule (Rule): condition rule of triggering
+
+            directional_dimension (DirectionalDimension): direction of the speed to compare (if not used, total speed is considered)
+                Default: None
         &#34;&#34;&#34;
-        self.value = value
+        self.value = convert_float(value)
         if not hasattr(Rule, str(rule)):
             raise ValueError(rule + &#34;; is not a valid rule.&#34;)
         self.rule = rule
+        if directional_dimension and not hasattr(
+            DirectionalDimension, str(directional_dimension)
+        ):
+            raise TypeError(
+                directional_dimension + &#34;; is not a valid DirectionalDimension.&#34;
+            )
+        self.directional_dimension = directional_dimension
 
     def __eq__(self, other):
         if isinstance(other, SpeedCondition):
@@ -1724,15 +1813,20 @@ class SpeedCondition(_EntityTriggerType):
 
         &#34;&#34;&#34;
         condition = element.find(&#34;SpeedCondition&#34;)
-        value = condition.attrib[&#34;value&#34;]
+        value = convert_float(condition.attrib[&#34;value&#34;])
         rule = getattr(Rule, condition.attrib[&#34;rule&#34;])
-        return SpeedCondition(value, rule)
+        direction = None
+        if &#34;direction&#34; in condition.attrib:
+            direction = getattr(DirectionalDimension, condition.attrib[&#34;direction&#34;])
+        return SpeedCondition(value, rule, direction)
 
     def get_attributes(self):
         &#34;&#34;&#34;returns the attributes of the SpeedCondition as a dict&#34;&#34;&#34;
         basedict = {}
         basedict[&#34;value&#34;] = str(self.value)
         basedict[&#34;rule&#34;] = self.rule.get_name()
+        if self.directional_dimension is not None and self.isVersion(minor=2):
+            basedict[&#34;direction&#34;] = self.directional_dimension.get_name()
         return basedict
         # return merge_dicts({&#39;value&#39;:str(self.value)},self.rule.get_attributes())
 
@@ -1754,6 +1848,9 @@ class RelativeSpeedCondition(_EntityTriggerType):
 
         entity (str): name of the entity to be relative to
 
+        directional_dimension (DirectionalDimension): direction of the speed to compare (if not used, total speed is considered)
+            Default: None
+
     Attributes
     ----------
         value (float): acceleration
@@ -1761,6 +1858,8 @@ class RelativeSpeedCondition(_EntityTriggerType):
         rule (Rule): condition rule of triggering
 
         entity (str): name of the entity to be relative to
+
+        directional_dimension (DirectionalDimension): direction of the speed to compare (if not used, total speed is considered)
 
     Methods
     -------
@@ -1775,7 +1874,7 @@ class RelativeSpeedCondition(_EntityTriggerType):
 
     &#34;&#34;&#34;
 
-    def __init__(self, value, rule, entity):
+    def __init__(self, value, rule, entity, directional_dimension=None):
         &#34;&#34;&#34;initalize the RelativeSpeedCondition
 
         Parameters
@@ -1786,12 +1885,21 @@ class RelativeSpeedCondition(_EntityTriggerType):
 
             entity (str): name of the entity to be relative to
 
+            directional_dimension (DirectionalDimension): direction of the speed to compare (if not used, total speed is considered)
+                Default: None
         &#34;&#34;&#34;
-        self.value = value
+        self.value = convert_float(value)
         if not hasattr(Rule, str(rule)):
             raise ValueError(rule + &#34;; is not a valid rule.&#34;)
         self.rule = rule
         self.entity = entity
+        if directional_dimension and not hasattr(
+            DirectionalDimension, str(directional_dimension)
+        ):
+            raise TypeError(
+                directional_dimension + &#34;; is not a valid DirectionalDimension.&#34;
+            )
+        self.directional_dimension = directional_dimension
 
     def __eq__(self, other):
         if isinstance(other, RelativeSpeedCondition):
@@ -1813,10 +1921,13 @@ class RelativeSpeedCondition(_EntityTriggerType):
 
         &#34;&#34;&#34;
         condition = element.find(&#34;RelativeSpeedCondition&#34;)
-        value = condition.attrib[&#34;value&#34;]
+        value = convert_float(condition.attrib[&#34;value&#34;])
         entity = condition.attrib[&#34;entityRef&#34;]
         rule = getattr(Rule, condition.attrib[&#34;rule&#34;])
-        return RelativeSpeedCondition(value, rule, entity)
+        direction = None
+        if &#34;direction&#34; in condition.attrib:
+            direction = getattr(DirectionalDimension, condition.attrib[&#34;direction&#34;])
+        return RelativeSpeedCondition(value, rule, entity, direction)
 
     def get_attributes(self):
         &#34;&#34;&#34;returns the attributes of the RelativeSpeedCondition as a dict&#34;&#34;&#34;
@@ -1824,6 +1935,8 @@ class RelativeSpeedCondition(_EntityTriggerType):
         basedict[&#34;value&#34;] = str(self.value)
         basedict[&#34;rule&#34;] = self.rule.get_name()
         basedict[&#34;entityRef&#34;] = self.entity
+        if self.directional_dimension is not None and self.isVersion(minor=2):
+            basedict[&#34;direction&#34;] = self.directional_dimension.get_name()
         return basedict
         # return merge_dicts({&#39;value&#39;:str(self.value),&#39;entityRef&#39;:self.entity},self.rule.get_attributes())
 
@@ -1866,7 +1979,7 @@ class TraveledDistanceCondition(_EntityTriggerType):
             value (float): how far it has traveled
 
         &#34;&#34;&#34;
-        self.value = value
+        self.value = convert_float(value)
 
     def __eq__(self, other):
         if isinstance(other, TraveledDistanceCondition):
@@ -1888,7 +2001,7 @@ class TraveledDistanceCondition(_EntityTriggerType):
 
         &#34;&#34;&#34;
         condition = element.find(&#34;TraveledDistanceCondition&#34;)
-        value = condition.attrib[&#34;value&#34;]
+        value = convert_float(condition.attrib[&#34;value&#34;])
         return TraveledDistanceCondition(value)
 
     def get_attributes(self):
@@ -1945,7 +2058,7 @@ class ReachPositionCondition(_EntityTriggerType):
         if not (isinstance(position, _PositionType)):
             raise TypeError(&#34;position input is not a valid Position&#34;)
         self.position = position
-        self.tolerance = tolerance
+        self.tolerance = convert_float(tolerance)
 
     def __eq__(self, other):
         if isinstance(other, ReachPositionCondition):
@@ -1970,7 +2083,7 @@ class ReachPositionCondition(_EntityTriggerType):
 
         &#34;&#34;&#34;
         condition = element.find(&#34;ReachPositionCondition&#34;)
-        tolerance = condition.attrib[&#34;tolerance&#34;]
+        tolerance = convert_float(condition.attrib[&#34;tolerance&#34;])
         position = _PositionFactory.parse_position(condition.find(&#34;Position&#34;))
         return ReachPositionCondition(position, tolerance)
 
@@ -1985,6 +2098,10 @@ class ReachPositionCondition(_EntityTriggerType):
             element, &#34;ReachPositionCondition&#34;, attrib=self.get_attributes()
         )
         reachposcond.append(self.position.get_element())
+        if self.isVersion(minor=2):
+            Warning(
+                &#34;ReachPositionCondition is deprecrated, please use DistanceCondition instead&#34;
+            )
         return element
 
 
@@ -2011,6 +2128,9 @@ class DistanceCondition(_EntityTriggerType):
         coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
             Default: CoordinateSystem.road
 
+        routing_algorithm (RoutingAlgorithm): the routing algorithm to use if a relevant coordinate system is used (road/lane)
+            Default: RoutingAlgorithm.undefined
+
     Attributes
     ----------
         value (float): distance to position
@@ -2026,6 +2146,8 @@ class DistanceCondition(_EntityTriggerType):
         distance_type (RelativeDistanceType): how the relative distance should be calculated
 
         coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance
+
+        routing_algorithm (RoutingAlgorithm): the routing algorithm to use if a relevant coordinate system is used (road/lane)
 
     Methods
     -------
@@ -2049,10 +2171,11 @@ class DistanceCondition(_EntityTriggerType):
         freespace=True,
         distance_type=RelativeDistanceType.longitudinal,
         coordinate_system=CoordinateSystem.road,
+        routing_algorithm=RoutingAlgorithm.undefined,
     ):
         self.value = value
-        self.alongroute = alongroute
-        self.freespace = freespace
+        self.alongroute = convert_bool(alongroute)
+        self.freespace = convert_bool(freespace)
         if not hasattr(Rule, str(rule)):
             raise ValueError(rule + &#34;; is not a valid rule.&#34;)
         self.rule = rule
@@ -2065,6 +2188,7 @@ class DistanceCondition(_EntityTriggerType):
             raise ValueError(coordinate_system + &#34;; is not a valid CoordinateSystem.&#34;)
         self.relative_distance_type = distance_type
         self.coordinate_system = coordinate_system
+        self.routing_algorithm = routing_algorithm
 
     def __eq__(self, other):
         if isinstance(other, DistanceCondition):
@@ -2110,11 +2234,25 @@ class DistanceCondition(_EntityTriggerType):
             )
         else:
             coordsystem = CoordinateSystem.road
+
+        if &#34;routingAlgorithm&#34; in condition.attrib:
+            routing_algorithm = getattr(
+                RoutingAlgorithm, condition.attrib[&#34;routingAlgorithm&#34;]
+            )
+        else:
+            routing_algorithm = RoutingAlgorithm.undefined
         position = None
 
         position = _PositionFactory.parse_position(condition.find(&#34;Position&#34;))
         return DistanceCondition(
-            value, rule, position, alongroute, freespace, reldisttype, coordsystem
+            value,
+            rule,
+            position,
+            alongroute,
+            freespace,
+            reldisttype,
+            coordsystem,
+            routing_algorithm,
         )
 
     def get_attributes(self):
@@ -2122,14 +2260,15 @@ class DistanceCondition(_EntityTriggerType):
         basedict = {}
         basedict[&#34;value&#34;] = str(self.value)
 
-        basedict[&#34;freespace&#34;] = convert_bool(self.freespace)
+        basedict[&#34;freespace&#34;] = get_bool_string(self.freespace)
         basedict[&#34;rule&#34;] = self.rule.get_name()
         if self.isVersion(minor=0):
-            basedict[&#34;alongRoute&#34;] = convert_bool(self.alongroute)
+            basedict[&#34;alongRoute&#34;] = get_bool_string(self.alongroute)
         else:
-            basedict[&#34;relativeDistanceType&#34;] = self.relative_distance_type.name
-            basedict[&#34;coordinateSystem&#34;] = self.coordinate_system.name
-
+            basedict[&#34;relativeDistanceType&#34;] = self.relative_distance_type.get_name()
+            basedict[&#34;coordinateSystem&#34;] = self.coordinate_system.get_name()
+        if self.isVersion(minor=2):
+            basedict[&#34;routingAlgorithm&#34;] = self.routing_algorithm.get_name()
         return basedict
 
     def get_element(self):
@@ -2162,6 +2301,9 @@ class RelativeDistanceCondition(_EntityTriggerType):
         coordinate_system (CoordinateSystem): what coordinate system to use (valid from V1.1)
             Default: CoordinateSystem.entity
 
+        routing_algorithm (RoutingAlgorithm): if coordinate_system road/lane is used, this can be set (valid from V1.2)
+            Default: None
+
     Attributes
     ----------
         value (float): distance to position
@@ -2175,6 +2317,9 @@ class RelativeDistanceCondition(_EntityTriggerType):
         freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
 
         coordinate_system (CoordinateSystem): what coordinate system to use (valid from V1.1)
+
+        routing_algorithm (RoutingAlgorithm): if coordinate_system road/lane is used, this can be set (valid from V1.2)
+            Default: None
 
     Methods
     -------
@@ -2198,6 +2343,7 @@ class RelativeDistanceCondition(_EntityTriggerType):
         alongroute=True,
         freespace=True,
         coordinate_system=CoordinateSystem.entity,
+        routing_algorithm=None,
     ):
         &#34;&#34;&#34;initalize the RelativeDistanceCondition
 
@@ -2216,12 +2362,13 @@ class RelativeDistanceCondition(_EntityTriggerType):
 
             coordinate_system (CoordinateSystem): what coordinate system to use (valid from V1.1)
                 Default: CoordinateSystem.entity
+
+            routing_algorithm (RoutingAlgorithm): if coordinate_system road/lane is used, this can be set (valid from V1.2)
+                Default: None
         &#34;&#34;&#34;
         self.value = value
-        if not isinstance(freespace, bool):
-            raise TypeError(&#34;freespace input not of type bool&#34;)
-        self.alongroute = alongroute
-        self.freespace = freespace
+        self.alongroute = convert_bool(alongroute)
+        self.freespace = convert_bool(freespace)
         if not hasattr(RelativeDistanceType, str(dist_type)):
             raise TypeError(&#34;dist_type is not of type RelativeDistanceType&#34;)
         self.dist_type = dist_type
@@ -2230,6 +2377,9 @@ class RelativeDistanceCondition(_EntityTriggerType):
         self.rule = rule
         self.entity = entity
         self.coordinate_system = coordinate_system
+        if routing_algorithm and not hasattr(RoutingAlgorithm, str(routing_algorithm)):
+            raise TypeError(str(routing_algorithm) + &#34; is not a valid RoutingAlgorithm&#34;)
+        self.routing_algorithm = routing_algorithm
 
     def __eq__(self, other):
         if isinstance(other, RelativeDistanceCondition):
@@ -2273,21 +2423,42 @@ class RelativeDistanceCondition(_EntityTriggerType):
             )
         else:
             coordsystem = CoordinateSystem.road
+        if &#34;routingAlgorithm&#34; in condition.attrib:
+            routing_algorithm = getattr(
+                RoutingAlgorithm, condition.attrib[&#34;routingAlgorithm&#34;]
+            )
+        else:
+            routing_algorithm = None
 
         return RelativeDistanceCondition(
-            value, rule, reldisttype, entity, alongroute, freespace, coordsystem
+            value,
+            rule,
+            reldisttype,
+            entity,
+            alongroute,
+            freespace,
+            coordsystem,
+            routing_algorithm,
         )
 
     def get_attributes(self):
         &#34;&#34;&#34;returns the attributes of the RelativeDistanceCondition as a dict&#34;&#34;&#34;
         basedict = {}
         basedict[&#34;value&#34;] = str(self.value)
-        basedict[&#34;freespace&#34;] = convert_bool(self.freespace)
+        basedict[&#34;freespace&#34;] = get_bool_string(self.freespace)
         basedict[&#34;entityRef&#34;] = self.entity
         basedict[&#34;rule&#34;] = self.rule.get_name()
         basedict[&#34;relativeDistanceType&#34;] = self.dist_type.get_name()
         if not self.isVersion(minor=0):
             basedict[&#34;coordinateSystem&#34;] = self.coordinate_system.get_name()
+        if self.routing_algorithm:
+            if not (self.isVersion(minor=0) or self.isVersion(minor=1)):
+                basedict[&#34;routingAlgorithm&#34;] = self.routing_algorithm.get_name()
+            else:
+                raise OpenSCENARIOVersionError(
+                    &#34;RoutingAlgorithm was introduced in V1.2&#34;
+                )
+
         return basedict
 
     def get_element(self):
@@ -2296,6 +2467,185 @@ class RelativeDistanceCondition(_EntityTriggerType):
         ET.SubElement(
             element, &#34;RelativeDistanceCondition&#34;, attrib=self.get_attributes()
         )
+        return element
+
+
+class RelativeClearanceCondition(_EntityTriggerType):
+    &#34;&#34;&#34;the RelativeClearanceCondition class is an Entity Condition used by the EntityTrigger
+
+    Parameters
+    ----------
+        distance_backward (float): distance backwards
+
+        distance_forward (float): distance forward
+
+        freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
+
+        opposite_lanes (bool): if lanes in opposite direction are considered
+
+    Attributes
+    ----------
+        distance_backward (float): distance backwards
+
+        distance_forward (float): distance forward
+
+        freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
+
+        opposite_lanes (bool): if lanes in opposite direction are considered
+
+        entities (list of EntityRef): specific entities to look for
+
+        lane_ranges (list of tuple): lanes to be checked
+
+    Methods
+    -------
+        add_entity(entity)
+            adds an entity to the RelativeClearanceCondition
+
+        add_relative_lane_range(from, to)
+            adds a RelativeLaneRange to the RelativeClearanceCondition
+
+        parse(element)
+            parses a ElementTree created by the class and returns an instance of the class
+
+        get_element()
+            Returns the full ElementTree of the class
+
+        get_attributes()
+            Returns a dictionary of all attributes of the class
+
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        opposite_lanes,
+        distance_backward=0,
+        distance_forward=0,
+        freespace=True,
+    ):
+        &#34;&#34;&#34;initalize the RelativeDistanceCondition
+
+        Parameters
+        ----------
+            distance_backward (float): distance backwards
+
+            distance_forward (float): distance forward
+
+            freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
+
+            opposite_lanes (bool): if lanes in opposite direction are considered
+        &#34;&#34;&#34;
+
+        self.freespace = convert_bool(freespace)
+        self.opposite_lanes = convert_bool(opposite_lanes)
+        self.distance_backward = convert_float(distance_backward)
+        self.distance_forward = convert_float(distance_forward)
+
+        self.entities = []
+        self.lane_ranges = []
+
+    def __eq__(self, other):
+        if isinstance(other, RelativeClearanceCondition):
+            if (
+                self.get_attributes() == other.get_attributes()
+                and self.entities == other.entities
+                and self.lane_ranges == other.lane_ranges
+            ):
+                return True
+        return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34;Parses the xml element of RelativeClearanceCondition
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (RelativeClearanceCondition): a RelativeClearanceCondition object
+
+        &#34;&#34;&#34;
+        condition = element.find(&#34;RelativeClearanceCondition&#34;)
+        if &#34;freespace&#34; in condition.attrib:
+            freespace = convert_bool(condition.attrib[&#34;freespace&#34;])
+        else:
+            freespace = convert_bool(condition.attrib[&#34;freeSpace&#34;])
+
+        opposite_lanes = convert_bool(condition.attrib[&#34;oppositeLanes&#34;])
+
+        if &#34;distanceBackward&#34; in condition.attrib:
+            back_dist = convert_float(condition.attrib[&#34;distanceBackward&#34;])
+        else:
+            back_dist = None
+
+        if &#34;distanceForward&#34; in condition.attrib:
+            fwd_dist = convert_float(condition.attrib[&#34;distanceForward&#34;])
+        else:
+            fwd_dist = None
+        retval = RelativeClearanceCondition(
+            opposite_lanes, back_dist, fwd_dist, freespace
+        )
+        for er in condition.findall(&#34;EntityRef&#34;):
+            retval.add_entity(er.attrib[&#34;entityRef&#34;])
+
+        for r in condition.findall(&#34;RelativeLaneRange&#34;):
+            retval.add_relative_lane_range(
+                convert_int(r.attrib[&#34;from&#34;]), convert_int(r.attrib[&#34;to&#34;])
+            )
+
+        return retval
+
+    def add_entity(self, entity):
+        &#34;&#34;&#34;adds an entity to the RelativeClearanceCondition
+
+        Parameters
+        ----------
+            entity (str): name of the entity
+
+        &#34;&#34;&#34;
+        self.entities.append(EntityRef(entity))
+
+    def add_relative_lane_range(self, from_lane, to_lane):
+        &#34;&#34;&#34;adds an RelativeLaneRange to the RelativeClearanceCondition
+
+        Parameters
+        ----------
+            from_lane (int): start lane
+
+            to_lane (int): end lane
+
+        &#34;&#34;&#34;
+        self.lane_ranges.append((from_lane, to_lane))
+
+    def get_attributes(self):
+        &#34;&#34;&#34;returns the attributes of the RelativeClearanceCondition as a dict&#34;&#34;&#34;
+        basedict = {}
+        basedict[&#34;oppositeLanes&#34;] = get_bool_string(self.opposite_lanes)
+        # TODO: wrong in the spec, should be lower case s
+        basedict[&#34;freespace&#34;] = get_bool_string(self.freespace)
+
+        if self.distance_backward is not None:
+            basedict[&#34;distanceBackward&#34;] = str(self.distance_backward)
+        if self.distance_forward is not None:
+            basedict[&#34;distanceForward&#34;] = str(self.distance_forward)
+        return basedict
+
+    def get_element(self):
+        &#34;&#34;&#34;returns the elementTree of the RelativeClearanceCondition&#34;&#34;&#34;
+        element = ET.Element(&#34;EntityCondition&#34;)
+        relative_clearence_element = ET.SubElement(
+            element, &#34;RelativeClearanceCondition&#34;, attrib=self.get_attributes()
+        )
+        for e in self.entities:
+            relative_clearence_element.append(e.get_element())
+        for r in self.lane_ranges:
+            ET.SubElement(
+                relative_clearence_element,
+                &#34;RelativeLaneRange&#34;,
+                {&#34;from&#34;: str(r[0]), &#34;to&#34;: str(r[1])},
+            )
         return element
 
 
@@ -2349,7 +2699,7 @@ class ParameterCondition(_ValueTriggerType):
 
         &#34;&#34;&#34;
         self.parameter = parameter
-        self.value = value
+        self.value = convert_int(value)
         if not hasattr(Rule, str(rule)):
             raise ValueError(rule + &#34;; is not a valid rule.&#34;)
         self.rule = rule
@@ -2374,7 +2724,7 @@ class ParameterCondition(_ValueTriggerType):
 
         &#34;&#34;&#34;
         parameter = element.attrib[&#34;parameterRef&#34;]
-        value = element.attrib[&#34;value&#34;]
+        value = convert_int(element.attrib[&#34;value&#34;])
         rule = getattr(Rule, element.attrib[&#34;rule&#34;])
         return ParameterCondition(parameter, value, rule)
 
@@ -2387,6 +2737,91 @@ class ParameterCondition(_ValueTriggerType):
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the ParameterCondition&#34;&#34;&#34;
         return ET.Element(&#34;ParameterCondition&#34;, attrib=self.get_attributes())
+
+
+class VariableCondition(_ValueTriggerType):
+    &#34;&#34;&#34;the VariableCondition class is an Value Condition used by the ValueTrigger (valid from V1.2)
+
+    Parameters
+    ----------
+        variable (str): the variable to trigger on
+
+        value (int): value to trigger on
+
+        rule (Rule): condition rule of triggering
+
+    Attributes
+    ----------
+        variable (str): the variable to trigger on
+
+        value (int): value to trigger on
+
+        rule (Rule): condition rule of triggering
+
+    Methods
+    -------
+        parse(element)
+            parses a ElementTree created by the class and returns an instance of the class
+
+        get_element()
+            Returns the full ElementTree of the class
+
+        get_attributes()
+            Returns a dictionary of all attributes of the class
+
+    &#34;&#34;&#34;
+
+    def __init__(self, variable, value, rule):
+        &#34;&#34;&#34;initalize the VariableCondition
+
+        Parameters
+        ----------
+            variable (str): the variable to trigger on
+
+            value (int): value to trigger on
+
+            rule (Rule): condition rule of triggering
+
+        &#34;&#34;&#34;
+        self.variable = variable
+        self.value = value
+        if not hasattr(Rule, str(rule)):
+            raise ValueError(rule + &#34;; is not a valid rule.&#34;)
+        self.rule = rule
+
+    def __eq__(self, other):
+        if isinstance(other, VariableCondition):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34;Parses the xml element of VariableCondition
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (VariableCondition): a VariableCondition object
+
+        &#34;&#34;&#34;
+        variable = element.attrib[&#34;variableRef&#34;]
+        value = element.attrib[&#34;value&#34;]
+        rule = getattr(Rule, element.attrib[&#34;rule&#34;])
+        return VariableCondition(variable, value, rule)
+
+    def get_attributes(self):
+        &#34;&#34;&#34;returns the attributes of the VariableCondition as a dict&#34;&#34;&#34;
+        basedict = {&#34;variableRef&#34;: self.variable, &#34;value&#34;: str(self.value)}
+        basedict[&#34;rule&#34;] = self.rule.get_name()
+        return basedict
+
+    def get_element(self):
+        &#34;&#34;&#34;returns the elementTree of the VariableCondition&#34;&#34;&#34;
+        return ET.Element(&#34;VariableCondition&#34;, attrib=self.get_attributes())
 
 
 class TimeOfDayCondition(_ValueTriggerType):
@@ -2469,7 +2904,7 @@ class SimulationTimeCondition(_ValueTriggerType):
 
     Parameters
     ----------
-        value (int): simulation time
+        value (float): simulation time
 
         rule (Rule): condition rule of triggering
 
@@ -2497,11 +2932,11 @@ class SimulationTimeCondition(_ValueTriggerType):
 
         Parameters
         ----------
-            value (int): simulation time
+            value (float): simulation time
 
             rule (Rule): condition rule of triggering
         &#34;&#34;&#34;
-        self.value = value
+        self.value = convert_float(value)
         if not hasattr(Rule, str(rule)):
             raise ValueError(rule + &#34;; is not a valid rule.&#34;)
         self.rule = rule
@@ -2526,7 +2961,7 @@ class SimulationTimeCondition(_ValueTriggerType):
 
         &#34;&#34;&#34;
         condition = element.find(&#34;SimulationTimeCondition&#34;)
-        value = element.attrib[&#34;value&#34;]
+        value = convert_float(element.attrib[&#34;value&#34;])
         rule = getattr(Rule, element.attrib[&#34;rule&#34;])
         return SimulationTimeCondition(value, rule)
 
@@ -2701,7 +3136,7 @@ class UserDefinedValueCondition(_ValueTriggerType):
 
         &#34;&#34;&#34;
         name = element.attrib[&#34;name&#34;]
-        value = element.attrib[&#34;value&#34;]
+        value = convert_int(element.attrib[&#34;value&#34;])
         rule = getattr(Rule, element.attrib[&#34;rule&#34;])
         return UserDefinedValueCondition(name, value, rule)
 
@@ -2880,7 +3315,7 @@ class TrafficSignalControllerCondition(_ValueTriggerType):
 <dl>
 <dt id="scenariogeneration.xosc.triggers.AccelerationCondition"><code class="flex name class">
 <span>class <span class="ident">AccelerationCondition</span></span>
-<span>(</span><span>value, rule)</span>
+<span>(</span><span>value, rule, direction=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>the AccelerationCondition class is an Entity Condition used by the EntityTrigger</p>
@@ -2888,11 +3323,16 @@ class TrafficSignalControllerCondition(_ValueTriggerType):
 <pre><code>value (float): acceleration
 
 rule (Rule): condition rule of triggering
+
+direction (DirectionalDimension) Direction of the acceleration (if not given, the total acceleration is considered)
+    Default: None
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>value (float): acceleration
 
 rule (Rule): condition rule of triggering
+
+direction (DirectionalDimension) Direction of the acceleration (if not given, the total acceleration is considered)
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>parse(element)
@@ -2909,6 +3349,8 @@ get_attributes()
 <pre><code>value (float): acceleration
 
 rule (Rule): condition rule of triggering
+
+direction (DirectionalDimension) Direction of the acceleration (if not given, the total acceleration is considered)
 </code></pre></div>
 <details class="source">
 <summary>
@@ -2923,11 +3365,16 @@ rule (Rule): condition rule of triggering
 
         rule (Rule): condition rule of triggering
 
+        direction (DirectionalDimension) Direction of the acceleration (if not given, the total acceleration is considered)
+            Default: None
+
     Attributes
     ----------
         value (float): acceleration
 
         rule (Rule): condition rule of triggering
+
+        direction (DirectionalDimension) Direction of the acceleration (if not given, the total acceleration is considered)
 
     Methods
     -------
@@ -2942,7 +3389,7 @@ rule (Rule): condition rule of triggering
 
     &#34;&#34;&#34;
 
-    def __init__(self, value, rule):
+    def __init__(self, value, rule, direction=None):
         &#34;&#34;&#34;the AccelerationCondition class is an Entity Condition used by the EntityTrigger
 
         Parameters
@@ -2950,11 +3397,16 @@ rule (Rule): condition rule of triggering
             value (float): acceleration
 
             rule (Rule): condition rule of triggering
+
+            direction (DirectionalDimension) Direction of the acceleration (if not given, the total acceleration is considered)
         &#34;&#34;&#34;
-        self.value = value
+        self.value = convert_float(value)
         if not hasattr(Rule, str(rule)):
             raise ValueError(rule + &#34;; is not a valid rule.&#34;)
         self.rule = rule
+        if direction and not hasattr(DirectionalDimension, str(direction)):
+            raise ValueError(direction + &#34;; is not a valid direction&#34;)
+        self.direction = direction
 
     def __eq__(self, other):
         if isinstance(other, AccelerationCondition):
@@ -2975,14 +3427,22 @@ rule (Rule): condition rule of triggering
             condition (AccelerationCondition): a AccelerationCondition object
 
         &#34;&#34;&#34;
+        direction = None
         condition = element.find(&#34;AccelerationCondition&#34;)
-        value = condition.attrib[&#34;value&#34;]
+        value = convert_float(condition.attrib[&#34;value&#34;])
         rule = getattr(Rule, condition.attrib[&#34;rule&#34;])
-        return AccelerationCondition(value, rule)
+        if &#34;direction&#34; in condition.attrib:
+            direction = getattr(DirectionalDimension, condition.attrib[&#34;direction&#34;])
+        return AccelerationCondition(value, rule, direction)
 
     def get_attributes(self):
         &#34;&#34;&#34;returns the attributes of the AccelerationCondition as a dict&#34;&#34;&#34;
-        return {&#34;value&#34;: str(self.value), &#34;rule&#34;: self.rule.get_name()}
+        retdict = {}
+        retdict[&#34;value&#34;] = str(self.value)
+        retdict[&#34;rule&#34;] = self.rule.get_name()
+        if self.direction is not None and self.isVersion(minor=2):
+            retdict[&#34;direction&#34;] = self.direction.get_name()
+        return retdict
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the AccelerationCondition&#34;&#34;&#34;
@@ -3025,10 +3485,13 @@ def parse(element):
         condition (AccelerationCondition): a AccelerationCondition object
 
     &#34;&#34;&#34;
+    direction = None
     condition = element.find(&#34;AccelerationCondition&#34;)
-    value = condition.attrib[&#34;value&#34;]
+    value = convert_float(condition.attrib[&#34;value&#34;])
     rule = getattr(Rule, condition.attrib[&#34;rule&#34;])
-    return AccelerationCondition(value, rule)</code></pre>
+    if &#34;direction&#34; in condition.attrib:
+        direction = getattr(DirectionalDimension, condition.attrib[&#34;direction&#34;])
+    return AccelerationCondition(value, rule, direction)</code></pre>
 </details>
 </dd>
 </dl>
@@ -3045,7 +3508,12 @@ def parse(element):
 </summary>
 <pre><code class="python">def get_attributes(self):
     &#34;&#34;&#34;returns the attributes of the AccelerationCondition as a dict&#34;&#34;&#34;
-    return {&#34;value&#34;: str(self.value), &#34;rule&#34;: self.rule.get_name()}</code></pre>
+    retdict = {}
+    retdict[&#34;value&#34;] = str(self.value)
+    retdict[&#34;rule&#34;] = self.rule.get_name()
+    if self.direction is not None and self.isVersion(minor=2):
+        retdict[&#34;direction&#34;] = self.direction.get_name()
+    return retdict</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xosc.triggers.AccelerationCondition.get_element"><code class="name flex">
@@ -3505,7 +3973,7 @@ def parse(element):
 </dd>
 <dt id="scenariogeneration.xosc.triggers.DistanceCondition"><code class="flex name class">
 <span>class <span class="ident">DistanceCondition</span></span>
-<span>(</span><span>value, rule, position, alongroute=True, freespace=True, distance_type=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;, coordinate_system=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;)</span>
+<span>(</span><span>value, rule, position, alongroute=True, freespace=True, distance_type=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;, coordinate_system=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;, routing_algorithm=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>the DistanceCondition class is an Entity Condition used by the EntityTrigger</p>
@@ -3527,6 +3995,9 @@ distance_type (RelativeDistanceType): how the relative distance should be calcul
 
 coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
     Default: CoordinateSystem.road
+
+routing_algorithm (RoutingAlgorithm): the routing algorithm to use if a relevant coordinate system is used (road/lane)
+    Default: RoutingAlgorithm.undefined
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>value (float): distance to position
@@ -3542,6 +4013,8 @@ freespace (bool): (True) distance between bounding boxes, (False) distance betwe
 distance_type (RelativeDistanceType): how the relative distance should be calculated
 
 coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance
+
+routing_algorithm (RoutingAlgorithm): the routing algorithm to use if a relevant coordinate system is used (road/lane)
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>parse(element)
@@ -3580,6 +4053,9 @@ get_attributes()
         coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
             Default: CoordinateSystem.road
 
+        routing_algorithm (RoutingAlgorithm): the routing algorithm to use if a relevant coordinate system is used (road/lane)
+            Default: RoutingAlgorithm.undefined
+
     Attributes
     ----------
         value (float): distance to position
@@ -3595,6 +4071,8 @@ get_attributes()
         distance_type (RelativeDistanceType): how the relative distance should be calculated
 
         coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance
+
+        routing_algorithm (RoutingAlgorithm): the routing algorithm to use if a relevant coordinate system is used (road/lane)
 
     Methods
     -------
@@ -3618,10 +4096,11 @@ get_attributes()
         freespace=True,
         distance_type=RelativeDistanceType.longitudinal,
         coordinate_system=CoordinateSystem.road,
+        routing_algorithm=RoutingAlgorithm.undefined,
     ):
         self.value = value
-        self.alongroute = alongroute
-        self.freespace = freespace
+        self.alongroute = convert_bool(alongroute)
+        self.freespace = convert_bool(freespace)
         if not hasattr(Rule, str(rule)):
             raise ValueError(rule + &#34;; is not a valid rule.&#34;)
         self.rule = rule
@@ -3634,6 +4113,7 @@ get_attributes()
             raise ValueError(coordinate_system + &#34;; is not a valid CoordinateSystem.&#34;)
         self.relative_distance_type = distance_type
         self.coordinate_system = coordinate_system
+        self.routing_algorithm = routing_algorithm
 
     def __eq__(self, other):
         if isinstance(other, DistanceCondition):
@@ -3679,11 +4159,25 @@ get_attributes()
             )
         else:
             coordsystem = CoordinateSystem.road
+
+        if &#34;routingAlgorithm&#34; in condition.attrib:
+            routing_algorithm = getattr(
+                RoutingAlgorithm, condition.attrib[&#34;routingAlgorithm&#34;]
+            )
+        else:
+            routing_algorithm = RoutingAlgorithm.undefined
         position = None
 
         position = _PositionFactory.parse_position(condition.find(&#34;Position&#34;))
         return DistanceCondition(
-            value, rule, position, alongroute, freespace, reldisttype, coordsystem
+            value,
+            rule,
+            position,
+            alongroute,
+            freespace,
+            reldisttype,
+            coordsystem,
+            routing_algorithm,
         )
 
     def get_attributes(self):
@@ -3691,14 +4185,15 @@ get_attributes()
         basedict = {}
         basedict[&#34;value&#34;] = str(self.value)
 
-        basedict[&#34;freespace&#34;] = convert_bool(self.freespace)
+        basedict[&#34;freespace&#34;] = get_bool_string(self.freespace)
         basedict[&#34;rule&#34;] = self.rule.get_name()
         if self.isVersion(minor=0):
-            basedict[&#34;alongRoute&#34;] = convert_bool(self.alongroute)
+            basedict[&#34;alongRoute&#34;] = get_bool_string(self.alongroute)
         else:
-            basedict[&#34;relativeDistanceType&#34;] = self.relative_distance_type.name
-            basedict[&#34;coordinateSystem&#34;] = self.coordinate_system.name
-
+            basedict[&#34;relativeDistanceType&#34;] = self.relative_distance_type.get_name()
+            basedict[&#34;coordinateSystem&#34;] = self.coordinate_system.get_name()
+        if self.isVersion(minor=2):
+            basedict[&#34;routingAlgorithm&#34;] = self.routing_algorithm.get_name()
         return basedict
 
     def get_element(self):
@@ -3768,11 +4263,25 @@ def parse(element):
         )
     else:
         coordsystem = CoordinateSystem.road
+
+    if &#34;routingAlgorithm&#34; in condition.attrib:
+        routing_algorithm = getattr(
+            RoutingAlgorithm, condition.attrib[&#34;routingAlgorithm&#34;]
+        )
+    else:
+        routing_algorithm = RoutingAlgorithm.undefined
     position = None
 
     position = _PositionFactory.parse_position(condition.find(&#34;Position&#34;))
     return DistanceCondition(
-        value, rule, position, alongroute, freespace, reldisttype, coordsystem
+        value,
+        rule,
+        position,
+        alongroute,
+        freespace,
+        reldisttype,
+        coordsystem,
+        routing_algorithm,
     )</code></pre>
 </details>
 </dd>
@@ -3793,14 +4302,15 @@ def parse(element):
     basedict = {}
     basedict[&#34;value&#34;] = str(self.value)
 
-    basedict[&#34;freespace&#34;] = convert_bool(self.freespace)
+    basedict[&#34;freespace&#34;] = get_bool_string(self.freespace)
     basedict[&#34;rule&#34;] = self.rule.get_name()
     if self.isVersion(minor=0):
-        basedict[&#34;alongRoute&#34;] = convert_bool(self.alongroute)
+        basedict[&#34;alongRoute&#34;] = get_bool_string(self.alongroute)
     else:
-        basedict[&#34;relativeDistanceType&#34;] = self.relative_distance_type.name
-        basedict[&#34;coordinateSystem&#34;] = self.coordinate_system.name
-
+        basedict[&#34;relativeDistanceType&#34;] = self.relative_distance_type.get_name()
+        basedict[&#34;coordinateSystem&#34;] = self.coordinate_system.get_name()
+    if self.isVersion(minor=2):
+        basedict[&#34;routingAlgorithm&#34;] = self.routing_algorithm.get_name()
     return basedict</code></pre>
 </details>
 </dd>
@@ -3981,7 +4491,7 @@ get_attributes()
             duration (float): the duration after the condition
 
         &#34;&#34;&#34;
-        self.duration = duration
+        self.duration = convert_float(duration)
 
     def __eq__(self, other):
         if isinstance(other, EndOfRoadCondition):
@@ -4003,7 +4513,7 @@ get_attributes()
 
         &#34;&#34;&#34;
         condition = element.find(&#34;EndOfRoadCondition&#34;)
-        duration = condition.attrib[&#34;duration&#34;]
+        duration = convert_float(condition.attrib[&#34;duration&#34;])
         return EndOfRoadCondition(duration)
 
     def get_attributes(self):
@@ -4052,7 +4562,7 @@ def parse(element):
 
     &#34;&#34;&#34;
     condition = element.find(&#34;EndOfRoadCondition&#34;)
-    duration = condition.attrib[&#34;duration&#34;]
+    duration = convert_float(condition.attrib[&#34;duration&#34;])
     return EndOfRoadCondition(duration)</code></pre>
 </details>
 </dd>
@@ -4232,7 +4742,7 @@ triggeringpoint (str): start or stop
         else:
             self._triggerpoint = &#34;StopTrigger&#34;
 
-        self.delay = delay
+        self.delay = convert_float(delay)
         if not hasattr(ConditionEdge, str(conditionedge)):
             raise ValueError(&#34;not a valid condition edge&#34;)
         self.conditionedge = conditionedge
@@ -4292,7 +4802,7 @@ triggeringpoint (str): start or stop
             )
 
         name = element.attrib[&#34;name&#34;]
-        delay = element.attrib[&#34;delay&#34;]
+        delay = convert_float(element.attrib[&#34;delay&#34;])
         conditionedge = getattr(ConditionEdge, element.attrib[&#34;conditionEdge&#34;])
         entityconditionelement = element.find(&#34;ByEntityCondition&#34;)
         triggering_entities = TriggeringEntities.parse(
@@ -4387,7 +4897,7 @@ def parse(element):
         )
 
     name = element.attrib[&#34;name&#34;]
-    delay = element.attrib[&#34;delay&#34;]
+    delay = convert_float(element.attrib[&#34;delay&#34;])
     conditionedge = getattr(ConditionEdge, element.attrib[&#34;conditionEdge&#34;])
     entityconditionelement = element.find(&#34;ByEntityCondition&#34;)
     triggering_entities = TriggeringEntities.parse(
@@ -4536,7 +5046,7 @@ get_attributes()
             duration (float): the duration of offroad
 
         &#34;&#34;&#34;
-        self.duration = duration
+        self.duration = convert_float(duration)
 
     def __eq__(self, other):
         if isinstance(other, OffroadCondition):
@@ -4558,7 +5068,7 @@ get_attributes()
 
         &#34;&#34;&#34;
         condition = element.find(&#34;OffroadCondition&#34;)
-        duration = condition.attrib[&#34;duration&#34;]
+        duration = convert_float(condition.attrib[&#34;duration&#34;])
         return OffroadCondition(duration)
 
     def get_attributes(self):
@@ -4607,7 +5117,7 @@ def parse(element):
 
     &#34;&#34;&#34;
     condition = element.find(&#34;OffroadCondition&#34;)
-    duration = condition.attrib[&#34;duration&#34;]
+    duration = convert_float(condition.attrib[&#34;duration&#34;])
     return OffroadCondition(duration)</code></pre>
 </details>
 </dd>
@@ -4733,7 +5243,7 @@ rule (Rule): condition rule of triggering
 
         &#34;&#34;&#34;
         self.parameter = parameter
-        self.value = value
+        self.value = convert_int(value)
         if not hasattr(Rule, str(rule)):
             raise ValueError(rule + &#34;; is not a valid rule.&#34;)
         self.rule = rule
@@ -4758,7 +5268,7 @@ rule (Rule): condition rule of triggering
 
         &#34;&#34;&#34;
         parameter = element.attrib[&#34;parameterRef&#34;]
-        value = element.attrib[&#34;value&#34;]
+        value = convert_int(element.attrib[&#34;value&#34;])
         rule = getattr(Rule, element.attrib[&#34;rule&#34;])
         return ParameterCondition(parameter, value, rule)
 
@@ -4808,7 +5318,7 @@ def parse(element):
 
     &#34;&#34;&#34;
     parameter = element.attrib[&#34;parameterRef&#34;]
-    value = element.attrib[&#34;value&#34;]
+    value = convert_int(element.attrib[&#34;value&#34;])
     rule = getattr(Rule, element.attrib[&#34;rule&#34;])
     return ParameterCondition(parameter, value, rule)</code></pre>
 </details>
@@ -4925,7 +5435,7 @@ tolerance (float): tolerance of the position
         if not (isinstance(position, _PositionType)):
             raise TypeError(&#34;position input is not a valid Position&#34;)
         self.position = position
-        self.tolerance = tolerance
+        self.tolerance = convert_float(tolerance)
 
     def __eq__(self, other):
         if isinstance(other, ReachPositionCondition):
@@ -4950,7 +5460,7 @@ tolerance (float): tolerance of the position
 
         &#34;&#34;&#34;
         condition = element.find(&#34;ReachPositionCondition&#34;)
-        tolerance = condition.attrib[&#34;tolerance&#34;]
+        tolerance = convert_float(condition.attrib[&#34;tolerance&#34;])
         position = _PositionFactory.parse_position(condition.find(&#34;Position&#34;))
         return ReachPositionCondition(position, tolerance)
 
@@ -4965,6 +5475,10 @@ tolerance (float): tolerance of the position
             element, &#34;ReachPositionCondition&#34;, attrib=self.get_attributes()
         )
         reachposcond.append(self.position.get_element())
+        if self.isVersion(minor=2):
+            Warning(
+                &#34;ReachPositionCondition is deprecrated, please use DistanceCondition instead&#34;
+            )
         return element</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -5003,7 +5517,7 @@ def parse(element):
 
     &#34;&#34;&#34;
     condition = element.find(&#34;ReachPositionCondition&#34;)
-    tolerance = condition.attrib[&#34;tolerance&#34;]
+    tolerance = convert_float(condition.attrib[&#34;tolerance&#34;])
     position = _PositionFactory.parse_position(condition.find(&#34;Position&#34;))
     return ReachPositionCondition(position, tolerance)</code></pre>
 </details>
@@ -5041,6 +5555,416 @@ def parse(element):
         element, &#34;ReachPositionCondition&#34;, attrib=self.get_attributes()
     )
     reachposcond.append(self.position.get_element())
+    if self.isVersion(minor=2):
+        Warning(
+            &#34;ReachPositionCondition is deprecrated, please use DistanceCondition instead&#34;
+        )
+    return element</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="scenariogeneration.xosc.triggers.RelativeClearanceCondition"><code class="flex name class">
+<span>class <span class="ident">RelativeClearanceCondition</span></span>
+<span>(</span><span>opposite_lanes, distance_backward=0, distance_forward=0, freespace=True)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>the RelativeClearanceCondition class is an Entity Condition used by the EntityTrigger</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>distance_backward (float): distance backwards
+
+distance_forward (float): distance forward
+
+freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
+
+opposite_lanes (bool): if lanes in opposite direction are considered
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>distance_backward (float): distance backwards
+
+distance_forward (float): distance forward
+
+freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
+
+opposite_lanes (bool): if lanes in opposite direction are considered
+
+entities (list of EntityRef): specific entities to look for
+
+lane_ranges (list of tuple): lanes to be checked
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>add_entity(entity)
+    adds an entity to the RelativeClearanceCondition
+
+add_relative_lane_range(from, to)
+    adds a RelativeLaneRange to the RelativeClearanceCondition
+
+parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element()
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of the class
+</code></pre>
+<p>initalize the RelativeDistanceCondition</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>distance_backward (float): distance backwards
+
+distance_forward (float): distance forward
+
+freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
+
+opposite_lanes (bool): if lanes in opposite direction are considered
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class RelativeClearanceCondition(_EntityTriggerType):
+    &#34;&#34;&#34;the RelativeClearanceCondition class is an Entity Condition used by the EntityTrigger
+
+    Parameters
+    ----------
+        distance_backward (float): distance backwards
+
+        distance_forward (float): distance forward
+
+        freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
+
+        opposite_lanes (bool): if lanes in opposite direction are considered
+
+    Attributes
+    ----------
+        distance_backward (float): distance backwards
+
+        distance_forward (float): distance forward
+
+        freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
+
+        opposite_lanes (bool): if lanes in opposite direction are considered
+
+        entities (list of EntityRef): specific entities to look for
+
+        lane_ranges (list of tuple): lanes to be checked
+
+    Methods
+    -------
+        add_entity(entity)
+            adds an entity to the RelativeClearanceCondition
+
+        add_relative_lane_range(from, to)
+            adds a RelativeLaneRange to the RelativeClearanceCondition
+
+        parse(element)
+            parses a ElementTree created by the class and returns an instance of the class
+
+        get_element()
+            Returns the full ElementTree of the class
+
+        get_attributes()
+            Returns a dictionary of all attributes of the class
+
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        opposite_lanes,
+        distance_backward=0,
+        distance_forward=0,
+        freespace=True,
+    ):
+        &#34;&#34;&#34;initalize the RelativeDistanceCondition
+
+        Parameters
+        ----------
+            distance_backward (float): distance backwards
+
+            distance_forward (float): distance forward
+
+            freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
+
+            opposite_lanes (bool): if lanes in opposite direction are considered
+        &#34;&#34;&#34;
+
+        self.freespace = convert_bool(freespace)
+        self.opposite_lanes = convert_bool(opposite_lanes)
+        self.distance_backward = convert_float(distance_backward)
+        self.distance_forward = convert_float(distance_forward)
+
+        self.entities = []
+        self.lane_ranges = []
+
+    def __eq__(self, other):
+        if isinstance(other, RelativeClearanceCondition):
+            if (
+                self.get_attributes() == other.get_attributes()
+                and self.entities == other.entities
+                and self.lane_ranges == other.lane_ranges
+            ):
+                return True
+        return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34;Parses the xml element of RelativeClearanceCondition
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (RelativeClearanceCondition): a RelativeClearanceCondition object
+
+        &#34;&#34;&#34;
+        condition = element.find(&#34;RelativeClearanceCondition&#34;)
+        if &#34;freespace&#34; in condition.attrib:
+            freespace = convert_bool(condition.attrib[&#34;freespace&#34;])
+        else:
+            freespace = convert_bool(condition.attrib[&#34;freeSpace&#34;])
+
+        opposite_lanes = convert_bool(condition.attrib[&#34;oppositeLanes&#34;])
+
+        if &#34;distanceBackward&#34; in condition.attrib:
+            back_dist = convert_float(condition.attrib[&#34;distanceBackward&#34;])
+        else:
+            back_dist = None
+
+        if &#34;distanceForward&#34; in condition.attrib:
+            fwd_dist = convert_float(condition.attrib[&#34;distanceForward&#34;])
+        else:
+            fwd_dist = None
+        retval = RelativeClearanceCondition(
+            opposite_lanes, back_dist, fwd_dist, freespace
+        )
+        for er in condition.findall(&#34;EntityRef&#34;):
+            retval.add_entity(er.attrib[&#34;entityRef&#34;])
+
+        for r in condition.findall(&#34;RelativeLaneRange&#34;):
+            retval.add_relative_lane_range(
+                convert_int(r.attrib[&#34;from&#34;]), convert_int(r.attrib[&#34;to&#34;])
+            )
+
+        return retval
+
+    def add_entity(self, entity):
+        &#34;&#34;&#34;adds an entity to the RelativeClearanceCondition
+
+        Parameters
+        ----------
+            entity (str): name of the entity
+
+        &#34;&#34;&#34;
+        self.entities.append(EntityRef(entity))
+
+    def add_relative_lane_range(self, from_lane, to_lane):
+        &#34;&#34;&#34;adds an RelativeLaneRange to the RelativeClearanceCondition
+
+        Parameters
+        ----------
+            from_lane (int): start lane
+
+            to_lane (int): end lane
+
+        &#34;&#34;&#34;
+        self.lane_ranges.append((from_lane, to_lane))
+
+    def get_attributes(self):
+        &#34;&#34;&#34;returns the attributes of the RelativeClearanceCondition as a dict&#34;&#34;&#34;
+        basedict = {}
+        basedict[&#34;oppositeLanes&#34;] = get_bool_string(self.opposite_lanes)
+        # TODO: wrong in the spec, should be lower case s
+        basedict[&#34;freespace&#34;] = get_bool_string(self.freespace)
+
+        if self.distance_backward is not None:
+            basedict[&#34;distanceBackward&#34;] = str(self.distance_backward)
+        if self.distance_forward is not None:
+            basedict[&#34;distanceForward&#34;] = str(self.distance_forward)
+        return basedict
+
+    def get_element(self):
+        &#34;&#34;&#34;returns the elementTree of the RelativeClearanceCondition&#34;&#34;&#34;
+        element = ET.Element(&#34;EntityCondition&#34;)
+        relative_clearence_element = ET.SubElement(
+            element, &#34;RelativeClearanceCondition&#34;, attrib=self.get_attributes()
+        )
+        for e in self.entities:
+            relative_clearence_element.append(e.get_element())
+        for r in self.lane_ranges:
+            ET.SubElement(
+                relative_clearence_element,
+                &#34;RelativeLaneRange&#34;,
+                {&#34;from&#34;: str(r[0]), &#34;to&#34;: str(r[1])},
+            )
+        return element</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>scenariogeneration.xosc.utils._EntityTriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.RelativeClearanceCondition.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of RelativeClearanceCondition</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>condition (RelativeClearanceCondition): a RelativeClearanceCondition object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34;Parses the xml element of RelativeClearanceCondition
+
+    Parameters
+    ----------
+        element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+    Returns
+    -------
+        condition (RelativeClearanceCondition): a RelativeClearanceCondition object
+
+    &#34;&#34;&#34;
+    condition = element.find(&#34;RelativeClearanceCondition&#34;)
+    if &#34;freespace&#34; in condition.attrib:
+        freespace = convert_bool(condition.attrib[&#34;freespace&#34;])
+    else:
+        freespace = convert_bool(condition.attrib[&#34;freeSpace&#34;])
+
+    opposite_lanes = convert_bool(condition.attrib[&#34;oppositeLanes&#34;])
+
+    if &#34;distanceBackward&#34; in condition.attrib:
+        back_dist = convert_float(condition.attrib[&#34;distanceBackward&#34;])
+    else:
+        back_dist = None
+
+    if &#34;distanceForward&#34; in condition.attrib:
+        fwd_dist = convert_float(condition.attrib[&#34;distanceForward&#34;])
+    else:
+        fwd_dist = None
+    retval = RelativeClearanceCondition(
+        opposite_lanes, back_dist, fwd_dist, freespace
+    )
+    for er in condition.findall(&#34;EntityRef&#34;):
+        retval.add_entity(er.attrib[&#34;entityRef&#34;])
+
+    for r in condition.findall(&#34;RelativeLaneRange&#34;):
+        retval.add_relative_lane_range(
+            convert_int(r.attrib[&#34;from&#34;]), convert_int(r.attrib[&#34;to&#34;])
+        )
+
+    return retval</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.RelativeClearanceCondition.add_entity"><code class="name flex">
+<span>def <span class="ident">add_entity</span></span>(<span>self, entity)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>adds an entity to the RelativeClearanceCondition</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>entity (str): name of the entity
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_entity(self, entity):
+    &#34;&#34;&#34;adds an entity to the RelativeClearanceCondition
+
+    Parameters
+    ----------
+        entity (str): name of the entity
+
+    &#34;&#34;&#34;
+    self.entities.append(EntityRef(entity))</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xosc.triggers.RelativeClearanceCondition.add_relative_lane_range"><code class="name flex">
+<span>def <span class="ident">add_relative_lane_range</span></span>(<span>self, from_lane, to_lane)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>adds an RelativeLaneRange to the RelativeClearanceCondition</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>from_lane (int): start lane
+
+to_lane (int): end lane
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_relative_lane_range(self, from_lane, to_lane):
+    &#34;&#34;&#34;adds an RelativeLaneRange to the RelativeClearanceCondition
+
+    Parameters
+    ----------
+        from_lane (int): start lane
+
+        to_lane (int): end lane
+
+    &#34;&#34;&#34;
+    self.lane_ranges.append((from_lane, to_lane))</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xosc.triggers.RelativeClearanceCondition.get_attributes"><code class="name flex">
+<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the attributes of the RelativeClearanceCondition as a dict</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_attributes(self):
+    &#34;&#34;&#34;returns the attributes of the RelativeClearanceCondition as a dict&#34;&#34;&#34;
+    basedict = {}
+    basedict[&#34;oppositeLanes&#34;] = get_bool_string(self.opposite_lanes)
+    # TODO: wrong in the spec, should be lower case s
+    basedict[&#34;freespace&#34;] = get_bool_string(self.freespace)
+
+    if self.distance_backward is not None:
+        basedict[&#34;distanceBackward&#34;] = str(self.distance_backward)
+    if self.distance_forward is not None:
+        basedict[&#34;distanceForward&#34;] = str(self.distance_forward)
+    return basedict</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xosc.triggers.RelativeClearanceCondition.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the elementTree of the RelativeClearanceCondition</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self):
+    &#34;&#34;&#34;returns the elementTree of the RelativeClearanceCondition&#34;&#34;&#34;
+    element = ET.Element(&#34;EntityCondition&#34;)
+    relative_clearence_element = ET.SubElement(
+        element, &#34;RelativeClearanceCondition&#34;, attrib=self.get_attributes()
+    )
+    for e in self.entities:
+        relative_clearence_element.append(e.get_element())
+    for r in self.lane_ranges:
+        ET.SubElement(
+            relative_clearence_element,
+            &#34;RelativeLaneRange&#34;,
+            {&#34;from&#34;: str(r[0]), &#34;to&#34;: str(r[1])},
+        )
     return element</code></pre>
 </details>
 </dd>
@@ -5048,7 +5972,7 @@ def parse(element):
 </dd>
 <dt id="scenariogeneration.xosc.triggers.RelativeDistanceCondition"><code class="flex name class">
 <span>class <span class="ident">RelativeDistanceCondition</span></span>
-<span>(</span><span>value, rule, dist_type, entity, alongroute=True, freespace=True, coordinate_system=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;)</span>
+<span>(</span><span>value, rule, dist_type, entity, alongroute=True, freespace=True, coordinate_system=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;, routing_algorithm=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>the RelativeDistanceCondition class is an Entity Condition used by the EntityTrigger</p>
@@ -5066,6 +5990,9 @@ freespace (bool): (True) distance between bounding boxes, (False) distance betwe
 
 coordinate_system (CoordinateSystem): what coordinate system to use (valid from V1.1)
     Default: CoordinateSystem.entity
+
+routing_algorithm (RoutingAlgorithm): if coordinate_system road/lane is used, this can be set (valid from V1.2)
+    Default: None
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>value (float): distance to position
@@ -5079,6 +6006,9 @@ dist_type (RelativeDistanceType): type of relative distance
 freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
 
 coordinate_system (CoordinateSystem): what coordinate system to use (valid from V1.1)
+
+routing_algorithm (RoutingAlgorithm): if coordinate_system road/lane is used, this can be set (valid from V1.2)
+    Default: None
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>parse(element)
@@ -5105,6 +6035,9 @@ freespace (bool): (True) distance between bounding boxes, (False) distance betwe
 
 coordinate_system (CoordinateSystem): what coordinate system to use (valid from V1.1)
     Default: CoordinateSystem.entity
+
+routing_algorithm (RoutingAlgorithm): if coordinate_system road/lane is used, this can be set (valid from V1.2)
+    Default: None
 </code></pre></div>
 <details class="source">
 <summary>
@@ -5129,6 +6062,9 @@ coordinate_system (CoordinateSystem): what coordinate system to use (valid from 
         coordinate_system (CoordinateSystem): what coordinate system to use (valid from V1.1)
             Default: CoordinateSystem.entity
 
+        routing_algorithm (RoutingAlgorithm): if coordinate_system road/lane is used, this can be set (valid from V1.2)
+            Default: None
+
     Attributes
     ----------
         value (float): distance to position
@@ -5142,6 +6078,9 @@ coordinate_system (CoordinateSystem): what coordinate system to use (valid from 
         freespace (bool): (True) distance between bounding boxes, (False) distance between ref point
 
         coordinate_system (CoordinateSystem): what coordinate system to use (valid from V1.1)
+
+        routing_algorithm (RoutingAlgorithm): if coordinate_system road/lane is used, this can be set (valid from V1.2)
+            Default: None
 
     Methods
     -------
@@ -5165,6 +6104,7 @@ coordinate_system (CoordinateSystem): what coordinate system to use (valid from 
         alongroute=True,
         freespace=True,
         coordinate_system=CoordinateSystem.entity,
+        routing_algorithm=None,
     ):
         &#34;&#34;&#34;initalize the RelativeDistanceCondition
 
@@ -5183,12 +6123,13 @@ coordinate_system (CoordinateSystem): what coordinate system to use (valid from 
 
             coordinate_system (CoordinateSystem): what coordinate system to use (valid from V1.1)
                 Default: CoordinateSystem.entity
+
+            routing_algorithm (RoutingAlgorithm): if coordinate_system road/lane is used, this can be set (valid from V1.2)
+                Default: None
         &#34;&#34;&#34;
         self.value = value
-        if not isinstance(freespace, bool):
-            raise TypeError(&#34;freespace input not of type bool&#34;)
-        self.alongroute = alongroute
-        self.freespace = freespace
+        self.alongroute = convert_bool(alongroute)
+        self.freespace = convert_bool(freespace)
         if not hasattr(RelativeDistanceType, str(dist_type)):
             raise TypeError(&#34;dist_type is not of type RelativeDistanceType&#34;)
         self.dist_type = dist_type
@@ -5197,6 +6138,9 @@ coordinate_system (CoordinateSystem): what coordinate system to use (valid from 
         self.rule = rule
         self.entity = entity
         self.coordinate_system = coordinate_system
+        if routing_algorithm and not hasattr(RoutingAlgorithm, str(routing_algorithm)):
+            raise TypeError(str(routing_algorithm) + &#34; is not a valid RoutingAlgorithm&#34;)
+        self.routing_algorithm = routing_algorithm
 
     def __eq__(self, other):
         if isinstance(other, RelativeDistanceCondition):
@@ -5240,21 +6184,42 @@ coordinate_system (CoordinateSystem): what coordinate system to use (valid from 
             )
         else:
             coordsystem = CoordinateSystem.road
+        if &#34;routingAlgorithm&#34; in condition.attrib:
+            routing_algorithm = getattr(
+                RoutingAlgorithm, condition.attrib[&#34;routingAlgorithm&#34;]
+            )
+        else:
+            routing_algorithm = None
 
         return RelativeDistanceCondition(
-            value, rule, reldisttype, entity, alongroute, freespace, coordsystem
+            value,
+            rule,
+            reldisttype,
+            entity,
+            alongroute,
+            freespace,
+            coordsystem,
+            routing_algorithm,
         )
 
     def get_attributes(self):
         &#34;&#34;&#34;returns the attributes of the RelativeDistanceCondition as a dict&#34;&#34;&#34;
         basedict = {}
         basedict[&#34;value&#34;] = str(self.value)
-        basedict[&#34;freespace&#34;] = convert_bool(self.freespace)
+        basedict[&#34;freespace&#34;] = get_bool_string(self.freespace)
         basedict[&#34;entityRef&#34;] = self.entity
         basedict[&#34;rule&#34;] = self.rule.get_name()
         basedict[&#34;relativeDistanceType&#34;] = self.dist_type.get_name()
         if not self.isVersion(minor=0):
             basedict[&#34;coordinateSystem&#34;] = self.coordinate_system.get_name()
+        if self.routing_algorithm:
+            if not (self.isVersion(minor=0) or self.isVersion(minor=1)):
+                basedict[&#34;routingAlgorithm&#34;] = self.routing_algorithm.get_name()
+            else:
+                raise OpenSCENARIOVersionError(
+                    &#34;RoutingAlgorithm was introduced in V1.2&#34;
+                )
+
         return basedict
 
     def get_element(self):
@@ -5323,9 +6288,22 @@ def parse(element):
         )
     else:
         coordsystem = CoordinateSystem.road
+    if &#34;routingAlgorithm&#34; in condition.attrib:
+        routing_algorithm = getattr(
+            RoutingAlgorithm, condition.attrib[&#34;routingAlgorithm&#34;]
+        )
+    else:
+        routing_algorithm = None
 
     return RelativeDistanceCondition(
-        value, rule, reldisttype, entity, alongroute, freespace, coordsystem
+        value,
+        rule,
+        reldisttype,
+        entity,
+        alongroute,
+        freespace,
+        coordsystem,
+        routing_algorithm,
     )</code></pre>
 </details>
 </dd>
@@ -5345,12 +6323,20 @@ def parse(element):
     &#34;&#34;&#34;returns the attributes of the RelativeDistanceCondition as a dict&#34;&#34;&#34;
     basedict = {}
     basedict[&#34;value&#34;] = str(self.value)
-    basedict[&#34;freespace&#34;] = convert_bool(self.freespace)
+    basedict[&#34;freespace&#34;] = get_bool_string(self.freespace)
     basedict[&#34;entityRef&#34;] = self.entity
     basedict[&#34;rule&#34;] = self.rule.get_name()
     basedict[&#34;relativeDistanceType&#34;] = self.dist_type.get_name()
     if not self.isVersion(minor=0):
         basedict[&#34;coordinateSystem&#34;] = self.coordinate_system.get_name()
+    if self.routing_algorithm:
+        if not (self.isVersion(minor=0) or self.isVersion(minor=1)):
+            basedict[&#34;routingAlgorithm&#34;] = self.routing_algorithm.get_name()
+        else:
+            raise OpenSCENARIOVersionError(
+                &#34;RoutingAlgorithm was introduced in V1.2&#34;
+            )
+
     return basedict</code></pre>
 </details>
 </dd>
@@ -5376,7 +6362,7 @@ def parse(element):
 </dd>
 <dt id="scenariogeneration.xosc.triggers.RelativeSpeedCondition"><code class="flex name class">
 <span>class <span class="ident">RelativeSpeedCondition</span></span>
-<span>(</span><span>value, rule, entity)</span>
+<span>(</span><span>value, rule, entity, directional_dimension=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>the RelativeSpeedCondition class is an Entity Condition used by the EntityTrigger</p>
@@ -5386,6 +6372,9 @@ def parse(element):
 rule (Rule): condition rule of triggering
 
 entity (str): name of the entity to be relative to
+
+directional_dimension (DirectionalDimension): direction of the speed to compare (if not used, total speed is considered)
+    Default: None
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>value (float): acceleration
@@ -5393,6 +6382,8 @@ entity (str): name of the entity to be relative to
 rule (Rule): condition rule of triggering
 
 entity (str): name of the entity to be relative to
+
+directional_dimension (DirectionalDimension): direction of the speed to compare (if not used, total speed is considered)
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>parse(element)
@@ -5411,6 +6402,9 @@ get_attributes()
 rule (Rule): condition rule of triggering
 
 entity (str): name of the entity to be relative to
+
+directional_dimension (DirectionalDimension): direction of the speed to compare (if not used, total speed is considered)
+    Default: None
 </code></pre></div>
 <details class="source">
 <summary>
@@ -5427,6 +6421,9 @@ entity (str): name of the entity to be relative to
 
         entity (str): name of the entity to be relative to
 
+        directional_dimension (DirectionalDimension): direction of the speed to compare (if not used, total speed is considered)
+            Default: None
+
     Attributes
     ----------
         value (float): acceleration
@@ -5434,6 +6431,8 @@ entity (str): name of the entity to be relative to
         rule (Rule): condition rule of triggering
 
         entity (str): name of the entity to be relative to
+
+        directional_dimension (DirectionalDimension): direction of the speed to compare (if not used, total speed is considered)
 
     Methods
     -------
@@ -5448,7 +6447,7 @@ entity (str): name of the entity to be relative to
 
     &#34;&#34;&#34;
 
-    def __init__(self, value, rule, entity):
+    def __init__(self, value, rule, entity, directional_dimension=None):
         &#34;&#34;&#34;initalize the RelativeSpeedCondition
 
         Parameters
@@ -5459,12 +6458,21 @@ entity (str): name of the entity to be relative to
 
             entity (str): name of the entity to be relative to
 
+            directional_dimension (DirectionalDimension): direction of the speed to compare (if not used, total speed is considered)
+                Default: None
         &#34;&#34;&#34;
-        self.value = value
+        self.value = convert_float(value)
         if not hasattr(Rule, str(rule)):
             raise ValueError(rule + &#34;; is not a valid rule.&#34;)
         self.rule = rule
         self.entity = entity
+        if directional_dimension and not hasattr(
+            DirectionalDimension, str(directional_dimension)
+        ):
+            raise TypeError(
+                directional_dimension + &#34;; is not a valid DirectionalDimension.&#34;
+            )
+        self.directional_dimension = directional_dimension
 
     def __eq__(self, other):
         if isinstance(other, RelativeSpeedCondition):
@@ -5486,10 +6494,13 @@ entity (str): name of the entity to be relative to
 
         &#34;&#34;&#34;
         condition = element.find(&#34;RelativeSpeedCondition&#34;)
-        value = condition.attrib[&#34;value&#34;]
+        value = convert_float(condition.attrib[&#34;value&#34;])
         entity = condition.attrib[&#34;entityRef&#34;]
         rule = getattr(Rule, condition.attrib[&#34;rule&#34;])
-        return RelativeSpeedCondition(value, rule, entity)
+        direction = None
+        if &#34;direction&#34; in condition.attrib:
+            direction = getattr(DirectionalDimension, condition.attrib[&#34;direction&#34;])
+        return RelativeSpeedCondition(value, rule, entity, direction)
 
     def get_attributes(self):
         &#34;&#34;&#34;returns the attributes of the RelativeSpeedCondition as a dict&#34;&#34;&#34;
@@ -5497,6 +6508,8 @@ entity (str): name of the entity to be relative to
         basedict[&#34;value&#34;] = str(self.value)
         basedict[&#34;rule&#34;] = self.rule.get_name()
         basedict[&#34;entityRef&#34;] = self.entity
+        if self.directional_dimension is not None and self.isVersion(minor=2):
+            basedict[&#34;direction&#34;] = self.directional_dimension.get_name()
         return basedict
         # return merge_dicts({&#39;value&#39;:str(self.value),&#39;entityRef&#39;:self.entity},self.rule.get_attributes())
 
@@ -5542,10 +6555,13 @@ def parse(element):
 
     &#34;&#34;&#34;
     condition = element.find(&#34;RelativeSpeedCondition&#34;)
-    value = condition.attrib[&#34;value&#34;]
+    value = convert_float(condition.attrib[&#34;value&#34;])
     entity = condition.attrib[&#34;entityRef&#34;]
     rule = getattr(Rule, condition.attrib[&#34;rule&#34;])
-    return RelativeSpeedCondition(value, rule, entity)</code></pre>
+    direction = None
+    if &#34;direction&#34; in condition.attrib:
+        direction = getattr(DirectionalDimension, condition.attrib[&#34;direction&#34;])
+    return RelativeSpeedCondition(value, rule, entity, direction)</code></pre>
 </details>
 </dd>
 </dl>
@@ -5566,6 +6582,8 @@ def parse(element):
     basedict[&#34;value&#34;] = str(self.value)
     basedict[&#34;rule&#34;] = self.rule.get_name()
     basedict[&#34;entityRef&#34;] = self.entity
+    if self.directional_dimension is not None and self.isVersion(minor=2):
+        basedict[&#34;direction&#34;] = self.directional_dimension.get_name()
     return basedict
     # return merge_dicts({&#39;value&#39;:str(self.value),&#39;entityRef&#39;:self.entity},self.rule.get_attributes())</code></pre>
 </details>
@@ -5595,7 +6613,7 @@ def parse(element):
 <dd>
 <div class="desc"><p>the SimulationTimeCondition class is an Value Condition used by the ValueTrigger</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>value (int): simulation time
+<pre><code>value (float): simulation time
 
 rule (Rule): condition rule of triggering
 </code></pre>
@@ -5616,7 +6634,7 @@ get_attributes()
 </code></pre>
 <p>initalize the SimulationTimeCondition</p>
 <h2 id="parameters_1">Parameters</h2>
-<pre><code>value (int): simulation time
+<pre><code>value (float): simulation time
 
 rule (Rule): condition rule of triggering
 </code></pre></div>
@@ -5629,7 +6647,7 @@ rule (Rule): condition rule of triggering
 
     Parameters
     ----------
-        value (int): simulation time
+        value (float): simulation time
 
         rule (Rule): condition rule of triggering
 
@@ -5657,11 +6675,11 @@ rule (Rule): condition rule of triggering
 
         Parameters
         ----------
-            value (int): simulation time
+            value (float): simulation time
 
             rule (Rule): condition rule of triggering
         &#34;&#34;&#34;
-        self.value = value
+        self.value = convert_float(value)
         if not hasattr(Rule, str(rule)):
             raise ValueError(rule + &#34;; is not a valid rule.&#34;)
         self.rule = rule
@@ -5686,7 +6704,7 @@ rule (Rule): condition rule of triggering
 
         &#34;&#34;&#34;
         condition = element.find(&#34;SimulationTimeCondition&#34;)
-        value = element.attrib[&#34;value&#34;]
+        value = convert_float(element.attrib[&#34;value&#34;])
         rule = getattr(Rule, element.attrib[&#34;rule&#34;])
         return SimulationTimeCondition(value, rule)
 
@@ -5737,7 +6755,7 @@ def parse(element):
 
     &#34;&#34;&#34;
     condition = element.find(&#34;SimulationTimeCondition&#34;)
-    value = element.attrib[&#34;value&#34;]
+    value = convert_float(element.attrib[&#34;value&#34;])
     rule = getattr(Rule, element.attrib[&#34;rule&#34;])
     return SimulationTimeCondition(value, rule)</code></pre>
 </details>
@@ -5780,7 +6798,7 @@ def parse(element):
 </dd>
 <dt id="scenariogeneration.xosc.triggers.SpeedCondition"><code class="flex name class">
 <span>class <span class="ident">SpeedCondition</span></span>
-<span>(</span><span>value, rule)</span>
+<span>(</span><span>value, rule, directional_dimension=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>the SpeedCondition class is an Entity Condition used by the EntityTrigger</p>
@@ -5788,11 +6806,16 @@ def parse(element):
 <pre><code>value (float): speed to trigger on
 
 rule (Rule): condition rule of triggering
+
+directional_dimension (DirectionalDimension): direction of the speed to compare (if not used, total speed is considered)
+    Default: None
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>value (float): speed to trigger on
 
 rule (Rule): condition rule of triggering
+
+directional_dimension (DirectionalDimension): direction of the speed to compare (if not used, total speed is considered)
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>parse(element)
@@ -5809,6 +6832,9 @@ get_attributes()
 <pre><code>value (float): speed to trigger on
 
 rule (Rule): condition rule of triggering
+
+directional_dimension (DirectionalDimension): direction of the speed to compare (if not used, total speed is considered)
+    Default: None
 </code></pre></div>
 <details class="source">
 <summary>
@@ -5823,11 +6849,16 @@ rule (Rule): condition rule of triggering
 
         rule (Rule): condition rule of triggering
 
+        directional_dimension (DirectionalDimension): direction of the speed to compare (if not used, total speed is considered)
+            Default: None
+
     Attributes
     ----------
         value (float): speed to trigger on
 
         rule (Rule): condition rule of triggering
+
+        directional_dimension (DirectionalDimension): direction of the speed to compare (if not used, total speed is considered)
 
     Methods
     -------
@@ -5842,7 +6873,7 @@ rule (Rule): condition rule of triggering
 
     &#34;&#34;&#34;
 
-    def __init__(self, value, rule):
+    def __init__(self, value, rule, directional_dimension=None):
         &#34;&#34;&#34;initalize the SpeedCondition class is an Entity Condition used by the EntityTrigger
 
         Parameters
@@ -5850,11 +6881,21 @@ rule (Rule): condition rule of triggering
             value (float): speed to trigger on
 
             rule (Rule): condition rule of triggering
+
+            directional_dimension (DirectionalDimension): direction of the speed to compare (if not used, total speed is considered)
+                Default: None
         &#34;&#34;&#34;
-        self.value = value
+        self.value = convert_float(value)
         if not hasattr(Rule, str(rule)):
             raise ValueError(rule + &#34;; is not a valid rule.&#34;)
         self.rule = rule
+        if directional_dimension and not hasattr(
+            DirectionalDimension, str(directional_dimension)
+        ):
+            raise TypeError(
+                directional_dimension + &#34;; is not a valid DirectionalDimension.&#34;
+            )
+        self.directional_dimension = directional_dimension
 
     def __eq__(self, other):
         if isinstance(other, SpeedCondition):
@@ -5876,15 +6917,20 @@ rule (Rule): condition rule of triggering
 
         &#34;&#34;&#34;
         condition = element.find(&#34;SpeedCondition&#34;)
-        value = condition.attrib[&#34;value&#34;]
+        value = convert_float(condition.attrib[&#34;value&#34;])
         rule = getattr(Rule, condition.attrib[&#34;rule&#34;])
-        return SpeedCondition(value, rule)
+        direction = None
+        if &#34;direction&#34; in condition.attrib:
+            direction = getattr(DirectionalDimension, condition.attrib[&#34;direction&#34;])
+        return SpeedCondition(value, rule, direction)
 
     def get_attributes(self):
         &#34;&#34;&#34;returns the attributes of the SpeedCondition as a dict&#34;&#34;&#34;
         basedict = {}
         basedict[&#34;value&#34;] = str(self.value)
         basedict[&#34;rule&#34;] = self.rule.get_name()
+        if self.directional_dimension is not None and self.isVersion(minor=2):
+            basedict[&#34;direction&#34;] = self.directional_dimension.get_name()
         return basedict
         # return merge_dicts({&#39;value&#39;:str(self.value)},self.rule.get_attributes())
 
@@ -5930,9 +6976,12 @@ def parse(element):
 
     &#34;&#34;&#34;
     condition = element.find(&#34;SpeedCondition&#34;)
-    value = condition.attrib[&#34;value&#34;]
+    value = convert_float(condition.attrib[&#34;value&#34;])
     rule = getattr(Rule, condition.attrib[&#34;rule&#34;])
-    return SpeedCondition(value, rule)</code></pre>
+    direction = None
+    if &#34;direction&#34; in condition.attrib:
+        direction = getattr(DirectionalDimension, condition.attrib[&#34;direction&#34;])
+    return SpeedCondition(value, rule, direction)</code></pre>
 </details>
 </dd>
 </dl>
@@ -5952,6 +7001,8 @@ def parse(element):
     basedict = {}
     basedict[&#34;value&#34;] = str(self.value)
     basedict[&#34;rule&#34;] = self.rule.get_name()
+    if self.directional_dimension is not None and self.isVersion(minor=2):
+        basedict[&#34;direction&#34;] = self.directional_dimension.get_name()
     return basedict
     # return merge_dicts({&#39;value&#39;:str(self.value)},self.rule.get_attributes())</code></pre>
 </details>
@@ -6036,7 +7087,7 @@ get_attributes()
             duration (float): time of standstill
 
         &#34;&#34;&#34;
-        self.duration = duration
+        self.duration = convert_float(duration)
 
     def __eq__(self, other):
         if isinstance(other, StandStillCondition):
@@ -6058,7 +7109,7 @@ get_attributes()
 
         &#34;&#34;&#34;
         condition = element.find(&#34;StandStillCondition&#34;)
-        duration = condition.attrib[&#34;duration&#34;]
+        duration = convert_float(condition.attrib[&#34;duration&#34;])
         return StandStillCondition(duration)
 
     def get_attributes(self):
@@ -6107,7 +7158,7 @@ def parse(element):
 
     &#34;&#34;&#34;
     condition = element.find(&#34;StandStillCondition&#34;)
-    duration = condition.attrib[&#34;duration&#34;]
+    duration = convert_float(condition.attrib[&#34;duration&#34;])
     return StandStillCondition(duration)</code></pre>
 </details>
 </dd>
@@ -6359,7 +7410,7 @@ def parse(element):
 </dd>
 <dt id="scenariogeneration.xosc.triggers.TimeHeadwayCondition"><code class="flex name class">
 <span>class <span class="ident">TimeHeadwayCondition</span></span>
-<span>(</span><span>entity, value, rule, alongroute=True, freespace=True, distance_type=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;, coordinate_system=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;)</span>
+<span>(</span><span>entity, value, rule, alongroute=True, freespace=True, distance_type=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;, coordinate_system=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;, routing_algorithm=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>the TimeHeadwayCondition class is an Entity Condition used by the EntityTrigger</p>
@@ -6381,6 +7432,9 @@ distance_type (RelativeDistanceType): how the relative distance should be calcul
 
 coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
     Default: CoordinateSystem.road
+
+routing_algorithm (RoutingAlgorithm): the routing algorithm for the condition (valid from V1.2)
+    Default: None
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>entity (str): name of the entity for the headway
@@ -6396,6 +7450,8 @@ freespace (bool): (True) distance between bounding boxes, (False) distance betwe
 distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
 
 coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+
+routing_algorithm (RoutingAlgorithm): the routing algorithm for the condition (valid from V1.2)
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>parse(element)
@@ -6426,6 +7482,9 @@ distance_type (RelativeDistanceType): how the relative distance should be calcul
 
 coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
     Default: CoordinateSystem.road
+
+routing_algorithm (RoutingAlgorithm): the routing algorithm for the condition (valid from V1.2)
+    Default: None
 </code></pre></div>
 <details class="source">
 <summary>
@@ -6453,6 +7512,10 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
 
         coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
             Default: CoordinateSystem.road
+
+        routing_algorithm (RoutingAlgorithm): the routing algorithm for the condition (valid from V1.2)
+            Default: None
+
     Attributes
     ----------
         entity (str): name of the entity for the headway
@@ -6468,6 +7531,8 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
         distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
 
         coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+
+        routing_algorithm (RoutingAlgorithm): the routing algorithm for the condition (valid from V1.2)
 
     Methods
     -------
@@ -6491,6 +7556,7 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
         freespace=True,
         distance_type=RelativeDistanceType.longitudinal,
         coordinate_system=CoordinateSystem.road,
+        routing_algorithm=None,
     ):
         &#34;&#34;&#34;initalize the TimeHeadwayCondition
 
@@ -6513,15 +7579,14 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
 
             coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
                 Default: CoordinateSystem.road
+
+            routing_algorithm (RoutingAlgorithm): the routing algorithm for the condition (valid from V1.2)
+                Default: None
         &#34;&#34;&#34;
         self.entity = entity
-        self.value = value
-        if not isinstance(alongroute, bool):
-            raise TypeError(&#34;alongroute input not of type bool&#34;)
-        if not isinstance(freespace, bool):
-            raise TypeError(&#34;freespace input not of type bool&#34;)
-        self.alongroute = alongroute
-        self.freespace = freespace
+        self.value = convert_float(value)
+        self.alongroute = convert_bool(alongroute)
+        self.freespace = convert_bool(freespace)
         if not hasattr(Rule, str(rule)):
             raise ValueError(rule + &#34;; is not a valid rule.&#34;)
         self.rule = rule
@@ -6531,6 +7596,9 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
             raise ValueError(coordinate_system + &#34;; is not a valid CoordinateSystem.&#34;)
         self.relative_distance_type = distance_type
         self.coordinate_system = coordinate_system
+        if routing_algorithm and not hasattr(RoutingAlgorithm, str(routing_algorithm)):
+            raise ValueError(routing_algorithm + &#34;; is not a valid RoutingAlgorithm.&#34;)
+        self.routing_algorithm = routing_algorithm
 
     def __eq__(self, other):
         if isinstance(other, TimeHeadwayCondition):
@@ -6555,6 +7623,7 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
         entity = condition.attrib[&#34;entityRef&#34;]
         value = condition.attrib[&#34;value&#34;]
         rule = getattr(Rule, condition.attrib[&#34;rule&#34;])
+        routing_algorithm = None
         if &#34;alongRoute&#34; in condition.attrib:
             alongroute = convert_bool(condition.attrib[&#34;alongRoute&#34;])
         else:
@@ -6575,8 +7644,19 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
             coordsystem = CoordinateSystem.road
         freespace = convert_bool(condition.attrib[&#34;freespace&#34;])
 
+        if &#34;routingAlgorithm&#34; in condition.attrib:
+            routing_algorithm = getattr(
+                RoutingAlgorithm, condition.attrib[&#34;routingAlgorithm&#34;]
+            )
         return TimeHeadwayCondition(
-            entity, value, rule, alongroute, freespace, reldisttype, coordsystem
+            entity,
+            value,
+            rule,
+            alongroute,
+            freespace,
+            reldisttype,
+            coordsystem,
+            routing_algorithm,
         )
 
     def get_attributes(self):
@@ -6585,12 +7665,18 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
         basedict[&#34;entityRef&#34;] = self.entity
         basedict[&#34;value&#34;] = str(self.value)
         if self.isVersion(minor=0):
-            basedict[&#34;alongRoute&#34;] = convert_bool(self.alongroute)
+            basedict[&#34;alongRoute&#34;] = get_bool_string(self.alongroute)
         else:
             basedict[&#34;relativeDistanceType&#34;] = self.relative_distance_type.get_name()
             basedict[&#34;coordinateSystem&#34;] = self.coordinate_system.get_name()
-        basedict[&#34;freespace&#34;] = convert_bool(self.freespace)
+        basedict[&#34;freespace&#34;] = get_bool_string(self.freespace)
         basedict[&#34;rule&#34;] = self.rule.get_name()
+        if self.routing_algorithm:
+            if self.version_minor &lt; 2:
+                raise OpenSCENARIOVersionError(
+                    &#34;RoutingAlgorithm in TimeHeadwayCondition was added in OSC V1.2&#34;
+                )
+            basedict[&#34;routingAlgorithm&#34;] = self.routing_algorithm.get_name()
         return basedict
 
     def get_element(self):
@@ -6638,6 +7724,7 @@ def parse(element):
     entity = condition.attrib[&#34;entityRef&#34;]
     value = condition.attrib[&#34;value&#34;]
     rule = getattr(Rule, condition.attrib[&#34;rule&#34;])
+    routing_algorithm = None
     if &#34;alongRoute&#34; in condition.attrib:
         alongroute = convert_bool(condition.attrib[&#34;alongRoute&#34;])
     else:
@@ -6658,8 +7745,19 @@ def parse(element):
         coordsystem = CoordinateSystem.road
     freespace = convert_bool(condition.attrib[&#34;freespace&#34;])
 
+    if &#34;routingAlgorithm&#34; in condition.attrib:
+        routing_algorithm = getattr(
+            RoutingAlgorithm, condition.attrib[&#34;routingAlgorithm&#34;]
+        )
     return TimeHeadwayCondition(
-        entity, value, rule, alongroute, freespace, reldisttype, coordsystem
+        entity,
+        value,
+        rule,
+        alongroute,
+        freespace,
+        reldisttype,
+        coordsystem,
+        routing_algorithm,
     )</code></pre>
 </details>
 </dd>
@@ -6681,12 +7779,18 @@ def parse(element):
     basedict[&#34;entityRef&#34;] = self.entity
     basedict[&#34;value&#34;] = str(self.value)
     if self.isVersion(minor=0):
-        basedict[&#34;alongRoute&#34;] = convert_bool(self.alongroute)
+        basedict[&#34;alongRoute&#34;] = get_bool_string(self.alongroute)
     else:
         basedict[&#34;relativeDistanceType&#34;] = self.relative_distance_type.get_name()
         basedict[&#34;coordinateSystem&#34;] = self.coordinate_system.get_name()
-    basedict[&#34;freespace&#34;] = convert_bool(self.freespace)
+    basedict[&#34;freespace&#34;] = get_bool_string(self.freespace)
     basedict[&#34;rule&#34;] = self.rule.get_name()
+    if self.routing_algorithm:
+        if self.version_minor &lt; 2:
+            raise OpenSCENARIOVersionError(
+                &#34;RoutingAlgorithm in TimeHeadwayCondition was added in OSC V1.2&#34;
+            )
+        basedict[&#34;routingAlgorithm&#34;] = self.routing_algorithm.get_name()
     return basedict</code></pre>
 </details>
 </dd>
@@ -6895,7 +7999,7 @@ def parse(element):
 </dd>
 <dt id="scenariogeneration.xosc.triggers.TimeToCollisionCondition"><code class="flex name class">
 <span>class <span class="ident">TimeToCollisionCondition</span></span>
-<span>(</span><span>value, rule, alongroute=True, freespace=True, entity=None, position=None, distance_type=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;, coordinate_system=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;)</span>
+<span>(</span><span>value, rule, alongroute=True, freespace=True, entity=None, position=None, distance_type=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;, coordinate_system=&lt;scenariogeneration.xosc.enumerations._OscEnum object&gt;, routing_algorithm=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>the TimeToCollisionCondition class is an Entity Condition used by the EntityTrigger</p>
@@ -6920,6 +8024,9 @@ distance_type (RelativeDistanceType): how the relative distance should be calcul
 
 coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
     Default: CoordinateSystem.road
+
+routing_algorithm (RoutingAlgorithm): the routing algorithm for the condition (valid from V1.2)
+    Default: None
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>value (float): time before collision
@@ -6939,6 +8046,8 @@ optionals:
 distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
 
 coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+
+routing_algorithm (RoutingAlgorithm): the routing algorithm for the condition (valid from V1.2)
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>parse(element)
@@ -6972,6 +8081,9 @@ distance_type (RelativeDistanceType): how the relative distance should be calcul
 
 coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
     Default: CoordinateSystem.road
+
+routing_algorithm (RoutingAlgorithm): the routing algorithm for the condition (valid from V1.2)
+    Default: None
 </code></pre></div>
 <details class="source">
 <summary>
@@ -7004,6 +8116,9 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
         coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
             Default: CoordinateSystem.road
 
+        routing_algorithm (RoutingAlgorithm): the routing algorithm for the condition (valid from V1.2)
+            Default: None
+
     Attributes
     ----------
         value (float): time before collision
@@ -7023,6 +8138,8 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
         distance_type (RelativeDistanceType): how the relative distance should be calculated (valid from V1.1)
 
         coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
+
+        routing_algorithm (RoutingAlgorithm): the routing algorithm for the condition (valid from V1.2)
 
     Methods
     -------
@@ -7047,6 +8164,7 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
         position=None,
         distance_type=RelativeDistanceType.longitudinal,
         coordinate_system=CoordinateSystem.road,
+        routing_algorithm=None,
     ):
         &#34;&#34;&#34;initalize the TimeToCollisionCondition
 
@@ -7073,14 +8191,13 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
 
             coordinate_system (CoordinateSystem): what coordinate system to use for the relative distance (valid from V1.1)
                 Default: CoordinateSystem.road
+
+            routing_algorithm (RoutingAlgorithm): the routing algorithm for the condition (valid from V1.2)
+                Default: None
         &#34;&#34;&#34;
-        self.value = value
-        if not isinstance(alongroute, bool):
-            raise TypeError(&#34;alongroute input not of type bool&#34;)
-        if not isinstance(freespace, bool):
-            raise TypeError(&#34;freespace input not of type bool&#34;)
-        self.freespace = freespace
-        self.alongroute = alongroute
+        self.value = convert_float(value)
+        self.freespace = convert_bool(freespace)
+        self.alongroute = convert_bool(alongroute)
         if not hasattr(Rule, str(rule)):
             raise ValueError(rule + &#34;; is not a valid rule.&#34;)
         self.rule = rule
@@ -7107,6 +8224,9 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
             raise ValueError(coordinate_system + &#34;; is not a valid CoordinateSystem.&#34;)
         self.relative_distance_type = distance_type
         self.coordinate_system = coordinate_system
+        if routing_algorithm and not hasattr(RoutingAlgorithm, str(routing_algorithm)):
+            raise ValueError(routing_algorithm + &#34;; is not a valid RoutingAlgorithm.&#34;)
+        self.routing_algorithm = routing_algorithm
 
     def __eq__(self, other):
         if isinstance(other, TimeToCollisionCondition):
@@ -7142,6 +8262,7 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
         value = condition.attrib[&#34;value&#34;]
         rule = getattr(Rule, condition.attrib[&#34;rule&#34;])
         freespace = convert_bool(condition.attrib[&#34;freespace&#34;])
+        routing_algorithm = None
         if &#34;alongRoute&#34; in condition.attrib:
             alongroute = convert_bool(condition.attrib[&#34;alongRoute&#34;])
         else:
@@ -7175,6 +8296,10 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
             raise ValueError(
                 &#34;No TimeToCollisionConditionTarget found while parsing TimeToCollisionCondition.&#34;
             )
+        if &#34;routingAlgorithm&#34; in condition.attrib:
+            routing_algorithm = getattr(
+                RoutingAlgorithm, condition.attrib[&#34;routingAlgorithm&#34;]
+            )
         return TimeToCollisionCondition(
             value,
             rule,
@@ -7184,6 +8309,7 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
             position,
             reldisttype,
             coordsystem,
+            routing_algorithm,
         )
 
     def get_attributes(self):
@@ -7191,12 +8317,18 @@ coordinate_system (CoordinateSystem): what coordinate system to use for the rela
         basedict = {}
         basedict[&#34;value&#34;] = str(self.value)
         if self.isVersion(minor=0):
-            basedict[&#34;alongRoute&#34;] = convert_bool(self.alongroute)
+            basedict[&#34;alongRoute&#34;] = get_bool_string(self.alongroute)
         else:
             basedict[&#34;relativeDistanceType&#34;] = self.relative_distance_type.name
             basedict[&#34;coordinateSystem&#34;] = self.coordinate_system.name
-        basedict[&#34;freespace&#34;] = convert_bool(self.freespace)
+        basedict[&#34;freespace&#34;] = get_bool_string(self.freespace)
         basedict[&#34;rule&#34;] = self.rule.get_name()
+        if self.routing_algorithm:
+            if self.version_minor &lt; 2:
+                raise OpenSCENARIOVersionError(
+                    &#34;RoutingAlgorithm in TimeHeadwayCondition was added in OSC V1.2&#34;
+                )
+            basedict[&#34;routingAlgorithm&#34;] = self.routing_algorithm.get_name()
         return basedict
 
     def get_element(self):
@@ -7254,6 +8386,7 @@ def parse(element):
     value = condition.attrib[&#34;value&#34;]
     rule = getattr(Rule, condition.attrib[&#34;rule&#34;])
     freespace = convert_bool(condition.attrib[&#34;freespace&#34;])
+    routing_algorithm = None
     if &#34;alongRoute&#34; in condition.attrib:
         alongroute = convert_bool(condition.attrib[&#34;alongRoute&#34;])
     else:
@@ -7287,6 +8420,10 @@ def parse(element):
         raise ValueError(
             &#34;No TimeToCollisionConditionTarget found while parsing TimeToCollisionCondition.&#34;
         )
+    if &#34;routingAlgorithm&#34; in condition.attrib:
+        routing_algorithm = getattr(
+            RoutingAlgorithm, condition.attrib[&#34;routingAlgorithm&#34;]
+        )
     return TimeToCollisionCondition(
         value,
         rule,
@@ -7296,6 +8433,7 @@ def parse(element):
         position,
         reldisttype,
         coordsystem,
+        routing_algorithm,
     )</code></pre>
 </details>
 </dd>
@@ -7316,12 +8454,18 @@ def parse(element):
     basedict = {}
     basedict[&#34;value&#34;] = str(self.value)
     if self.isVersion(minor=0):
-        basedict[&#34;alongRoute&#34;] = convert_bool(self.alongroute)
+        basedict[&#34;alongRoute&#34;] = get_bool_string(self.alongroute)
     else:
         basedict[&#34;relativeDistanceType&#34;] = self.relative_distance_type.name
         basedict[&#34;coordinateSystem&#34;] = self.coordinate_system.name
-    basedict[&#34;freespace&#34;] = convert_bool(self.freespace)
+    basedict[&#34;freespace&#34;] = get_bool_string(self.freespace)
     basedict[&#34;rule&#34;] = self.rule.get_name()
+    if self.routing_algorithm:
+        if self.version_minor &lt; 2:
+            raise OpenSCENARIOVersionError(
+                &#34;RoutingAlgorithm in TimeHeadwayCondition was added in OSC V1.2&#34;
+            )
+        basedict[&#34;routingAlgorithm&#34;] = self.routing_algorithm.get_name()
     return basedict</code></pre>
 </details>
 </dd>
@@ -7791,7 +8935,7 @@ get_attributes()
             value (float): how far it has traveled
 
         &#34;&#34;&#34;
-        self.value = value
+        self.value = convert_float(value)
 
     def __eq__(self, other):
         if isinstance(other, TraveledDistanceCondition):
@@ -7813,7 +8957,7 @@ get_attributes()
 
         &#34;&#34;&#34;
         condition = element.find(&#34;TraveledDistanceCondition&#34;)
-        value = condition.attrib[&#34;value&#34;]
+        value = convert_float(condition.attrib[&#34;value&#34;])
         return TraveledDistanceCondition(value)
 
     def get_attributes(self):
@@ -7864,7 +9008,7 @@ def parse(element):
 
     &#34;&#34;&#34;
     condition = element.find(&#34;TraveledDistanceCondition&#34;)
-    value = condition.attrib[&#34;value&#34;]
+    value = convert_float(condition.attrib[&#34;value&#34;])
     return TraveledDistanceCondition(value)</code></pre>
 </details>
 </dd>
@@ -8495,7 +9639,7 @@ rule (Rule): condition rule of triggering
 
         &#34;&#34;&#34;
         name = element.attrib[&#34;name&#34;]
-        value = element.attrib[&#34;value&#34;]
+        value = convert_int(element.attrib[&#34;value&#34;])
         rule = getattr(Rule, element.attrib[&#34;rule&#34;])
         return UserDefinedValueCondition(name, value, rule)
 
@@ -8545,7 +9689,7 @@ def parse(element):
 
     &#34;&#34;&#34;
     name = element.attrib[&#34;name&#34;]
-    value = element.attrib[&#34;value&#34;]
+    value = convert_int(element.attrib[&#34;value&#34;])
     rule = getattr(Rule, element.attrib[&#34;rule&#34;])
     return UserDefinedValueCondition(name, value, rule)</code></pre>
 </details>
@@ -8719,7 +9863,7 @@ triggeringpoint (str): start or stop
         else:
             self._triggerpoint = &#34;StopTrigger&#34;
 
-        self.delay = delay
+        self.delay = convert_float(delay)
         if not hasattr(ConditionEdge, str(conditionedge)):
             raise ValueError(&#34;not a valid condition edge&#34;)
         self.conditionedge = conditionedge
@@ -8775,7 +9919,7 @@ triggeringpoint (str): start or stop
             )
 
         name = element.attrib[&#34;name&#34;]
-        delay = element.attrib[&#34;delay&#34;]
+        delay = convert_float(element.attrib[&#34;delay&#34;])
         conditionedge = getattr(ConditionEdge, element.attrib[&#34;conditionEdge&#34;])
         condition = _ValueConditionFactory.parse_value_condition(
             element.find(&#34;ByValueCondition&#34;)
@@ -8851,7 +9995,7 @@ def parse(element):
         )
 
     name = element.attrib[&#34;name&#34;]
-    delay = element.attrib[&#34;delay&#34;]
+    delay = convert_float(element.attrib[&#34;delay&#34;])
     conditionedge = getattr(ConditionEdge, element.attrib[&#34;conditionEdge&#34;])
     condition = _ValueConditionFactory.parse_value_condition(
         element.find(&#34;ByValueCondition&#34;)
@@ -8902,6 +10046,208 @@ def parse(element):
         condgroup = ET.SubElement(element, &#34;ConditionGroup&#34;)
         condgroup.append(condition)
         return element</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="scenariogeneration.xosc.triggers.VariableCondition"><code class="flex name class">
+<span>class <span class="ident">VariableCondition</span></span>
+<span>(</span><span>variable, value, rule)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>the VariableCondition class is an Value Condition used by the ValueTrigger (valid from V1.2)</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>variable (str): the variable to trigger on
+
+value (int): value to trigger on
+
+rule (Rule): condition rule of triggering
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>variable (str): the variable to trigger on
+
+value (int): value to trigger on
+
+rule (Rule): condition rule of triggering
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element()
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of the class
+</code></pre>
+<p>initalize the VariableCondition</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>variable (str): the variable to trigger on
+
+value (int): value to trigger on
+
+rule (Rule): condition rule of triggering
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class VariableCondition(_ValueTriggerType):
+    &#34;&#34;&#34;the VariableCondition class is an Value Condition used by the ValueTrigger (valid from V1.2)
+
+    Parameters
+    ----------
+        variable (str): the variable to trigger on
+
+        value (int): value to trigger on
+
+        rule (Rule): condition rule of triggering
+
+    Attributes
+    ----------
+        variable (str): the variable to trigger on
+
+        value (int): value to trigger on
+
+        rule (Rule): condition rule of triggering
+
+    Methods
+    -------
+        parse(element)
+            parses a ElementTree created by the class and returns an instance of the class
+
+        get_element()
+            Returns the full ElementTree of the class
+
+        get_attributes()
+            Returns a dictionary of all attributes of the class
+
+    &#34;&#34;&#34;
+
+    def __init__(self, variable, value, rule):
+        &#34;&#34;&#34;initalize the VariableCondition
+
+        Parameters
+        ----------
+            variable (str): the variable to trigger on
+
+            value (int): value to trigger on
+
+            rule (Rule): condition rule of triggering
+
+        &#34;&#34;&#34;
+        self.variable = variable
+        self.value = value
+        if not hasattr(Rule, str(rule)):
+            raise ValueError(rule + &#34;; is not a valid rule.&#34;)
+        self.rule = rule
+
+    def __eq__(self, other):
+        if isinstance(other, VariableCondition):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+
+    @staticmethod
+    def parse(element):
+        &#34;&#34;&#34;Parses the xml element of VariableCondition
+
+        Parameters
+        ----------
+            element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+        Returns
+        -------
+            condition (VariableCondition): a VariableCondition object
+
+        &#34;&#34;&#34;
+        variable = element.attrib[&#34;variableRef&#34;]
+        value = element.attrib[&#34;value&#34;]
+        rule = getattr(Rule, element.attrib[&#34;rule&#34;])
+        return VariableCondition(variable, value, rule)
+
+    def get_attributes(self):
+        &#34;&#34;&#34;returns the attributes of the VariableCondition as a dict&#34;&#34;&#34;
+        basedict = {&#34;variableRef&#34;: self.variable, &#34;value&#34;: str(self.value)}
+        basedict[&#34;rule&#34;] = self.rule.get_name()
+        return basedict
+
+    def get_element(self):
+        &#34;&#34;&#34;returns the elementTree of the VariableCondition&#34;&#34;&#34;
+        return ET.Element(&#34;VariableCondition&#34;, attrib=self.get_attributes())</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>scenariogeneration.xosc.utils._ValueTriggerType</li>
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.VariableCondition.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the xml element of VariableCondition</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>condition (VariableCondition): a VariableCondition object
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def parse(element):
+    &#34;&#34;&#34;Parses the xml element of VariableCondition
+
+    Parameters
+    ----------
+        element (xml.etree.ElementTree.Element): A position element (same as generated by the class itself)
+
+    Returns
+    -------
+        condition (VariableCondition): a VariableCondition object
+
+    &#34;&#34;&#34;
+    variable = element.attrib[&#34;variableRef&#34;]
+    value = element.attrib[&#34;value&#34;]
+    rule = getattr(Rule, element.attrib[&#34;rule&#34;])
+    return VariableCondition(variable, value, rule)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xosc.triggers.VariableCondition.get_attributes"><code class="name flex">
+<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the attributes of the VariableCondition as a dict</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_attributes(self):
+    &#34;&#34;&#34;returns the attributes of the VariableCondition as a dict&#34;&#34;&#34;
+    basedict = {&#34;variableRef&#34;: self.variable, &#34;value&#34;: str(self.value)}
+    basedict[&#34;rule&#34;] = self.rule.get_name()
+    return basedict</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xosc.triggers.VariableCondition.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the elementTree of the VariableCondition</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self):
+    &#34;&#34;&#34;returns the elementTree of the VariableCondition&#34;&#34;&#34;
+    return ET.Element(&#34;VariableCondition&#34;, attrib=self.get_attributes())</code></pre>
 </details>
 </dd>
 </dl>
@@ -8998,6 +10344,16 @@ def parse(element):
 <li><code><a title="scenariogeneration.xosc.triggers.ReachPositionCondition.get_attributes" href="#scenariogeneration.xosc.triggers.ReachPositionCondition.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.ReachPositionCondition.get_element" href="#scenariogeneration.xosc.triggers.ReachPositionCondition.get_element">get_element</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.ReachPositionCondition.parse" href="#scenariogeneration.xosc.triggers.ReachPositionCondition.parse">parse</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xosc.triggers.RelativeClearanceCondition" href="#scenariogeneration.xosc.triggers.RelativeClearanceCondition">RelativeClearanceCondition</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xosc.triggers.RelativeClearanceCondition.add_entity" href="#scenariogeneration.xosc.triggers.RelativeClearanceCondition.add_entity">add_entity</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.RelativeClearanceCondition.add_relative_lane_range" href="#scenariogeneration.xosc.triggers.RelativeClearanceCondition.add_relative_lane_range">add_relative_lane_range</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.RelativeClearanceCondition.get_attributes" href="#scenariogeneration.xosc.triggers.RelativeClearanceCondition.get_attributes">get_attributes</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.RelativeClearanceCondition.get_element" href="#scenariogeneration.xosc.triggers.RelativeClearanceCondition.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.RelativeClearanceCondition.parse" href="#scenariogeneration.xosc.triggers.RelativeClearanceCondition.parse">parse</a></code></li>
 </ul>
 </li>
 <li>
@@ -9127,6 +10483,14 @@ def parse(element):
 <li><code><a title="scenariogeneration.xosc.triggers.ValueTrigger.get_attributes" href="#scenariogeneration.xosc.triggers.ValueTrigger.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.ValueTrigger.get_element" href="#scenariogeneration.xosc.triggers.ValueTrigger.get_element">get_element</a></code></li>
 <li><code><a title="scenariogeneration.xosc.triggers.ValueTrigger.parse" href="#scenariogeneration.xosc.triggers.ValueTrigger.parse">parse</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xosc.triggers.VariableCondition" href="#scenariogeneration.xosc.triggers.VariableCondition">VariableCondition</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xosc.triggers.VariableCondition.get_attributes" href="#scenariogeneration.xosc.triggers.VariableCondition.get_attributes">get_attributes</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.VariableCondition.get_element" href="#scenariogeneration.xosc.triggers.VariableCondition.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xosc.triggers.VariableCondition.parse" href="#scenariogeneration.xosc.triggers.VariableCondition.parse">parse</a></code></li>
 </ul>
 </li>
 </ul>

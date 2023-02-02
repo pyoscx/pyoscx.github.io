@@ -54,16 +54,23 @@ from .utils import (
     Parameter,
     convert_float,
 )
-from .utils import EntityRef
-from .utils import ParameterDeclarations
+from .utils import (
+    EntityRef,
+    DynamicsConstraints,
+    CatalogFile,
+    CatalogReference,
+    ParameterDeclarations,
+)
+from .exceptions import OpenSCENARIOVersionError
 from .enumerations import (
     VehicleCategory,
     PedestrianCategory,
     MiscObjectCategory,
     ObjectType,
     VersionBase,
+    Role,
 )
-from .utils import DynamicsConstraints, CatalogFile, CatalogReference
+
 
 # TODO: Add functionality for lists in add_entity_byref &amp; add_entity_bytype
 class Entities:
@@ -146,7 +153,7 @@ class Entities:
 
             entityobject (CatalogReference, Vehicle, Pedestrian, MiscObject, or ExternalObjectReference (V1.1)): object description
 
-            controller (CatalogReference, or Controller): controller for the object
+            controller (CatalogReference, Controller, or list of CatalogReference/Controller): controller for the object
                 Default (None)
 
         &#34;&#34;&#34;
@@ -202,7 +209,7 @@ class ScenarioObject(VersionBase):
 
         entityobject (CatalogReference, Vehicle, Pedestrian, MiscObject, or ExternalObjectReference): object description
 
-        controller (CatalogReference, or Controller): controller for the object
+        controller (CatalogReference, Controller, or list of CatalogReference/Controller): controller for the object
 
     Attributes
     ----------
@@ -210,7 +217,7 @@ class ScenarioObject(VersionBase):
 
         entityobject (CatalogReference, Vehicle, Pedestrian, MiscObject, or ExternalObjectReference): object description
 
-        controller (CatalogReference, or Controller): controller for the object
+        controller (list of CatalogReference/Controller): controller for the object
 
     Methods
     -------
@@ -233,7 +240,7 @@ class ScenarioObject(VersionBase):
 
             entityobject (CatalogReference, Vehicle, Pedestrian, MiscObject, or ExternalObjectReference): object description
 
-            controller (CatalogReference, or Controller): controller for the object
+            controller (CatalogReference, Controller, or list of CatalogReference/Controller): controller for the object (multiple controllers are valid since OSC V1.2)
                 Default: None
 
         &#34;&#34;&#34;
@@ -252,15 +259,22 @@ class ScenarioObject(VersionBase):
                 &#34;entityobject is not of type CatalogReference, Vehicle, Pedestrian, MiscObject, nor ExternalObjectReference (or to old version of openscenario)&#34;
             )
 
-        if controller is not None and not (
-            isinstance(controller, CatalogReference)
-            or isinstance(controller, Controller)
-        ):
-            raise TypeError(
-                &#34;controller input is not of type CatalogReference or Controller&#34;
-            )
+        if controller is not None:
+            if not isinstance(controller, list):
+                self.controller = [controller]
+            else:
+                self.controller = controller
+
+            for cnt in self.controller:
+                if cnt is not None and not (
+                    isinstance(cnt, CatalogReference) or isinstance(cnt, Controller)
+                ):
+                    raise TypeError(
+                        &#34;controller input is not of type CatalogReference or Controller&#34;
+                    )
+        else:
+            self.controller = controller
         self.entityobject = entityobject
-        self.controller = controller
 
     def __eq__(self, other):
         if isinstance(other, ScenarioObject):
@@ -301,15 +315,18 @@ class ScenarioObject(VersionBase):
 
         controller = None
         if element.find(&#34;ObjectController&#34;) != None:
-            object_controller_element = element.find(&#34;ObjectController&#34;)
-            if object_controller_element.find(&#34;Controller&#34;) != None:
-                controller = Controller.parse(
-                    object_controller_element.find(&#34;Controller&#34;)
-                )
-            elif object_controller_element.find(&#34;CatalogReference&#34;) != None:
-                controller = CatalogReference.parse(
-                    object_controller_element.find(&#34;CatalogReference&#34;)
-                )
+            controller = []
+            for object_controller_element in element.findall(&#34;ObjectController&#34;):
+                if object_controller_element.find(&#34;Controller&#34;) != None:
+                    controller.append(
+                        Controller.parse(object_controller_element.find(&#34;Controller&#34;))
+                    )
+                elif object_controller_element.find(&#34;CatalogReference&#34;) != None:
+                    controller.append(
+                        CatalogReference.parse(
+                            object_controller_element.find(&#34;CatalogReference&#34;)
+                        )
+                    )
 
         return ScenarioObject(name, entityobject, controller)
 
@@ -323,8 +340,14 @@ class ScenarioObject(VersionBase):
 
         element.append(self.entityobject.get_element())
         if self.controller:
-            objcont = ET.SubElement(element, &#34;ObjectController&#34;)
-            objcont.append(self.controller.get_element())
+            if self.version_minor &lt; 2 and len(self.controller) &gt; 1:
+                raise OpenSCENARIOVersionError(
+                    &#34;multiple controllers were added in OSC V1.2&#34;
+                )
+
+            for cnt in self.controller:
+                objcont = ET.SubElement(element, &#34;ObjectController&#34;)
+                objcont.append(cnt.get_element())
 
         return element
 
@@ -474,6 +497,9 @@ class Pedestrian(VersionBase):
         model (str): definition model of the pedestrian
             Default: None
 
+        role (Role): the role of the Pedestrian (valid from OpenSCENARIO V1.2)
+            Default: None
+
     Attributes
     ----------
         name (str): name of the pedestrian
@@ -489,6 +515,8 @@ class Pedestrian(VersionBase):
         parameters (ParameterDeclaration): Parameter declarations of the pedestrian
 
         properties (Properties): additional properties of the pedestrian
+
+        role (Role): the role of the Pedestrian
 
     Methods
     -------
@@ -518,7 +546,7 @@ class Pedestrian(VersionBase):
 
     &#34;&#34;&#34;
 
-    def __init__(self, name, mass, category, boundingbox, model=None):
+    def __init__(self, name, mass, category, boundingbox, model=None, role=None):
         &#34;&#34;&#34;initalzie the Pedestrian Class
 
         Parameters
@@ -533,6 +561,9 @@ class Pedestrian(VersionBase):
 
             model (str): definition model of the pedestrian
                 Default: None
+
+            role (Role): the role of the Vehicle
+                Default: None
         &#34;&#34;&#34;
         self.name = name
         self.model = model
@@ -546,6 +577,9 @@ class Pedestrian(VersionBase):
         self.boundingbox = boundingbox
         self.parameters = ParameterDeclarations()
         self.properties = Properties()
+        if role is not None and not hasattr(Role, str(role)):
+            raise TypeError(role + &#34; is not a valid vehicle role.&#34;)
+        self.role = role
 
     def __eq__(self, other):
         if isinstance(other, Pedestrian):
@@ -554,6 +588,7 @@ class Pedestrian(VersionBase):
                 and self.boundingbox == other.boundingbox
                 and self.properties == other.properties
                 and self.parameters == other.parameters
+                and self.role == other.role
             ):
                 return True
         return False
@@ -587,8 +622,10 @@ class Pedestrian(VersionBase):
             parameters = ParameterDeclarations()
         boundingbox = BoundingBox.parse(element.find(&#34;BoundingBox&#34;))
         properties = Properties.parse(element.find(&#34;Properties&#34;))
-
-        pedestrian = Pedestrian(name, mass, category, boundingbox, model)
+        role = None
+        if &#34;role&#34; in element.attrib:
+            role = getattr(Role, element.attrib[&#34;role&#34;])
+        pedestrian = Pedestrian(name, mass, category, boundingbox, model, role)
         pedestrian.parameters = parameters
         pedestrian.properties = properties
 
@@ -674,6 +711,8 @@ class Pedestrian(VersionBase):
             else:
                 retdict[&#34;model3d&#34;] = self.model
         retdict[&#34;mass&#34;] = str(self.mass)
+        if self.role and not self.isVersion(minor=0) and not self.isVersion(minor=1):
+            retdict[&#34;role&#34;] = self.role.get_name()
         return retdict
 
     def get_element(self):
@@ -936,6 +975,15 @@ class Vehicle(VersionBase):
         model3d (str): path to model file (valid from V1.1)
             Default: None
 
+        max_acceleration_rate (float): the maximum acceleration rate (jerk) of the vehicle (valid from OpenSCENARIO V1.2)
+            Default: None
+
+        max_deceleration_rate (float): the maximum acceleration rate (jerk) of the vehicle (valid from OpenSCENARIO V1.2)
+            Default: None
+
+        role (Role): the role of the Vehicle (valid from OpenSCENARIO V1.2)
+            Default: None
+
     Attributes
     ----------
         name (str): name of the vehicle
@@ -955,7 +1003,8 @@ class Vehicle(VersionBase):
         mass (float): the mass of the vehicle
 
         model3d (str): path to model file (valid from V1.1)
-            Default: None
+
+        role (Role): the role of the Vehicle
 
     Methods
     -------
@@ -1000,6 +1049,9 @@ class Vehicle(VersionBase):
         max_deceleration,
         mass=None,
         model3d=None,
+        max_acceleration_rate=None,
+        max_deceleration_rate=None,
+        role=None,
     ):
         &#34;&#34;&#34;initalzie the Vehicle Class
 
@@ -1026,6 +1078,15 @@ class Vehicle(VersionBase):
 
             model3d (str): path to model file (valid from V1.1)
                 Default: None
+
+            max_acceleration_rate (float): the maximum acceleration rate (jerk) of the vehicle (valid from OpenSCENARIO V1.2)
+                Default: None
+
+            max_deceleration_rate (float): the maximum acceleration rate (jerk) of the vehicle (valid from OpenSCENARIO V1.2)
+                Default: None
+
+            role (Role): the role of the Vehicle
+                Default: None
         &#34;&#34;&#34;
         self.name = name
         if not hasattr(VehicleCategory, str(vehicle_type)):
@@ -1038,12 +1099,19 @@ class Vehicle(VersionBase):
 
         self.axles = Axles(frontaxle, rearaxle)
         self.dynamics = DynamicsConstraints(
-            max_acceleration, max_deceleration, max_speed
+            max_acceleration,
+            max_deceleration,
+            max_speed,
+            max_acceleration_rate,
+            max_deceleration_rate,
         )
         self.parameters = ParameterDeclarations()
         self.properties = Properties()
-        self.mass = mass
+        self.mass = convert_float(mass)
         self.model3d = model3d
+        if role is not None and not hasattr(Role, str(role)):
+            raise TypeError(role + &#34; is not a valid vehicle role.&#34;)
+        self.role = role
 
     def __eq__(self, other):
         if isinstance(other, Vehicle):
@@ -1055,6 +1123,7 @@ class Vehicle(VersionBase):
                 and self.dynamics == other.dynamics
                 and self.parameters == other.parameters
                 and self.mass == other.mass
+                and self.role == other.role
             ):
                 return True
         return False
@@ -1075,7 +1144,7 @@ class Vehicle(VersionBase):
         name = element.attrib[&#34;name&#34;]
         mass = None
         if &#34;mass&#34; in element.attrib:
-            mass = element.attrib[&#34;mass&#34;]
+            mass = convert_float(element.attrib[&#34;mass&#34;])
         vehicle_type = getattr(VehicleCategory, element.attrib[&#34;vehicleCategory&#34;])
         model3d = None
         if &#34;model3d&#34; in element.attrib:
@@ -1091,14 +1160,19 @@ class Vehicle(VersionBase):
         properties = Properties.parse(element.find(&#34;Properties&#34;))
 
         performance = DynamicsConstraints.parse(element.find(&#34;Performance&#34;))
-        max_speed = performance.get_attributes()[&#34;maxSpeed&#34;]
-        max_acc = performance.get_attributes()[&#34;maxAcceleration&#34;]
-        max_dec = performance.get_attributes()[&#34;maxDeceleration&#34;]
+        max_speed = performance.max_speed
+        max_acc = performance.max_acceleration
+        max_dec = performance.max_deceleration
+        max_acc_rate = performance.max_acceleration_rate
+        max_dec_rate = performance.max_deceleration_rate
 
         axles_element = element.find(&#34;Axles&#34;)
         frontaxle = Axle.parse(axles_element.find(&#34;FrontAxle&#34;))
         rearaxle = Axle.parse(axles_element.find(&#34;RearAxle&#34;))
 
+        role = None
+        if &#34;role&#34; in element.attrib:
+            role = getattr(Role, element.attrib[&#34;role&#34;])
         vehicle = Vehicle(
             name,
             vehicle_type,
@@ -1110,6 +1184,9 @@ class Vehicle(VersionBase):
             max_dec,
             mass,
             model3d,
+            max_acc_rate,
+            max_dec_rate,
+            role,
         )
         vehicle.properties = properties
         vehicle.parameters = parameters
@@ -1211,6 +1288,8 @@ class Vehicle(VersionBase):
             retdict[&#34;mass&#34;] = str(self.mass)
         if not self.isVersion(minor=0) and self.model3d:
             retdict[&#34;model3d&#34;] = self.model3d
+        if self.role and not self.isVersion(minor=0) and not self.isVersion(minor=1):
+            retdict[&#34;role&#34;] = self.role.get_name()
 
         return retdict
 
@@ -2087,7 +2166,7 @@ get_element()
 
             entityobject (CatalogReference, Vehicle, Pedestrian, MiscObject, or ExternalObjectReference (V1.1)): object description
 
-            controller (CatalogReference, or Controller): controller for the object
+            controller (CatalogReference, Controller, or list of CatalogReference/Controller): controller for the object
                 Default (None)
 
         &#34;&#34;&#34;
@@ -2248,7 +2327,7 @@ object_type (ObjectType or list of ObjectType): type of entity
 
 entityobject (CatalogReference, Vehicle, Pedestrian, MiscObject, or ExternalObjectReference (V1.1)): object description
 
-controller (CatalogReference, or Controller): controller for the object
+controller (CatalogReference, Controller, or list of CatalogReference/Controller): controller for the object
     Default (None)
 </code></pre></div>
 <details class="source">
@@ -2264,7 +2343,7 @@ controller (CatalogReference, or Controller): controller for the object
 
         entityobject (CatalogReference, Vehicle, Pedestrian, MiscObject, or ExternalObjectReference (V1.1)): object description
 
-        controller (CatalogReference, or Controller): controller for the object
+        controller (CatalogReference, Controller, or list of CatalogReference/Controller): controller for the object
             Default (None)
 
     &#34;&#34;&#34;
@@ -3264,7 +3343,7 @@ author (str): author of the catalog
 </dd>
 <dt id="scenariogeneration.xosc.entities.Pedestrian"><code class="flex name class">
 <span>class <span class="ident">Pedestrian</span></span>
-<span>(</span><span>name, mass, category, boundingbox, model=None)</span>
+<span>(</span><span>name, mass, category, boundingbox, model=None, role=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>the Pedestrian class creates a pedestrian type entity of openscenario</p>
@@ -3278,6 +3357,9 @@ boundingbox (BoundingBox): the bounding box of the pedestrian
 category (PedestrianCategory): type of of pedestrian
 
 model (str): definition model of the pedestrian
+    Default: None
+
+role (Role): the role of the Pedestrian (valid from OpenSCENARIO V1.2)
     Default: None
 </code></pre>
 <h2 id="attributes">Attributes</h2>
@@ -3294,6 +3376,8 @@ boundingbox (BoundingBox): the bounding box of the pedestrian
 parameters (ParameterDeclaration): Parameter declarations of the pedestrian
 
 properties (Properties): additional properties of the pedestrian
+
+role (Role): the role of the Pedestrian
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>parse(element)
@@ -3332,6 +3416,9 @@ boundingbox (BoundingBox): the bounding box of the pedestrian
 
 model (str): definition model of the pedestrian
     Default: None
+
+role (Role): the role of the Vehicle
+    Default: None
 </code></pre></div>
 <details class="source">
 <summary>
@@ -3353,6 +3440,9 @@ model (str): definition model of the pedestrian
         model (str): definition model of the pedestrian
             Default: None
 
+        role (Role): the role of the Pedestrian (valid from OpenSCENARIO V1.2)
+            Default: None
+
     Attributes
     ----------
         name (str): name of the pedestrian
@@ -3368,6 +3458,8 @@ model (str): definition model of the pedestrian
         parameters (ParameterDeclaration): Parameter declarations of the pedestrian
 
         properties (Properties): additional properties of the pedestrian
+
+        role (Role): the role of the Pedestrian
 
     Methods
     -------
@@ -3397,7 +3489,7 @@ model (str): definition model of the pedestrian
 
     &#34;&#34;&#34;
 
-    def __init__(self, name, mass, category, boundingbox, model=None):
+    def __init__(self, name, mass, category, boundingbox, model=None, role=None):
         &#34;&#34;&#34;initalzie the Pedestrian Class
 
         Parameters
@@ -3412,6 +3504,9 @@ model (str): definition model of the pedestrian
 
             model (str): definition model of the pedestrian
                 Default: None
+
+            role (Role): the role of the Vehicle
+                Default: None
         &#34;&#34;&#34;
         self.name = name
         self.model = model
@@ -3425,6 +3520,9 @@ model (str): definition model of the pedestrian
         self.boundingbox = boundingbox
         self.parameters = ParameterDeclarations()
         self.properties = Properties()
+        if role is not None and not hasattr(Role, str(role)):
+            raise TypeError(role + &#34; is not a valid vehicle role.&#34;)
+        self.role = role
 
     def __eq__(self, other):
         if isinstance(other, Pedestrian):
@@ -3433,6 +3531,7 @@ model (str): definition model of the pedestrian
                 and self.boundingbox == other.boundingbox
                 and self.properties == other.properties
                 and self.parameters == other.parameters
+                and self.role == other.role
             ):
                 return True
         return False
@@ -3466,8 +3565,10 @@ model (str): definition model of the pedestrian
             parameters = ParameterDeclarations()
         boundingbox = BoundingBox.parse(element.find(&#34;BoundingBox&#34;))
         properties = Properties.parse(element.find(&#34;Properties&#34;))
-
-        pedestrian = Pedestrian(name, mass, category, boundingbox, model)
+        role = None
+        if &#34;role&#34; in element.attrib:
+            role = getattr(Role, element.attrib[&#34;role&#34;])
+        pedestrian = Pedestrian(name, mass, category, boundingbox, model, role)
         pedestrian.parameters = parameters
         pedestrian.properties = properties
 
@@ -3553,6 +3654,8 @@ model (str): definition model of the pedestrian
             else:
                 retdict[&#34;model3d&#34;] = self.model
         retdict[&#34;mass&#34;] = str(self.mass)
+        if self.role and not self.isVersion(minor=0) and not self.isVersion(minor=1):
+            retdict[&#34;role&#34;] = self.role.get_name()
         return retdict
 
     def get_element(self):
@@ -3614,8 +3717,10 @@ def parse(element):
         parameters = ParameterDeclarations()
     boundingbox = BoundingBox.parse(element.find(&#34;BoundingBox&#34;))
     properties = Properties.parse(element.find(&#34;Properties&#34;))
-
-    pedestrian = Pedestrian(name, mass, category, boundingbox, model)
+    role = None
+    if &#34;role&#34; in element.attrib:
+        role = getattr(Role, element.attrib[&#34;role&#34;])
+    pedestrian = Pedestrian(name, mass, category, boundingbox, model, role)
     pedestrian.parameters = parameters
     pedestrian.properties = properties
 
@@ -3787,6 +3892,8 @@ author (str): author of the catalog
         else:
             retdict[&#34;model3d&#34;] = self.model
     retdict[&#34;mass&#34;] = str(self.mass)
+    if self.role and not self.isVersion(minor=0) and not self.isVersion(minor=1):
+        retdict[&#34;role&#34;] = self.role.get_name()
     return retdict</code></pre>
 </details>
 </dd>
@@ -3822,14 +3929,14 @@ author (str): author of the catalog
 
 entityobject (CatalogReference, Vehicle, Pedestrian, MiscObject, or ExternalObjectReference): object description
 
-controller (CatalogReference, or Controller): controller for the object
+controller (CatalogReference, Controller, or list of CatalogReference/Controller): controller for the object
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>name (str): name of the object
 
 entityobject (CatalogReference, Vehicle, Pedestrian, MiscObject, or ExternalObjectReference): object description
 
-controller (CatalogReference, or Controller): controller for the object
+controller (list of CatalogReference/Controller): controller for the object
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>parse(element)
@@ -3847,7 +3954,7 @@ get_attributes()
 
 entityobject (CatalogReference, Vehicle, Pedestrian, MiscObject, or ExternalObjectReference): object description
 
-controller (CatalogReference, or Controller): controller for the object
+controller (CatalogReference, Controller, or list of CatalogReference/Controller): controller for the object (multiple controllers are valid since OSC V1.2)
     Default: None
 </code></pre></div>
 <details class="source">
@@ -3863,7 +3970,7 @@ controller (CatalogReference, or Controller): controller for the object
 
         entityobject (CatalogReference, Vehicle, Pedestrian, MiscObject, or ExternalObjectReference): object description
 
-        controller (CatalogReference, or Controller): controller for the object
+        controller (CatalogReference, Controller, or list of CatalogReference/Controller): controller for the object
 
     Attributes
     ----------
@@ -3871,7 +3978,7 @@ controller (CatalogReference, or Controller): controller for the object
 
         entityobject (CatalogReference, Vehicle, Pedestrian, MiscObject, or ExternalObjectReference): object description
 
-        controller (CatalogReference, or Controller): controller for the object
+        controller (list of CatalogReference/Controller): controller for the object
 
     Methods
     -------
@@ -3894,7 +4001,7 @@ controller (CatalogReference, or Controller): controller for the object
 
             entityobject (CatalogReference, Vehicle, Pedestrian, MiscObject, or ExternalObjectReference): object description
 
-            controller (CatalogReference, or Controller): controller for the object
+            controller (CatalogReference, Controller, or list of CatalogReference/Controller): controller for the object (multiple controllers are valid since OSC V1.2)
                 Default: None
 
         &#34;&#34;&#34;
@@ -3913,15 +4020,22 @@ controller (CatalogReference, or Controller): controller for the object
                 &#34;entityobject is not of type CatalogReference, Vehicle, Pedestrian, MiscObject, nor ExternalObjectReference (or to old version of openscenario)&#34;
             )
 
-        if controller is not None and not (
-            isinstance(controller, CatalogReference)
-            or isinstance(controller, Controller)
-        ):
-            raise TypeError(
-                &#34;controller input is not of type CatalogReference or Controller&#34;
-            )
+        if controller is not None:
+            if not isinstance(controller, list):
+                self.controller = [controller]
+            else:
+                self.controller = controller
+
+            for cnt in self.controller:
+                if cnt is not None and not (
+                    isinstance(cnt, CatalogReference) or isinstance(cnt, Controller)
+                ):
+                    raise TypeError(
+                        &#34;controller input is not of type CatalogReference or Controller&#34;
+                    )
+        else:
+            self.controller = controller
         self.entityobject = entityobject
-        self.controller = controller
 
     def __eq__(self, other):
         if isinstance(other, ScenarioObject):
@@ -3962,15 +4076,18 @@ controller (CatalogReference, or Controller): controller for the object
 
         controller = None
         if element.find(&#34;ObjectController&#34;) != None:
-            object_controller_element = element.find(&#34;ObjectController&#34;)
-            if object_controller_element.find(&#34;Controller&#34;) != None:
-                controller = Controller.parse(
-                    object_controller_element.find(&#34;Controller&#34;)
-                )
-            elif object_controller_element.find(&#34;CatalogReference&#34;) != None:
-                controller = CatalogReference.parse(
-                    object_controller_element.find(&#34;CatalogReference&#34;)
-                )
+            controller = []
+            for object_controller_element in element.findall(&#34;ObjectController&#34;):
+                if object_controller_element.find(&#34;Controller&#34;) != None:
+                    controller.append(
+                        Controller.parse(object_controller_element.find(&#34;Controller&#34;))
+                    )
+                elif object_controller_element.find(&#34;CatalogReference&#34;) != None:
+                    controller.append(
+                        CatalogReference.parse(
+                            object_controller_element.find(&#34;CatalogReference&#34;)
+                        )
+                    )
 
         return ScenarioObject(name, entityobject, controller)
 
@@ -3984,8 +4101,14 @@ controller (CatalogReference, or Controller): controller for the object
 
         element.append(self.entityobject.get_element())
         if self.controller:
-            objcont = ET.SubElement(element, &#34;ObjectController&#34;)
-            objcont.append(self.controller.get_element())
+            if self.version_minor &lt; 2 and len(self.controller) &gt; 1:
+                raise OpenSCENARIOVersionError(
+                    &#34;multiple controllers were added in OSC V1.2&#34;
+                )
+
+            for cnt in self.controller:
+                objcont = ET.SubElement(element, &#34;ObjectController&#34;)
+                objcont.append(cnt.get_element())
 
         return element</code></pre>
 </details>
@@ -4039,15 +4162,18 @@ def parse(element):
 
     controller = None
     if element.find(&#34;ObjectController&#34;) != None:
-        object_controller_element = element.find(&#34;ObjectController&#34;)
-        if object_controller_element.find(&#34;Controller&#34;) != None:
-            controller = Controller.parse(
-                object_controller_element.find(&#34;Controller&#34;)
-            )
-        elif object_controller_element.find(&#34;CatalogReference&#34;) != None:
-            controller = CatalogReference.parse(
-                object_controller_element.find(&#34;CatalogReference&#34;)
-            )
+        controller = []
+        for object_controller_element in element.findall(&#34;ObjectController&#34;):
+            if object_controller_element.find(&#34;Controller&#34;) != None:
+                controller.append(
+                    Controller.parse(object_controller_element.find(&#34;Controller&#34;))
+                )
+            elif object_controller_element.find(&#34;CatalogReference&#34;) != None:
+                controller.append(
+                    CatalogReference.parse(
+                        object_controller_element.find(&#34;CatalogReference&#34;)
+                    )
+                )
 
     return ScenarioObject(name, entityobject, controller)</code></pre>
 </details>
@@ -4084,8 +4210,14 @@ def parse(element):
 
     element.append(self.entityobject.get_element())
     if self.controller:
-        objcont = ET.SubElement(element, &#34;ObjectController&#34;)
-        objcont.append(self.controller.get_element())
+        if self.version_minor &lt; 2 and len(self.controller) &gt; 1:
+            raise OpenSCENARIOVersionError(
+                &#34;multiple controllers were added in OSC V1.2&#34;
+            )
+
+        for cnt in self.controller:
+            objcont = ET.SubElement(element, &#34;ObjectController&#34;)
+            objcont.append(cnt.get_element())
 
     return element</code></pre>
 </details>
@@ -4094,7 +4226,7 @@ def parse(element):
 </dd>
 <dt id="scenariogeneration.xosc.entities.Vehicle"><code class="flex name class">
 <span>class <span class="ident">Vehicle</span></span>
-<span>(</span><span>name, vehicle_type, boundingbox, frontaxle, rearaxle, max_speed, max_acceleration, max_deceleration, mass=None, model3d=None)</span>
+<span>(</span><span>name, vehicle_type, boundingbox, frontaxle, rearaxle, max_speed, max_acceleration, max_deceleration, mass=None, model3d=None, max_acceleration_rate=None, max_deceleration_rate=None, role=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>the Vehicle Class creates a Vehicle for openscenario</p>
@@ -4120,6 +4252,15 @@ mass (float): the mass of the vehicle (valid from OpenSCENARIO V1.1)
 
 model3d (str): path to model file (valid from V1.1)
     Default: None
+
+max_acceleration_rate (float): the maximum acceleration rate (jerk) of the vehicle (valid from OpenSCENARIO V1.2)
+    Default: None
+
+max_deceleration_rate (float): the maximum acceleration rate (jerk) of the vehicle (valid from OpenSCENARIO V1.2)
+    Default: None
+
+role (Role): the role of the Vehicle (valid from OpenSCENARIO V1.2)
+    Default: None
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>name (str): name of the vehicle
@@ -4139,7 +4280,8 @@ properties (Properties): additional properties of the vehicle
 mass (float): the mass of the vehicle
 
 model3d (str): path to model file (valid from V1.1)
-    Default: None
+
+role (Role): the role of the Vehicle
 </code></pre>
 <h2 id="methods">Methods</h2>
 <pre><code>parse(element)
@@ -4192,6 +4334,15 @@ mass (float): the mass of the vehicle (valid from OpenSCENARIO V1.1)
 
 model3d (str): path to model file (valid from V1.1)
     Default: None
+
+max_acceleration_rate (float): the maximum acceleration rate (jerk) of the vehicle (valid from OpenSCENARIO V1.2)
+    Default: None
+
+max_deceleration_rate (float): the maximum acceleration rate (jerk) of the vehicle (valid from OpenSCENARIO V1.2)
+    Default: None
+
+role (Role): the role of the Vehicle
+    Default: None
 </code></pre></div>
 <details class="source">
 <summary>
@@ -4224,6 +4375,15 @@ model3d (str): path to model file (valid from V1.1)
         model3d (str): path to model file (valid from V1.1)
             Default: None
 
+        max_acceleration_rate (float): the maximum acceleration rate (jerk) of the vehicle (valid from OpenSCENARIO V1.2)
+            Default: None
+
+        max_deceleration_rate (float): the maximum acceleration rate (jerk) of the vehicle (valid from OpenSCENARIO V1.2)
+            Default: None
+
+        role (Role): the role of the Vehicle (valid from OpenSCENARIO V1.2)
+            Default: None
+
     Attributes
     ----------
         name (str): name of the vehicle
@@ -4243,7 +4403,8 @@ model3d (str): path to model file (valid from V1.1)
         mass (float): the mass of the vehicle
 
         model3d (str): path to model file (valid from V1.1)
-            Default: None
+
+        role (Role): the role of the Vehicle
 
     Methods
     -------
@@ -4288,6 +4449,9 @@ model3d (str): path to model file (valid from V1.1)
         max_deceleration,
         mass=None,
         model3d=None,
+        max_acceleration_rate=None,
+        max_deceleration_rate=None,
+        role=None,
     ):
         &#34;&#34;&#34;initalzie the Vehicle Class
 
@@ -4314,6 +4478,15 @@ model3d (str): path to model file (valid from V1.1)
 
             model3d (str): path to model file (valid from V1.1)
                 Default: None
+
+            max_acceleration_rate (float): the maximum acceleration rate (jerk) of the vehicle (valid from OpenSCENARIO V1.2)
+                Default: None
+
+            max_deceleration_rate (float): the maximum acceleration rate (jerk) of the vehicle (valid from OpenSCENARIO V1.2)
+                Default: None
+
+            role (Role): the role of the Vehicle
+                Default: None
         &#34;&#34;&#34;
         self.name = name
         if not hasattr(VehicleCategory, str(vehicle_type)):
@@ -4326,12 +4499,19 @@ model3d (str): path to model file (valid from V1.1)
 
         self.axles = Axles(frontaxle, rearaxle)
         self.dynamics = DynamicsConstraints(
-            max_acceleration, max_deceleration, max_speed
+            max_acceleration,
+            max_deceleration,
+            max_speed,
+            max_acceleration_rate,
+            max_deceleration_rate,
         )
         self.parameters = ParameterDeclarations()
         self.properties = Properties()
-        self.mass = mass
+        self.mass = convert_float(mass)
         self.model3d = model3d
+        if role is not None and not hasattr(Role, str(role)):
+            raise TypeError(role + &#34; is not a valid vehicle role.&#34;)
+        self.role = role
 
     def __eq__(self, other):
         if isinstance(other, Vehicle):
@@ -4343,6 +4523,7 @@ model3d (str): path to model file (valid from V1.1)
                 and self.dynamics == other.dynamics
                 and self.parameters == other.parameters
                 and self.mass == other.mass
+                and self.role == other.role
             ):
                 return True
         return False
@@ -4363,7 +4544,7 @@ model3d (str): path to model file (valid from V1.1)
         name = element.attrib[&#34;name&#34;]
         mass = None
         if &#34;mass&#34; in element.attrib:
-            mass = element.attrib[&#34;mass&#34;]
+            mass = convert_float(element.attrib[&#34;mass&#34;])
         vehicle_type = getattr(VehicleCategory, element.attrib[&#34;vehicleCategory&#34;])
         model3d = None
         if &#34;model3d&#34; in element.attrib:
@@ -4379,14 +4560,19 @@ model3d (str): path to model file (valid from V1.1)
         properties = Properties.parse(element.find(&#34;Properties&#34;))
 
         performance = DynamicsConstraints.parse(element.find(&#34;Performance&#34;))
-        max_speed = performance.get_attributes()[&#34;maxSpeed&#34;]
-        max_acc = performance.get_attributes()[&#34;maxAcceleration&#34;]
-        max_dec = performance.get_attributes()[&#34;maxDeceleration&#34;]
+        max_speed = performance.max_speed
+        max_acc = performance.max_acceleration
+        max_dec = performance.max_deceleration
+        max_acc_rate = performance.max_acceleration_rate
+        max_dec_rate = performance.max_deceleration_rate
 
         axles_element = element.find(&#34;Axles&#34;)
         frontaxle = Axle.parse(axles_element.find(&#34;FrontAxle&#34;))
         rearaxle = Axle.parse(axles_element.find(&#34;RearAxle&#34;))
 
+        role = None
+        if &#34;role&#34; in element.attrib:
+            role = getattr(Role, element.attrib[&#34;role&#34;])
         vehicle = Vehicle(
             name,
             vehicle_type,
@@ -4398,6 +4584,9 @@ model3d (str): path to model file (valid from V1.1)
             max_dec,
             mass,
             model3d,
+            max_acc_rate,
+            max_dec_rate,
+            role,
         )
         vehicle.properties = properties
         vehicle.parameters = parameters
@@ -4499,6 +4688,8 @@ model3d (str): path to model file (valid from V1.1)
             retdict[&#34;mass&#34;] = str(self.mass)
         if not self.isVersion(minor=0) and self.model3d:
             retdict[&#34;model3d&#34;] = self.model3d
+        if self.role and not self.isVersion(minor=0) and not self.isVersion(minor=1):
+            retdict[&#34;role&#34;] = self.role.get_name()
 
         return retdict
 
@@ -4550,7 +4741,7 @@ def parse(element):
     name = element.attrib[&#34;name&#34;]
     mass = None
     if &#34;mass&#34; in element.attrib:
-        mass = element.attrib[&#34;mass&#34;]
+        mass = convert_float(element.attrib[&#34;mass&#34;])
     vehicle_type = getattr(VehicleCategory, element.attrib[&#34;vehicleCategory&#34;])
     model3d = None
     if &#34;model3d&#34; in element.attrib:
@@ -4566,14 +4757,19 @@ def parse(element):
     properties = Properties.parse(element.find(&#34;Properties&#34;))
 
     performance = DynamicsConstraints.parse(element.find(&#34;Performance&#34;))
-    max_speed = performance.get_attributes()[&#34;maxSpeed&#34;]
-    max_acc = performance.get_attributes()[&#34;maxAcceleration&#34;]
-    max_dec = performance.get_attributes()[&#34;maxDeceleration&#34;]
+    max_speed = performance.max_speed
+    max_acc = performance.max_acceleration
+    max_dec = performance.max_deceleration
+    max_acc_rate = performance.max_acceleration_rate
+    max_dec_rate = performance.max_deceleration_rate
 
     axles_element = element.find(&#34;Axles&#34;)
     frontaxle = Axle.parse(axles_element.find(&#34;FrontAxle&#34;))
     rearaxle = Axle.parse(axles_element.find(&#34;RearAxle&#34;))
 
+    role = None
+    if &#34;role&#34; in element.attrib:
+        role = getattr(Role, element.attrib[&#34;role&#34;])
     vehicle = Vehicle(
         name,
         vehicle_type,
@@ -4585,6 +4781,9 @@ def parse(element):
         max_dec,
         mass,
         model3d,
+        max_acc_rate,
+        max_dec_rate,
+        role,
     )
     vehicle.properties = properties
     vehicle.parameters = parameters
@@ -4785,6 +4984,8 @@ author (str): author of the catalog
         retdict[&#34;mass&#34;] = str(self.mass)
     if not self.isVersion(minor=0) and self.model3d:
         retdict[&#34;model3d&#34;] = self.model3d
+    if self.role and not self.isVersion(minor=0) and not self.isVersion(minor=1):
+        retdict[&#34;role&#34;] = self.role.get_name()
 
     return retdict</code></pre>
 </details>

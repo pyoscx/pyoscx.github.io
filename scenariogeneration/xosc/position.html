@@ -36,11 +36,11 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <pre><code class="python">&#34;&#34;&#34;
   scenariogeneration
   https://github.com/pyoscx/scenariogeneration
- 
+
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at https://mozilla.org/MPL/2.0/.
- 
+
   Copyright (c) 2022 The scenariogeneration Authors.
 
 &#34;&#34;&#34;
@@ -55,6 +55,7 @@ from .utils import (
     VersionBase,
     ParameterDeclarations,
     convert_bool,
+    get_bool_string,
     ReferenceContext,
     CatalogFile,
     Parameter,
@@ -201,8 +202,8 @@ class WorldPosition(_PositionType):
 
         &#34;&#34;&#34;
         position_element = element.find(&#34;WorldPosition&#34;)
-        x = float(position_element.attrib[&#34;x&#34;])
-        y = float(position_element.attrib[&#34;y&#34;])
+        x = convert_float(position_element.attrib[&#34;x&#34;])
+        y = convert_float(position_element.attrib[&#34;y&#34;])
         z = None
         h = None
         r = None
@@ -1223,8 +1224,8 @@ class RoutePositionInRoadCoordinates(_PositionType):
         road_coord_element = position_element.find(
             &#34;InRoutePosition/FromRoadCoordinates&#34;
         )
-        s = road_coord_element.attrib[&#34;pathS&#34;]
-        t = road_coord_element.attrib[&#34;t&#34;]
+        s = convert_float(road_coord_element.attrib[&#34;pathS&#34;])
+        t = convert_float(road_coord_element.attrib[&#34;t&#34;])
         route_element = position_element.find(&#34;RouteRef&#34;)
         if route_element.find(&#34;Route&#34;) != None:
             routeref = Route.parse(route_element.find(&#34;Route&#34;))
@@ -1351,10 +1352,10 @@ class RoutePositionInLaneCoordinates(_PositionType):
         lane_coord_element = position_element.find(
             &#34;InRoutePosition/FromLaneCoordinates&#34;
         )
-        s = lane_coord_element.attrib[&#34;pathS&#34;]
-        lane_id = lane_coord_element.attrib[&#34;laneId&#34;]
+        s = convert_float(lane_coord_element.attrib[&#34;pathS&#34;])
+        lane_id = convert_int(lane_coord_element.attrib[&#34;laneId&#34;])
         try:
-            offset = lane_coord_element.attrib[&#34;laneOffset&#34;]
+            offset = convert_float(lane_coord_element.attrib[&#34;laneOffset&#34;])
         except KeyError:
             offset = 0
         route_element = position_element.find(&#34;RouteRef&#34;)
@@ -1622,10 +1623,16 @@ class GeoPosition(_PositionType):
     def get_attributes(self):
         &#34;&#34;&#34;returns the attributes of the GeoPosition as a dict&#34;&#34;&#34;
         retdict = {}
-        retdict[&#34;longitude&#34;] = str(self.longitude)
-        retdict[&#34;latitude&#34;] = str(self.latitude)
-        if self.height is not None:
-            retdict[&#34;height&#34;] = str(self.height)
+        if self.isVersion(minor=1):
+            retdict[&#34;longitude&#34;] = str(self.longitude)
+            retdict[&#34;latitude&#34;] = str(self.latitude)
+            if self.height is not None:
+                retdict[&#34;height&#34;] = str(self.height)
+        else:
+            retdict[&#34;longitudeDeg&#34;] = str(self.longitude)
+            retdict[&#34;latitudeDeg&#34;] = str(self.latitude)
+            if self.height is not None:
+                retdict[&#34;altitude&#34;] = str(self.height)
         return retdict
 
     def get_element(self, elementname=&#34;Position&#34;):
@@ -2122,9 +2129,7 @@ class Route(VersionBase):
 
         &#34;&#34;&#34;
         self.name = name
-        if not isinstance(closed, bool):
-            raise TypeError(&#34;closed input is not of type bool&#34;)
-        self.closed = closed
+        self.closed = convert_bool(closed)
         self.waypoints = []
         self.parameters = ParameterDeclarations()
 
@@ -2223,7 +2228,7 @@ class Route(VersionBase):
         &#34;&#34;&#34;returns the attributes of the Route as a dict&#34;&#34;&#34;
         retdict = {}
         retdict[&#34;name&#34;] = self.name
-        retdict[&#34;closed&#34;] = convert_bool(self.closed)
+        retdict[&#34;closed&#34;] = get_bool_string(self.closed)
         return retdict
 
     def get_element(self):
@@ -2293,9 +2298,7 @@ class Trajectory(VersionBase):
         &#34;&#34;&#34;
 
         self.name = name
-        if not isinstance(closed, bool):
-            raise TypeError(&#34;closed input is not boolean&#34;)
-        self.closed = closed
+        self.closed = convert_bool(closed)
         self.parameters = ParameterDeclarations()
         self.shapes = None
 
@@ -2396,7 +2399,7 @@ class Trajectory(VersionBase):
         &#34;&#34;&#34;returns the attributes of the Trajectory as a dict&#34;&#34;&#34;
         retdict = {}
         retdict[&#34;name&#34;] = self.name
-        retdict[&#34;closed&#34;] = convert_bool(self.closed)
+        retdict[&#34;closed&#34;] = get_bool_string(self.closed)
         return retdict
 
     def get_element(self):
@@ -3252,10 +3255,16 @@ orientation (Orientation): Orietation of the entity
     def get_attributes(self):
         &#34;&#34;&#34;returns the attributes of the GeoPosition as a dict&#34;&#34;&#34;
         retdict = {}
-        retdict[&#34;longitude&#34;] = str(self.longitude)
-        retdict[&#34;latitude&#34;] = str(self.latitude)
-        if self.height is not None:
-            retdict[&#34;height&#34;] = str(self.height)
+        if self.isVersion(minor=1):
+            retdict[&#34;longitude&#34;] = str(self.longitude)
+            retdict[&#34;latitude&#34;] = str(self.latitude)
+            if self.height is not None:
+                retdict[&#34;height&#34;] = str(self.height)
+        else:
+            retdict[&#34;longitudeDeg&#34;] = str(self.longitude)
+            retdict[&#34;latitudeDeg&#34;] = str(self.latitude)
+            if self.height is not None:
+                retdict[&#34;altitude&#34;] = str(self.height)
         return retdict
 
     def get_element(self, elementname=&#34;Position&#34;):
@@ -3290,10 +3299,16 @@ orientation (Orientation): Orietation of the entity
 <pre><code class="python">def get_attributes(self):
     &#34;&#34;&#34;returns the attributes of the GeoPosition as a dict&#34;&#34;&#34;
     retdict = {}
-    retdict[&#34;longitude&#34;] = str(self.longitude)
-    retdict[&#34;latitude&#34;] = str(self.latitude)
-    if self.height is not None:
-        retdict[&#34;height&#34;] = str(self.height)
+    if self.isVersion(minor=1):
+        retdict[&#34;longitude&#34;] = str(self.longitude)
+        retdict[&#34;latitude&#34;] = str(self.latitude)
+        if self.height is not None:
+            retdict[&#34;height&#34;] = str(self.height)
+    else:
+        retdict[&#34;longitudeDeg&#34;] = str(self.longitude)
+        retdict[&#34;latitudeDeg&#34;] = str(self.latitude)
+        if self.height is not None:
+            retdict[&#34;altitude&#34;] = str(self.height)
     return retdict</code></pre>
 </details>
 </dd>
@@ -5728,9 +5743,7 @@ closed (boolean): if the waypoints forms a loop
 
         &#34;&#34;&#34;
         self.name = name
-        if not isinstance(closed, bool):
-            raise TypeError(&#34;closed input is not of type bool&#34;)
-        self.closed = closed
+        self.closed = convert_bool(closed)
         self.waypoints = []
         self.parameters = ParameterDeclarations()
 
@@ -5829,7 +5842,7 @@ closed (boolean): if the waypoints forms a loop
         &#34;&#34;&#34;returns the attributes of the Route as a dict&#34;&#34;&#34;
         retdict = {}
         retdict[&#34;name&#34;] = self.name
-        retdict[&#34;closed&#34;] = convert_bool(self.closed)
+        retdict[&#34;closed&#34;] = get_bool_string(self.closed)
         return retdict
 
     def get_element(self):
@@ -6021,7 +6034,7 @@ author (str): author of the catalog
     &#34;&#34;&#34;returns the attributes of the Route as a dict&#34;&#34;&#34;
     retdict = {}
     retdict[&#34;name&#34;] = self.name
-    retdict[&#34;closed&#34;] = convert_bool(self.closed)
+    retdict[&#34;closed&#34;] = get_bool_string(self.closed)
     return retdict</code></pre>
 </details>
 </dd>
@@ -6205,10 +6218,10 @@ orientation (Orientation): Oritation of the entity
         lane_coord_element = position_element.find(
             &#34;InRoutePosition/FromLaneCoordinates&#34;
         )
-        s = lane_coord_element.attrib[&#34;pathS&#34;]
-        lane_id = lane_coord_element.attrib[&#34;laneId&#34;]
+        s = convert_float(lane_coord_element.attrib[&#34;pathS&#34;])
+        lane_id = convert_int(lane_coord_element.attrib[&#34;laneId&#34;])
         try:
-            offset = lane_coord_element.attrib[&#34;laneOffset&#34;]
+            offset = convert_float(lane_coord_element.attrib[&#34;laneOffset&#34;])
         except KeyError:
             offset = 0
         route_element = position_element.find(&#34;RouteRef&#34;)
@@ -6281,10 +6294,10 @@ def parse(element):
     lane_coord_element = position_element.find(
         &#34;InRoutePosition/FromLaneCoordinates&#34;
     )
-    s = lane_coord_element.attrib[&#34;pathS&#34;]
-    lane_id = lane_coord_element.attrib[&#34;laneId&#34;]
+    s = convert_float(lane_coord_element.attrib[&#34;pathS&#34;])
+    lane_id = convert_int(lane_coord_element.attrib[&#34;laneId&#34;])
     try:
-        offset = lane_coord_element.attrib[&#34;laneOffset&#34;]
+        offset = convert_float(lane_coord_element.attrib[&#34;laneOffset&#34;])
     except KeyError:
         offset = 0
     route_element = position_element.find(&#34;RouteRef&#34;)
@@ -6468,8 +6481,8 @@ orientation (Orientation): Oritation of the entity
         road_coord_element = position_element.find(
             &#34;InRoutePosition/FromRoadCoordinates&#34;
         )
-        s = road_coord_element.attrib[&#34;pathS&#34;]
-        t = road_coord_element.attrib[&#34;t&#34;]
+        s = convert_float(road_coord_element.attrib[&#34;pathS&#34;])
+        t = convert_float(road_coord_element.attrib[&#34;t&#34;])
         route_element = position_element.find(&#34;RouteRef&#34;)
         if route_element.find(&#34;Route&#34;) != None:
             routeref = Route.parse(route_element.find(&#34;Route&#34;))
@@ -6536,8 +6549,8 @@ def parse(element):
     road_coord_element = position_element.find(
         &#34;InRoutePosition/FromRoadCoordinates&#34;
     )
-    s = road_coord_element.attrib[&#34;pathS&#34;]
-    t = road_coord_element.attrib[&#34;t&#34;]
+    s = convert_float(road_coord_element.attrib[&#34;pathS&#34;])
+    t = convert_float(road_coord_element.attrib[&#34;t&#34;])
     route_element = position_element.find(&#34;RouteRef&#34;)
     if route_element.find(&#34;Route&#34;) != None:
         routeref = Route.parse(route_element.find(&#34;Route&#34;))
@@ -6902,9 +6915,7 @@ get_attributes()
         &#34;&#34;&#34;
 
         self.name = name
-        if not isinstance(closed, bool):
-            raise TypeError(&#34;closed input is not boolean&#34;)
-        self.closed = closed
+        self.closed = convert_bool(closed)
         self.parameters = ParameterDeclarations()
         self.shapes = None
 
@@ -7005,7 +7016,7 @@ get_attributes()
         &#34;&#34;&#34;returns the attributes of the Trajectory as a dict&#34;&#34;&#34;
         retdict = {}
         retdict[&#34;name&#34;] = self.name
-        retdict[&#34;closed&#34;] = convert_bool(self.closed)
+        retdict[&#34;closed&#34;] = get_bool_string(self.closed)
         return retdict
 
     def get_element(self):
@@ -7196,7 +7207,7 @@ author (str): author of the catalog
     &#34;&#34;&#34;returns the attributes of the Trajectory as a dict&#34;&#34;&#34;
     retdict = {}
     retdict[&#34;name&#34;] = self.name
-    retdict[&#34;closed&#34;] = convert_bool(self.closed)
+    retdict[&#34;closed&#34;] = get_bool_string(self.closed)
     return retdict</code></pre>
 </details>
 </dd>
@@ -7851,8 +7862,8 @@ r (float): roll of the entity
 
         &#34;&#34;&#34;
         position_element = element.find(&#34;WorldPosition&#34;)
-        x = float(position_element.attrib[&#34;x&#34;])
-        y = float(position_element.attrib[&#34;y&#34;])
+        x = convert_float(position_element.attrib[&#34;x&#34;])
+        y = convert_float(position_element.attrib[&#34;y&#34;])
         z = None
         h = None
         r = None
@@ -7928,8 +7939,8 @@ def parse(element):
 
     &#34;&#34;&#34;
     position_element = element.find(&#34;WorldPosition&#34;)
-    x = float(position_element.attrib[&#34;x&#34;])
-    y = float(position_element.attrib[&#34;y&#34;])
+    x = convert_float(position_element.attrib[&#34;x&#34;])
+    y = convert_float(position_element.attrib[&#34;y&#34;])
     z = None
     h = None
     r = None
