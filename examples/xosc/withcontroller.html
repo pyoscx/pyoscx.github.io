@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>examples.xosc.parallel_distance_actions API documentation</title>
+<title>examples.xosc.withcontroller API documentation</title>
 <meta name="description" content="scenariogeneration
 https://github.com/pyoscx/scenariogeneration …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -20,7 +20,7 @@ https://github.com/pyoscx/scenariogeneration …" />
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>examples.xosc.parallel_distance_actions</code></h1>
+<h1 class="title">Module <code>examples.xosc.withcontroller</code></h1>
 </header>
 <section id="section-intro">
 <p>scenariogeneration
@@ -29,20 +29,14 @@ https://github.com/pyoscx/scenariogeneration …" />
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
 <p>Copyright (c) 2022 The scenariogeneration Authors.</p>
-<p>Simple example showing how one vehicle triggers two different actions based on different distance related triggers</p>
+<p>An example how to add a sumo controller to an object</p>
 <p>Some features used:</p>
 <ul>
 <li>
-<p>ReachPositionCondition</p>
+<p>Controller</p>
 </li>
 <li>
-<p>RelativeDistanceCondition</p>
-</li>
-<li>
-<p>RelativeLaneChangeAction</p>
-</li>
-<li>
-<p>AbsoluteSpeedAction</p>
+<p>Properties</p>
 </li>
 </ul>
 <details class="source">
@@ -59,18 +53,17 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 
   Copyright (c) 2022 The scenariogeneration Authors.
 
-    Simple example showing how one vehicle triggers two different actions based on different distance related triggers
+    An example how to add a sumo controller to an object
+
 
     Some features used:
 
-    - ReachPositionCondition
+    - Controller
 
-    - RelativeDistanceCondition
+    - Properties
 
-    - RelativeLaneChangeAction
-
-    - AbsoluteSpeedAction
 &#34;&#34;&#34;
+
 import os
 from scenariogeneration import xosc, prettyprint, ScenarioGenerator
 
@@ -93,108 +86,76 @@ class Scenario(ScenarioGenerator):
         ### create parameters
         paramdec = xosc.ParameterDeclarations()
 
+        paramdec.add_parameter(
+            xosc.Parameter(&#34;$HostVehicle&#34;, xosc.ParameterType.string, &#34;car_white&#34;)
+        )
+        paramdec.add_parameter(
+            xosc.Parameter(&#34;$TargetVehicle&#34;, xosc.ParameterType.string, &#34;car_red&#34;)
+        )
+
+        ### create vehicles
+
+        bb = xosc.BoundingBox(2, 5, 1.8, 2.0, 0, 0.9)
+        fa = xosc.Axle(0.523598775598, 0.8, 1.68, 2.98, 0.4)
+        ba = xosc.Axle(0.523598775598, 0.8, 1.68, 0, 0.4)
+        white_veh = xosc.Vehicle(
+            &#34;car_white&#34;, xosc.VehicleCategory.car, bb, fa, ba, 69, 10, 10
+        )
+
+        white_veh.add_property_file(&#34;../models/car_white.osgb&#34;)
+        white_veh.add_property(&#34;model_id&#34;, &#34;0&#34;)
+
+        bb = xosc.BoundingBox(1.8, 4.5, 1.5, 1.3, 0, 0.8)
+        fa = xosc.Axle(0.523598775598, 0.8, 1.68, 2.98, 0.4)
+        ba = xosc.Axle(0.523598775598, 0.8, 1.68, 0, 0.4)
+        red_veh = xosc.Vehicle(
+            &#34;car_red&#34;, xosc.VehicleCategory.car, bb, fa, ba, 69, 10, 10
+        )
+
+        red_veh.add_property_file(&#34;../models/car_red.osgb&#34;)
+        red_veh.add_property(&#34;model_id&#34;, &#34;2&#34;)
+
         ## create entities
 
         egoname = &#34;Ego&#34;
-        egoref = &#34;Egofake&#34;
         targetname = &#34;Target&#34;
+        prop = xosc.Properties()
+        prop.add_property(name=&#34;esminiController&#34;, value=&#34;SumoController&#34;)
+        prop.add_file(&#34;../sumo_inputs/e6mini.sumocfg&#34;)
+        cont = xosc.Controller(&#34;mycontroler&#34;, prop)
+        # cont.dump_to_catalog(&#39;Controller.xosc&#39;,&#39;Controller&#39;,&#39;controllers&#39;,&#39;Mandolin&#39;)
+
         entities = xosc.Entities()
-        entities.add_scenario_object(
-            egoname, xosc.CatalogReference(&#34;VehicleCatalog&#34;, &#34;car_white&#34;)
-        )
-        entities.add_scenario_object(
-            targetname, xosc.CatalogReference(&#34;VehicleCatalog&#34;, &#34;car_yellow&#34;)
-        )
+        entities.add_scenario_object(egoname, white_veh)
+        entities.add_scenario_object(targetname, red_veh, cont)
 
         ### create init
 
         init = xosc.Init()
-
-        init.add_init_action(
-            egoname, xosc.TeleportAction(xosc.LanePosition(10, 0, -4, 0))
-        )
-        init.add_init_action(
-            egoname,
-            xosc.AbsoluteSpeedAction(
-                20,
-                xosc.TransitionDynamics(
-                    xosc.DynamicsShapes.step, xosc.DynamicsDimension.time, 1
-                ),
-            ),
+        step_time = xosc.TransitionDynamics(
+            xosc.DynamicsShapes.step, xosc.DynamicsDimension.time, 1
         )
 
-        init.add_init_action(
-            targetname, xosc.TeleportAction(xosc.LanePosition(50, 0, -2, 0))
-        )
-        init.add_init_action(
-            targetname,
-            xosc.AbsoluteSpeedAction(
-                10,
-                xosc.TransitionDynamics(
-                    xosc.DynamicsShapes.step, xosc.DynamicsDimension.time, 1
-                ),
-            ),
-        )
+        egospeed = xosc.AbsoluteSpeedAction(10, step_time)
+        egostart = xosc.TeleportAction(xosc.LanePosition(25, 0, -3, 0))
 
-        ## do lanechange
-        lc_cond = xosc.ReachPositionCondition(xosc.LanePosition(40, 0, -4, 0), 1)
-        lc_event = xosc.Event(&#34;lanechange&#34;, xosc.Priority.parallel)
-        lc_event.add_action(
-            &#34;lanechangeaction&#34;,
-            xosc.RelativeLaneChangeAction(
-                -1,
-                targetname,
-                xosc.TransitionDynamics(
-                    xosc.DynamicsShapes.sinusoidal, xosc.DynamicsDimension.time, 3
-                ),
-            ),
-        )
-        lc_event.add_trigger(
-            xosc.EntityTrigger(
-                &#34;lanechangetrigger&#34;, 0, xosc.ConditionEdge.none, lc_cond, egoname
-            )
-        )
+        init.add_init_action(egoname, egospeed)
+        init.add_init_action(egoname, egostart)
 
-        event = xosc.Event(&#34;speedchange&#34;, xosc.Priority.parallel)
-        event.add_action(
-            &#34;speedaction&#34;,
-            xosc.AbsoluteSpeedAction(
-                10,
-                xosc.TransitionDynamics(
-                    xosc.DynamicsShapes.linear, xosc.DynamicsDimension.time, 3
-                ),
-            ),
+        ## create the story
+        storyparam = xosc.ParameterDeclarations()
+        storyparam.add_parameter(
+            xosc.Parameter(&#34;$owner&#34;, xosc.ParameterType.string, targetname)
         )
-        trig_cond = xosc.RelativeDistanceCondition(
-            5, xosc.Rule.lessThan, xosc.RelativeDistanceType.lateral, targetname
-        )
-        event.add_trigger(
-            xosc.EntityTrigger(
-                &#34;trigger&#34;, 0, xosc.ConditionEdge.none, trig_cond, egoname
-            )
-        )
-
-        man = xosc.Maneuver(&#34;mymaneuver&#34;)
-        man.add_event(lc_event)
-        man.add_event(event)
+        story = xosc.Story(&#34;mystory&#34;, storyparam)
 
         ## create the storyboard
-        sb = xosc.StoryBoard(
-            init,
-            xosc.ValueTrigger(
-                &#34;stop_simulation&#34;,
-                0,
-                xosc.ConditionEdge.rising,
-                xosc.SimulationTimeCondition(20, xosc.Rule.greaterThan),
-                &#34;stop&#34;,
-            ),
-        )
+        sb = xosc.StoryBoard(init)
 
-        sb.add_maneuver(man, egoname)
         ## create the scenario
         sce = xosc.Scenario(
-            &#34;adaptspeed_example&#34;,
-            &#34;User&#34;,
+            &#34;adapt_speed_example&#34;,
+            &#34;Mandolin&#34;,
             paramdec,
             entities=entities,
             storyboard=sb,
@@ -227,7 +188,7 @@ if __name__ == &#34;__main__&#34;:
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="examples.xosc.parallel_distance_actions.Scenario"><code class="flex name class">
+<dt id="examples.xosc.withcontroller.Scenario"><code class="flex name class">
 <span>class <span class="ident">Scenario</span></span>
 </code></dt>
 <dd>
@@ -269,108 +230,76 @@ number_of_parallel_writings (int): parallelize the writing of the xml files
         ### create parameters
         paramdec = xosc.ParameterDeclarations()
 
+        paramdec.add_parameter(
+            xosc.Parameter(&#34;$HostVehicle&#34;, xosc.ParameterType.string, &#34;car_white&#34;)
+        )
+        paramdec.add_parameter(
+            xosc.Parameter(&#34;$TargetVehicle&#34;, xosc.ParameterType.string, &#34;car_red&#34;)
+        )
+
+        ### create vehicles
+
+        bb = xosc.BoundingBox(2, 5, 1.8, 2.0, 0, 0.9)
+        fa = xosc.Axle(0.523598775598, 0.8, 1.68, 2.98, 0.4)
+        ba = xosc.Axle(0.523598775598, 0.8, 1.68, 0, 0.4)
+        white_veh = xosc.Vehicle(
+            &#34;car_white&#34;, xosc.VehicleCategory.car, bb, fa, ba, 69, 10, 10
+        )
+
+        white_veh.add_property_file(&#34;../models/car_white.osgb&#34;)
+        white_veh.add_property(&#34;model_id&#34;, &#34;0&#34;)
+
+        bb = xosc.BoundingBox(1.8, 4.5, 1.5, 1.3, 0, 0.8)
+        fa = xosc.Axle(0.523598775598, 0.8, 1.68, 2.98, 0.4)
+        ba = xosc.Axle(0.523598775598, 0.8, 1.68, 0, 0.4)
+        red_veh = xosc.Vehicle(
+            &#34;car_red&#34;, xosc.VehicleCategory.car, bb, fa, ba, 69, 10, 10
+        )
+
+        red_veh.add_property_file(&#34;../models/car_red.osgb&#34;)
+        red_veh.add_property(&#34;model_id&#34;, &#34;2&#34;)
+
         ## create entities
 
         egoname = &#34;Ego&#34;
-        egoref = &#34;Egofake&#34;
         targetname = &#34;Target&#34;
+        prop = xosc.Properties()
+        prop.add_property(name=&#34;esminiController&#34;, value=&#34;SumoController&#34;)
+        prop.add_file(&#34;../sumo_inputs/e6mini.sumocfg&#34;)
+        cont = xosc.Controller(&#34;mycontroler&#34;, prop)
+        # cont.dump_to_catalog(&#39;Controller.xosc&#39;,&#39;Controller&#39;,&#39;controllers&#39;,&#39;Mandolin&#39;)
+
         entities = xosc.Entities()
-        entities.add_scenario_object(
-            egoname, xosc.CatalogReference(&#34;VehicleCatalog&#34;, &#34;car_white&#34;)
-        )
-        entities.add_scenario_object(
-            targetname, xosc.CatalogReference(&#34;VehicleCatalog&#34;, &#34;car_yellow&#34;)
-        )
+        entities.add_scenario_object(egoname, white_veh)
+        entities.add_scenario_object(targetname, red_veh, cont)
 
         ### create init
 
         init = xosc.Init()
-
-        init.add_init_action(
-            egoname, xosc.TeleportAction(xosc.LanePosition(10, 0, -4, 0))
-        )
-        init.add_init_action(
-            egoname,
-            xosc.AbsoluteSpeedAction(
-                20,
-                xosc.TransitionDynamics(
-                    xosc.DynamicsShapes.step, xosc.DynamicsDimension.time, 1
-                ),
-            ),
+        step_time = xosc.TransitionDynamics(
+            xosc.DynamicsShapes.step, xosc.DynamicsDimension.time, 1
         )
 
-        init.add_init_action(
-            targetname, xosc.TeleportAction(xosc.LanePosition(50, 0, -2, 0))
-        )
-        init.add_init_action(
-            targetname,
-            xosc.AbsoluteSpeedAction(
-                10,
-                xosc.TransitionDynamics(
-                    xosc.DynamicsShapes.step, xosc.DynamicsDimension.time, 1
-                ),
-            ),
-        )
+        egospeed = xosc.AbsoluteSpeedAction(10, step_time)
+        egostart = xosc.TeleportAction(xosc.LanePosition(25, 0, -3, 0))
 
-        ## do lanechange
-        lc_cond = xosc.ReachPositionCondition(xosc.LanePosition(40, 0, -4, 0), 1)
-        lc_event = xosc.Event(&#34;lanechange&#34;, xosc.Priority.parallel)
-        lc_event.add_action(
-            &#34;lanechangeaction&#34;,
-            xosc.RelativeLaneChangeAction(
-                -1,
-                targetname,
-                xosc.TransitionDynamics(
-                    xosc.DynamicsShapes.sinusoidal, xosc.DynamicsDimension.time, 3
-                ),
-            ),
-        )
-        lc_event.add_trigger(
-            xosc.EntityTrigger(
-                &#34;lanechangetrigger&#34;, 0, xosc.ConditionEdge.none, lc_cond, egoname
-            )
-        )
+        init.add_init_action(egoname, egospeed)
+        init.add_init_action(egoname, egostart)
 
-        event = xosc.Event(&#34;speedchange&#34;, xosc.Priority.parallel)
-        event.add_action(
-            &#34;speedaction&#34;,
-            xosc.AbsoluteSpeedAction(
-                10,
-                xosc.TransitionDynamics(
-                    xosc.DynamicsShapes.linear, xosc.DynamicsDimension.time, 3
-                ),
-            ),
+        ## create the story
+        storyparam = xosc.ParameterDeclarations()
+        storyparam.add_parameter(
+            xosc.Parameter(&#34;$owner&#34;, xosc.ParameterType.string, targetname)
         )
-        trig_cond = xosc.RelativeDistanceCondition(
-            5, xosc.Rule.lessThan, xosc.RelativeDistanceType.lateral, targetname
-        )
-        event.add_trigger(
-            xosc.EntityTrigger(
-                &#34;trigger&#34;, 0, xosc.ConditionEdge.none, trig_cond, egoname
-            )
-        )
-
-        man = xosc.Maneuver(&#34;mymaneuver&#34;)
-        man.add_event(lc_event)
-        man.add_event(event)
+        story = xosc.Story(&#34;mystory&#34;, storyparam)
 
         ## create the storyboard
-        sb = xosc.StoryBoard(
-            init,
-            xosc.ValueTrigger(
-                &#34;stop_simulation&#34;,
-                0,
-                xosc.ConditionEdge.rising,
-                xosc.SimulationTimeCondition(20, xosc.Rule.greaterThan),
-                &#34;stop&#34;,
-            ),
-        )
+        sb = xosc.StoryBoard(init)
 
-        sb.add_maneuver(man, egoname)
         ## create the scenario
         sce = xosc.Scenario(
-            &#34;adaptspeed_example&#34;,
-            &#34;User&#34;,
+            &#34;adapt_speed_example&#34;,
+            &#34;Mandolin&#34;,
             paramdec,
             entities=entities,
             storyboard=sb,
@@ -414,7 +343,7 @@ number_of_parallel_writings (int): parallelize the writing of the xml files
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="examples.xosc.parallel_distance_actions.Scenario" href="#examples.xosc.parallel_distance_actions.Scenario">Scenario</a></code></h4>
+<h4><code><a title="examples.xosc.withcontroller.Scenario" href="#examples.xosc.withcontroller.Scenario">Scenario</a></code></h4>
 </li>
 </ul>
 </li>

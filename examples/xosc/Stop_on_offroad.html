@@ -52,13 +52,13 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <pre><code class="python">&#34;&#34;&#34;
   scenariogeneration
   https://github.com/pyoscx/scenariogeneration
- 
+
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at https://mozilla.org/MPL/2.0/.
- 
+
   Copyright (c) 2022 The scenariogeneration Authors.
-  
+
     Simple example showing how one vehicle triggers based on the speed of another vehicle, then changes its speed
 
     Some features used:
@@ -72,161 +72,173 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
     - OffroadCondition
 &#34;&#34;&#34;
 import os
-from scenariogeneration import xosc, prettyprint
-
-### create catalogs
-catalog = xosc.Catalog()
-catalog.add_catalog(&#34;VehicleCatalog&#34;, &#34;../xosc/Catalogs/Vehicles&#34;)
-
-### create road
-road = xosc.RoadNetwork(
-    roadfile=&#34;../xodr/e6mini.xodr&#34;, scenegraph=&#34;../models/e6mini.osgb&#34;
-)
+from scenariogeneration import xosc, prettyprint, ScenarioGenerator
 
 
-### create parameters
-paramdec = xosc.ParameterDeclarations()
+class Scenario(ScenarioGenerator):
+    def __init__(self):
+        super().__init__()
+        self.open_scenario_version = 2
 
-paramdec.add_parameter(
-    xosc.Parameter(&#34;$HostVehicle&#34;, xosc.ParameterType.string, &#34;car_white&#34;)
-)
-paramdec.add_parameter(
-    xosc.Parameter(&#34;$TargetVehicle&#34;, xosc.ParameterType.string, &#34;car_red&#34;)
-)
+    def scenario(self, **kwargs):
+        ### create catalogs
+        catalog = xosc.Catalog()
+        catalog.add_catalog(&#34;VehicleCatalog&#34;, &#34;../xosc/Catalogs/Vehicles&#34;)
 
-### create vehicles
+        ### create road
+        road = xosc.RoadNetwork(
+            roadfile=&#34;../xodr/e6mini.xodr&#34;, scenegraph=&#34;../models/e6mini.osgb&#34;
+        )
 
-bb = xosc.BoundingBox(2, 5, 1.8, 2.0, 0, 0.9)
-fa = xosc.Axle(0.523598775598, 0.8, 1.68, 2.98, 0.4)
-ba = xosc.Axle(0.523598775598, 0.8, 1.68, 0, 0.4)
-white_veh = xosc.Vehicle(&#34;car_white&#34;, xosc.VehicleCategory.car, bb, fa, ba, 69, 10, 10)
+        ### create parameters
+        paramdec = xosc.ParameterDeclarations()
 
-white_veh.add_property_file(&#34;../models/car_white.osgb&#34;)
-white_veh.add_property(&#34;model_id&#34;, &#34;0&#34;)
+        paramdec.add_parameter(
+            xosc.Parameter(&#34;$HostVehicle&#34;, xosc.ParameterType.string, &#34;car_white&#34;)
+        )
+        paramdec.add_parameter(
+            xosc.Parameter(&#34;$TargetVehicle&#34;, xosc.ParameterType.string, &#34;car_red&#34;)
+        )
+
+        ### create vehicles
+
+        bb = xosc.BoundingBox(2, 5, 1.8, 2.0, 0, 0.9)
+        fa = xosc.Axle(0.523598775598, 0.8, 1.68, 2.98, 0.4)
+        ba = xosc.Axle(0.523598775598, 0.8, 1.68, 0, 0.4)
+        white_veh = xosc.Vehicle(
+            &#34;car_white&#34;, xosc.VehicleCategory.car, bb, fa, ba, 69, 10, 10
+        )
+
+        white_veh.add_property_file(&#34;../models/car_white.osgb&#34;)
+        white_veh.add_property(&#34;model_id&#34;, &#34;0&#34;)
+
+        bb = xosc.BoundingBox(1.8, 4.5, 1.5, 1.3, 0, 0.8)
+        fa = xosc.Axle(0.523598775598, 0.8, 1.68, 2.98, 0.4)
+        ba = xosc.Axle(0.523598775598, 0.8, 1.68, 0, 0.4)
+        red_veh = xosc.Vehicle(
+            &#34;car_red&#34;, xosc.VehicleCategory.car, bb, fa, ba, 69, 10, 10
+        )
+
+        red_veh.add_property_file(&#34;../models/car_red.osgb&#34;)
+        red_veh.add_property(&#34;model_id&#34;, &#34;2&#34;)
+
+        ## create entities
+
+        egoname = &#34;Ego&#34;
+        targetname = &#34;Target&#34;
+
+        entities = xosc.Entities()
+        entities.add_scenario_object(egoname, white_veh)
+        entities.add_scenario_object(targetname, red_veh)
+
+        ### create init
+
+        init = xosc.Init()
+        step_time = xosc.TransitionDynamics(
+            xosc.DynamicsShapes.step, xosc.DynamicsDimension.time, 1
+        )
+
+        egospeed = xosc.AbsoluteSpeedAction(
+            25,
+            xosc.TransitionDynamics(
+                xosc.DynamicsShapes.sinusoidal, xosc.DynamicsDimension.time, 8
+            ),
+        )
+        egostart = xosc.TeleportAction(xosc.LanePosition(25, 0, -3, 0))
+
+        targetspeed = xosc.AbsoluteSpeedAction(15, step_time)
+        targetstart = xosc.TeleportAction(xosc.RoadPosition(30, -5, 0))
+
+        init.add_init_action(egoname, egospeed)
+        init.add_init_action(egoname, egostart)
+        init.add_init_action(targetname, targetspeed)
+        init.add_init_action(targetname, targetstart)
+
+        ### create an event
+
+        trigcond = xosc.RelativeSpeedCondition(0, xosc.Rule.lessThan, egoname)
+
+        trigger = xosc.EntityTrigger(
+            &#34;mytesttrigger&#34;, 0.2, xosc.ConditionEdge.none, trigcond, targetname
+        )
+
+        event = xosc.Event(&#34;myfirstevent&#34;, xosc.Priority.overwrite)
+        event.add_trigger(trigger)
+
+        sin_time = xosc.TransitionDynamics(
+            xosc.DynamicsShapes.linear, xosc.DynamicsDimension.time, 5
+        )
+        action = xosc.RelativeLaneChangeAction(
+            -8,
+            targetname,
+            xosc.TransitionDynamics(
+                xosc.DynamicsShapes.linear, xosc.DynamicsDimension.time, 6
+            ),
+            -10,
+        )
+        event.add_action(&#34;newspeed&#34;, action)
+
+        ## create the maneuver
+        man = xosc.Maneuver(&#34;my_maneuver&#34;)
+        man.add_event(event)
+
+        mangr = xosc.ManeuverGroup(&#34;mangroup&#34;)
+        mangr.add_actor(targetname)
+        mangr.add_maneuver(man)
+        starttrigger = xosc.ValueTrigger(
+            &#34;starttrigger&#34;,
+            0,
+            xosc.ConditionEdge.rising,
+            xosc.SimulationTimeCondition(0, xosc.Rule.greaterThan),
+        )
+        act = xosc.Act(&#34;my_act&#34;, starttrigger)
+        act.add_maneuver_group(mangr)
+
+        ## create the story
+        storyparam = xosc.ParameterDeclarations()
+        storyparam.add_parameter(
+            xosc.Parameter(&#34;$owner&#34;, xosc.ParameterType.string, targetname)
+        )
+        story = xosc.Story(&#34;mystory&#34;, storyparam)
+        story.add_act(act)
+
+        ## create the storyboard
+        stoptrigger = xosc.EntityTrigger(
+            &#34;stop_simulation&#34;,
+            0.5,
+            xosc.ConditionEdge.rising,
+            xosc.OffroadCondition(0.5),
+            targetname,
+            triggeringpoint=&#34;stop&#34;,
+        )
+        sb = xosc.StoryBoard(init, stoptrigger)
+        sb.add_story(story)
+
+        ## create the scenario
+        sce = xosc.Scenario(
+            &#34;adapt_speed_example&#34;,
+            &#34;Mandolin&#34;,
+            paramdec,
+            entities=entities,
+            storyboard=sb,
+            roadnetwork=road,
+            catalog=catalog,
+            osc_minor_version=self.open_scenario_version,
+        )
+        return sce
 
 
-bb = xosc.BoundingBox(1.8, 4.5, 1.5, 1.3, 0, 0.8)
-fa = xosc.Axle(0.523598775598, 0.8, 1.68, 2.98, 0.4)
-ba = xosc.Axle(0.523598775598, 0.8, 1.68, 0, 0.4)
-red_veh = xosc.Vehicle(&#34;car_red&#34;, xosc.VehicleCategory.car, bb, fa, ba, 69, 10, 10)
+if __name__ == &#34;__main__&#34;:
+    sce = Scenario()
+    # Print the resulting xml
+    prettyprint(sce.scenario().get_element())
 
-red_veh.add_property_file(&#34;../models/car_red.osgb&#34;)
-red_veh.add_property(&#34;model_id&#34;, &#34;2&#34;)
+    # write the OpenSCENARIO file as xosc using current script name
+    sce.generate(&#34;.&#34;)
 
-## create entities
-
-egoname = &#34;Ego&#34;
-targetname = &#34;Target&#34;
-
-entities = xosc.Entities()
-entities.add_scenario_object(egoname, white_veh)
-entities.add_scenario_object(targetname, red_veh)
-
-
-### create init
-
-init = xosc.Init()
-step_time = xosc.TransitionDynamics(
-    xosc.DynamicsShapes.step, xosc.DynamicsDimension.time, 1
-)
-
-egospeed = xosc.AbsoluteSpeedAction(
-    25,
-    xosc.TransitionDynamics(
-        xosc.DynamicsShapes.sinusoidal, xosc.DynamicsDimension.time, 8
-    ),
-)
-egostart = xosc.TeleportAction(xosc.LanePosition(25, 0, -3, 0))
-
-targetspeed = xosc.AbsoluteSpeedAction(15, step_time)
-targetstart = xosc.TeleportAction(xosc.RoadPosition(30, -5, 0))
-
-init.add_init_action(egoname, egospeed)
-init.add_init_action(egoname, egostart)
-init.add_init_action(targetname, targetspeed)
-init.add_init_action(targetname, targetstart)
-
-
-### create an event
-
-trigcond = xosc.RelativeSpeedCondition(0, xosc.Rule.lessThan, egoname)
-
-trigger = xosc.EntityTrigger(
-    &#34;mytesttrigger&#34;, 0.2, xosc.ConditionEdge.none, trigcond, targetname
-)
-
-event = xosc.Event(&#34;myfirstevent&#34;, xosc.Priority.overwrite)
-event.add_trigger(trigger)
-
-sin_time = xosc.TransitionDynamics(
-    xosc.DynamicsShapes.linear, xosc.DynamicsDimension.time, 5
-)
-action = xosc.RelativeLaneChangeAction(
-    -8,
-    targetname,
-    xosc.TransitionDynamics(xosc.DynamicsShapes.linear, xosc.DynamicsDimension.time, 6),
-    -10,
-)
-event.add_action(&#34;newspeed&#34;, action)
-
-
-## create the maneuver
-man = xosc.Maneuver(&#34;my_maneuver&#34;)
-man.add_event(event)
-
-mangr = xosc.ManeuverGroup(&#34;mangroup&#34;)
-mangr.add_actor(targetname)
-mangr.add_maneuver(man)
-starttrigger = xosc.ValueTrigger(
-    &#34;starttrigger&#34;,
-    0,
-    xosc.ConditionEdge.rising,
-    xosc.SimulationTimeCondition(0, xosc.Rule.greaterThan),
-)
-act = xosc.Act(&#34;my_act&#34;, starttrigger)
-act.add_maneuver_group(mangr)
-
-## create the story
-storyparam = xosc.ParameterDeclarations()
-storyparam.add_parameter(
-    xosc.Parameter(&#34;$owner&#34;, xosc.ParameterType.string, targetname)
-)
-story = xosc.Story(&#34;mystory&#34;, storyparam)
-story.add_act(act)
-
-
-## create the storyboard
-stoptrigger = xosc.EntityTrigger(
-    &#34;stop_simulation&#34;,
-    0.5,
-    xosc.ConditionEdge.rising,
-    xosc.OffroadCondition(0.5),
-    targetname,
-    triggeringpoint=&#34;stop&#34;,
-)
-sb = xosc.StoryBoard(init, stoptrigger)
-sb.add_story(story)
-
-## create the scenario
-sce = xosc.Scenario(
-    &#34;adapt_speed_example&#34;,
-    &#34;Mandolin&#34;,
-    paramdec,
-    entities=entities,
-    storyboard=sb,
-    roadnetwork=road,
-    catalog=catalog,
-)
-
-# Print the resulting xml
-prettyprint(sce.get_element())
-
-# write the OpenSCENARIO file as xosc using current script name
-sce.write_xml(os.path.basename(__file__).replace(&#34;.py&#34;, &#34;.xosc&#34;))
-
-# uncomment the following lines to display the scenario using esmini
-# from scenariogeneration import esmini
-# esmini(sce,os.path.join(&#39;esmini&#39;))</code></pre>
+    # uncomment the following lines to display the scenario using esmini
+    # from scenariogeneration import esmini
+    # esmini(sce,os.path.join(&#39;esmini&#39;))</code></pre>
 </details>
 </section>
 <section>
@@ -236,6 +248,202 @@ sce.write_xml(os.path.basename(__file__).replace(&#34;.py&#34;, &#34;.xosc&#34;)
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="examples.xosc.Stop_on_offroad.Scenario"><code class="flex name class">
+<span>class <span class="ident">Scenario</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>ScenarioTemplate is a class that should be inherited by a Scenario class in order to generate xodr and xosc files based on pyoscx and pyodrx</p>
+<p>Two main uses, in your generation class define self.parameters as either as
+- a dict of lists, where the lists are the values you want to sweep over, all permutations of these sets will be generated
+- a list of dicts, where the dicts are identical and each element in the list is one scenario</p>
+<h2 id="attributes">Attributes</h2>
+<pre><code>road_file (str): name of the roadfile
+
+parameters (dict of lists, or list of dicts): parameter sets to be used
+
+naming (str): two options "numerical" or "parameter"
+
+generate_all_roads (bool): will only generate unique roads
+
+number_of_parallel_writings (int): parallelize the writing of the xml files
+    Default: 1 (no parallelization)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Scenario(ScenarioGenerator):
+    def __init__(self):
+        super().__init__()
+        self.open_scenario_version = 2
+
+    def scenario(self, **kwargs):
+        ### create catalogs
+        catalog = xosc.Catalog()
+        catalog.add_catalog(&#34;VehicleCatalog&#34;, &#34;../xosc/Catalogs/Vehicles&#34;)
+
+        ### create road
+        road = xosc.RoadNetwork(
+            roadfile=&#34;../xodr/e6mini.xodr&#34;, scenegraph=&#34;../models/e6mini.osgb&#34;
+        )
+
+        ### create parameters
+        paramdec = xosc.ParameterDeclarations()
+
+        paramdec.add_parameter(
+            xosc.Parameter(&#34;$HostVehicle&#34;, xosc.ParameterType.string, &#34;car_white&#34;)
+        )
+        paramdec.add_parameter(
+            xosc.Parameter(&#34;$TargetVehicle&#34;, xosc.ParameterType.string, &#34;car_red&#34;)
+        )
+
+        ### create vehicles
+
+        bb = xosc.BoundingBox(2, 5, 1.8, 2.0, 0, 0.9)
+        fa = xosc.Axle(0.523598775598, 0.8, 1.68, 2.98, 0.4)
+        ba = xosc.Axle(0.523598775598, 0.8, 1.68, 0, 0.4)
+        white_veh = xosc.Vehicle(
+            &#34;car_white&#34;, xosc.VehicleCategory.car, bb, fa, ba, 69, 10, 10
+        )
+
+        white_veh.add_property_file(&#34;../models/car_white.osgb&#34;)
+        white_veh.add_property(&#34;model_id&#34;, &#34;0&#34;)
+
+        bb = xosc.BoundingBox(1.8, 4.5, 1.5, 1.3, 0, 0.8)
+        fa = xosc.Axle(0.523598775598, 0.8, 1.68, 2.98, 0.4)
+        ba = xosc.Axle(0.523598775598, 0.8, 1.68, 0, 0.4)
+        red_veh = xosc.Vehicle(
+            &#34;car_red&#34;, xosc.VehicleCategory.car, bb, fa, ba, 69, 10, 10
+        )
+
+        red_veh.add_property_file(&#34;../models/car_red.osgb&#34;)
+        red_veh.add_property(&#34;model_id&#34;, &#34;2&#34;)
+
+        ## create entities
+
+        egoname = &#34;Ego&#34;
+        targetname = &#34;Target&#34;
+
+        entities = xosc.Entities()
+        entities.add_scenario_object(egoname, white_veh)
+        entities.add_scenario_object(targetname, red_veh)
+
+        ### create init
+
+        init = xosc.Init()
+        step_time = xosc.TransitionDynamics(
+            xosc.DynamicsShapes.step, xosc.DynamicsDimension.time, 1
+        )
+
+        egospeed = xosc.AbsoluteSpeedAction(
+            25,
+            xosc.TransitionDynamics(
+                xosc.DynamicsShapes.sinusoidal, xosc.DynamicsDimension.time, 8
+            ),
+        )
+        egostart = xosc.TeleportAction(xosc.LanePosition(25, 0, -3, 0))
+
+        targetspeed = xosc.AbsoluteSpeedAction(15, step_time)
+        targetstart = xosc.TeleportAction(xosc.RoadPosition(30, -5, 0))
+
+        init.add_init_action(egoname, egospeed)
+        init.add_init_action(egoname, egostart)
+        init.add_init_action(targetname, targetspeed)
+        init.add_init_action(targetname, targetstart)
+
+        ### create an event
+
+        trigcond = xosc.RelativeSpeedCondition(0, xosc.Rule.lessThan, egoname)
+
+        trigger = xosc.EntityTrigger(
+            &#34;mytesttrigger&#34;, 0.2, xosc.ConditionEdge.none, trigcond, targetname
+        )
+
+        event = xosc.Event(&#34;myfirstevent&#34;, xosc.Priority.overwrite)
+        event.add_trigger(trigger)
+
+        sin_time = xosc.TransitionDynamics(
+            xosc.DynamicsShapes.linear, xosc.DynamicsDimension.time, 5
+        )
+        action = xosc.RelativeLaneChangeAction(
+            -8,
+            targetname,
+            xosc.TransitionDynamics(
+                xosc.DynamicsShapes.linear, xosc.DynamicsDimension.time, 6
+            ),
+            -10,
+        )
+        event.add_action(&#34;newspeed&#34;, action)
+
+        ## create the maneuver
+        man = xosc.Maneuver(&#34;my_maneuver&#34;)
+        man.add_event(event)
+
+        mangr = xosc.ManeuverGroup(&#34;mangroup&#34;)
+        mangr.add_actor(targetname)
+        mangr.add_maneuver(man)
+        starttrigger = xosc.ValueTrigger(
+            &#34;starttrigger&#34;,
+            0,
+            xosc.ConditionEdge.rising,
+            xosc.SimulationTimeCondition(0, xosc.Rule.greaterThan),
+        )
+        act = xosc.Act(&#34;my_act&#34;, starttrigger)
+        act.add_maneuver_group(mangr)
+
+        ## create the story
+        storyparam = xosc.ParameterDeclarations()
+        storyparam.add_parameter(
+            xosc.Parameter(&#34;$owner&#34;, xosc.ParameterType.string, targetname)
+        )
+        story = xosc.Story(&#34;mystory&#34;, storyparam)
+        story.add_act(act)
+
+        ## create the storyboard
+        stoptrigger = xosc.EntityTrigger(
+            &#34;stop_simulation&#34;,
+            0.5,
+            xosc.ConditionEdge.rising,
+            xosc.OffroadCondition(0.5),
+            targetname,
+            triggeringpoint=&#34;stop&#34;,
+        )
+        sb = xosc.StoryBoard(init, stoptrigger)
+        sb.add_story(story)
+
+        ## create the scenario
+        sce = xosc.Scenario(
+            &#34;adapt_speed_example&#34;,
+            &#34;Mandolin&#34;,
+            paramdec,
+            entities=entities,
+            storyboard=sb,
+            roadnetwork=road,
+            catalog=catalog,
+            osc_minor_version=self.open_scenario_version,
+        )
+        return sce</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.scenario_generator.ScenarioGenerator" href="../../scenariogeneration/scenario_generator.html#scenariogeneration.scenario_generator.ScenarioGenerator">ScenarioGenerator</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="scenariogeneration.scenario_generator.ScenarioGenerator" href="../../scenariogeneration/scenario_generator.html#scenariogeneration.scenario_generator.ScenarioGenerator">ScenarioGenerator</a></b></code>:
+<ul class="hlist">
+<li><code><a title="scenariogeneration.scenario_generator.ScenarioGenerator.generate" href="../../scenariogeneration/scenario_generator.html#scenariogeneration.scenario_generator.ScenarioGenerator.generate">generate</a></code></li>
+<li><code><a title="scenariogeneration.scenario_generator.ScenarioGenerator.generate_single" href="../../scenariogeneration/scenario_generator.html#scenariogeneration.scenario_generator.ScenarioGenerator.generate_single">generate_single</a></code></li>
+<li><code><a title="scenariogeneration.scenario_generator.ScenarioGenerator.print_permutations" href="../../scenariogeneration/scenario_generator.html#scenariogeneration.scenario_generator.ScenarioGenerator.print_permutations">print_permutations</a></code></li>
+<li><code><a title="scenariogeneration.scenario_generator.ScenarioGenerator.road" href="../../scenariogeneration/scenario_generator.html#scenariogeneration.scenario_generator.ScenarioGenerator.road">road</a></code></li>
+<li><code><a title="scenariogeneration.scenario_generator.ScenarioGenerator.scenario" href="../../scenariogeneration/scenario_generator.html#scenariogeneration.scenario_generator.ScenarioGenerator.scenario">scenario</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -247,6 +455,13 @@ sce.write_xml(os.path.basename(__file__).replace(&#34;.py&#34;, &#34;.xosc&#34;)
 <li><h3>Super-module</h3>
 <ul>
 <li><code><a title="examples.xosc" href="index.html">examples.xosc</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="examples.xosc.Stop_on_offroad.Scenario" href="#examples.xosc.Stop_on_offroad.Scenario">Scenario</a></code></h4>
+</li>
 </ul>
 </li>
 </ul>
