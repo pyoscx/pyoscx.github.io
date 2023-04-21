@@ -210,6 +210,8 @@ def esmini(
         )
 
     # run esmini
+    print(&#39;hej&#39;)
+    print(executable_path + filetype + filename + additional_args)
     if os.system(executable_path + filetype + filename + additional_args) != 0:
         print(&#34;An error occurred while trying to execute the scenario&#34;)
         return
@@ -441,6 +443,8 @@ headless (boolean): run esmini in headless mode (no viewer)
         )
 
     # run esmini
+    print(&#39;hej&#39;)
+    print(executable_path + filetype + filename + additional_args)
     if os.system(executable_path + filetype + filename + additional_args) != 0:
         print(&#34;An error occurred while trying to execute the scenario&#34;)
         return

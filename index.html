@@ -24,7 +24,7 @@
 <section id="section-intro">
 <p>Scenariogeneration is a python package created for easy creation and generation of the ASAM open standards: OpenSCENARIO and OpenDRIVE.</p>
 <p>The package can be found on <a href="https://pypi.org/project/scenariogeneration/">pypi</a>, and the source-code on <a href="https://github.com/pyoscx/scenariogeneration">github</a>.</p>
-<p>This user guide is ment for the package itself, not OpenSCENARIO nor OpenDRIVE, for more in depth documentation about the standards, please visit <a href="www.asam.net">ASAM</a>.</p>
+<p>This user guide is ment for the package itself, not OpenSCENARIO nor OpenDRIVE, for more in depth documentation about the standards, please visit <a href="https://www.asam.net">ASAM</a>.</p>
 <p>Please note that this is not an official implementation of either OpenSCENARIO or OpenDRIVE.</p>
 <h1 id="introduction">Introduction</h1>
 <p>The package consists of the two main modules, <strong>xosc</strong> (OpenSCENARIO), and <strong>xodr</strong> (OpenDRIVE), together with some support functionality for auto generation with parametrization (ScenarioGenerator) as well as easy viewing with <a href="https://github.com/esmini/esmini">esmini</a>.</p>
@@ -57,9 +57,19 @@ This enables modifying already exisisting xosc files, eg. from a Scenario editor
 </code></pre>
 <p><strong>ParseOpenScenario</strong> can read all types of OpenSCENARIO files (Scenario, Catalog and ParameterValueDistribution), and will return the Object related to that file type.</p>
 <p>NOTE: more layers of classes are added in some cases, that the user don't usually see/use. Eg. the <strong>ValueTrigger</strong> and <strong>EntityTrigger</strong> will never be returned, but a <strong>Trigger</strong> and <strong>ConditionGroup</strong> will always be present.</p>
+<h3 id="example-usage-of-parsing-and-openscenario-versions">Example usage of parsing and OpenSCENARIO versions</h3>
+<p>Sometimes you might recive a <em>.xosc</em> file that is in a newer version than what your simulator needs, for this the <em>xosc</em> module can be used to convert (if possible), to a older version like this:</p>
+<pre><code>from scenariogeneration import xosc
+
+scenario = xosc.ParseOpenScenario(&quot;multiple_maneuvers_1.xosc&quot;)
+
+scenario.header.setVersion(minor=0)
+
+scenario.write_xml(&quot;multiple_maneuvers_0.xosc&quot;)
+</code></pre>
 <h2 id="xodr">xodr</h2>
-<p>The xodr module handles the part related to OpenDrive, and does not (as of now) have a full coverage of the standard, please see <a href="https://github.com/pyoscx/scenariogeneration/blob/main/xodr_coverage.txt">coverage</a> for more information.</p>
-<p>The <strong>xodr</strong> module is also a xml generator, similar to the <strong>xosc</strong> module. However, since opendrive is more complicated to create a functional road-network, it includes a number of automation algorithms which allow the user to easily generate a correct OpenDRIVE hierarchy. As a matter of fact, the OpenDRIVE standard contains many geometrical dependencies, indexing, and complex structures, that to create the xml directly is quite cumbersome. Hence, it is highly recommended to use the automations and "generators" included in the package. In the examples, both "generator" level (<a href="examples/xodr/full_junction.html">full_junction</a>, <a href="examples/xodr/highway_example.html">highway_example</a>, and <a href="examples/xodr/simple_road_with_objects.html">simple_road_with_objects</a>) and low level examples (as <a href="examples/xodr/junction_trippel_twoway.html">junction_trippel_twoway</a>, <a href="examples/xodr/multiple_geometries_one_road.html">multiple_geometries_one_road</a> and <a href="exampels/xodr/road_merge_w_lane_merge.html">road_merge_w_lane_merge</a> ) are presented.</p>
+<p>The xodr module handles the part related to OpenDRIVE, and does not (as of now) have a full coverage of the standard, please see <a href="https://github.com/pyoscx/scenariogeneration/blob/main/xodr_coverage.txt">coverage</a> for more information.</p>
+<p>The <strong>xodr</strong> module is also a xml generator, similar to the <strong>xosc</strong> module. However, since OpenDRIVE is more complicated to create a functional road-network, it includes a number of automation algorithms which allow the user to easily generate a correct OpenDRIVE hierarchy. As a matter of fact, the OpenDRIVE standard contains many geometrical dependencies, indexing, and complex structures, that to create the xml directly is quite cumbersome. Hence, it is highly recommended to use the automations and "generators" included in the package. In the examples, both "generator" level (<a href="examples/xodr/full_junction.html">full_junction</a>, <a href="examples/xodr/highway_example.html">highway_example</a>, and <a href="examples/xodr/simple_road_with_objects.html">simple_road_with_objects</a>) and low level examples (as <a href="examples/xodr/junction_trippel_twoway.html">junction_trippel_twoway</a>, <a href="examples/xodr/multiple_geometries_one_road.html">multiple_geometries_one_road</a> and <a href="exampels/xodr/road_merge_w_lane_merge.html">road_merge_w_lane_merge</a> ) are presented.</p>
 <h3 id="automatic-calculation-of-geometries-and-links">Automatic calculation of geometries and links</h3>
 <p>The most important automation functionality is the <em>adjust_roads_and_lanes</em> method of the <em>OpenDRIVE</em> class, which does two main things:</p>
 <ol>
@@ -89,9 +99,13 @@ Some example usage of this can be seen in <a href="examples/xodr/highway_example
 <p>First of all, the roads needs a predecessor or successor pointing to the junction. This can be done in two different ways: (1) with the <em>add_successor/add_predecessor</em>, or (2) with the <em>add_incoming_road</em> functions in the junction creator.</p>
 <p>When adding a road to the junction two functions are available, <em>add_incoming_road_cartesian_geometry</em> and <em>add_incoming_road_circular_geometry</em>, both uses a local coordinate system for that junciton that will help to connect the roads together.
 - The <em>add_incoming_road_cartesian_geometry</em> uses a <em>x-y</em> coordinate system with an arbitrary origin, the incomming road is added with an <em>x-y-h</em> input, where <em>h</em> is the heading of the road <strong>into</strong> the junction.</p>
-<p><img alt="Cartesian" src="https://github.com/esmini/esmini/blob/master/docu/cartesian.png?raw=true" title="Cartesian geometry">
-- The <em>add_incoming_road_circular_geometry</em> uses a <em>r-h</em> coordinate system where the origin is in the middle of the junction and <em>r</em> is the radius and <em>h</em> the heading from the center where to connect the road.</p>
-<p><img alt="Circular" src="https://github.com/esmini/esmini/blob/master/resources/circular.png?raw=true" title="Circular geometry"></p>
+<p><img src="https://github.com/pyoscx/scenariogeneration/blob/main/docu/cartesian.png?raw=true" alt="Cartesian" width="200" height="200", title="Cartesian geometry"></p>
+<!-- ![Cartesian](https://github.com/pyoscx/scenariogeneration/blob/main/docu/cartesian.png?raw=true "Cartesian geometry") -->
+<ul>
+<li>The <em>add_incoming_road_circular_geometry</em> uses a <em>r-h</em> coordinate system where the origin is in the middle of the junction and <em>r</em> is the radius and <em>h</em> the heading from the center where to connect the road.</li>
+</ul>
+<p><img alt="Circular" src="https://github.com/pyoscx/scenariogeneration/blob/main/docu/circular.png?raw=true" title="Circular geometry">
+<a href="https://github.com/pyoscx/scenariogeneration/blob/main/docu/cartesian.png?raw=true">https://github.com/pyoscx/scenariogeneration/blob/main/docu/cartesian.png?raw=true</a></p>
 <p>An example can be seen below:</p>
 <pre><code>from scenariogeneration import xodr
 
@@ -292,6 +306,7 @@ To connect the scenario and the generated road, create the RoadNetwork object in
 <li><a href="#automatic-generation-of-story-act-and-maneuvergroup">Automatic generation of Story, Act, and ManeuverGroup</a></li>
 <li><a href="#generate-different-versions-of-openscenario">Generate different versions of OpenSCENARIO</a></li>
 <li><a href="#parsing-an-xosc-file-and-get-the-python-object-back">Parsing an .xosc file and get the Python object back</a></li>
+<li><a href="#example-usage-of-parsing-and-openscenario-versions">Example usage of parsing and OpenSCENARIO versions</a></li>
 </ul>
 </li>
 <li><a href="#xodr">xodr</a><ul>
