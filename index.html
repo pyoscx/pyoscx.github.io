@@ -36,7 +36,7 @@
 <p>The <strong>xosc</strong> module handles the parts related to OpenSCENARIO, and covers all of OpenSCENARIO V 1.0.0 and most of OpenSCENARIO V 1.1.0 and OpenSCENARIO V 1.2.0. The module is a xml file generator which allows the user to easily generate a full OpenSCENARIO hierarchy without the need of explicity define all the levels of abstraction (if not needed). This has led to a couple of name changes compared to the standard (mostly adding Absolute or Relative to the name), in the description of the class, the OpenSCENARIO references are written for reference.</p>
 <p>The idea with this module is to create easy access to the elements of OpenSCENARIO without having to expose the user to all the xml levels that does not carry any vital information for the user. Hence, some of the xml-elements that build up OpenSCENARIO are never seen in the class structure but compressed to a level where the user can set the required data.</p>
 <p>The module can generate xmls of both V1.0.0, V1.1.0 and V1.2.0 of OpenSCENARIO.</p>
-<p>In general the <strong>xosc</strong> module does not contain many "smart" functionality (except some default values), but the user can build up the scenario based on the classes available.</p>
+<p>In general the <strong>xosc</strong> module does not contain many "smart" functionalities (except some default values), but the user can build up the scenario based on the classes available.</p>
 <h3 id="automatic-generation-of-story-act-and-maneuvergroup">Automatic generation of Story, Act, and ManeuverGroup</h3>
 <p>One of the few functionalities of the <strong>xosc</strong> module is for simple scenario generation and to create the <strong>StoryBoard</strong>.</p>
 <p>In short the <strong>StoryBoard</strong>, consists of alot of layers from the Story, down to the Actions and Triggers.
@@ -49,14 +49,14 @@ This feature is enabled by one simple input to the Scenario class as:</p>
 </code></pre>
 <p>The default is 2 (V1.2.0), but with this V1.0.0 OpenSCENARIO xmls can be generated.</p>
 <p>The V1.2.0 will remove the depricated attributes, and have a pure V1.2.0 xml. If version specific elements are used together with the wrong version, a <strong>OpenSCENARIOVersionError</strong> will be raised.</p>
-<p>NOTE: as of V0.5.0 some interfaces had to be changed in order to fulfill the V1.1.0 standard, please see the <a href="https://github.com/pyoscx/scenariogeneration/blob/main/release_notes.md">release notes</a> for more info.</p>
+<p>NOTE: When a new versions of the standards are introduced, some interfaces might change, please see the <a href="https://github.com/pyoscx/scenariogeneration/blob/main/release_notes.md">release notes</a> for more info.</p>
 <h3 id="parsing-an-xosc-file-and-get-the-python-object-back">Parsing an .xosc file and get the Python object back</h3>
 <p>As of scenariogeneration V0.7.0, the <strong>xosc</strong> module supports parsing an existing .xosc file.
 This enables modifying already exisisting xosc files, eg. from a Scenario editor.</p>
 <pre><code>scenario = ParseOpenScenario('my_non_python_made_scenario.xosc')
 </code></pre>
 <p><strong>ParseOpenScenario</strong> can read all types of OpenSCENARIO files (Scenario, Catalog and ParameterValueDistribution), and will return the Object related to that file type.</p>
-<p>NOTE: more layers of classes are added in some cases, that the user don't usually see/use. Eg. the <strong>ValueTrigger</strong> and <strong>EntityTrigger</strong> will never be returned, but a <strong>Trigger</strong> and <strong>ConditionGroup</strong> will always be present.</p>
+<p><strong>NOTE:</strong> more layers of classes are added in some cases, that the user don't usually see/use. Eg. the <strong>ValueTrigger</strong> and <strong>EntityTrigger</strong> will never be returned, but a <strong>Trigger</strong> and <strong>ConditionGroup</strong> will always be present. Same for the <strong>StoryBoard</strong> that will contain all hierarcies from <strong>Story</strong> down to Actions.</p>
 <h3 id="example-usage-of-parsing-and-openscenario-versions">Example usage of parsing and OpenSCENARIO versions</h3>
 <p>Sometimes you might recive a <em>.xosc</em> file that is in a newer version than what your simulator needs, for this the <em>xosc</em> module can be used to convert (if possible), to a older version like this:</p>
 <pre><code>from scenariogeneration import xosc
@@ -75,11 +75,11 @@ scenario.write_xml(&quot;multiple_maneuvers_0.xosc&quot;)
 <ol>
 <li><strong>Patch all Geometries and Roads Together</strong> This is done on two levels: the "RoadNetwork" level and the "PlanView" level. At the RoadNetwork level all defined roads are patched consecutively, and this is possible only if the "predecessor/successor" attributes of the roads have been set. This is done either by: fixing the first road added to (0,0,0) and patch all other roads to that one, or localize if any PlanView(s) created has a manually added start point (e.g. if multiple roads are not connected via predecessor/successor). At the PlanView level, instead all geometries are patched together creating one continuous road, based at its start point. See the <a href="examples/xodr/highway_example.html">highway_example</a> for an example showing how to work on the RoadNetwork level and <a href="examples/xodr/multiple_geometries_one_road.html">multiple_geometries_one_road</a> for the PlanView level.</li>
 </ol>
-<p>Note: <em>adjust_roads_and_lanes</em> will assume that the heading is continious between different geometries and roads.</p>
+<p><strong>NOTE:</strong> <em>adjust_roads_and_lanes</em> will assume that the heading is continious between different geometries and roads.</p>
 <ol>
 <li><strong>Create Lane Linking</strong> At this step the algorithm tries to link the lanes between roads. Normally this requires the same number of lanes in the connecting roads, but if the roads have a different amount of lanes, (should only be done in a junction!), the algorithm handles this case by adding offsets when defining the predecessor/successor attributes (see example: <a href="examples/xodr/highway_example.html">highway_example</a>, or <a href="examples/xodr/direct_junction_exit.html">direct_junction_exit</a>)</li>
 </ol>
-<p><strong>NOTE:</strong> No real sanity check is made with the <em>adjust_roads_and_lanes</em> method, hence the resulting road might be very strange if the input is "wrong".</p>
+<p><strong>NOTE:</strong> No real sanity check is made with the <em>adjust_roads_and_lanes</em> method, hence the resulting road might be very strange if the inputs are "wrong".</p>
 <h3 id="generators">Generators</h3>
 <p>For most simple roads, the generators that are provided in the <strong>xodr</strong> module can be used. These most often will generate the roads that can build up the network and then the user can just "patch" them together with the "successor/predecessor" attributes (see <a href="examples/xodr/highway_example.html">highway_example</a>)</p>
 <h4 id="create_road">create_road</h4>
@@ -210,12 +210,12 @@ odr.adjust_roads_and_lanes()
 
 </code></pre>
 <h2 id="scenariogenerator">ScenarioGenerator</h2>
-<p>The ScenarioGenerator class can be used as a glue to parametrize and generate connected OpenSCENARIO and OpenDRIVE xmls, for large scale, parametrized simulations (Note that a similar feature is supported in the OpenSCENARIO standard since V1.1.0).</p>
+<p>The ScenarioGenerator class can be used as a glue to parametrize and generate connected OpenSCENARIO and OpenDRIVE xmls, for large scale, parametrized simulations (In the OpenSCENARIO standard since V1.1.0, this is included in the standard).</p>
 <p>To utilize this, let your Scenario class inherit ScenarioGenerator and initalize it.
 Some options can be used to parameterize your Scenario either by:
-- let self.parameters be a dict containing lists. This in turn will yield all permutations of the inputs (Note: this grows quickly, so be careful)
+- let self.parameters be a dict containing lists. This in turn will yield all permutations of the inputs (<strong>WARBUBG:</strong> this grows quickly, so be careful)
 - let self.parameters be a list of dicts (same structure in each element). This will yield a scenario for each entry in the list.</p>
-<p>Then overwrite the road and/or the scenario methods where the road should return an xodr.OpenDrive object, and the scenario method should return a xosc.Scenario object.
+<p>Then implement the road and/or the scenario methods where the road should return an xodr.OpenDrive object, and the scenario method should return a xosc.Scenario object.
 To connect the scenario and the generated road, create the RoadNetwork object in the scenario as: xosc.RoadNetwork(self.road_file).</p>
 <p>Finally the <em>generate</em> method can be used to generate all permutations of the defined parameters.</p>
 <h3 id="useful-scenariogenerator-attributes">Useful ScenarioGenerator attributes</h3>
@@ -264,7 +264,7 @@ To connect the scenario and the generated road, create the RoadNetwork object in
 <p>Useful links for related projects and other information</p>
 <ul>
 <li>
-<p><a href="www.asam.net">ASAM</a></p>
+<p><a href="https://www.asam.net">ASAM</a></p>
 </li>
 <li>
 <p><a href="https://github.com/esmini/esmini">esmini</a></p>
