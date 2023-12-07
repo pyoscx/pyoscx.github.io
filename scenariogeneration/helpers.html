@@ -44,32 +44,49 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
   Copyright (c) 2022 The scenariogeneration Authors.
 
 &#34;&#34;&#34;
-
 import xml.etree.ElementTree as ET
-import xml.dom.minidom as mini
+from lxml import etree
+import os
 
 
-def prettify(element, encoding=&#34;utf-8&#34;):
-    &#34;&#34;&#34;prints the element to the commandline
+def prettify(element, encoding=None):
+    &#34;&#34;&#34;Returns a bytes string representing a prettified version of an XML element.
 
-    Parameters
+    Parameters:
     ----------
-        element (Element, or any generation class of scenariogeneration): element to print
+        element (ET.Element): The XML element to prettify.
+        encoding (str): The encoding to use for the output, defaults to &#39;utf-8&#39;.
+                        If None, then &#39;utf-8&#39; will be used as default.
 
-        encoding (str): specifies the output encoding
-            Default: &#39;utf-8&#39;
-
+    Returns:
+    ----------
+        bytes: The prettified XML as bytes string with 4-space indentation.
     &#34;&#34;&#34;
     if not isinstance(element, ET.Element):
         element = element.get_element()
-    rough = (
-        ET.tostring(element, &#34;utf-8&#34;)
-        .replace(b&#34;\n&#34;, b&#34;&#34;)
-        .replace(b&#34;\t&#34;, b&#34;&#34;)
-        .replace(b&#34;    &#34;, b&#34;&#34;)
+
+    if encoding is None:
+        encoding = &#34;utf-8&#34;
+
+    # Define a 4-space indent string
+    indent_str = &#34;    &#34;
+
+    # Use the etree.Parser class from lxml to specify a custom parser
+    parser = etree.XMLParser(remove_blank_text=True)
+
+    # Convert the ElementTree element to an lxml etree form
+    lxml_element = etree.fromstring(ET.tostring(element, encoding), parser=parser)
+
+    # Now generate a 2-space indented pretty_print string (bytes type)
+    pretty_print_bytes = etree.tostring(
+        lxml_element, pretty_print=True, encoding=encoding
     )
-    reparsed = mini.parseString(rough)
-    return reparsed.toprettyxml(indent=&#34;    &#34;, encoding=encoding)
+
+    # Decode the bytes type pretty_print string to utf-8 encoded string, then replace 2-space indents with 4 spaces
+    pretty_print_str = pretty_print_bytes.decode(encoding).replace(&#34;  &#34;, indent_str)
+
+    # Encode the string back into bytes type and return
+    return pretty_print_str.encode(encoding)
 
 
 def prettyprint(element, encoding=None):
@@ -83,7 +100,7 @@ def prettyprint(element, encoding=None):
             Default: None (works best for printing in terminal on ubuntu atleast)
 
     &#34;&#34;&#34;
-    print(prettify(element, encoding=encoding))
+    print(prettify(element, encoding=encoding).decode())
 
 
 def printToFile(element, filename, prettyprint=True, encoding=&#34;utf-8&#34;):
@@ -102,6 +119,8 @@ def printToFile(element, filename, prettyprint=True, encoding=&#34;utf-8&#34;):
     &#34;&#34;&#34;
     if prettyprint:
         try:
+            if os.path.dirname(filename):
+                os.makedirs(os.path.dirname(filename), exist_ok=True)
             with open(filename, &#34;wb&#34;) as file_handle:
                 file_handle.write(prettify(element, encoding=encoding))
         except LookupError:
@@ -243,41 +262,60 @@ def convert_bool(value):
 </details>
 </dd>
 <dt id="scenariogeneration.helpers.prettify"><code class="name flex">
-<span>def <span class="ident">prettify</span></span>(<span>element, encoding='utf-8')</span>
+<span>def <span class="ident">prettify</span></span>(<span>element, encoding=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>prints the element to the commandline</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>element (Element, or any generation class of scenariogeneration): element to print
-
-encoding (str): specifies the output encoding
-    Default: 'utf-8'
+<div class="desc"><p>Returns a bytes string representing a prettified version of an XML element.</p>
+<h2 id="parameters">Parameters:</h2>
+<pre><code>element (ET.Element): The XML element to prettify.
+encoding (str): The encoding to use for the output, defaults to 'utf-8'.
+                If None, then 'utf-8' will be used as default.
+</code></pre>
+<h2 id="returns">Returns:</h2>
+<pre><code>bytes: The prettified XML as bytes string with 4-space indentation.
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def prettify(element, encoding=&#34;utf-8&#34;):
-    &#34;&#34;&#34;prints the element to the commandline
+<pre><code class="python">def prettify(element, encoding=None):
+    &#34;&#34;&#34;Returns a bytes string representing a prettified version of an XML element.
 
-    Parameters
+    Parameters:
     ----------
-        element (Element, or any generation class of scenariogeneration): element to print
+        element (ET.Element): The XML element to prettify.
+        encoding (str): The encoding to use for the output, defaults to &#39;utf-8&#39;.
+                        If None, then &#39;utf-8&#39; will be used as default.
 
-        encoding (str): specifies the output encoding
-            Default: &#39;utf-8&#39;
-
+    Returns:
+    ----------
+        bytes: The prettified XML as bytes string with 4-space indentation.
     &#34;&#34;&#34;
     if not isinstance(element, ET.Element):
         element = element.get_element()
-    rough = (
-        ET.tostring(element, &#34;utf-8&#34;)
-        .replace(b&#34;\n&#34;, b&#34;&#34;)
-        .replace(b&#34;\t&#34;, b&#34;&#34;)
-        .replace(b&#34;    &#34;, b&#34;&#34;)
+
+    if encoding is None:
+        encoding = &#34;utf-8&#34;
+
+    # Define a 4-space indent string
+    indent_str = &#34;    &#34;
+
+    # Use the etree.Parser class from lxml to specify a custom parser
+    parser = etree.XMLParser(remove_blank_text=True)
+
+    # Convert the ElementTree element to an lxml etree form
+    lxml_element = etree.fromstring(ET.tostring(element, encoding), parser=parser)
+
+    # Now generate a 2-space indented pretty_print string (bytes type)
+    pretty_print_bytes = etree.tostring(
+        lxml_element, pretty_print=True, encoding=encoding
     )
-    reparsed = mini.parseString(rough)
-    return reparsed.toprettyxml(indent=&#34;    &#34;, encoding=encoding)</code></pre>
+
+    # Decode the bytes type pretty_print string to utf-8 encoded string, then replace 2-space indents with 4 spaces
+    pretty_print_str = pretty_print_bytes.decode(encoding).replace(&#34;  &#34;, indent_str)
+
+    # Encode the string back into bytes type and return
+    return pretty_print_str.encode(encoding)</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.helpers.prettyprint"><code class="name flex">
@@ -306,7 +344,7 @@ encoding (str): specify the output encoding
             Default: None (works best for printing in terminal on ubuntu atleast)
 
     &#34;&#34;&#34;
-    print(prettify(element, encoding=encoding))</code></pre>
+    print(prettify(element, encoding=encoding).decode())</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.helpers.printToFile"><code class="name flex">
@@ -344,6 +382,8 @@ encoding (str): specify the output encoding
     &#34;&#34;&#34;
     if prettyprint:
         try:
+            if os.path.dirname(filename):
+                os.makedirs(os.path.dirname(filename), exist_ok=True)
             with open(filename, &#34;wb&#34;) as file_handle:
                 file_handle.write(prettify(element, encoding=encoding))
         except LookupError:

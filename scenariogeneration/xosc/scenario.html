@@ -36,11 +36,11 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <pre><code class="python">&#34;&#34;&#34;
   scenariogeneration
   https://github.com/pyoscx/scenariogeneration
- 
+
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at https://mozilla.org/MPL/2.0/.
- 
+
   Copyright (c) 2022 The scenariogeneration Authors.
 
 &#34;&#34;&#34;
@@ -60,12 +60,12 @@ from .utils import (
     TrafficSignalController,
     VariableDeclarations,
 )
-from .enumerations import VersionBase, XMLNS, XSI
+from .enumerations import VersionBase, XMLNS, XSI, _MINOR_VERSION
 from .entities import Entities
 from .storyboard import StoryBoard
 
 
-class Scenario:
+class Scenario(VersionBase):
     &#34;&#34;&#34;The Scenario class collects all parts of OpenScenario and creates a .xml file
 
     Parameters
@@ -83,7 +83,7 @@ class Scenario:
         catalog (Catalog): the catalogs used in the scenario
 
         osc_minor_version (int): used to set if another than the newest version of OpenSCENARIO should be used
-            Default: 1
+            Default: 2
 
         licence (License): optional license to the file header
             Default: None
@@ -132,7 +132,7 @@ class Scenario:
         storyboard,
         roadnetwork,
         catalog,
-        osc_minor_version=1,
+        osc_minor_version=_MINOR_VERSION,
         license=None,
         creation_date=None,
         header_properties=None,
@@ -290,7 +290,7 @@ class Scenario:
                 Default: &#39;utf-8&#39;
 
         &#34;&#34;&#34;
-        printToFile(self.get_element(), filename, prettyprint)
+        printToFile(self.get_element(), filename, prettyprint, encoding)
 
 
 class RoadNetwork(VersionBase):
@@ -793,7 +793,7 @@ Atleast 2 positions are required.</p>
 </dd>
 <dt id="scenariogeneration.xosc.scenario.Scenario"><code class="flex name class">
 <span>class <span class="ident">Scenario</span></span>
-<span>(</span><span>name, author, parameters, entities, storyboard, roadnetwork, catalog, osc_minor_version=1, license=None, creation_date=None, header_properties=None, variable_declaration=None)</span>
+<span>(</span><span>name, author, parameters, entities, storyboard, roadnetwork, catalog, osc_minor_version=2, license=None, creation_date=None, header_properties=None, variable_declaration=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>The Scenario class collects all parts of OpenScenario and creates a .xml file</p>
@@ -811,7 +811,7 @@ roadnetwork (RoadNetwork): the roadnetwork of the scenario
 catalog (Catalog): the catalogs used in the scenario
 
 osc_minor_version (int): used to set if another than the newest version of OpenSCENARIO should be used
-    Default: 1
+    Default: 2
 
 licence (License): optional license to the file header
     Default: None
@@ -878,7 +878,7 @@ variable_declaration (VariableDeclarations): (Valid from OSC V1.2)
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Scenario:
+<pre><code class="python">class Scenario(VersionBase):
     &#34;&#34;&#34;The Scenario class collects all parts of OpenScenario and creates a .xml file
 
     Parameters
@@ -896,7 +896,7 @@ variable_declaration (VariableDeclarations): (Valid from OSC V1.2)
         catalog (Catalog): the catalogs used in the scenario
 
         osc_minor_version (int): used to set if another than the newest version of OpenSCENARIO should be used
-            Default: 1
+            Default: 2
 
         licence (License): optional license to the file header
             Default: None
@@ -945,7 +945,7 @@ variable_declaration (VariableDeclarations): (Valid from OSC V1.2)
         storyboard,
         roadnetwork,
         catalog,
-        osc_minor_version=1,
+        osc_minor_version=_MINOR_VERSION,
         license=None,
         creation_date=None,
         header_properties=None,
@@ -1103,8 +1103,12 @@ variable_declaration (VariableDeclarations): (Valid from OSC V1.2)
                 Default: &#39;utf-8&#39;
 
         &#34;&#34;&#34;
-        printToFile(self.get_element(), filename, prettyprint)</code></pre>
+        printToFile(self.get_element(), filename, prettyprint, encoding)</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Static methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.scenario.Scenario.parse"><code class="name flex">
@@ -1228,7 +1232,7 @@ encoding (str): specifies the output encoding
             Default: &#39;utf-8&#39;
 
     &#34;&#34;&#34;
-    printToFile(self.get_element(), filename, prettyprint)</code></pre>
+    printToFile(self.get_element(), filename, prettyprint, encoding)</code></pre>
 </details>
 </dd>
 </dl>

@@ -36,17 +36,17 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <pre><code class="python">&#34;&#34;&#34;
   scenariogeneration
   https://github.com/pyoscx/scenariogeneration
- 
+
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at https://mozilla.org/MPL/2.0/.
- 
+
   Copyright (c) 2022 The scenariogeneration Authors.
 
 &#34;&#34;&#34;
 import xml.etree.ElementTree as ET
 
-from .enumerations import VersionBase, XMLNS, XSI
+from .enumerations import VersionBase, XMLNS, XSI, _MINOR_VERSION
 from .utils import (
     _StochasticDistributionType,
     FileHeader,
@@ -105,7 +105,7 @@ class _DeterministicFactory:
             )
 
 
-class _HistogramBin:
+class _HistogramBin(VersionBase):
     &#34;&#34;&#34;the _HistogramBin is used by Histogram to define the bins
 
     Parameters
@@ -185,12 +185,12 @@ class _HistogramBin:
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the HistogramBin&#34;&#34;&#34;
-        element = ET.Element(&#34;HistogramBin&#34;, self.get_attributes())
+        element = ET.Element(&#34;Bin&#34;, self.get_attributes())
         element.append(self.range.get_element())
         return element
 
 
-class _ProbabilityDistributionSetElement:
+class _ProbabilityDistributionSetElement(VersionBase):
     &#34;&#34;&#34;the _ProbabilityDistributionSetElement is used by ProbabilityDistributionSet to define the elements
 
     Parameters
@@ -266,7 +266,7 @@ class _ProbabilityDistributionSetElement:
         return element
 
 
-class Range:
+class Range(VersionBase):
     &#34;&#34;&#34;the Range creates a Range used by parameter distributions
 
     Parameters
@@ -344,7 +344,7 @@ class Range:
 
 
 ## Stochastic distributions
-class Stochastic:
+class Stochastic(VersionBase):
     &#34;&#34;&#34;Creates the Stochastic type of parameter distributions
 
     Parameters
@@ -762,7 +762,7 @@ class Histogram(_StochasticDistributionType):
 
         &#34;&#34;&#34;
         hist = Histogram()
-        for h_element in element.findall(&#34;HistogramBin&#34;):
+        for h_element in element.findall(&#34;Bin&#34;):
             hist.bins.append(_HistogramBin.parse(h_element))
         return hist
 
@@ -870,7 +870,7 @@ class ProbabilityDistributionSet(_StochasticDistributionType):
 ### Deterministic
 
 
-class ParameterValueSet:
+class ParameterValueSet(VersionBase):
     &#34;&#34;&#34;Creates the ParameterValueSet used by the DeterministicMultiParameterDistribution
 
     Parameters
@@ -951,7 +951,7 @@ class ParameterValueSet:
         return element
 
 
-class DeterministicMultiParameterDistribution:
+class DeterministicMultiParameterDistribution(VersionBase):
     &#34;&#34;&#34;Creates the DeterministicMultiParameterDistribution type of parameter distributions
 
     Parameters
@@ -1030,7 +1030,7 @@ class DeterministicMultiParameterDistribution:
         return element
 
 
-class DistributionRange:
+class DistributionRange(VersionBase):
     &#34;&#34;&#34;Creates the DistributionRange used to define a Single parameter distribution
 
     Parameters
@@ -1117,7 +1117,7 @@ class DistributionRange:
         return element
 
 
-class DistributionSet:
+class DistributionSet(VersionBase):
     &#34;&#34;&#34;Creates the DistributionSet used to define a Single parameter distribution
 
     Parameters
@@ -1189,7 +1189,7 @@ class DistributionSet:
         return element
 
 
-class Deterministic:
+class Deterministic(VersionBase):
     &#34;&#34;&#34;Creates the Deterministic type of parameter distributions
 
     Parameters
@@ -1354,7 +1354,7 @@ class ParameterValueDistribution(VersionBase):
         author,
         scenario_file,
         parameter_distribution,
-        osc_minor_version=1,
+        osc_minor_version=_MINOR_VERSION,
         header_properties=None,
         license=None,
     ):
@@ -1457,7 +1457,7 @@ class ParameterValueDistribution(VersionBase):
 
         return element
 
-    def write_xml(self, filename, prettyprint=True):
+    def write_xml(self, filename, prettyprint=True, encoding=&#34;utf-8&#34;):
         &#34;&#34;&#34;write_xml writes the parametervaluedistribution xml file
 
         Parameters
@@ -1468,7 +1468,7 @@ class ParameterValueDistribution(VersionBase):
                 Default: True
 
         &#34;&#34;&#34;
-        printToFile(self.get_element(), filename, prettyprint)</code></pre>
+        printToFile(self.get_element(), filename, prettyprint, encoding)</code></pre>
 </details>
 </section>
 <section>
@@ -1509,7 +1509,7 @@ get_element(elementname)
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Deterministic:
+<pre><code class="python">class Deterministic(VersionBase):
     &#34;&#34;&#34;Creates the Deterministic type of parameter distributions
 
     Parameters
@@ -1630,6 +1630,10 @@ get_element(elementname)
 
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Static methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.parameters.Deterministic.parse"><code class="name flex">
@@ -1791,7 +1795,7 @@ get_element(elementname)
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class DeterministicMultiParameterDistribution:
+<pre><code class="python">class DeterministicMultiParameterDistribution(VersionBase):
     &#34;&#34;&#34;Creates the DeterministicMultiParameterDistribution type of parameter distributions
 
     Parameters
@@ -1869,6 +1873,10 @@ get_element(elementname)
 
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Static methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.parameters.DeterministicMultiParameterDistribution.parse"><code class="name flex">
@@ -1993,7 +2001,7 @@ range (Range): the range of the parameter
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class DistributionRange:
+<pre><code class="python">class DistributionRange(VersionBase):
     &#34;&#34;&#34;Creates the DistributionRange used to define a Single parameter distribution
 
     Parameters
@@ -2079,6 +2087,10 @@ range (Range): the range of the parameter
 
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Static methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.parameters.DistributionRange.parse"><code class="name flex">
@@ -2174,7 +2186,7 @@ get_element(elementname)
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class DistributionSet:
+<pre><code class="python">class DistributionSet(VersionBase):
     &#34;&#34;&#34;Creates the DistributionSet used to define a Single parameter distribution
 
     Parameters
@@ -2245,6 +2257,10 @@ get_element(elementname)
 
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Static methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.parameters.DistributionSet.parse"><code class="name flex">
@@ -2402,7 +2418,7 @@ add_bin(weight,range)
 
         &#34;&#34;&#34;
         hist = Histogram()
-        for h_element in element.findall(&#34;HistogramBin&#34;):
+        for h_element in element.findall(&#34;Bin&#34;):
             hist.bins.append(_HistogramBin.parse(h_element))
         return hist
 
@@ -2466,7 +2482,7 @@ def parse(element):
 
     &#34;&#34;&#34;
     hist = Histogram()
-    for h_element in element.findall(&#34;HistogramBin&#34;):
+    for h_element in element.findall(&#34;Bin&#34;):
         hist.bins.append(_HistogramBin.parse(h_element))
     return hist</code></pre>
 </details>
@@ -2754,7 +2770,7 @@ def parse(element):
 </dd>
 <dt id="scenariogeneration.xosc.parameters.ParameterValueDistribution"><code class="flex name class">
 <span>class <span class="ident">ParameterValueDistribution</span></span>
-<span>(</span><span>description, author, scenario_file, parameter_distribution, osc_minor_version=1, header_properties=None, license=None)</span>
+<span>(</span><span>description, author, scenario_file, parameter_distribution, osc_minor_version=2, header_properties=None, license=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Creates the the ParameterValueDistribution file for open scenario</p>
@@ -2843,7 +2859,7 @@ licence (License): optional license to the file header
         author,
         scenario_file,
         parameter_distribution,
-        osc_minor_version=1,
+        osc_minor_version=_MINOR_VERSION,
         header_properties=None,
         license=None,
     ):
@@ -2946,7 +2962,7 @@ licence (License): optional license to the file header
 
         return element
 
-    def write_xml(self, filename, prettyprint=True):
+    def write_xml(self, filename, prettyprint=True, encoding=&#34;utf-8&#34;):
         &#34;&#34;&#34;write_xml writes the parametervaluedistribution xml file
 
         Parameters
@@ -2957,7 +2973,7 @@ licence (License): optional license to the file header
                 Default: True
 
         &#34;&#34;&#34;
-        printToFile(self.get_element(), filename, prettyprint)</code></pre>
+        printToFile(self.get_element(), filename, prettyprint, encoding)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -3048,7 +3064,7 @@ def parse(element):
 </details>
 </dd>
 <dt id="scenariogeneration.xosc.parameters.ParameterValueDistribution.write_xml"><code class="name flex">
-<span>def <span class="ident">write_xml</span></span>(<span>self, filename, prettyprint=True)</span>
+<span>def <span class="ident">write_xml</span></span>(<span>self, filename, prettyprint=True, encoding='utf-8')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>write_xml writes the parametervaluedistribution xml file</p>
@@ -3062,7 +3078,7 @@ prettyprint (bool): pretty print or ugly print?
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def write_xml(self, filename, prettyprint=True):
+<pre><code class="python">def write_xml(self, filename, prettyprint=True, encoding=&#34;utf-8&#34;):
     &#34;&#34;&#34;write_xml writes the parametervaluedistribution xml file
 
     Parameters
@@ -3073,7 +3089,7 @@ prettyprint (bool): pretty print or ugly print?
             Default: True
 
     &#34;&#34;&#34;
-    printToFile(self.get_element(), filename, prettyprint)</code></pre>
+    printToFile(self.get_element(), filename, prettyprint, encoding)</code></pre>
 </details>
 </dd>
 </dl>
@@ -3102,7 +3118,7 @@ get_element(elementname)
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class ParameterValueSet:
+<pre><code class="python">class ParameterValueSet(VersionBase):
     &#34;&#34;&#34;Creates the ParameterValueSet used by the DeterministicMultiParameterDistribution
 
     Parameters
@@ -3182,6 +3198,10 @@ get_element(elementname)
 
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Static methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.parameters.ParameterValueSet.parse"><code class="name flex">
@@ -3708,7 +3728,7 @@ upper (float): upper limit of the range
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Range:
+<pre><code class="python">class Range(VersionBase):
     &#34;&#34;&#34;the Range creates a Range used by parameter distributions
 
     Parameters
@@ -3784,6 +3804,10 @@ upper (float): upper limit of the range
         element = ET.Element(elementname, self.get_attributes())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Static methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.parameters.Range.parse"><code class="name flex">
@@ -3899,7 +3923,7 @@ random_seed (float): the seed for the run
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Stochastic:
+<pre><code class="python">class Stochastic(VersionBase):
     &#34;&#34;&#34;Creates the Stochastic type of parameter distributions
 
     Parameters
@@ -4020,6 +4044,10 @@ random_seed (float): the seed for the run
 
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Static methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.parameters.Stochastic.parse"><code class="name flex">

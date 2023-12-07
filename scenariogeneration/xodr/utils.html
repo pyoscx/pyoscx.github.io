@@ -36,15 +36,18 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <pre><code class="python">&#34;&#34;&#34;
   scenariogeneration
   https://github.com/pyoscx/scenariogeneration
- 
+
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at https://mozilla.org/MPL/2.0/.
- 
+
   Copyright (c) 2022 The scenariogeneration Authors.
 
 &#34;&#34;&#34;
+import xml.etree.ElementTree as ET
+
 from .enumerations import ContactPoint
+from ..helpers import enum2str
 
 
 def get_lane_sec_and_s_for_lane_calc(road, contact_point):
@@ -74,7 +77,315 @@ def get_lane_sec_and_s_for_lane_calc(road, contact_point):
         for geom in road.planview._raw_geometries:
             relevant_s += geom.length
 
-    return relevant_lanesection, relevant_s</code></pre>
+    return relevant_lanesection, relevant_s
+
+
+class XodrBase:
+    &#34;&#34;&#34;Sets up common functionality for xodr generating classes by enabling userdata inputs
+
+    Parameters
+    ----------
+
+    Attributes
+    ----------
+        user_data (list of UserData): all userdata added
+
+        includes (list of str): all includes (filenames)
+
+        data_quality (DataQuality): All
+
+    Methods
+    -------
+
+        add_userdata(userdata)
+            adds a userdata to the xodr entry
+
+        add_dataquality(dataquality)
+            adds dataquality to the xodr entry
+
+    &#34;&#34;&#34;
+
+    def __init__(self):
+        &#34;&#34;&#34;initalize the UserData&#34;&#34;&#34;
+        self.user_data = []
+        self.data_quality = None
+
+    def __eq__(self, other):
+        if (
+            self.user_data == other.user_data
+            and self.data_quality == other.data_quality
+        ):
+            return True
+
+        return False
+
+    def add_userdata(self, userdata):
+        &#34;&#34;&#34;Adds a userdata entry to the xodr entry
+
+        Parameters
+        ----------
+            userdata (Userdata): the data to be added
+        &#34;&#34;&#34;
+        if not isinstance(userdata, UserData):
+            raise TypeError(&#34;userdata is not of type UserData.&#34;)
+        self.user_data.append(userdata)
+
+    def add_dataquality(self, dataquality):
+        &#34;&#34;&#34;Adds a dataquality entry to the xodr entry
+
+        Parameters
+        ----------
+            dataquality (DataQuality): the data to be added
+        &#34;&#34;&#34;
+        if not isinstance(dataquality, DataQuality):
+            raise TypeError(&#34;dataquality is not of type DataQuality.&#34;)
+        self.data_quality = dataquality
+
+    def _add_additional_data_to_element(self, element):
+        &#34;&#34;&#34;returns the elementTree of the Junction&#34;&#34;&#34;
+        for ud in self.user_data:
+            element.append(ud.get_element())
+        if self.data_quality:
+            element.append(self.data_quality.get_element())
+        return element
+
+
+class UserData:
+    &#34;&#34;&#34;Sets up addtional data for any entry of OpenDRIVE
+
+    Parameters
+    ----------
+        code (str): code of the userdata
+
+        value (str): value of the userdata
+            Default: None
+
+    Attributes
+    ----------
+        code (str): code of the userdata
+
+        value (str): value of the userdata
+
+        user_data_content (list of ET.element): list of all extra elements added
+
+    Methods
+    -------
+        get_element()
+            Returns the full ElementTree of the class
+
+        get_attributes()
+            Returns a dictionary of all attributes of the class
+
+        add_userdata_content(ET.element)
+            adds extra elements to the userdata
+
+    &#34;&#34;&#34;
+
+    def __init__(self, code, value=None):
+        &#34;&#34;&#34;initalize the UserData&#34;&#34;&#34;
+        self.code = code
+        self.value = value
+        self.userdata_content = []
+
+    def add_userdata_content(self, content):
+        &#34;&#34;&#34;add_userdata_content adds extra elements to userdata
+
+        Parameters
+        ----------
+            content (ET.element): the element to be added
+        &#34;&#34;&#34;
+        self.userdata_content.append(content)
+
+    def _element_equals(self, e1, e2):
+        if e1.tag != e2.tag:
+            return False
+        if e1.text != e2.text:
+            return False
+        if e1.tail != e2.tail:
+            return False
+        if e1.attrib != e2.attrib:
+            return False
+        if len(e1) != len(e2):
+            return False
+        return all(self._elements_equal(c1, c2) for c1, c2 in zip(e1, e2))
+
+    def __eq__(self, other):
+        if isinstance(other, UserData):
+            if self.get_attributes() == other.get_attributes() and len(
+                self.userdata_content
+            ) == len(other.userdata_content):
+                for i in range(len(self.userdata_content)):
+                    if not self._element_equals(
+                        self.userdata_content[i], other.userdata_content[i]
+                    ):
+                        return False
+                return True
+        return False
+
+    def get_attributes(self):
+        &#34;&#34;&#34;returns the attributes as a dict of the JunctionGroup&#34;&#34;&#34;
+        retdict = {}
+        retdict[&#34;code&#34;] = str(self.code)
+        if self.value is not None:
+            retdict[&#34;value&#34;] = str(self.value)
+        return retdict
+
+    def get_element(self):
+        &#34;&#34;&#34;returns the elementTree of the Junction&#34;&#34;&#34;
+        element = ET.Element(&#34;userData&#34;, attrib=self.get_attributes())
+        for i in self.userdata_content:
+            element.append(i)
+        return element
+
+
+class DataQuality:
+    &#34;&#34;&#34;Sets up DataQuality for any entry of OpenDRIVE
+
+
+    Attributes
+    ----------
+        date (str): code of the userdata
+
+        post_processing (RawDataPostProcessing): postprocessing definition
+
+        source (RawDataSource): source of the data
+
+        post_processing_comment (str): comment of the postprocessing
+
+        source_comment (str): comment of the soure
+
+        xy_abs (float): absolute xy error
+
+        xy_rel (float): relative xy error
+
+        z_abs (float): absolute z error
+
+        z_rel (float): relative z error
+
+    Methods
+    -------
+        get_element()
+            Returns the full ElementTree of the class
+
+        get_attributes()
+            Returns a dictionary of all attributes of the class
+
+        add_raw_data_info(date, post_processing, source, post_processing_comment, source_comment)
+            adds raw data info
+
+        add_error(xy_abs, xy_rel, z_abs,z_rel)
+            adds error info
+    &#34;&#34;&#34;
+
+    def __init__(self):
+        &#34;&#34;&#34;initalize the UserData&#34;&#34;&#34;
+        self.date = None
+        self.post_processing = None
+        self.source = None
+        self.post_processing_comment = None
+        self.source_comment = None
+        self.xy_abs = None
+        self.xy_rel = None
+        self.z_abs = None
+        self.z_rel = None
+        self._error_added = False
+        self._raw_data_added = False
+
+    def add_raw_data_info(
+        self,
+        date,
+        post_processing,
+        source,
+        post_processing_comment=None,
+        source_comment=None,
+    ):
+        &#34;&#34;&#34;add_raw_data_info adds data for the RawData entry
+
+        Parameters
+        ----------
+            date (str): code of the userdata
+
+            post_processing (RawDataPostProcessing): postprocessing definition
+
+            source (RawDataSource): source of the data
+
+            post_processing_comment (str): comment of the postprocessing
+                Default: None
+
+            source_comment (str): comment of the soure
+                Default: None
+        &#34;&#34;&#34;
+
+        self.date = date
+        self.post_processing = post_processing
+        self.source = source
+        self.post_processing_comment = post_processing_comment
+        self.source_comment = source_comment
+        self._raw_data_added = True
+
+    def add_error(self, xy_abs, xy_rel, z_abs, z_rel):
+        &#34;&#34;&#34;add_error adds data to the error element
+
+        Parameters
+        ----------
+            xy_abs (float): absolute xy error
+
+            xy_rel (float): relative xy error
+
+            z_abs (float): absolute z error
+
+            z_rel (float): relative z error
+        &#34;&#34;&#34;
+        self.xy_abs = xy_abs
+        self.xy_rel = xy_rel
+        self.z_abs = z_abs
+        self.z_rel = z_rel
+        self._error_added = True
+
+    def __eq__(self, other):
+        if isinstance(other, DataQuality):
+            if (
+                self.date == other.date
+                and self.post_processing == other.post_processing
+                and self.source == other.source
+                and self.post_processing_comment == other.post_processing_comment
+                and self.source_comment == other.source_comment
+                and self.xy_abs == other.xy_abs
+                and self.xy_rel == other.xy_rel
+                and self.z_abs == other.z_abs
+                and self.z_rel == other.z_rel
+            ):
+                return True
+        return False
+
+    def get_element(self):
+        &#34;&#34;&#34;returns the elementTree of the Junction&#34;&#34;&#34;
+        element = ET.Element(&#34;dataQuality&#34;)
+        if self._raw_data_added:
+            raw_data_attrib = {
+                &#34;date&#34;: self.date,
+                &#34;postProcessing&#34;: enum2str(self.post_processing),
+                &#34;source&#34;: enum2str(self.source),
+            }
+            if self.post_processing_comment is not None:
+                raw_data_attrib[&#34;postProcessingComment&#34;] = self.post_processing_comment
+            if self.source_comment is not None:
+                raw_data_attrib[&#34;sourceComment&#34;] = self.source_comment
+
+            ET.SubElement(element, &#34;rawData&#34;, attrib=raw_data_attrib)
+
+        if self._error_added:
+            ET.SubElement(
+                element,
+                &#34;error&#34;,
+                attrib={
+                    &#34;xyAbsolute&#34;: str(self.xy_abs),
+                    &#34;xyRelative&#34;: str(self.xy_rel),
+                    &#34;zAbsolute&#34;: str(self.z_rel),
+                    &#34;zRelative&#34;: str(self.z_rel),
+                },
+            )
+        return element</code></pre>
 </details>
 </section>
 <section>
@@ -136,6 +447,699 @@ s (float): the s coordinate at start or end of the road
 </dl>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="scenariogeneration.xodr.utils.DataQuality"><code class="flex name class">
+<span>class <span class="ident">DataQuality</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Sets up DataQuality for any entry of OpenDRIVE</p>
+<h2 id="attributes">Attributes</h2>
+<pre><code>date (str): code of the userdata
+
+post_processing (RawDataPostProcessing): postprocessing definition
+
+source (RawDataSource): source of the data
+
+post_processing_comment (str): comment of the postprocessing
+
+source_comment (str): comment of the soure
+
+xy_abs (float): absolute xy error
+
+xy_rel (float): relative xy error
+
+z_abs (float): absolute z error
+
+z_rel (float): relative z error
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element()
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of the class
+
+add_raw_data_info(date, post_processing, source, post_processing_comment, source_comment)
+    adds raw data info
+
+add_error(xy_abs, xy_rel, z_abs,z_rel)
+    adds error info
+</code></pre>
+<p>initalize the UserData</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class DataQuality:
+    &#34;&#34;&#34;Sets up DataQuality for any entry of OpenDRIVE
+
+
+    Attributes
+    ----------
+        date (str): code of the userdata
+
+        post_processing (RawDataPostProcessing): postprocessing definition
+
+        source (RawDataSource): source of the data
+
+        post_processing_comment (str): comment of the postprocessing
+
+        source_comment (str): comment of the soure
+
+        xy_abs (float): absolute xy error
+
+        xy_rel (float): relative xy error
+
+        z_abs (float): absolute z error
+
+        z_rel (float): relative z error
+
+    Methods
+    -------
+        get_element()
+            Returns the full ElementTree of the class
+
+        get_attributes()
+            Returns a dictionary of all attributes of the class
+
+        add_raw_data_info(date, post_processing, source, post_processing_comment, source_comment)
+            adds raw data info
+
+        add_error(xy_abs, xy_rel, z_abs,z_rel)
+            adds error info
+    &#34;&#34;&#34;
+
+    def __init__(self):
+        &#34;&#34;&#34;initalize the UserData&#34;&#34;&#34;
+        self.date = None
+        self.post_processing = None
+        self.source = None
+        self.post_processing_comment = None
+        self.source_comment = None
+        self.xy_abs = None
+        self.xy_rel = None
+        self.z_abs = None
+        self.z_rel = None
+        self._error_added = False
+        self._raw_data_added = False
+
+    def add_raw_data_info(
+        self,
+        date,
+        post_processing,
+        source,
+        post_processing_comment=None,
+        source_comment=None,
+    ):
+        &#34;&#34;&#34;add_raw_data_info adds data for the RawData entry
+
+        Parameters
+        ----------
+            date (str): code of the userdata
+
+            post_processing (RawDataPostProcessing): postprocessing definition
+
+            source (RawDataSource): source of the data
+
+            post_processing_comment (str): comment of the postprocessing
+                Default: None
+
+            source_comment (str): comment of the soure
+                Default: None
+        &#34;&#34;&#34;
+
+        self.date = date
+        self.post_processing = post_processing
+        self.source = source
+        self.post_processing_comment = post_processing_comment
+        self.source_comment = source_comment
+        self._raw_data_added = True
+
+    def add_error(self, xy_abs, xy_rel, z_abs, z_rel):
+        &#34;&#34;&#34;add_error adds data to the error element
+
+        Parameters
+        ----------
+            xy_abs (float): absolute xy error
+
+            xy_rel (float): relative xy error
+
+            z_abs (float): absolute z error
+
+            z_rel (float): relative z error
+        &#34;&#34;&#34;
+        self.xy_abs = xy_abs
+        self.xy_rel = xy_rel
+        self.z_abs = z_abs
+        self.z_rel = z_rel
+        self._error_added = True
+
+    def __eq__(self, other):
+        if isinstance(other, DataQuality):
+            if (
+                self.date == other.date
+                and self.post_processing == other.post_processing
+                and self.source == other.source
+                and self.post_processing_comment == other.post_processing_comment
+                and self.source_comment == other.source_comment
+                and self.xy_abs == other.xy_abs
+                and self.xy_rel == other.xy_rel
+                and self.z_abs == other.z_abs
+                and self.z_rel == other.z_rel
+            ):
+                return True
+        return False
+
+    def get_element(self):
+        &#34;&#34;&#34;returns the elementTree of the Junction&#34;&#34;&#34;
+        element = ET.Element(&#34;dataQuality&#34;)
+        if self._raw_data_added:
+            raw_data_attrib = {
+                &#34;date&#34;: self.date,
+                &#34;postProcessing&#34;: enum2str(self.post_processing),
+                &#34;source&#34;: enum2str(self.source),
+            }
+            if self.post_processing_comment is not None:
+                raw_data_attrib[&#34;postProcessingComment&#34;] = self.post_processing_comment
+            if self.source_comment is not None:
+                raw_data_attrib[&#34;sourceComment&#34;] = self.source_comment
+
+            ET.SubElement(element, &#34;rawData&#34;, attrib=raw_data_attrib)
+
+        if self._error_added:
+            ET.SubElement(
+                element,
+                &#34;error&#34;,
+                attrib={
+                    &#34;xyAbsolute&#34;: str(self.xy_abs),
+                    &#34;xyRelative&#34;: str(self.xy_rel),
+                    &#34;zAbsolute&#34;: str(self.z_rel),
+                    &#34;zRelative&#34;: str(self.z_rel),
+                },
+            )
+        return element</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xodr.utils.DataQuality.add_error"><code class="name flex">
+<span>def <span class="ident">add_error</span></span>(<span>self, xy_abs, xy_rel, z_abs, z_rel)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>add_error adds data to the error element</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>xy_abs (float): absolute xy error
+
+xy_rel (float): relative xy error
+
+z_abs (float): absolute z error
+
+z_rel (float): relative z error
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_error(self, xy_abs, xy_rel, z_abs, z_rel):
+    &#34;&#34;&#34;add_error adds data to the error element
+
+    Parameters
+    ----------
+        xy_abs (float): absolute xy error
+
+        xy_rel (float): relative xy error
+
+        z_abs (float): absolute z error
+
+        z_rel (float): relative z error
+    &#34;&#34;&#34;
+    self.xy_abs = xy_abs
+    self.xy_rel = xy_rel
+    self.z_abs = z_abs
+    self.z_rel = z_rel
+    self._error_added = True</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.utils.DataQuality.add_raw_data_info"><code class="name flex">
+<span>def <span class="ident">add_raw_data_info</span></span>(<span>self, date, post_processing, source, post_processing_comment=None, source_comment=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>add_raw_data_info adds data for the RawData entry</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>date (str): code of the userdata
+
+post_processing (RawDataPostProcessing): postprocessing definition
+
+source (RawDataSource): source of the data
+
+post_processing_comment (str): comment of the postprocessing
+    Default: None
+
+source_comment (str): comment of the soure
+    Default: None
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_raw_data_info(
+    self,
+    date,
+    post_processing,
+    source,
+    post_processing_comment=None,
+    source_comment=None,
+):
+    &#34;&#34;&#34;add_raw_data_info adds data for the RawData entry
+
+    Parameters
+    ----------
+        date (str): code of the userdata
+
+        post_processing (RawDataPostProcessing): postprocessing definition
+
+        source (RawDataSource): source of the data
+
+        post_processing_comment (str): comment of the postprocessing
+            Default: None
+
+        source_comment (str): comment of the soure
+            Default: None
+    &#34;&#34;&#34;
+
+    self.date = date
+    self.post_processing = post_processing
+    self.source = source
+    self.post_processing_comment = post_processing_comment
+    self.source_comment = source_comment
+    self._raw_data_added = True</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.utils.DataQuality.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the elementTree of the Junction</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self):
+    &#34;&#34;&#34;returns the elementTree of the Junction&#34;&#34;&#34;
+    element = ET.Element(&#34;dataQuality&#34;)
+    if self._raw_data_added:
+        raw_data_attrib = {
+            &#34;date&#34;: self.date,
+            &#34;postProcessing&#34;: enum2str(self.post_processing),
+            &#34;source&#34;: enum2str(self.source),
+        }
+        if self.post_processing_comment is not None:
+            raw_data_attrib[&#34;postProcessingComment&#34;] = self.post_processing_comment
+        if self.source_comment is not None:
+            raw_data_attrib[&#34;sourceComment&#34;] = self.source_comment
+
+        ET.SubElement(element, &#34;rawData&#34;, attrib=raw_data_attrib)
+
+    if self._error_added:
+        ET.SubElement(
+            element,
+            &#34;error&#34;,
+            attrib={
+                &#34;xyAbsolute&#34;: str(self.xy_abs),
+                &#34;xyRelative&#34;: str(self.xy_rel),
+                &#34;zAbsolute&#34;: str(self.z_rel),
+                &#34;zRelative&#34;: str(self.z_rel),
+            },
+        )
+    return element</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="scenariogeneration.xodr.utils.UserData"><code class="flex name class">
+<span>class <span class="ident">UserData</span></span>
+<span>(</span><span>code, value=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Sets up addtional data for any entry of OpenDRIVE</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>code (str): code of the userdata
+
+value (str): value of the userdata
+    Default: None
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>code (str): code of the userdata
+
+value (str): value of the userdata
+
+user_data_content (list of ET.element): list of all extra elements added
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element()
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of the class
+
+add_userdata_content(ET.element)
+    adds extra elements to the userdata
+</code></pre>
+<p>initalize the UserData</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class UserData:
+    &#34;&#34;&#34;Sets up addtional data for any entry of OpenDRIVE
+
+    Parameters
+    ----------
+        code (str): code of the userdata
+
+        value (str): value of the userdata
+            Default: None
+
+    Attributes
+    ----------
+        code (str): code of the userdata
+
+        value (str): value of the userdata
+
+        user_data_content (list of ET.element): list of all extra elements added
+
+    Methods
+    -------
+        get_element()
+            Returns the full ElementTree of the class
+
+        get_attributes()
+            Returns a dictionary of all attributes of the class
+
+        add_userdata_content(ET.element)
+            adds extra elements to the userdata
+
+    &#34;&#34;&#34;
+
+    def __init__(self, code, value=None):
+        &#34;&#34;&#34;initalize the UserData&#34;&#34;&#34;
+        self.code = code
+        self.value = value
+        self.userdata_content = []
+
+    def add_userdata_content(self, content):
+        &#34;&#34;&#34;add_userdata_content adds extra elements to userdata
+
+        Parameters
+        ----------
+            content (ET.element): the element to be added
+        &#34;&#34;&#34;
+        self.userdata_content.append(content)
+
+    def _element_equals(self, e1, e2):
+        if e1.tag != e2.tag:
+            return False
+        if e1.text != e2.text:
+            return False
+        if e1.tail != e2.tail:
+            return False
+        if e1.attrib != e2.attrib:
+            return False
+        if len(e1) != len(e2):
+            return False
+        return all(self._elements_equal(c1, c2) for c1, c2 in zip(e1, e2))
+
+    def __eq__(self, other):
+        if isinstance(other, UserData):
+            if self.get_attributes() == other.get_attributes() and len(
+                self.userdata_content
+            ) == len(other.userdata_content):
+                for i in range(len(self.userdata_content)):
+                    if not self._element_equals(
+                        self.userdata_content[i], other.userdata_content[i]
+                    ):
+                        return False
+                return True
+        return False
+
+    def get_attributes(self):
+        &#34;&#34;&#34;returns the attributes as a dict of the JunctionGroup&#34;&#34;&#34;
+        retdict = {}
+        retdict[&#34;code&#34;] = str(self.code)
+        if self.value is not None:
+            retdict[&#34;value&#34;] = str(self.value)
+        return retdict
+
+    def get_element(self):
+        &#34;&#34;&#34;returns the elementTree of the Junction&#34;&#34;&#34;
+        element = ET.Element(&#34;userData&#34;, attrib=self.get_attributes())
+        for i in self.userdata_content:
+            element.append(i)
+        return element</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xodr.utils.UserData.add_userdata_content"><code class="name flex">
+<span>def <span class="ident">add_userdata_content</span></span>(<span>self, content)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>add_userdata_content adds extra elements to userdata</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>content (ET.element): the element to be added
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_userdata_content(self, content):
+    &#34;&#34;&#34;add_userdata_content adds extra elements to userdata
+
+    Parameters
+    ----------
+        content (ET.element): the element to be added
+    &#34;&#34;&#34;
+    self.userdata_content.append(content)</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.utils.UserData.get_attributes"><code class="name flex">
+<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the attributes as a dict of the JunctionGroup</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_attributes(self):
+    &#34;&#34;&#34;returns the attributes as a dict of the JunctionGroup&#34;&#34;&#34;
+    retdict = {}
+    retdict[&#34;code&#34;] = str(self.code)
+    if self.value is not None:
+        retdict[&#34;value&#34;] = str(self.value)
+    return retdict</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.utils.UserData.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the elementTree of the Junction</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self):
+    &#34;&#34;&#34;returns the elementTree of the Junction&#34;&#34;&#34;
+    element = ET.Element(&#34;userData&#34;, attrib=self.get_attributes())
+    for i in self.userdata_content:
+        element.append(i)
+    return element</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="scenariogeneration.xodr.utils.XodrBase"><code class="flex name class">
+<span>class <span class="ident">XodrBase</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Sets up common functionality for xodr generating classes by enabling userdata inputs</p>
+<h2 id="parameters">Parameters</h2>
+<h2 id="attributes">Attributes</h2>
+<pre><code>user_data (list of UserData): all userdata added
+
+includes (list of str): all includes (filenames)
+
+data_quality (DataQuality): All
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>add_userdata(userdata)
+    adds a userdata to the xodr entry
+
+add_dataquality(dataquality)
+    adds dataquality to the xodr entry
+</code></pre>
+<p>initalize the UserData</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class XodrBase:
+    &#34;&#34;&#34;Sets up common functionality for xodr generating classes by enabling userdata inputs
+
+    Parameters
+    ----------
+
+    Attributes
+    ----------
+        user_data (list of UserData): all userdata added
+
+        includes (list of str): all includes (filenames)
+
+        data_quality (DataQuality): All
+
+    Methods
+    -------
+
+        add_userdata(userdata)
+            adds a userdata to the xodr entry
+
+        add_dataquality(dataquality)
+            adds dataquality to the xodr entry
+
+    &#34;&#34;&#34;
+
+    def __init__(self):
+        &#34;&#34;&#34;initalize the UserData&#34;&#34;&#34;
+        self.user_data = []
+        self.data_quality = None
+
+    def __eq__(self, other):
+        if (
+            self.user_data == other.user_data
+            and self.data_quality == other.data_quality
+        ):
+            return True
+
+        return False
+
+    def add_userdata(self, userdata):
+        &#34;&#34;&#34;Adds a userdata entry to the xodr entry
+
+        Parameters
+        ----------
+            userdata (Userdata): the data to be added
+        &#34;&#34;&#34;
+        if not isinstance(userdata, UserData):
+            raise TypeError(&#34;userdata is not of type UserData.&#34;)
+        self.user_data.append(userdata)
+
+    def add_dataquality(self, dataquality):
+        &#34;&#34;&#34;Adds a dataquality entry to the xodr entry
+
+        Parameters
+        ----------
+            dataquality (DataQuality): the data to be added
+        &#34;&#34;&#34;
+        if not isinstance(dataquality, DataQuality):
+            raise TypeError(&#34;dataquality is not of type DataQuality.&#34;)
+        self.data_quality = dataquality
+
+    def _add_additional_data_to_element(self, element):
+        &#34;&#34;&#34;returns the elementTree of the Junction&#34;&#34;&#34;
+        for ud in self.user_data:
+            element.append(ud.get_element())
+        if self.data_quality:
+            element.append(self.data_quality.get_element())
+        return element</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xodr.elevation.ElevationProfile" href="elevation.html#scenariogeneration.xodr.elevation.ElevationProfile">ElevationProfile</a></li>
+<li><a title="scenariogeneration.xodr.elevation.LateralProfile" href="elevation.html#scenariogeneration.xodr.elevation.LateralProfile">LateralProfile</a></li>
+<li><a title="scenariogeneration.xodr.geometry.Arc" href="geometry.html#scenariogeneration.xodr.geometry.Arc">Arc</a></li>
+<li><a title="scenariogeneration.xodr.geometry.Line" href="geometry.html#scenariogeneration.xodr.geometry.Line">Line</a></li>
+<li><a title="scenariogeneration.xodr.geometry.ParamPoly3" href="geometry.html#scenariogeneration.xodr.geometry.ParamPoly3">ParamPoly3</a></li>
+<li><a title="scenariogeneration.xodr.geometry.PlanView" href="geometry.html#scenariogeneration.xodr.geometry.PlanView">PlanView</a></li>
+<li><a title="scenariogeneration.xodr.geometry.Spiral" href="geometry.html#scenariogeneration.xodr.geometry.Spiral">Spiral</a></li>
+<li>scenariogeneration.xodr.geometry._Geometry</li>
+<li><a title="scenariogeneration.xodr.lane.ExplicitRoadLine" href="lane.html#scenariogeneration.xodr.lane.ExplicitRoadLine">ExplicitRoadLine</a></li>
+<li><a title="scenariogeneration.xodr.lane.Lane" href="lane.html#scenariogeneration.xodr.lane.Lane">Lane</a></li>
+<li><a title="scenariogeneration.xodr.lane.LaneOffset" href="lane.html#scenariogeneration.xodr.lane.LaneOffset">LaneOffset</a></li>
+<li><a title="scenariogeneration.xodr.lane.LaneSection" href="lane.html#scenariogeneration.xodr.lane.LaneSection">LaneSection</a></li>
+<li><a title="scenariogeneration.xodr.lane.Lanes" href="lane.html#scenariogeneration.xodr.lane.Lanes">Lanes</a></li>
+<li><a title="scenariogeneration.xodr.lane.RoadLine" href="lane.html#scenariogeneration.xodr.lane.RoadLine">RoadLine</a></li>
+<li><a title="scenariogeneration.xodr.lane.RoadMark" href="lane.html#scenariogeneration.xodr.lane.RoadMark">RoadMark</a></li>
+<li><a title="scenariogeneration.xodr.links.Connection" href="links.html#scenariogeneration.xodr.links.Connection">Connection</a></li>
+<li><a title="scenariogeneration.xodr.links.Junction" href="links.html#scenariogeneration.xodr.links.Junction">Junction</a></li>
+<li><a title="scenariogeneration.xodr.links.JunctionGroup" href="links.html#scenariogeneration.xodr.links.JunctionGroup">JunctionGroup</a></li>
+<li>scenariogeneration.xodr.links._Link</li>
+<li>scenariogeneration.xodr.links._Links</li>
+<li><a title="scenariogeneration.xodr.opendrive.OpenDrive" href="opendrive.html#scenariogeneration.xodr.opendrive.OpenDrive">OpenDrive</a></li>
+<li><a title="scenariogeneration.xodr.opendrive.Road" href="opendrive.html#scenariogeneration.xodr.opendrive.Road">Road</a></li>
+<li>scenariogeneration.xodr.opendrive._Type</li>
+<li><a title="scenariogeneration.xodr.signals_objects.CornerLocal" href="signals_objects.html#scenariogeneration.xodr.signals_objects.CornerLocal">CornerLocal</a></li>
+<li><a title="scenariogeneration.xodr.signals_objects.CornerRoad" href="signals_objects.html#scenariogeneration.xodr.signals_objects.CornerRoad">CornerRoad</a></li>
+<li><a title="scenariogeneration.xodr.signals_objects.Dependency" href="signals_objects.html#scenariogeneration.xodr.signals_objects.Dependency">Dependency</a></li>
+<li><a title="scenariogeneration.xodr.signals_objects.Outline" href="signals_objects.html#scenariogeneration.xodr.signals_objects.Outline">Outline</a></li>
+<li><a title="scenariogeneration.xodr.signals_objects.ParkingSpace" href="signals_objects.html#scenariogeneration.xodr.signals_objects.ParkingSpace">ParkingSpace</a></li>
+<li><a title="scenariogeneration.xodr.signals_objects.SignalReference" href="signals_objects.html#scenariogeneration.xodr.signals_objects.SignalReference">SignalReference</a></li>
+<li><a title="scenariogeneration.xodr.signals_objects.Tunnel" href="signals_objects.html#scenariogeneration.xodr.signals_objects.Tunnel">Tunnel</a></li>
+<li><a title="scenariogeneration.xodr.signals_objects.Validity" href="signals_objects.html#scenariogeneration.xodr.signals_objects.Validity">Validity</a></li>
+<li>scenariogeneration.xodr.signals_objects._SignalObjectBase</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xodr.utils.XodrBase.add_dataquality"><code class="name flex">
+<span>def <span class="ident">add_dataquality</span></span>(<span>self, dataquality)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Adds a dataquality entry to the xodr entry</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>dataquality (DataQuality): the data to be added
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_dataquality(self, dataquality):
+    &#34;&#34;&#34;Adds a dataquality entry to the xodr entry
+
+    Parameters
+    ----------
+        dataquality (DataQuality): the data to be added
+    &#34;&#34;&#34;
+    if not isinstance(dataquality, DataQuality):
+        raise TypeError(&#34;dataquality is not of type DataQuality.&#34;)
+    self.data_quality = dataquality</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.utils.XodrBase.add_userdata"><code class="name flex">
+<span>def <span class="ident">add_userdata</span></span>(<span>self, userdata)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Adds a userdata entry to the xodr entry</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>userdata (Userdata): the data to be added
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_userdata(self, userdata):
+    &#34;&#34;&#34;Adds a userdata entry to the xodr entry
+
+    Parameters
+    ----------
+        userdata (Userdata): the data to be added
+    &#34;&#34;&#34;
+    if not isinstance(userdata, UserData):
+        raise TypeError(&#34;userdata is not of type UserData.&#34;)
+    self.user_data.append(userdata)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -152,6 +1156,33 @@ s (float): the s coordinate at start or end of the road
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="scenariogeneration.xodr.utils.get_lane_sec_and_s_for_lane_calc" href="#scenariogeneration.xodr.utils.get_lane_sec_and_s_for_lane_calc">get_lane_sec_and_s_for_lane_calc</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="scenariogeneration.xodr.utils.DataQuality" href="#scenariogeneration.xodr.utils.DataQuality">DataQuality</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xodr.utils.DataQuality.add_error" href="#scenariogeneration.xodr.utils.DataQuality.add_error">add_error</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.DataQuality.add_raw_data_info" href="#scenariogeneration.xodr.utils.DataQuality.add_raw_data_info">add_raw_data_info</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.DataQuality.get_element" href="#scenariogeneration.xodr.utils.DataQuality.get_element">get_element</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xodr.utils.UserData" href="#scenariogeneration.xodr.utils.UserData">UserData</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xodr.utils.UserData.add_userdata_content" href="#scenariogeneration.xodr.utils.UserData.add_userdata_content">add_userdata_content</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.UserData.get_attributes" href="#scenariogeneration.xodr.utils.UserData.get_attributes">get_attributes</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.UserData.get_element" href="#scenariogeneration.xodr.utils.UserData.get_element">get_element</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xodr.utils.XodrBase" href="#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_dataquality" href="#scenariogeneration.xodr.utils.XodrBase.add_dataquality">add_dataquality</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_userdata" href="#scenariogeneration.xodr.utils.XodrBase.add_userdata">add_userdata</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

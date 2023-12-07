@@ -59,6 +59,7 @@ from .utils import (
     ReferenceContext,
     CatalogFile,
     Parameter,
+    convert_enum,
 )
 from .exceptions import (
     OpenSCENARIOVersionError,
@@ -1607,10 +1608,24 @@ class GeoPosition(_PositionType):
 
         &#34;&#34;&#34;
         position_element = element.find(&#34;GeoPosition&#34;)
-        longitude = convert_float(position_element.attrib[&#34;longitude&#34;])
-        latitude = convert_float(position_element.attrib[&#34;latitude&#34;])
+        if &#34;longitude&#34; in position_element.attrib:
+            longitude = convert_float(position_element.attrib[&#34;longitude&#34;])
+        elif &#34;longitudeDeg&#34; in position_element.attrib:
+            longitude = convert_float(position_element.attrib[&#34;longitudeDeg&#34;])
+        else:
+            raise KeyError(&#34;Cannot find valid longitude for GeoPosition&#34;)
+
+        if &#34;latitude&#34; in position_element.attrib:
+            latitude = convert_float(position_element.attrib[&#34;latitude&#34;])
+        elif &#34;latitudeDeg&#34; in position_element.attrib:
+            latitude = convert_float(position_element.attrib[&#34;latitudeDeg&#34;])
+        else:
+            raise KeyError(&#34;Cannot find valid latitude for GeoPosition&#34;)
+
         if &#34;height&#34; in position_element.attrib:
             height = convert_float(position_element.attrib[&#34;height&#34;])
+        elif &#34;altitude&#34; in position_element.attrib:
+            height = convert_float(position_element.attrib[&#34;altitude&#34;])
         else:
             height = None
 
@@ -2032,9 +2047,7 @@ class Waypoint(VersionBase):
         if not isinstance(position, _PositionType):
             raise TypeError(&#34;position input not a valid Position&#34;)
         self.position = position
-        if not hasattr(RouteStrategy, str(routestrategy)):
-            ValueError(&#34;not a valid RouteStrategy&#34;)
-        self.routestrategy = routestrategy
+        self.routestrategy = convert_enum(routestrategy, RouteStrategy)
 
     def __eq__(self, other):
         if isinstance(other, Waypoint):
@@ -2061,7 +2074,7 @@ class Waypoint(VersionBase):
 
         pos_element = element.find(&#34;Position&#34;)
         position = _PositionFactory.parse_position(pos_element)
-        strategy = getattr(RouteStrategy, element.attrib[&#34;routeStrategy&#34;])
+        strategy = convert_enum(element.attrib[&#34;routeStrategy&#34;], RouteStrategy)
         return Waypoint(position, strategy)
 
     def get_attributes(self):
@@ -3239,10 +3252,24 @@ orientation (Orientation): Orietation of the entity
 
         &#34;&#34;&#34;
         position_element = element.find(&#34;GeoPosition&#34;)
-        longitude = convert_float(position_element.attrib[&#34;longitude&#34;])
-        latitude = convert_float(position_element.attrib[&#34;latitude&#34;])
+        if &#34;longitude&#34; in position_element.attrib:
+            longitude = convert_float(position_element.attrib[&#34;longitude&#34;])
+        elif &#34;longitudeDeg&#34; in position_element.attrib:
+            longitude = convert_float(position_element.attrib[&#34;longitudeDeg&#34;])
+        else:
+            raise KeyError(&#34;Cannot find valid longitude for GeoPosition&#34;)
+
+        if &#34;latitude&#34; in position_element.attrib:
+            latitude = convert_float(position_element.attrib[&#34;latitude&#34;])
+        elif &#34;latitudeDeg&#34; in position_element.attrib:
+            latitude = convert_float(position_element.attrib[&#34;latitudeDeg&#34;])
+        else:
+            raise KeyError(&#34;Cannot find valid latitude for GeoPosition&#34;)
+
         if &#34;height&#34; in position_element.attrib:
             height = convert_float(position_element.attrib[&#34;height&#34;])
+        elif &#34;altitude&#34; in position_element.attrib:
+            height = convert_float(position_element.attrib[&#34;altitude&#34;])
         else:
             height = None
 
@@ -3363,10 +3390,24 @@ orientation (Orientation): Orietation of the entity
 
     &#34;&#34;&#34;
     position_element = element.find(&#34;GeoPosition&#34;)
-    longitude = convert_float(position_element.attrib[&#34;longitude&#34;])
-    latitude = convert_float(position_element.attrib[&#34;latitude&#34;])
+    if &#34;longitude&#34; in position_element.attrib:
+        longitude = convert_float(position_element.attrib[&#34;longitude&#34;])
+    elif &#34;longitudeDeg&#34; in position_element.attrib:
+        longitude = convert_float(position_element.attrib[&#34;longitudeDeg&#34;])
+    else:
+        raise KeyError(&#34;Cannot find valid longitude for GeoPosition&#34;)
+
+    if &#34;latitude&#34; in position_element.attrib:
+        latitude = convert_float(position_element.attrib[&#34;latitude&#34;])
+    elif &#34;latitudeDeg&#34; in position_element.attrib:
+        latitude = convert_float(position_element.attrib[&#34;latitudeDeg&#34;])
+    else:
+        raise KeyError(&#34;Cannot find valid latitude for GeoPosition&#34;)
+
     if &#34;height&#34; in position_element.attrib:
         height = convert_float(position_element.attrib[&#34;height&#34;])
+    elif &#34;altitude&#34; in position_element.attrib:
+        height = convert_float(position_element.attrib[&#34;altitude&#34;])
     else:
         height = None
 
@@ -7595,9 +7636,7 @@ routestrategy (RouteStrategy): routing strategy for this waypoint
         if not isinstance(position, _PositionType):
             raise TypeError(&#34;position input not a valid Position&#34;)
         self.position = position
-        if not hasattr(RouteStrategy, str(routestrategy)):
-            ValueError(&#34;not a valid RouteStrategy&#34;)
-        self.routestrategy = routestrategy
+        self.routestrategy = convert_enum(routestrategy, RouteStrategy)
 
     def __eq__(self, other):
         if isinstance(other, Waypoint):
@@ -7624,7 +7663,7 @@ routestrategy (RouteStrategy): routing strategy for this waypoint
 
         pos_element = element.find(&#34;Position&#34;)
         position = _PositionFactory.parse_position(pos_element)
-        strategy = getattr(RouteStrategy, element.attrib[&#34;routeStrategy&#34;])
+        strategy = convert_enum(element.attrib[&#34;routeStrategy&#34;], RouteStrategy)
         return Waypoint(position, strategy)
 
     def get_attributes(self):
@@ -7674,7 +7713,7 @@ def parse(element):
 
     pos_element = element.find(&#34;Position&#34;)
     position = _PositionFactory.parse_position(pos_element)
-    strategy = getattr(RouteStrategy, element.attrib[&#34;routeStrategy&#34;])
+    strategy = convert_enum(element.attrib[&#34;routeStrategy&#34;], RouteStrategy)
     return Waypoint(position, strategy)</code></pre>
 </details>
 </dd>

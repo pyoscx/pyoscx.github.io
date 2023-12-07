@@ -60,7 +60,7 @@ from .enumerations import (
     ReferenceContext,
     DynamicsShapes,
     DynamicsDimension,
-    RouteStrategy,
+    _MINOR_VERSION,
     XSI,
     XMLNS,
     VehicleCategory,
@@ -76,6 +76,7 @@ from .enumerations import (
     Wetness,
     Role,
     FollowingMode,
+    _OscEnum,
 )
 import datetime as dt
 
@@ -400,9 +401,7 @@ class Parameter(VersionBase):
 
         &#34;&#34;&#34;
         self.name = name
-        if not hasattr(ParameterType, str(parameter_type)):
-            raise ValueError(&#34;parameter_type not a valid type.&#34;)
-        self.parameter_type = parameter_type
+        self.parameter_type = convert_enum(parameter_type, ParameterType, False)
         if isinstance(value, bool):
             value = get_bool_string(value)
         self.value = value
@@ -432,9 +431,11 @@ class Parameter(VersionBase):
         &#34;&#34;&#34;
         name = element.attrib[&#34;name&#34;]
         value = element.attrib[&#34;value&#34;]
-        parameter_type = getattr(ParameterType, element.attrib[&#34;parameterType&#34;])
+        parameter_type = convert_enum(
+            element.attrib[&#34;parameterType&#34;], ParameterType, False
+        )
         parameter = Parameter(name, parameter_type, value)
-        constraint_groups = element.findall(&#34;ValueConstraintGroup&#34;)
+        constraint_groups = element.findall(&#34;ConstraintGroup&#34;)
         for constraint_group in constraint_groups:
             parameter.add_value_constraint_group(
                 ValueConstraintGroup.parse(constraint_group)
@@ -518,9 +519,7 @@ class Variable(VersionBase):
 
         &#34;&#34;&#34;
         self.name = name
-        if not hasattr(ParameterType, str(variable_type)):
-            raise ValueError(&#34;variable_type not a valid type.&#34;)
-        self.variable_type = variable_type
+        self.variable_type = convert_enum(variable_type, ParameterType, False)
         self.value = value
         self.constraint_groups = []
 
@@ -548,7 +547,9 @@ class Variable(VersionBase):
         &#34;&#34;&#34;
         name = element.attrib[&#34;name&#34;]
         value = element.attrib[&#34;value&#34;]
-        variable_type = getattr(ParameterType, element.attrib[&#34;variableType&#34;])
+        variable_type = convert_enum(
+            element.attrib[&#34;variableType&#34;], ParameterType, False
+        )
         variable = Variable(name, variable_type, value)
         constraint_groups = element.findall(&#34;ValueConstraintGroup&#34;)
         for constraint_group in constraint_groups:
@@ -567,8 +568,8 @@ class Variable(VersionBase):
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the Variable&#34;&#34;&#34;
-        if self.version_minor &lt; 2:
-            OpenSCENARIOVersionError(&#34;Variables were introduced in OSC 1.2&#34;)
+        if self.isVersionEqLess(minor=1):
+            raise OpenSCENARIOVersionError(&#34;Variables were introduced in OSC 1.2&#34;)
         element = ET.Element(&#34;VariableDeclaration&#34;, attrib=self.get_attributes())
         return element
 
@@ -628,9 +629,7 @@ class Orientation(VersionBase):
         self.h = convert_float(h)
         self.p = convert_float(p)
         self.r = convert_float(r)
-        if reference is not None and not hasattr(ReferenceContext, str(reference)):
-            raise TypeError(&#34;reference input is not of type ReferenceContext&#34;)
-        self.ref = reference
+        self.ref = convert_enum(reference, ReferenceContext, True)
 
     def __eq__(self, other):
         if isinstance(other, Orientation):
@@ -663,7 +662,7 @@ class Orientation(VersionBase):
             r = convert_float(element.attrib[&#34;r&#34;])
         if &#34;type&#34; in element.attrib:
             reference_str = element.attrib[&#34;type&#34;]
-            reference = getattr(ReferenceContext, reference_str)
+            reference = convert_enum(reference_str, ReferenceContext, False)
 
         return Orientation(h, p, r, reference)
 
@@ -755,20 +754,11 @@ class TransitionDynamics(VersionBase):
             following_mode (FollowingMode): the following mode of the TransitionDynamics (valid from OSC V1.2)
                 Default: None
         &#34;&#34;&#34;
-        if not hasattr(DynamicsShapes, str(shape)):
-            raise TypeError(shape + &#34;; is not a valid shape.&#34;)
 
-        self.shape = shape
-        if not hasattr(DynamicsDimension, str(dimension)):
-            raise ValueError(dimension + &#34; is not a valid dynamics dimension&#34;)
-        self.dimension = dimension
+        self.shape = convert_enum(shape, DynamicsShapes, False)
+        self.dimension = convert_enum(dimension, DynamicsDimension, False)
         self.value = convert_float(value)
-
-        if following_mode is not None and not hasattr(
-            FollowingMode, str(following_mode)
-        ):
-            raise TypeError(following_mode + &#34; is not a valid FollowingMode.&#34;)
-        self.following_mode = following_mode
+        self.following_mode = convert_enum(following_mode, FollowingMode, True)
 
     def __eq__(self, other):
         if isinstance(other, TransitionDynamics):
@@ -789,12 +779,14 @@ class TransitionDynamics(VersionBase):
             transitiondynamics (TransitionDynamics): a TransitionDynamics object
 
         &#34;&#34;&#34;
-        shape = getattr(DynamicsShapes, element.attrib[&#34;dynamicsShape&#34;])
-        dimension = getattr(DynamicsDimension, element.attrib[&#34;dynamicsDimension&#34;])
+        shape = convert_enum(element.attrib[&#34;dynamicsShape&#34;], DynamicsShapes)
+        dimension = convert_enum(element.attrib[&#34;dynamicsDimension&#34;], DynamicsDimension)
         value = convert_float(element.attrib[&#34;value&#34;])
         following_mode = None
         if &#34;followingMode&#34; in element.attrib:
-            following_mode = getattr(FollowingMode, element.attrib[&#34;followingMode&#34;])
+            following_mode = convert_enum(
+                element.attrib[&#34;followingMode&#34;], FollowingMode
+            )
         return TransitionDynamics(shape, dimension, value, following_mode)
 
     def get_attributes(self):
@@ -1070,7 +1062,7 @@ class FileHeader(VersionBase):
         author (str): the author of the scenario
 
         revMinor (int): the minor revision of the standard
-            Default: 1
+            Default: 2
 
         license (License): license (valid from OpenSCENARIO V1.1)
             Default: None
@@ -1108,7 +1100,7 @@ class FileHeader(VersionBase):
         self,
         author,
         description,
-        revMinor=1,
+        revMinor=_MINOR_VERSION,
         license=None,
         creation_date=None,
         properties=None,
@@ -1201,9 +1193,19 @@ class FileHeader(VersionBase):
         &#34;&#34;&#34;returns the elementTree of the FileHeader&#34;&#34;&#34;
         element = ET.Element(&#34;FileHeader&#34;, attrib=self.get_attributes())
         if self.license:
-            element.append(self.license.get_element())
-        if self.properties and self.version_minor &gt; 1:
-            element.append(self.properties.get_element())
+            if self.isVersionEqLarger(minor=1):
+                element.append(self.license.get_element())
+            else:
+                raise OpenSCENARIOVersionError(
+                    &#34;License in FileHeader was introduced in OSC 1.1&#34;
+                )
+        if self.properties:
+            if self.isVersionEqLarger(minor=2):
+                element.append(self.properties.get_element())
+            else:
+                raise OpenSCENARIOVersionError(
+                    &#34;Properties in FileHeader was introduced in OSC 1.2&#34;
+                )
 
         return element
 
@@ -1264,12 +1266,7 @@ class TimeReference(VersionBase):
             self._only_nones = False
         else:
             raise ValueError(&#34;missing inputs for time reference&#34;)
-        if reference_domain is not None and not hasattr(
-            ReferenceContext, str(reference_domain)
-        ):
-            raise TypeError(&#34;input reference_domain is not of type ReferenceContext&#34;)
-
-        self.reference_domain = reference_domain
+        self.reference_domain = convert_enum(reference_domain, ReferenceContext, True)
         self.scale = convert_float(scale)
         self.offset = convert_float(offset)
 
@@ -1308,8 +1305,8 @@ class TimeReference(VersionBase):
         if &#34;scale&#34; in timing_element.attrib:
             scale = timing_element.attrib[&#34;scale&#34;]
         if &#34;domainAbsoluteRelative&#34; in timing_element.attrib:
-            reference_domain = getattr(
-                ReferenceContext, timing_element.attrib[&#34;domainAbsoluteRelative&#34;]
+            reference_domain = convert_enum(
+                timing_element.attrib[&#34;domainAbsoluteRelative&#34;], ReferenceContext
             )
 
         return TimeReference(reference_domain, scale, offset)
@@ -1530,6 +1527,10 @@ class Phase(VersionBase):
             element.append(s.get_element())
         if self.traffic_group_state is not None:
             # NOTE: Misspelling according to standard...
+            if self.isVersionEqLess(minor=1):
+                raise OpenSCENARIOVersionError(
+                    &#34;TrafficSignalGroupStage was added in OSC 1.2.&#34;
+                )
             ET.SubElement(
                 element,
                 &#34;TrafficeSignalGroupState&#34;,
@@ -1760,7 +1761,7 @@ class TrafficDefinition(VersionBase):
         )
         for entry in vehicle_entries:
             weight = convert_float(entry.attrib[&#34;weight&#34;])
-            category = getattr(VehicleCategory, entry.attrib[&#34;category&#34;])
+            category = convert_enum(entry.attrib[&#34;category&#34;], VehicleCategory)
             td.add_vehicle(category, weight)
 
         controller_distributions = element.find(&#34;ControllerDistribution&#34;)
@@ -1784,7 +1785,7 @@ class TrafficDefinition(VersionBase):
                 &#34;VehicleRoleDistributionEntry&#34;
             ):
                 td.add_vehicle_role(
-                    getattr(Role, entry.attrib[&#34;role&#34;]), entry.attrib[&#34;weight&#34;]
+                    convert_enum(entry.attrib[&#34;role&#34;], Role), entry.attrib[&#34;weight&#34;]
                 )
         return td
 
@@ -1798,9 +1799,7 @@ class TrafficDefinition(VersionBase):
             weight (float): the corresponding weight for the distribution of the vehicle category
 
         &#34;&#34;&#34;
-        if not hasattr(VehicleCategory, str(vehiclecategory)):
-            raise TypeError(&#34;vehcilecategory input is not of type VehcileCategory&#34;)
-        self.vehiclecategories.append(vehiclecategory)
+        self.vehiclecategories.append(convert_enum(vehiclecategory, VehicleCategory))
         self.vehicleweights.append(weight)
         return self
 
@@ -1813,10 +1812,8 @@ class TrafficDefinition(VersionBase):
 
             weight (float): the weight of that vehicle role
         &#34;&#34;&#34;
-        if not hasattr(Role, str(vehicle_role)):
-            raise TypeError(&#34;vehicle_role input is not of type Role&#34;)
         self.vehicle_roles_weights.append(convert_float(weight))
-        self.vehicle_roles.append(vehicle_role)
+        self.vehicle_roles.append(convert_enum(vehicle_role, Role))
 
     def add_controller(self, controller, weight):
         &#34;&#34;&#34;Adds a controller to the traffic distribution
@@ -1916,7 +1913,7 @@ class CatalogFile(VersionBase):
             Adds a new catalog
     &#34;&#34;&#34;
 
-    def __init__(self, prettyprint=True):
+    def __init__(self, prettyprint=True, encoding=&#34;utf-8&#34;):
         &#34;&#34;&#34;initalize the CatalogFile class
 
         Parameters
@@ -1927,6 +1924,7 @@ class CatalogFile(VersionBase):
         self.prettyprint = prettyprint
         self.catalog_element = None
         self.filename = &#34;&#34;
+        self.encoding = encoding
 
     def add_to_catalog(self, obj, osc_minor_version=1):
         &#34;&#34;&#34;add_to_catalog adds an element to the catalog
@@ -2009,7 +2007,9 @@ class CatalogFile(VersionBase):
 
     def dump(self):
         &#34;&#34;&#34;writes the new/updated catalog file&#34;&#34;&#34;
-        printToFile(self.catalog_element, self.filename, self.prettyprint)
+        printToFile(
+            self.catalog_element, self.filename, self.prettyprint, self.encoding
+        )
 
 
 class Catalog(VersionBase):
@@ -2565,13 +2565,11 @@ class Weather(VersionBase):
             dome_azimuth_offset (float): offset for dome image (valid from OpenSCENARIO V1.2)
                 Default: None
         &#34;&#34;&#34;
-        if cloudstate and not (
-            hasattr(CloudState, str(cloudstate))
-            or hasattr(FractionalCloudCover, str(cloudstate))
-        ):
-            raise TypeError(
-                &#34;cloudstate input is not of type CloudState or FractionalCloudCover&#34;
-            )
+        try:
+            self.cloudstate = convert_enum(cloudstate, CloudState, True)
+        except Exception as e:
+            self.cloudstate = convert_enum(cloudstate, FractionalCloudCover, True)
+
         if precipitation and not isinstance(precipitation, Precipitation):
             raise TypeError(&#34;precipitation input is not of type Precipitation&#34;)
         if fog and not isinstance(fog, Fog):
@@ -2581,7 +2579,7 @@ class Weather(VersionBase):
         if sun and not isinstance(sun, Sun):
             raise TypeError(&#34;sun input is not of type Sun&#34;)
 
-        self.cloudstate = cloudstate
+        # self.cloudstate = cloudstate
         self.atmosphericPressure = atmosphericPressure
         self.temperature = temperature
         self.fog = fog
@@ -2600,7 +2598,7 @@ class Weather(VersionBase):
                 and self.sun == other.sun
                 and self.precipitation == other.precipitation
                 and self.dome_image == other.dome_image
-                and self.dome_azimuth_offset == self.dome_azimuth_offset
+                and self.dome_azimuth_offset == other.dome_azimuth_offset
             ):
                 return True
         return False
@@ -2633,7 +2631,11 @@ class Weather(VersionBase):
         if &#34;atmosphericPressure&#34; in element.attrib:
             atmosphericPressure = element.attrib[&#34;atmosphericPressure&#34;]
         if &#34;cloudState&#34; in element.attrib:
-            cloudstate = getattr(CloudState, element.attrib[&#34;cloudState&#34;])
+            cloudstate = convert_enum(element.attrib[&#34;cloudState&#34;], CloudState, False)
+        if &#34;fractionalCloudCover&#34; in element.attrib:
+            cloudstate = convert_enum(
+                element.attrib[&#34;fractionalCloudCover&#34;], FractionalCloudCover
+            )
         if element.find(&#34;Sun&#34;) != None:
             sun = Sun.parse(element.find(&#34;Sun&#34;))
         if element.find(&#34;Fog&#34;) != None:
@@ -2643,10 +2645,12 @@ class Weather(VersionBase):
         if element.find(&#34;Wind&#34;) != None:
             wind = Wind.parse(element.find(&#34;Wind&#34;))
         if element.find(&#34;DomeImage&#34;) != None:
-            dome_file = element.find(&#34;DomeImage&#34;).find(&#34;DomeFile&#34;)
+            dome_file = element.find(&#34;DomeImage&#34;).find(&#34;DomeFile&#34;).attrib[&#34;filepath&#34;]
 
             if &#34;azimuthOffset&#34; in element.find(&#34;DomeImage&#34;).attrib:
-                dome_azimuth = convert_float(element.find(&#34;DomeImage&#34;).attrib)
+                dome_azimuth = convert_float(
+                    element.find(&#34;DomeImage&#34;).attrib[&#34;azimuthOffset&#34;]
+                )
         return Weather(
             cloudstate,
             atmosphericPressure,
@@ -2663,7 +2667,23 @@ class Weather(VersionBase):
         &#34;&#34;&#34;returns the attributes of the Weather as a dict&#34;&#34;&#34;
         retdict = {}
         if self.cloudstate:
-            retdict[&#34;cloudState&#34;] = self.cloudstate.get_name()
+            if hasattr(CloudState, str(self.cloudstate)):
+                if self.isVersionEqLarger(minor=2):
+                    raise OpenSCENARIOVersionError(
+                        &#34;Cloudstate is replaced with FractionalCloudCover for OSC versions &gt; 1.1&#34;
+                    )
+                retdict[&#34;cloudState&#34;] = self.cloudstate.get_name()
+            elif hasattr(FractionalCloudCover, str(self.cloudstate)):
+                if self.isVersionEqLess(minor=1):
+                    raise OpenSCENARIOVersionError(
+                        &#34;FractionalCloudCover was introduced in OSC 1.2&#34;
+                    )
+                retdict[&#34;fractionalCloudCover&#34;] = self.cloudstate.get_name()
+            elif str(self.cloudstate)[0] == &#34;$&#34;:
+                if self.isVersionEqLarger(minor=2):
+                    retdict[&#34;fractionalCloudCover&#34;] = self.cloudstate.get_name()
+                else:
+                    retdict[&#34;cloudState&#34;] = self.cloudstate.get_name()
         if self.temperature is not None and not self.isVersion(minor=0):
             retdict[&#34;temperature&#34;] = str(self.temperature)
         elif self.temperature is not None and self.isVersion(minor=0):
@@ -2680,6 +2700,19 @@ class Weather(VersionBase):
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the Weather&#34;&#34;&#34;
+        if self.isVersion(minor=0):
+            if self.sun == None:
+                raise OpenSCENARIOVersionError(&#34;In OpenScenario 1.0, Sun is required.&#34;)
+            if self.cloudstate == None:
+                raise OpenSCENARIOVersionError(
+                    &#34;In OpenScenario 1.0, CloudState is required.&#34;
+                )
+            if self.fog == None:
+                raise OpenSCENARIOVersionError(&#34;In OpenScenario 1.0, Fog is required.&#34;)
+            if self.precipitation == None:
+                raise OpenSCENARIOVersionError(
+                    &#34;In OpenScenario 1.0, Precipitation is required.&#34;
+                )
         element = ET.Element(&#34;Weather&#34;, attrib=self.get_attributes())
         if self.sun:
             element.append(self.sun.get_element())
@@ -2700,7 +2733,9 @@ class Weather(VersionBase):
             if self.dome_azimuth_offset:
                 dome_attr[&#34;azimuthOffset&#34;] = str(self.dome_azimuth_offset)
             dome_element = ET.SubElement(element, &#34;DomeImage&#34;, attrib=dome_attr)
-            ET.SubElement(dome_element, &#34;File&#34;, attrib={&#34;filepath&#34;: self.dome_image})
+            ET.SubElement(
+                dome_element, &#34;DomeFile&#34;, attrib={&#34;filepath&#34;: self.dome_image}
+            )
         return element
 
 
@@ -2746,6 +2781,8 @@ class Fog(VersionBase):
         &#34;&#34;&#34;
 
         self.visual_range = visual_range
+        if bounding_box and not isinstance(bounding_box, BoundingBox):
+            raise TypeError(&#34;bounding_box not of type BoundingBox&#34;)
         self.bounding_box = bounding_box
 
     def __eq__(self, other):
@@ -2927,9 +2964,7 @@ class Precipitation(VersionBase):
             intensity (float): intensity of precipitation (0...1)
 
         &#34;&#34;&#34;
-        if not hasattr(PrecipitationType, str(precipitation)):
-            raise TypeError(&#34;precipitation input is not of type PrecipitationType&#34;)
-        self.precipitation = precipitation
+        self.precipitation = convert_enum(precipitation, PrecipitationType, False)
         self.intensity = convert_float(intensity)
 
     def __eq__(self, other):
@@ -2956,7 +2991,9 @@ class Precipitation(VersionBase):
             intesity = element.attrib[&#34;precipitationIntensity&#34;]
         elif &#34;intensity&#34; in element.attrib:
             intesity = element.attrib[&#34;intensity&#34;]
-        precipitation = getattr(PrecipitationType, element.attrib[&#34;precipitationType&#34;])
+        precipitation = convert_enum(
+            element.attrib[&#34;precipitationType&#34;], PrecipitationType, False
+        )
 
         return Precipitation(precipitation, intesity)
 
@@ -3048,6 +3085,8 @@ class Wind(VersionBase):
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the Wind&#34;&#34;&#34;
+        if self.isVersion(minor=0):
+            raise OpenSCENARIOVersionError(&#34;Wind was introduced in OSC 1.1&#34;)
         element = ET.Element(&#34;Wind&#34;, attrib=self.get_attributes())
 
         return element
@@ -3100,13 +3139,11 @@ class RoadCondition(VersionBase):
             wetness (Wetness): wetness of the road
                 Default: None
         &#34;&#34;&#34;
-        self.friction_scale_factor = friction_scale_factor
+        self.friction_scale_factor = convert_float(friction_scale_factor)
         if properties is not None and not isinstance(properties, Properties):
             raise TypeError(&#34;properties input is not of type Properties&#34;)
         self.properties = properties
-        if wetness and not hasattr(Wetness, str(wetness)):
-            raise TypeError(str(wetness) + &#34;; is not a valid Wetness&#34;)
-        self.wetness = wetness
+        self.wetness = convert_enum(wetness, Wetness, True)
 
     def __eq__(self, other):
         if isinstance(other, RoadCondition):
@@ -3137,7 +3174,7 @@ class RoadCondition(VersionBase):
         if element.find(&#34;Properties&#34;) != None:
             properties = Properties.parse(element.find(&#34;Properties&#34;))
         if &#34;wetness&#34; in element.attrib:
-            wetness = getattr(Wetness, element.attrib[&#34;wetness&#34;])
+            wetness = convert_enum(element.attrib[&#34;wetness&#34;], Wetness, False)
         return RoadCondition(friction_scale_factor, properties, wetness)
 
     def get_attributes(self):
@@ -3383,11 +3420,7 @@ class Controller(VersionBase):
         if not isinstance(properties, Properties):
             raise TypeError(&#34;properties input is not of type Properties&#34;)
         self.properties = properties
-
-        if controller_type == None or hasattr(ControllerType, str(controller_type)):
-            self.controller_type = controller_type
-        else:
-            raise TypeError(&#34;controller_type not a balid controller_type&#34;)
+        self.controller_type = convert_enum(controller_type, ControllerType, True)
 
     def __eq__(self, other):
         if isinstance(other, Controller):
@@ -3395,6 +3428,7 @@ class Controller(VersionBase):
                 self.properties == other.properties
                 and self.parameters == other.parameters
                 and self.name == other.name
+                and self.controller_type == other.controller_type
             ):
                 return True
         return False
@@ -3415,7 +3449,12 @@ class Controller(VersionBase):
         name = element.attrib[&#34;name&#34;]
         properties_element = element.find(&#34;Properties&#34;)
         properties = Properties.parse(properties_element)
-        controller = Controller(name, properties)
+        cnt_type = None
+        if &#34;controllerType&#34; in element.attrib:
+            cnt_type = convert_enum(
+                element.attrib[&#34;controllerType&#34;], ControllerType, False
+            )
+        controller = Controller(name, properties, cnt_type)
 
         parameters_element = element.find(&#34;ParameterDeclarations&#34;)
         if parameters_element:
@@ -3946,16 +3985,13 @@ class AbsoluteSpeed(VersionBase):
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the AbsoluteSpeed&#34;&#34;&#34;
-        if self.isVersion(minor=0):
-            raise OpenSCENARIOVersionError(
-                &#34;AbsoluteSpeed was introduced in OpenSCENARIO V1.1&#34;
-            )
+
         elementFinalSpeed = ET.Element(&#34;FinalSpeed&#34;)
         elementAbsoluteSpeed = ET.SubElement(
             elementFinalSpeed, &#34;AbsoluteSpeed&#34;, attrib=self.get_attributes()
         )
         if self.steadyState:
-            if self.isVersion(1, 0):
+            if self.isVersion(minor=0):
                 raise OpenSCENARIOVersionError(
                     &#34;steadyState was introduced in OpenSCENARIO V1.1&#34;
                 )
@@ -4019,11 +4055,9 @@ class RelativeSpeedToMaster(VersionBase):
                     &#34;steadyState input is not an TargetTimeSteadyState or TargetDistanceSteadyState input&#34;
                 )
         self.steadyState = steadyState
-        if not speedTargetValueType.classname == &#34;SpeedTargetValueType&#34;:
-            raise TypeError(
-                &#34;speedTargetValueType input is not a valid SpeedTargetValueType&#34;
-            )
-        self.speedTargetValueType = speedTargetValueType
+        self.speedTargetValueType = convert_enum(
+            speedTargetValueType, SpeedTargetValueType
+        )
 
     def __eq__(self, other):
         if isinstance(other, RelativeSpeedToMaster):
@@ -4050,8 +4084,8 @@ class RelativeSpeedToMaster(VersionBase):
         speed_element = element.find(&#34;RelativeSpeedToMaster&#34;)
 
         value = speed_element.attrib[&#34;value&#34;]
-        speedTargetValueType = getattr(
-            SpeedTargetValueType, speed_element.attrib[&#34;speedTargetValueType&#34;]
+        speedTargetValueType = convert_enum(
+            speed_element.attrib[&#34;speedTargetValueType&#34;], SpeedTargetValueType
         )
         state = None
         if speed_element.find(&#34;TargetDistanceSteadyState&#34;) != None:
@@ -4074,16 +4108,12 @@ class RelativeSpeedToMaster(VersionBase):
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the RelativeSpeedToMaster&#34;&#34;&#34;
-        if self.isVersion(minor=0):
-            raise OpenSCENARIOVersionError(
-                &#34;RelativeSpeedToMaster was introduced in OpenSCENARIO V1.1&#34;
-            )
         elementFinalSpeed = ET.Element(&#34;FinalSpeed&#34;)
         elementRelativeSpeed = ET.SubElement(
             elementFinalSpeed, &#34;RelativeSpeedToMaster&#34;, attrib=self.get_attributes()
         )
         if self.steadyState:
-            if self.isVersion(1, 0):
+            if self.isVersion(minor=0):
                 raise OpenSCENARIOVersionError(
                     &#34;steadyState was introduced in OpenSCENARIO V1.1&#34;
                 )
@@ -4287,6 +4317,34 @@ def get_bool_string(value):
         return &#34;false&#34;
 
 
+def convert_enum(value, enumtype, none_ok=False):
+    if isinstance(value, _OscEnum):
+        if hasattr(enumtype, str(value)) or &#34;$&#34; == str(value)[0]:
+            return value
+        else:
+            raise TypeError(
+                value.get_name() + &#34; is not of Enumeration type :&#34; + str(enumtype)
+            )
+    elif isinstance(value, str):
+        if hasattr(enumtype, value):
+            return _OscEnum(enumtype.__name__, value)
+        elif &#34;$&#34; == value[0]:
+            return _OscEnum(enumtype.__name__, value)
+        else:
+            raise ValueError(
+                value
+                + &#34; is not a valid string input for Enumeration type &#34;
+                + str(enumtype)
+            )
+    elif value == None:
+        if none_ok:
+            return None
+        else:
+            raise TypeError(&#34;None value not a valid option for: &#34; + str(enumtype))
+
+    raise TypeError(str(value) + &#34; is not of a valid enumeration or str type.&#34;)
+
+
 def convert_float(value):
     &#34;&#34;&#34;Method to ensure floats are floats, will take care of None values aswell
 
@@ -4416,7 +4474,7 @@ class ValueConstraintGroup(VersionBase):
             raise OpenSCENARIOVersionError(
                 &#34;ValueConstraintGroup was introduced in OpenSCENARIO V1.1&#34;
             )
-        element = ET.Element(&#34;ValueConstraintGroup&#34;)
+        element = ET.Element(&#34;ConstraintGroup&#34;)
         if not self.value_constraints:
             raise ValueError(&#34;No Value Constraints in the Value Contraint Group&#34;)
         for value_constraint in self.value_constraints:
@@ -4464,9 +4522,7 @@ class ValueConstraint(VersionBase):
             value (string): a constant value, parameter or parameter expression. The value must match the enclosing parameter declaration.
         &#34;&#34;&#34;
         self.value = value
-        if not hasattr(Rule, str(rule)):
-            raise TypeError(str(rule) + &#34; is not a valid ValueConstraint type&#34;)
-        self.rule = rule
+        self.rule = convert_enum(rule, Rule)
 
     def __eq__(self, other):
         if isinstance(other, ValueConstraint):
@@ -4488,7 +4544,7 @@ class ValueConstraint(VersionBase):
 
         &#34;&#34;&#34;
         value = element.attrib[&#34;value&#34;]
-        rule = getattr(Rule, element.attrib[&#34;rule&#34;])
+        rule = convert_enum(element.attrib[&#34;rule&#34;], Rule)
         return ValueConstraint(rule, value)
 
     def get_attributes(self):
@@ -4754,9 +4810,7 @@ class Color(VersionBase):
             color_definition (ColorRGB or ColorCmyk): the color definition
 
         &#34;&#34;&#34;
-        if not hasattr(ColorType, str(color_type)):
-            raise TypeError(str(color_type) + &#34; is not a valid ColorType type&#34;)
-        self.color_type = color_type
+        self.color_type = convert_enum(color_type, ColorType, False)
         if not isinstance(color_definition, _ColorDefinition):
             raise TypeError(&#34;input is not a color definition&#34;)
         self.color_definition = color_definition
@@ -4784,7 +4838,7 @@ class Color(VersionBase):
 
         &#34;&#34;&#34;
 
-        color_type = getattr(ColorType, element.attrib[&#34;colorType&#34;])
+        color_type = convert_enum(element.attrib[&#34;colorType&#34;], ColorType)
         if element.find(&#34;ColorRgb&#34;) is not None:
             color_def = ColorRGB.parse(element.find(&#34;ColorRgb&#34;))
         elif element.find(&#34;ColorCmyk&#34;) is not None:
@@ -4860,6 +4914,8 @@ class UserDefinedLight(VersionBase):
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the UserDefinedLight&#34;&#34;&#34;
+        if self.isVersionEqLess(minor=1):
+            raise OpenSCENARIOVersionError(&#34;UserDefinedLight was introduced in OSC 1.2&#34;)
         element = ET.Element(
             &#34;UserDefinedLight&#34;, attrib={&#34;userDefinedLightType&#34;: self.type}
         )
@@ -4913,12 +4969,9 @@ class _LightState(VersionBase):
             user_defined_type (str): type of the custom command
 
         &#34;&#34;&#34;
-        if not hasattr(LightMode, str(mode)):
-            raise TypeError(&#34;mode input is not of type LightMode&#34;)
-
         if color and not isinstance(color, Color):
             raise TypeError(&#34;color input is not of type Color&#34;)
-        self.mode = mode
+        self.mode = convert_enum(mode, LightMode)
         self.color = color
 
         self.intensity = convert_float(intensity)
@@ -4964,12 +5017,12 @@ class _LightState(VersionBase):
         if &#34;flashingOffDuration&#34; in element.attrib:
             flashing_off = element.attrib[&#34;flashingOffDuration&#34;]
 
-        if &#34;intensity&#34; in element.attrib:
-            intensity = convert_float(element.attrib[&#34;intensity&#34;])
+        if &#34;luminousIntensity&#34; in element.attrib:
+            intensity = convert_float(element.attrib[&#34;luminousIntensity&#34;])
 
         if element.find(&#34;Color&#34;) != None:
             color = Color.parse(element.find(&#34;Color&#34;))
-        mode = getattr(LightMode, element.attrib[&#34;mode&#34;])
+        mode = convert_enum(element.attrib[&#34;mode&#34;], LightMode)
         return _LightState(mode, color, intensity, flashing_off, flashing_on)
 
     def get_attributes(self):
@@ -4981,7 +5034,7 @@ class _LightState(VersionBase):
         if self.flash_off_duration is not None:
             retdict[&#34;flashingOffDuration&#34;] = str(self.flash_off_duration)
         if self.intensity is not None:
-            retdict[&#34;intensity&#34;] = str(self.intensity)
+            retdict[&#34;luminousIntensity&#34;] = str(self.intensity)
 
         retdict[&#34;mode&#34;] = self.mode.get_name()
         return retdict
@@ -5356,9 +5409,7 @@ class PedestrianAnimation(_AnimationType):
         userDefinedPedestrianAnimation (str): User defined pedestrian animation
 
         &#34;&#34;&#34;
-        if motion is not None and not hasattr(PedestrianMotionType, str(motion)):
-            raise ValueError(&#34;motion is  not a valid type.&#34;)
-        self.motion = motion
+        self.motion = convert_enum(motion, PedestrianMotionType, True)
         self.animation = animation
         self.gestures = []
 
@@ -5384,12 +5435,14 @@ class PedestrianAnimation(_AnimationType):
             PedestrianAnimation (PedestrianAnimation): a PedestrianAnimation object
 
         &#34;&#34;&#34;
-        motion = getattr(PedestrianMotionType, element.attrib[&#34;motion&#34;])
+        motion = convert_enum(element.attrib[&#34;motion&#34;], PedestrianMotionType)
         animation = element.attrib[&#34;userDefinedPedestrianAnimation&#34;]
         pa = PedestrianAnimation(motion, animation)
 
         for gesture in element.findall(&#34;PedestrianGesture&#34;):
-            pa.add_gesture(getattr(PedestrianGestureType, gesture.attrib[&#34;gesture&#34;]))
+            pa.add_gesture(
+                convert_enum(gesture.attrib[&#34;gesture&#34;], PedestrianGestureType)
+            )
         return pa
 
     def add_gesture(self, gesture):
@@ -5400,9 +5453,7 @@ class PedestrianAnimation(_AnimationType):
             gesture (PedestrianGestureType): A new gesture of the pedestrian
 
         &#34;&#34;&#34;
-        if not hasattr(PedestrianGestureType, str(gesture)):
-            raise ValueError(&#34;gesture is not a valid PedestrianGestureType.&#34;)
-        self.gestures.append(gesture)
+        self.gestures.append(convert_enum(gesture, PedestrianGestureType))
         return self
 
     def get_attributes(self):
@@ -5459,9 +5510,7 @@ class _VehicleComponent(VersionBase):
         vehicleComponenetType (VehicleComponentType): Available compopnent types attached to a vehicle.
 
         &#34;&#34;&#34;
-        if not hasattr(VehicleComponentType, str(type)):
-            raise ValueError(type + &#34; is  not a valid type.&#34;)
-        self.type = type
+        self.type = convert_enum(type, VehicleComponentType)
 
     def __eq__(self, other):
         if isinstance(other, _VehicleComponent):
@@ -5482,7 +5531,9 @@ class _VehicleComponent(VersionBase):
             VehicleComponent (VehicleComponent): a VehicleComponent object
 
         &#34;&#34;&#34;
-        type = getattr(VehicleComponentType, element.attrib[&#34;vehicleComponentType&#34;])
+        type = convert_enum(
+            element.attrib[&#34;vehicleComponentType&#34;], VehicleComponentType
+        )
         return _VehicleComponent(type)
 
     def get_attributes(self):
@@ -5635,6 +5686,43 @@ class _ComponentAnimation(_AnimationType):
         return None
     else:
         return False</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xosc.utils.convert_enum"><code class="name flex">
+<span>def <span class="ident">convert_enum</span></span>(<span>value, enumtype, none_ok=False)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def convert_enum(value, enumtype, none_ok=False):
+    if isinstance(value, _OscEnum):
+        if hasattr(enumtype, str(value)) or &#34;$&#34; == str(value)[0]:
+            return value
+        else:
+            raise TypeError(
+                value.get_name() + &#34; is not of Enumeration type :&#34; + str(enumtype)
+            )
+    elif isinstance(value, str):
+        if hasattr(enumtype, value):
+            return _OscEnum(enumtype.__name__, value)
+        elif &#34;$&#34; == value[0]:
+            return _OscEnum(enumtype.__name__, value)
+        else:
+            raise ValueError(
+                value
+                + &#34; is not a valid string input for Enumeration type &#34;
+                + str(enumtype)
+            )
+    elif value == None:
+        if none_ok:
+            return None
+        else:
+            raise TypeError(&#34;None value not a valid option for: &#34; + str(enumtype))
+
+    raise TypeError(str(value) + &#34; is not of a valid enumeration or str type.&#34;)</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xosc.utils.convert_float"><code class="name flex">
@@ -5886,16 +5974,13 @@ steadyState (TargetTimeSteadyState / TargetDistanceSteadyState) Final phase of c
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the AbsoluteSpeed&#34;&#34;&#34;
-        if self.isVersion(minor=0):
-            raise OpenSCENARIOVersionError(
-                &#34;AbsoluteSpeed was introduced in OpenSCENARIO V1.1&#34;
-            )
+
         elementFinalSpeed = ET.Element(&#34;FinalSpeed&#34;)
         elementAbsoluteSpeed = ET.SubElement(
             elementFinalSpeed, &#34;AbsoluteSpeed&#34;, attrib=self.get_attributes()
         )
         if self.steadyState:
-            if self.isVersion(1, 0):
+            if self.isVersion(minor=0):
                 raise OpenSCENARIOVersionError(
                     &#34;steadyState was introduced in OpenSCENARIO V1.1&#34;
                 )
@@ -5985,16 +6070,13 @@ def parse(element):
 </summary>
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the AbsoluteSpeed&#34;&#34;&#34;
-    if self.isVersion(minor=0):
-        raise OpenSCENARIOVersionError(
-            &#34;AbsoluteSpeed was introduced in OpenSCENARIO V1.1&#34;
-        )
+
     elementFinalSpeed = ET.Element(&#34;FinalSpeed&#34;)
     elementAbsoluteSpeed = ET.SubElement(
         elementFinalSpeed, &#34;AbsoluteSpeed&#34;, attrib=self.get_attributes()
     )
     if self.steadyState:
-        if self.isVersion(1, 0):
+        if self.isVersion(minor=0):
             raise OpenSCENARIOVersionError(
                 &#34;steadyState was introduced in OpenSCENARIO V1.1&#34;
             )
@@ -6723,7 +6805,7 @@ path (str): path to the catalog
 </dd>
 <dt id="scenariogeneration.xosc.utils.CatalogFile"><code class="flex name class">
 <span>class <span class="ident">CatalogFile</span></span>
-<span>(</span><span>prettyprint=True)</span>
+<span>(</span><span>prettyprint=True, encoding='utf-8')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>The CatalogFile class handles any catalogs in open scenario, such as writing, and updating them</p>
@@ -6779,7 +6861,7 @@ add_catalog(catalogname, path)
             Adds a new catalog
     &#34;&#34;&#34;
 
-    def __init__(self, prettyprint=True):
+    def __init__(self, prettyprint=True, encoding=&#34;utf-8&#34;):
         &#34;&#34;&#34;initalize the CatalogFile class
 
         Parameters
@@ -6790,6 +6872,7 @@ add_catalog(catalogname, path)
         self.prettyprint = prettyprint
         self.catalog_element = None
         self.filename = &#34;&#34;
+        self.encoding = encoding
 
     def add_to_catalog(self, obj, osc_minor_version=1):
         &#34;&#34;&#34;add_to_catalog adds an element to the catalog
@@ -6872,7 +6955,9 @@ add_catalog(catalogname, path)
 
     def dump(self):
         &#34;&#34;&#34;writes the new/updated catalog file&#34;&#34;&#34;
-        printToFile(self.catalog_element, self.filename, self.prettyprint)</code></pre>
+        printToFile(
+            self.catalog_element, self.filename, self.prettyprint, self.encoding
+        )</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -7010,7 +7095,9 @@ author (str): author of the catalog
 </summary>
 <pre><code class="python">def dump(self):
     &#34;&#34;&#34;writes the new/updated catalog file&#34;&#34;&#34;
-    printToFile(self.catalog_element, self.filename, self.prettyprint)</code></pre>
+    printToFile(
+        self.catalog_element, self.filename, self.prettyprint, self.encoding
+    )</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xosc.utils.CatalogFile.open_catalog"><code class="name flex">
@@ -7575,9 +7662,7 @@ color_definition (ColorRGB or ColorCmyk): the color definition
             color_definition (ColorRGB or ColorCmyk): the color definition
 
         &#34;&#34;&#34;
-        if not hasattr(ColorType, str(color_type)):
-            raise TypeError(str(color_type) + &#34; is not a valid ColorType type&#34;)
-        self.color_type = color_type
+        self.color_type = convert_enum(color_type, ColorType, False)
         if not isinstance(color_definition, _ColorDefinition):
             raise TypeError(&#34;input is not a color definition&#34;)
         self.color_definition = color_definition
@@ -7605,7 +7690,7 @@ color_definition (ColorRGB or ColorCmyk): the color definition
 
         &#34;&#34;&#34;
 
-        color_type = getattr(ColorType, element.attrib[&#34;colorType&#34;])
+        color_type = convert_enum(element.attrib[&#34;colorType&#34;], ColorType)
         if element.find(&#34;ColorRgb&#34;) is not None:
             color_def = ColorRGB.parse(element.find(&#34;ColorRgb&#34;))
         elif element.find(&#34;ColorCmyk&#34;) is not None:
@@ -7661,7 +7746,7 @@ def parse(element):
 
     &#34;&#34;&#34;
 
-    color_type = getattr(ColorType, element.attrib[&#34;colorType&#34;])
+    color_type = convert_enum(element.attrib[&#34;colorType&#34;], ColorType)
     if element.find(&#34;ColorRgb&#34;) is not None:
         color_def = ColorRGB.parse(element.find(&#34;ColorRgb&#34;))
     elif element.find(&#34;ColorCmyk&#34;) is not None:
@@ -8296,11 +8381,7 @@ controller_type (ControllerType): controller type (valid from V1.2)
         if not isinstance(properties, Properties):
             raise TypeError(&#34;properties input is not of type Properties&#34;)
         self.properties = properties
-
-        if controller_type == None or hasattr(ControllerType, str(controller_type)):
-            self.controller_type = controller_type
-        else:
-            raise TypeError(&#34;controller_type not a balid controller_type&#34;)
+        self.controller_type = convert_enum(controller_type, ControllerType, True)
 
     def __eq__(self, other):
         if isinstance(other, Controller):
@@ -8308,6 +8389,7 @@ controller_type (ControllerType): controller type (valid from V1.2)
                 self.properties == other.properties
                 and self.parameters == other.parameters
                 and self.name == other.name
+                and self.controller_type == other.controller_type
             ):
                 return True
         return False
@@ -8328,7 +8410,12 @@ controller_type (ControllerType): controller type (valid from V1.2)
         name = element.attrib[&#34;name&#34;]
         properties_element = element.find(&#34;Properties&#34;)
         properties = Properties.parse(properties_element)
-        controller = Controller(name, properties)
+        cnt_type = None
+        if &#34;controllerType&#34; in element.attrib:
+            cnt_type = convert_enum(
+                element.attrib[&#34;controllerType&#34;], ControllerType, False
+            )
+        controller = Controller(name, properties, cnt_type)
 
         parameters_element = element.find(&#34;ParameterDeclarations&#34;)
         if parameters_element:
@@ -8439,7 +8526,12 @@ def parse(element):
     name = element.attrib[&#34;name&#34;]
     properties_element = element.find(&#34;Properties&#34;)
     properties = Properties.parse(properties_element)
-    controller = Controller(name, properties)
+    cnt_type = None
+    if &#34;controllerType&#34; in element.attrib:
+        cnt_type = convert_enum(
+            element.attrib[&#34;controllerType&#34;], ControllerType, False
+        )
+    controller = Controller(name, properties, cnt_type)
 
     parameters_element = element.find(&#34;ParameterDeclarations&#34;)
     if parameters_element:
@@ -9864,7 +9956,7 @@ author (str): author of the catalog
 </dd>
 <dt id="scenariogeneration.xosc.utils.FileHeader"><code class="flex name class">
 <span>class <span class="ident">FileHeader</span></span>
-<span>(</span><span>author, description, revMinor=1, license=None, creation_date=None, properties=None)</span>
+<span>(</span><span>author, description, revMinor=2, license=None, creation_date=None, properties=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>FileHeader creates the header of the OpenScenario file1</p>
@@ -9874,7 +9966,7 @@ author (str): author of the catalog
 author (str): the author of the scenario
 
 revMinor (int): the minor revision of the standard
-    Default: 1
+    Default: 2
 
 license (License): license (valid from OpenSCENARIO V1.1)
     Default: None
@@ -9937,7 +10029,7 @@ properties (Properties): additional info about the scenario
         author (str): the author of the scenario
 
         revMinor (int): the minor revision of the standard
-            Default: 1
+            Default: 2
 
         license (License): license (valid from OpenSCENARIO V1.1)
             Default: None
@@ -9975,7 +10067,7 @@ properties (Properties): additional info about the scenario
         self,
         author,
         description,
-        revMinor=1,
+        revMinor=_MINOR_VERSION,
         license=None,
         creation_date=None,
         properties=None,
@@ -10068,9 +10160,19 @@ properties (Properties): additional info about the scenario
         &#34;&#34;&#34;returns the elementTree of the FileHeader&#34;&#34;&#34;
         element = ET.Element(&#34;FileHeader&#34;, attrib=self.get_attributes())
         if self.license:
-            element.append(self.license.get_element())
-        if self.properties and self.version_minor &gt; 1:
-            element.append(self.properties.get_element())
+            if self.isVersionEqLarger(minor=1):
+                element.append(self.license.get_element())
+            else:
+                raise OpenSCENARIOVersionError(
+                    &#34;License in FileHeader was introduced in OSC 1.1&#34;
+                )
+        if self.properties:
+            if self.isVersionEqLarger(minor=2):
+                element.append(self.properties.get_element())
+            else:
+                raise OpenSCENARIOVersionError(
+                    &#34;Properties in FileHeader was introduced in OSC 1.2&#34;
+                )
 
         return element</code></pre>
 </details>
@@ -10159,9 +10261,19 @@ def parse(element):
     &#34;&#34;&#34;returns the elementTree of the FileHeader&#34;&#34;&#34;
     element = ET.Element(&#34;FileHeader&#34;, attrib=self.get_attributes())
     if self.license:
-        element.append(self.license.get_element())
-    if self.properties and self.version_minor &gt; 1:
-        element.append(self.properties.get_element())
+        if self.isVersionEqLarger(minor=1):
+            element.append(self.license.get_element())
+        else:
+            raise OpenSCENARIOVersionError(
+                &#34;License in FileHeader was introduced in OSC 1.1&#34;
+            )
+    if self.properties:
+        if self.isVersionEqLarger(minor=2):
+            element.append(self.properties.get_element())
+        else:
+            raise OpenSCENARIOVersionError(
+                &#34;Properties in FileHeader was introduced in OSC 1.2&#34;
+            )
 
     return element</code></pre>
 </details>
@@ -10248,6 +10360,8 @@ bounding_box (BoundingBox): bounding box of fog
         &#34;&#34;&#34;
 
         self.visual_range = visual_range
+        if bounding_box and not isinstance(bounding_box, BoundingBox):
+            raise TypeError(&#34;bounding_box not of type BoundingBox&#34;)
         self.bounding_box = bounding_box
 
     def __eq__(self, other):
@@ -10724,9 +10838,7 @@ reference (ReferenceContext): absolute or relative
         self.h = convert_float(h)
         self.p = convert_float(p)
         self.r = convert_float(r)
-        if reference is not None and not hasattr(ReferenceContext, str(reference)):
-            raise TypeError(&#34;reference input is not of type ReferenceContext&#34;)
-        self.ref = reference
+        self.ref = convert_enum(reference, ReferenceContext, True)
 
     def __eq__(self, other):
         if isinstance(other, Orientation):
@@ -10759,7 +10871,7 @@ reference (ReferenceContext): absolute or relative
             r = convert_float(element.attrib[&#34;r&#34;])
         if &#34;type&#34; in element.attrib:
             reference_str = element.attrib[&#34;type&#34;]
-            reference = getattr(ReferenceContext, reference_str)
+            reference = convert_enum(reference_str, ReferenceContext, False)
 
         return Orientation(h, p, r, reference)
 
@@ -10846,7 +10958,7 @@ def parse(element):
         r = convert_float(element.attrib[&#34;r&#34;])
     if &#34;type&#34; in element.attrib:
         reference_str = element.attrib[&#34;type&#34;]
-        reference = getattr(ReferenceContext, reference_str)
+        reference = convert_enum(reference_str, ReferenceContext, False)
 
     return Orientation(h, p, r, reference)</code></pre>
 </details>
@@ -11026,9 +11138,7 @@ value (str): value of the parameter
 
         &#34;&#34;&#34;
         self.name = name
-        if not hasattr(ParameterType, str(parameter_type)):
-            raise ValueError(&#34;parameter_type not a valid type.&#34;)
-        self.parameter_type = parameter_type
+        self.parameter_type = convert_enum(parameter_type, ParameterType, False)
         if isinstance(value, bool):
             value = get_bool_string(value)
         self.value = value
@@ -11058,9 +11168,11 @@ value (str): value of the parameter
         &#34;&#34;&#34;
         name = element.attrib[&#34;name&#34;]
         value = element.attrib[&#34;value&#34;]
-        parameter_type = getattr(ParameterType, element.attrib[&#34;parameterType&#34;])
+        parameter_type = convert_enum(
+            element.attrib[&#34;parameterType&#34;], ParameterType, False
+        )
         parameter = Parameter(name, parameter_type, value)
-        constraint_groups = element.findall(&#34;ValueConstraintGroup&#34;)
+        constraint_groups = element.findall(&#34;ConstraintGroup&#34;)
         for constraint_group in constraint_groups:
             parameter.add_value_constraint_group(
                 ValueConstraintGroup.parse(constraint_group)
@@ -11134,9 +11246,11 @@ def parse(element):
     &#34;&#34;&#34;
     name = element.attrib[&#34;name&#34;]
     value = element.attrib[&#34;value&#34;]
-    parameter_type = getattr(ParameterType, element.attrib[&#34;parameterType&#34;])
+    parameter_type = convert_enum(
+        element.attrib[&#34;parameterType&#34;], ParameterType, False
+    )
     parameter = Parameter(name, parameter_type, value)
-    constraint_groups = element.findall(&#34;ValueConstraintGroup&#34;)
+    constraint_groups = element.findall(&#34;ConstraintGroup&#34;)
     for constraint_group in constraint_groups:
         parameter.add_value_constraint_group(
             ValueConstraintGroup.parse(constraint_group)
@@ -11671,9 +11785,7 @@ get_attributes()
         userDefinedPedestrianAnimation (str): User defined pedestrian animation
 
         &#34;&#34;&#34;
-        if motion is not None and not hasattr(PedestrianMotionType, str(motion)):
-            raise ValueError(&#34;motion is  not a valid type.&#34;)
-        self.motion = motion
+        self.motion = convert_enum(motion, PedestrianMotionType, True)
         self.animation = animation
         self.gestures = []
 
@@ -11699,12 +11811,14 @@ get_attributes()
             PedestrianAnimation (PedestrianAnimation): a PedestrianAnimation object
 
         &#34;&#34;&#34;
-        motion = getattr(PedestrianMotionType, element.attrib[&#34;motion&#34;])
+        motion = convert_enum(element.attrib[&#34;motion&#34;], PedestrianMotionType)
         animation = element.attrib[&#34;userDefinedPedestrianAnimation&#34;]
         pa = PedestrianAnimation(motion, animation)
 
         for gesture in element.findall(&#34;PedestrianGesture&#34;):
-            pa.add_gesture(getattr(PedestrianGestureType, gesture.attrib[&#34;gesture&#34;]))
+            pa.add_gesture(
+                convert_enum(gesture.attrib[&#34;gesture&#34;], PedestrianGestureType)
+            )
         return pa
 
     def add_gesture(self, gesture):
@@ -11715,9 +11829,7 @@ get_attributes()
             gesture (PedestrianGestureType): A new gesture of the pedestrian
 
         &#34;&#34;&#34;
-        if not hasattr(PedestrianGestureType, str(gesture)):
-            raise ValueError(&#34;gesture is not a valid PedestrianGestureType.&#34;)
-        self.gestures.append(gesture)
+        self.gestures.append(convert_enum(gesture, PedestrianGestureType))
         return self
 
     def get_attributes(self):
@@ -11776,12 +11888,14 @@ def parse(element):
         PedestrianAnimation (PedestrianAnimation): a PedestrianAnimation object
 
     &#34;&#34;&#34;
-    motion = getattr(PedestrianMotionType, element.attrib[&#34;motion&#34;])
+    motion = convert_enum(element.attrib[&#34;motion&#34;], PedestrianMotionType)
     animation = element.attrib[&#34;userDefinedPedestrianAnimation&#34;]
     pa = PedestrianAnimation(motion, animation)
 
     for gesture in element.findall(&#34;PedestrianGesture&#34;):
-        pa.add_gesture(getattr(PedestrianGestureType, gesture.attrib[&#34;gesture&#34;]))
+        pa.add_gesture(
+            convert_enum(gesture.attrib[&#34;gesture&#34;], PedestrianGestureType)
+        )
     return pa</code></pre>
 </details>
 </dd>
@@ -11808,9 +11922,7 @@ def parse(element):
         gesture (PedestrianGestureType): A new gesture of the pedestrian
 
     &#34;&#34;&#34;
-    if not hasattr(PedestrianGestureType, str(gesture)):
-        raise ValueError(&#34;gesture is not a valid PedestrianGestureType.&#34;)
-    self.gestures.append(gesture)
+    self.gestures.append(convert_enum(gesture, PedestrianGestureType))
     return self</code></pre>
 </details>
 </dd>
@@ -12025,6 +12137,10 @@ traffic_group_state (str): state for a group of signals (valid since V1.2)
             element.append(s.get_element())
         if self.traffic_group_state is not None:
             # NOTE: Misspelling according to standard...
+            if self.isVersionEqLess(minor=1):
+                raise OpenSCENARIOVersionError(
+                    &#34;TrafficSignalGroupStage was added in OSC 1.2.&#34;
+                )
             ET.SubElement(
                 element,
                 &#34;TrafficeSignalGroupState&#34;,
@@ -12145,6 +12261,10 @@ state (str): state of the signal defined in the road network
         element.append(s.get_element())
     if self.traffic_group_state is not None:
         # NOTE: Misspelling according to standard...
+        if self.isVersionEqLess(minor=1):
+            raise OpenSCENARIOVersionError(
+                &#34;TrafficSignalGroupStage was added in OSC 1.2.&#34;
+            )
         ET.SubElement(
             element,
             &#34;TrafficeSignalGroupState&#34;,
@@ -12229,9 +12349,7 @@ intensity (float): intensity of precipitation (0...1)
             intensity (float): intensity of precipitation (0...1)
 
         &#34;&#34;&#34;
-        if not hasattr(PrecipitationType, str(precipitation)):
-            raise TypeError(&#34;precipitation input is not of type PrecipitationType&#34;)
-        self.precipitation = precipitation
+        self.precipitation = convert_enum(precipitation, PrecipitationType, False)
         self.intensity = convert_float(intensity)
 
     def __eq__(self, other):
@@ -12258,7 +12376,9 @@ intensity (float): intensity of precipitation (0...1)
             intesity = element.attrib[&#34;precipitationIntensity&#34;]
         elif &#34;intensity&#34; in element.attrib:
             intesity = element.attrib[&#34;intensity&#34;]
-        precipitation = getattr(PrecipitationType, element.attrib[&#34;precipitationType&#34;])
+        precipitation = convert_enum(
+            element.attrib[&#34;precipitationType&#34;], PrecipitationType, False
+        )
 
         return Precipitation(precipitation, intesity)
 
@@ -12317,7 +12437,9 @@ def parse(element):
         intesity = element.attrib[&#34;precipitationIntensity&#34;]
     elif &#34;intensity&#34; in element.attrib:
         intesity = element.attrib[&#34;intensity&#34;]
-    precipitation = getattr(PrecipitationType, element.attrib[&#34;precipitationType&#34;])
+    precipitation = convert_enum(
+        element.attrib[&#34;precipitationType&#34;], PrecipitationType, False
+    )
 
     return Precipitation(precipitation, intesity)</code></pre>
 </details>
@@ -12712,11 +12834,9 @@ steadyState (TargetTimeSteadyState / TargetDistanceSteadyState): Optional final 
                     &#34;steadyState input is not an TargetTimeSteadyState or TargetDistanceSteadyState input&#34;
                 )
         self.steadyState = steadyState
-        if not speedTargetValueType.classname == &#34;SpeedTargetValueType&#34;:
-            raise TypeError(
-                &#34;speedTargetValueType input is not a valid SpeedTargetValueType&#34;
-            )
-        self.speedTargetValueType = speedTargetValueType
+        self.speedTargetValueType = convert_enum(
+            speedTargetValueType, SpeedTargetValueType
+        )
 
     def __eq__(self, other):
         if isinstance(other, RelativeSpeedToMaster):
@@ -12743,8 +12863,8 @@ steadyState (TargetTimeSteadyState / TargetDistanceSteadyState): Optional final 
         speed_element = element.find(&#34;RelativeSpeedToMaster&#34;)
 
         value = speed_element.attrib[&#34;value&#34;]
-        speedTargetValueType = getattr(
-            SpeedTargetValueType, speed_element.attrib[&#34;speedTargetValueType&#34;]
+        speedTargetValueType = convert_enum(
+            speed_element.attrib[&#34;speedTargetValueType&#34;], SpeedTargetValueType
         )
         state = None
         if speed_element.find(&#34;TargetDistanceSteadyState&#34;) != None:
@@ -12767,16 +12887,12 @@ steadyState (TargetTimeSteadyState / TargetDistanceSteadyState): Optional final 
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the RelativeSpeedToMaster&#34;&#34;&#34;
-        if self.isVersion(minor=0):
-            raise OpenSCENARIOVersionError(
-                &#34;RelativeSpeedToMaster was introduced in OpenSCENARIO V1.1&#34;
-            )
         elementFinalSpeed = ET.Element(&#34;FinalSpeed&#34;)
         elementRelativeSpeed = ET.SubElement(
             elementFinalSpeed, &#34;RelativeSpeedToMaster&#34;, attrib=self.get_attributes()
         )
         if self.steadyState:
-            if self.isVersion(1, 0):
+            if self.isVersion(minor=0):
                 raise OpenSCENARIOVersionError(
                     &#34;steadyState was introduced in OpenSCENARIO V1.1&#34;
                 )
@@ -12824,8 +12940,8 @@ def parse(element):
     speed_element = element.find(&#34;RelativeSpeedToMaster&#34;)
 
     value = speed_element.attrib[&#34;value&#34;]
-    speedTargetValueType = getattr(
-        SpeedTargetValueType, speed_element.attrib[&#34;speedTargetValueType&#34;]
+    speedTargetValueType = convert_enum(
+        speed_element.attrib[&#34;speedTargetValueType&#34;], SpeedTargetValueType
     )
     state = None
     if speed_element.find(&#34;TargetDistanceSteadyState&#34;) != None:
@@ -12871,16 +12987,12 @@ def parse(element):
 </summary>
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the RelativeSpeedToMaster&#34;&#34;&#34;
-    if self.isVersion(minor=0):
-        raise OpenSCENARIOVersionError(
-            &#34;RelativeSpeedToMaster was introduced in OpenSCENARIO V1.1&#34;
-        )
     elementFinalSpeed = ET.Element(&#34;FinalSpeed&#34;)
     elementRelativeSpeed = ET.SubElement(
         elementFinalSpeed, &#34;RelativeSpeedToMaster&#34;, attrib=self.get_attributes()
     )
     if self.steadyState:
-        if self.isVersion(1, 0):
+        if self.isVersion(minor=0):
             raise OpenSCENARIOVersionError(
                 &#34;steadyState was introduced in OpenSCENARIO V1.1&#34;
             )
@@ -12987,13 +13099,11 @@ wetness (Wetness): wetness of the road
             wetness (Wetness): wetness of the road
                 Default: None
         &#34;&#34;&#34;
-        self.friction_scale_factor = friction_scale_factor
+        self.friction_scale_factor = convert_float(friction_scale_factor)
         if properties is not None and not isinstance(properties, Properties):
             raise TypeError(&#34;properties input is not of type Properties&#34;)
         self.properties = properties
-        if wetness and not hasattr(Wetness, str(wetness)):
-            raise TypeError(str(wetness) + &#34;; is not a valid Wetness&#34;)
-        self.wetness = wetness
+        self.wetness = convert_enum(wetness, Wetness, True)
 
     def __eq__(self, other):
         if isinstance(other, RoadCondition):
@@ -13024,7 +13134,7 @@ wetness (Wetness): wetness of the road
         if element.find(&#34;Properties&#34;) != None:
             properties = Properties.parse(element.find(&#34;Properties&#34;))
         if &#34;wetness&#34; in element.attrib:
-            wetness = getattr(Wetness, element.attrib[&#34;wetness&#34;])
+            wetness = convert_enum(element.attrib[&#34;wetness&#34;], Wetness, False)
         return RoadCondition(friction_scale_factor, properties, wetness)
 
     def get_attributes(self):
@@ -13082,7 +13192,7 @@ def parse(element):
     if element.find(&#34;Properties&#34;) != None:
         properties = Properties.parse(element.find(&#34;Properties&#34;))
     if &#34;wetness&#34; in element.attrib:
-        wetness = getattr(Wetness, element.attrib[&#34;wetness&#34;])
+        wetness = convert_enum(element.attrib[&#34;wetness&#34;], Wetness, False)
     return RoadCondition(friction_scale_factor, properties, wetness)</code></pre>
 </details>
 </dd>
@@ -14087,12 +14197,7 @@ Default: None</p></div>
             self._only_nones = False
         else:
             raise ValueError(&#34;missing inputs for time reference&#34;)
-        if reference_domain is not None and not hasattr(
-            ReferenceContext, str(reference_domain)
-        ):
-            raise TypeError(&#34;input reference_domain is not of type ReferenceContext&#34;)
-
-        self.reference_domain = reference_domain
+        self.reference_domain = convert_enum(reference_domain, ReferenceContext, True)
         self.scale = convert_float(scale)
         self.offset = convert_float(offset)
 
@@ -14131,8 +14236,8 @@ Default: None</p></div>
         if &#34;scale&#34; in timing_element.attrib:
             scale = timing_element.attrib[&#34;scale&#34;]
         if &#34;domainAbsoluteRelative&#34; in timing_element.attrib:
-            reference_domain = getattr(
-                ReferenceContext, timing_element.attrib[&#34;domainAbsoluteRelative&#34;]
+            reference_domain = convert_enum(
+                timing_element.attrib[&#34;domainAbsoluteRelative&#34;], ReferenceContext
             )
 
         return TimeReference(reference_domain, scale, offset)
@@ -14203,8 +14308,8 @@ def parse(element):
     if &#34;scale&#34; in timing_element.attrib:
         scale = timing_element.attrib[&#34;scale&#34;]
     if &#34;domainAbsoluteRelative&#34; in timing_element.attrib:
-        reference_domain = getattr(
-            ReferenceContext, timing_element.attrib[&#34;domainAbsoluteRelative&#34;]
+        reference_domain = convert_enum(
+            timing_element.attrib[&#34;domainAbsoluteRelative&#34;], ReferenceContext
         )
 
     return TimeReference(reference_domain, scale, offset)</code></pre>
@@ -14391,7 +14496,7 @@ add_controller(controller,weight)
         )
         for entry in vehicle_entries:
             weight = convert_float(entry.attrib[&#34;weight&#34;])
-            category = getattr(VehicleCategory, entry.attrib[&#34;category&#34;])
+            category = convert_enum(entry.attrib[&#34;category&#34;], VehicleCategory)
             td.add_vehicle(category, weight)
 
         controller_distributions = element.find(&#34;ControllerDistribution&#34;)
@@ -14415,7 +14520,7 @@ add_controller(controller,weight)
                 &#34;VehicleRoleDistributionEntry&#34;
             ):
                 td.add_vehicle_role(
-                    getattr(Role, entry.attrib[&#34;role&#34;]), entry.attrib[&#34;weight&#34;]
+                    convert_enum(entry.attrib[&#34;role&#34;], Role), entry.attrib[&#34;weight&#34;]
                 )
         return td
 
@@ -14429,9 +14534,7 @@ add_controller(controller,weight)
             weight (float): the corresponding weight for the distribution of the vehicle category
 
         &#34;&#34;&#34;
-        if not hasattr(VehicleCategory, str(vehiclecategory)):
-            raise TypeError(&#34;vehcilecategory input is not of type VehcileCategory&#34;)
-        self.vehiclecategories.append(vehiclecategory)
+        self.vehiclecategories.append(convert_enum(vehiclecategory, VehicleCategory))
         self.vehicleweights.append(weight)
         return self
 
@@ -14444,10 +14547,8 @@ add_controller(controller,weight)
 
             weight (float): the weight of that vehicle role
         &#34;&#34;&#34;
-        if not hasattr(Role, str(vehicle_role)):
-            raise TypeError(&#34;vehicle_role input is not of type Role&#34;)
         self.vehicle_roles_weights.append(convert_float(weight))
-        self.vehicle_roles.append(vehicle_role)
+        self.vehicle_roles.append(convert_enum(vehicle_role, Role))
 
     def add_controller(self, controller, weight):
         &#34;&#34;&#34;Adds a controller to the traffic distribution
@@ -14564,7 +14665,7 @@ def parse(element):
     )
     for entry in vehicle_entries:
         weight = convert_float(entry.attrib[&#34;weight&#34;])
-        category = getattr(VehicleCategory, entry.attrib[&#34;category&#34;])
+        category = convert_enum(entry.attrib[&#34;category&#34;], VehicleCategory)
         td.add_vehicle(category, weight)
 
     controller_distributions = element.find(&#34;ControllerDistribution&#34;)
@@ -14588,7 +14689,7 @@ def parse(element):
             &#34;VehicleRoleDistributionEntry&#34;
         ):
             td.add_vehicle_role(
-                getattr(Role, entry.attrib[&#34;role&#34;]), entry.attrib[&#34;weight&#34;]
+                convert_enum(entry.attrib[&#34;role&#34;], Role), entry.attrib[&#34;weight&#34;]
             )
     return td</code></pre>
 </details>
@@ -14656,9 +14757,7 @@ weight (float): the corresponding weight for the distribution of the vehicle cat
         weight (float): the corresponding weight for the distribution of the vehicle category
 
     &#34;&#34;&#34;
-    if not hasattr(VehicleCategory, str(vehiclecategory)):
-        raise TypeError(&#34;vehcilecategory input is not of type VehcileCategory&#34;)
-    self.vehiclecategories.append(vehiclecategory)
+    self.vehiclecategories.append(convert_enum(vehiclecategory, VehicleCategory))
     self.vehicleweights.append(weight)
     return self</code></pre>
 </details>
@@ -14686,10 +14785,8 @@ weight (float): the weight of that vehicle role
 
         weight (float): the weight of that vehicle role
     &#34;&#34;&#34;
-    if not hasattr(Role, str(vehicle_role)):
-        raise TypeError(&#34;vehicle_role input is not of type Role&#34;)
     self.vehicle_roles_weights.append(convert_float(weight))
-    self.vehicle_roles.append(vehicle_role)</code></pre>
+    self.vehicle_roles.append(convert_enum(vehicle_role, Role))</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xosc.utils.TrafficDefinition.get_attributes"><code class="name flex">
@@ -15164,20 +15261,11 @@ following_mode (FollowingMode): the following mode of the TransitionDynamics (va
             following_mode (FollowingMode): the following mode of the TransitionDynamics (valid from OSC V1.2)
                 Default: None
         &#34;&#34;&#34;
-        if not hasattr(DynamicsShapes, str(shape)):
-            raise TypeError(shape + &#34;; is not a valid shape.&#34;)
 
-        self.shape = shape
-        if not hasattr(DynamicsDimension, str(dimension)):
-            raise ValueError(dimension + &#34; is not a valid dynamics dimension&#34;)
-        self.dimension = dimension
+        self.shape = convert_enum(shape, DynamicsShapes, False)
+        self.dimension = convert_enum(dimension, DynamicsDimension, False)
         self.value = convert_float(value)
-
-        if following_mode is not None and not hasattr(
-            FollowingMode, str(following_mode)
-        ):
-            raise TypeError(following_mode + &#34; is not a valid FollowingMode.&#34;)
-        self.following_mode = following_mode
+        self.following_mode = convert_enum(following_mode, FollowingMode, True)
 
     def __eq__(self, other):
         if isinstance(other, TransitionDynamics):
@@ -15198,12 +15286,14 @@ following_mode (FollowingMode): the following mode of the TransitionDynamics (va
             transitiondynamics (TransitionDynamics): a TransitionDynamics object
 
         &#34;&#34;&#34;
-        shape = getattr(DynamicsShapes, element.attrib[&#34;dynamicsShape&#34;])
-        dimension = getattr(DynamicsDimension, element.attrib[&#34;dynamicsDimension&#34;])
+        shape = convert_enum(element.attrib[&#34;dynamicsShape&#34;], DynamicsShapes)
+        dimension = convert_enum(element.attrib[&#34;dynamicsDimension&#34;], DynamicsDimension)
         value = convert_float(element.attrib[&#34;value&#34;])
         following_mode = None
         if &#34;followingMode&#34; in element.attrib:
-            following_mode = getattr(FollowingMode, element.attrib[&#34;followingMode&#34;])
+            following_mode = convert_enum(
+                element.attrib[&#34;followingMode&#34;], FollowingMode
+            )
         return TransitionDynamics(shape, dimension, value, following_mode)
 
     def get_attributes(self):
@@ -15255,12 +15345,14 @@ def parse(element):
         transitiondynamics (TransitionDynamics): a TransitionDynamics object
 
     &#34;&#34;&#34;
-    shape = getattr(DynamicsShapes, element.attrib[&#34;dynamicsShape&#34;])
-    dimension = getattr(DynamicsDimension, element.attrib[&#34;dynamicsDimension&#34;])
+    shape = convert_enum(element.attrib[&#34;dynamicsShape&#34;], DynamicsShapes)
+    dimension = convert_enum(element.attrib[&#34;dynamicsDimension&#34;], DynamicsDimension)
     value = convert_float(element.attrib[&#34;value&#34;])
     following_mode = None
     if &#34;followingMode&#34; in element.attrib:
-        following_mode = getattr(FollowingMode, element.attrib[&#34;followingMode&#34;])
+        following_mode = convert_enum(
+            element.attrib[&#34;followingMode&#34;], FollowingMode
+        )
     return TransitionDynamics(shape, dimension, value, following_mode)</code></pre>
 </details>
 </dd>
@@ -15744,6 +15836,8 @@ def parse(element):
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the UserDefinedLight&#34;&#34;&#34;
+        if self.isVersionEqLess(minor=1):
+            raise OpenSCENARIOVersionError(&#34;UserDefinedLight was introduced in OSC 1.2&#34;)
         element = ET.Element(
             &#34;UserDefinedLight&#34;, attrib={&#34;userDefinedLightType&#34;: self.type}
         )
@@ -15801,6 +15895,8 @@ def parse(element):
 </summary>
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the UserDefinedLight&#34;&#34;&#34;
+    if self.isVersionEqLess(minor=1):
+        raise OpenSCENARIOVersionError(&#34;UserDefinedLight was introduced in OSC 1.2&#34;)
     element = ET.Element(
         &#34;UserDefinedLight&#34;, attrib={&#34;userDefinedLightType&#34;: self.type}
     )
@@ -15885,9 +15981,7 @@ value (string): a constant value, parameter or parameter expression. The value m
             value (string): a constant value, parameter or parameter expression. The value must match the enclosing parameter declaration.
         &#34;&#34;&#34;
         self.value = value
-        if not hasattr(Rule, str(rule)):
-            raise TypeError(str(rule) + &#34; is not a valid ValueConstraint type&#34;)
-        self.rule = rule
+        self.rule = convert_enum(rule, Rule)
 
     def __eq__(self, other):
         if isinstance(other, ValueConstraint):
@@ -15909,7 +16003,7 @@ value (string): a constant value, parameter or parameter expression. The value m
 
         &#34;&#34;&#34;
         value = element.attrib[&#34;value&#34;]
-        rule = getattr(Rule, element.attrib[&#34;rule&#34;])
+        rule = convert_enum(element.attrib[&#34;rule&#34;], Rule)
         return ValueConstraint(rule, value)
 
     def get_attributes(self):
@@ -15963,7 +16057,7 @@ def parse(element):
 
     &#34;&#34;&#34;
     value = element.attrib[&#34;value&#34;]
-    rule = getattr(Rule, element.attrib[&#34;rule&#34;])
+    rule = convert_enum(element.attrib[&#34;rule&#34;], Rule)
     return ValueConstraint(rule, value)</code></pre>
 </details>
 </dd>
@@ -16106,7 +16200,7 @@ get_element(elementname)
             raise OpenSCENARIOVersionError(
                 &#34;ValueConstraintGroup was introduced in OpenSCENARIO V1.1&#34;
             )
-        element = ET.Element(&#34;ValueConstraintGroup&#34;)
+        element = ET.Element(&#34;ConstraintGroup&#34;)
         if not self.value_constraints:
             raise ValueError(&#34;No Value Constraints in the Value Contraint Group&#34;)
         for value_constraint in self.value_constraints:
@@ -16199,7 +16293,7 @@ def parse(element):
         raise OpenSCENARIOVersionError(
             &#34;ValueConstraintGroup was introduced in OpenSCENARIO V1.1&#34;
         )
-    element = ET.Element(&#34;ValueConstraintGroup&#34;)
+    element = ET.Element(&#34;ConstraintGroup&#34;)
     if not self.value_constraints:
         raise ValueError(&#34;No Value Constraints in the Value Contraint Group&#34;)
     for value_constraint in self.value_constraints:
@@ -16298,9 +16392,7 @@ value (str): value of the variable
 
         &#34;&#34;&#34;
         self.name = name
-        if not hasattr(ParameterType, str(variable_type)):
-            raise ValueError(&#34;variable_type not a valid type.&#34;)
-        self.variable_type = variable_type
+        self.variable_type = convert_enum(variable_type, ParameterType, False)
         self.value = value
         self.constraint_groups = []
 
@@ -16328,7 +16420,9 @@ value (str): value of the variable
         &#34;&#34;&#34;
         name = element.attrib[&#34;name&#34;]
         value = element.attrib[&#34;value&#34;]
-        variable_type = getattr(ParameterType, element.attrib[&#34;variableType&#34;])
+        variable_type = convert_enum(
+            element.attrib[&#34;variableType&#34;], ParameterType, False
+        )
         variable = Variable(name, variable_type, value)
         constraint_groups = element.findall(&#34;ValueConstraintGroup&#34;)
         for constraint_group in constraint_groups:
@@ -16347,8 +16441,8 @@ value (str): value of the variable
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the Variable&#34;&#34;&#34;
-        if self.version_minor &lt; 2:
-            OpenSCENARIOVersionError(&#34;Variables were introduced in OSC 1.2&#34;)
+        if self.isVersionEqLess(minor=1):
+            raise OpenSCENARIOVersionError(&#34;Variables were introduced in OSC 1.2&#34;)
         element = ET.Element(&#34;VariableDeclaration&#34;, attrib=self.get_attributes())
         return element</code></pre>
 </details>
@@ -16388,7 +16482,9 @@ def parse(element):
     &#34;&#34;&#34;
     name = element.attrib[&#34;name&#34;]
     value = element.attrib[&#34;value&#34;]
-    variable_type = getattr(ParameterType, element.attrib[&#34;variableType&#34;])
+    variable_type = convert_enum(
+        element.attrib[&#34;variableType&#34;], ParameterType, False
+    )
     variable = Variable(name, variable_type, value)
     constraint_groups = element.findall(&#34;ValueConstraintGroup&#34;)
     for constraint_group in constraint_groups:
@@ -16430,8 +16526,8 @@ def parse(element):
 </summary>
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the Variable&#34;&#34;&#34;
-    if self.version_minor &lt; 2:
-        OpenSCENARIOVersionError(&#34;Variables were introduced in OSC 1.2&#34;)
+    if self.isVersionEqLess(minor=1):
+        raise OpenSCENARIOVersionError(&#34;Variables were introduced in OSC 1.2&#34;)
     element = ET.Element(&#34;VariableDeclaration&#34;, attrib=self.get_attributes())
     return element</code></pre>
 </details>
@@ -16832,13 +16928,11 @@ dome_azimuth_offset (float): offset for dome image (valid from OpenSCENARIO V1.2
             dome_azimuth_offset (float): offset for dome image (valid from OpenSCENARIO V1.2)
                 Default: None
         &#34;&#34;&#34;
-        if cloudstate and not (
-            hasattr(CloudState, str(cloudstate))
-            or hasattr(FractionalCloudCover, str(cloudstate))
-        ):
-            raise TypeError(
-                &#34;cloudstate input is not of type CloudState or FractionalCloudCover&#34;
-            )
+        try:
+            self.cloudstate = convert_enum(cloudstate, CloudState, True)
+        except Exception as e:
+            self.cloudstate = convert_enum(cloudstate, FractionalCloudCover, True)
+
         if precipitation and not isinstance(precipitation, Precipitation):
             raise TypeError(&#34;precipitation input is not of type Precipitation&#34;)
         if fog and not isinstance(fog, Fog):
@@ -16848,7 +16942,7 @@ dome_azimuth_offset (float): offset for dome image (valid from OpenSCENARIO V1.2
         if sun and not isinstance(sun, Sun):
             raise TypeError(&#34;sun input is not of type Sun&#34;)
 
-        self.cloudstate = cloudstate
+        # self.cloudstate = cloudstate
         self.atmosphericPressure = atmosphericPressure
         self.temperature = temperature
         self.fog = fog
@@ -16867,7 +16961,7 @@ dome_azimuth_offset (float): offset for dome image (valid from OpenSCENARIO V1.2
                 and self.sun == other.sun
                 and self.precipitation == other.precipitation
                 and self.dome_image == other.dome_image
-                and self.dome_azimuth_offset == self.dome_azimuth_offset
+                and self.dome_azimuth_offset == other.dome_azimuth_offset
             ):
                 return True
         return False
@@ -16900,7 +16994,11 @@ dome_azimuth_offset (float): offset for dome image (valid from OpenSCENARIO V1.2
         if &#34;atmosphericPressure&#34; in element.attrib:
             atmosphericPressure = element.attrib[&#34;atmosphericPressure&#34;]
         if &#34;cloudState&#34; in element.attrib:
-            cloudstate = getattr(CloudState, element.attrib[&#34;cloudState&#34;])
+            cloudstate = convert_enum(element.attrib[&#34;cloudState&#34;], CloudState, False)
+        if &#34;fractionalCloudCover&#34; in element.attrib:
+            cloudstate = convert_enum(
+                element.attrib[&#34;fractionalCloudCover&#34;], FractionalCloudCover
+            )
         if element.find(&#34;Sun&#34;) != None:
             sun = Sun.parse(element.find(&#34;Sun&#34;))
         if element.find(&#34;Fog&#34;) != None:
@@ -16910,10 +17008,12 @@ dome_azimuth_offset (float): offset for dome image (valid from OpenSCENARIO V1.2
         if element.find(&#34;Wind&#34;) != None:
             wind = Wind.parse(element.find(&#34;Wind&#34;))
         if element.find(&#34;DomeImage&#34;) != None:
-            dome_file = element.find(&#34;DomeImage&#34;).find(&#34;DomeFile&#34;)
+            dome_file = element.find(&#34;DomeImage&#34;).find(&#34;DomeFile&#34;).attrib[&#34;filepath&#34;]
 
             if &#34;azimuthOffset&#34; in element.find(&#34;DomeImage&#34;).attrib:
-                dome_azimuth = convert_float(element.find(&#34;DomeImage&#34;).attrib)
+                dome_azimuth = convert_float(
+                    element.find(&#34;DomeImage&#34;).attrib[&#34;azimuthOffset&#34;]
+                )
         return Weather(
             cloudstate,
             atmosphericPressure,
@@ -16930,7 +17030,23 @@ dome_azimuth_offset (float): offset for dome image (valid from OpenSCENARIO V1.2
         &#34;&#34;&#34;returns the attributes of the Weather as a dict&#34;&#34;&#34;
         retdict = {}
         if self.cloudstate:
-            retdict[&#34;cloudState&#34;] = self.cloudstate.get_name()
+            if hasattr(CloudState, str(self.cloudstate)):
+                if self.isVersionEqLarger(minor=2):
+                    raise OpenSCENARIOVersionError(
+                        &#34;Cloudstate is replaced with FractionalCloudCover for OSC versions &gt; 1.1&#34;
+                    )
+                retdict[&#34;cloudState&#34;] = self.cloudstate.get_name()
+            elif hasattr(FractionalCloudCover, str(self.cloudstate)):
+                if self.isVersionEqLess(minor=1):
+                    raise OpenSCENARIOVersionError(
+                        &#34;FractionalCloudCover was introduced in OSC 1.2&#34;
+                    )
+                retdict[&#34;fractionalCloudCover&#34;] = self.cloudstate.get_name()
+            elif str(self.cloudstate)[0] == &#34;$&#34;:
+                if self.isVersionEqLarger(minor=2):
+                    retdict[&#34;fractionalCloudCover&#34;] = self.cloudstate.get_name()
+                else:
+                    retdict[&#34;cloudState&#34;] = self.cloudstate.get_name()
         if self.temperature is not None and not self.isVersion(minor=0):
             retdict[&#34;temperature&#34;] = str(self.temperature)
         elif self.temperature is not None and self.isVersion(minor=0):
@@ -16947,6 +17063,19 @@ dome_azimuth_offset (float): offset for dome image (valid from OpenSCENARIO V1.2
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the Weather&#34;&#34;&#34;
+        if self.isVersion(minor=0):
+            if self.sun == None:
+                raise OpenSCENARIOVersionError(&#34;In OpenScenario 1.0, Sun is required.&#34;)
+            if self.cloudstate == None:
+                raise OpenSCENARIOVersionError(
+                    &#34;In OpenScenario 1.0, CloudState is required.&#34;
+                )
+            if self.fog == None:
+                raise OpenSCENARIOVersionError(&#34;In OpenScenario 1.0, Fog is required.&#34;)
+            if self.precipitation == None:
+                raise OpenSCENARIOVersionError(
+                    &#34;In OpenScenario 1.0, Precipitation is required.&#34;
+                )
         element = ET.Element(&#34;Weather&#34;, attrib=self.get_attributes())
         if self.sun:
             element.append(self.sun.get_element())
@@ -16967,7 +17096,9 @@ dome_azimuth_offset (float): offset for dome image (valid from OpenSCENARIO V1.2
             if self.dome_azimuth_offset:
                 dome_attr[&#34;azimuthOffset&#34;] = str(self.dome_azimuth_offset)
             dome_element = ET.SubElement(element, &#34;DomeImage&#34;, attrib=dome_attr)
-            ET.SubElement(dome_element, &#34;File&#34;, attrib={&#34;filepath&#34;: self.dome_image})
+            ET.SubElement(
+                dome_element, &#34;DomeFile&#34;, attrib={&#34;filepath&#34;: self.dome_image}
+            )
         return element</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -17019,7 +17150,11 @@ def parse(element):
     if &#34;atmosphericPressure&#34; in element.attrib:
         atmosphericPressure = element.attrib[&#34;atmosphericPressure&#34;]
     if &#34;cloudState&#34; in element.attrib:
-        cloudstate = getattr(CloudState, element.attrib[&#34;cloudState&#34;])
+        cloudstate = convert_enum(element.attrib[&#34;cloudState&#34;], CloudState, False)
+    if &#34;fractionalCloudCover&#34; in element.attrib:
+        cloudstate = convert_enum(
+            element.attrib[&#34;fractionalCloudCover&#34;], FractionalCloudCover
+        )
     if element.find(&#34;Sun&#34;) != None:
         sun = Sun.parse(element.find(&#34;Sun&#34;))
     if element.find(&#34;Fog&#34;) != None:
@@ -17029,10 +17164,12 @@ def parse(element):
     if element.find(&#34;Wind&#34;) != None:
         wind = Wind.parse(element.find(&#34;Wind&#34;))
     if element.find(&#34;DomeImage&#34;) != None:
-        dome_file = element.find(&#34;DomeImage&#34;).find(&#34;DomeFile&#34;)
+        dome_file = element.find(&#34;DomeImage&#34;).find(&#34;DomeFile&#34;).attrib[&#34;filepath&#34;]
 
         if &#34;azimuthOffset&#34; in element.find(&#34;DomeImage&#34;).attrib:
-            dome_azimuth = convert_float(element.find(&#34;DomeImage&#34;).attrib)
+            dome_azimuth = convert_float(
+                element.find(&#34;DomeImage&#34;).attrib[&#34;azimuthOffset&#34;]
+            )
     return Weather(
         cloudstate,
         atmosphericPressure,
@@ -17062,7 +17199,23 @@ def parse(element):
     &#34;&#34;&#34;returns the attributes of the Weather as a dict&#34;&#34;&#34;
     retdict = {}
     if self.cloudstate:
-        retdict[&#34;cloudState&#34;] = self.cloudstate.get_name()
+        if hasattr(CloudState, str(self.cloudstate)):
+            if self.isVersionEqLarger(minor=2):
+                raise OpenSCENARIOVersionError(
+                    &#34;Cloudstate is replaced with FractionalCloudCover for OSC versions &gt; 1.1&#34;
+                )
+            retdict[&#34;cloudState&#34;] = self.cloudstate.get_name()
+        elif hasattr(FractionalCloudCover, str(self.cloudstate)):
+            if self.isVersionEqLess(minor=1):
+                raise OpenSCENARIOVersionError(
+                    &#34;FractionalCloudCover was introduced in OSC 1.2&#34;
+                )
+            retdict[&#34;fractionalCloudCover&#34;] = self.cloudstate.get_name()
+        elif str(self.cloudstate)[0] == &#34;$&#34;:
+            if self.isVersionEqLarger(minor=2):
+                retdict[&#34;fractionalCloudCover&#34;] = self.cloudstate.get_name()
+            else:
+                retdict[&#34;cloudState&#34;] = self.cloudstate.get_name()
     if self.temperature is not None and not self.isVersion(minor=0):
         retdict[&#34;temperature&#34;] = str(self.temperature)
     elif self.temperature is not None and self.isVersion(minor=0):
@@ -17089,6 +17242,19 @@ def parse(element):
 </summary>
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the Weather&#34;&#34;&#34;
+    if self.isVersion(minor=0):
+        if self.sun == None:
+            raise OpenSCENARIOVersionError(&#34;In OpenScenario 1.0, Sun is required.&#34;)
+        if self.cloudstate == None:
+            raise OpenSCENARIOVersionError(
+                &#34;In OpenScenario 1.0, CloudState is required.&#34;
+            )
+        if self.fog == None:
+            raise OpenSCENARIOVersionError(&#34;In OpenScenario 1.0, Fog is required.&#34;)
+        if self.precipitation == None:
+            raise OpenSCENARIOVersionError(
+                &#34;In OpenScenario 1.0, Precipitation is required.&#34;
+            )
     element = ET.Element(&#34;Weather&#34;, attrib=self.get_attributes())
     if self.sun:
         element.append(self.sun.get_element())
@@ -17109,7 +17275,9 @@ def parse(element):
         if self.dome_azimuth_offset:
             dome_attr[&#34;azimuthOffset&#34;] = str(self.dome_azimuth_offset)
         dome_element = ET.SubElement(element, &#34;DomeImage&#34;, attrib=dome_attr)
-        ET.SubElement(dome_element, &#34;File&#34;, attrib={&#34;filepath&#34;: self.dome_image})
+        ET.SubElement(
+            dome_element, &#34;DomeFile&#34;, attrib={&#34;filepath&#34;: self.dome_image}
+        )
     return element</code></pre>
 </details>
 </dd>
@@ -17222,6 +17390,8 @@ speed (float): wind speed (m/s)
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the Wind&#34;&#34;&#34;
+        if self.isVersion(minor=0):
+            raise OpenSCENARIOVersionError(&#34;Wind was introduced in OSC 1.1&#34;)
         element = ET.Element(&#34;Wind&#34;, attrib=self.get_attributes())
 
         return element</code></pre>
@@ -17294,6 +17464,8 @@ def parse(element):
 </summary>
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the Wind&#34;&#34;&#34;
+    if self.isVersion(minor=0):
+        raise OpenSCENARIOVersionError(&#34;Wind was introduced in OSC 1.1&#34;)
     element = ET.Element(&#34;Wind&#34;, attrib=self.get_attributes())
 
     return element</code></pre>
@@ -17316,8 +17488,9 @@ def parse(element):
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
-<ul class="">
+<ul class="two-column">
 <li><code><a title="scenariogeneration.xosc.utils.convert_bool" href="#scenariogeneration.xosc.utils.convert_bool">convert_bool</a></code></li>
+<li><code><a title="scenariogeneration.xosc.utils.convert_enum" href="#scenariogeneration.xosc.utils.convert_enum">convert_enum</a></code></li>
 <li><code><a title="scenariogeneration.xosc.utils.convert_float" href="#scenariogeneration.xosc.utils.convert_float">convert_float</a></code></li>
 <li><code><a title="scenariogeneration.xosc.utils.convert_int" href="#scenariogeneration.xosc.utils.convert_int">convert_int</a></code></li>
 <li><code><a title="scenariogeneration.xosc.utils.get_bool_string" href="#scenariogeneration.xosc.utils.get_bool_string">get_bool_string</a></code></li>

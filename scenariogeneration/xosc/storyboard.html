@@ -63,12 +63,13 @@ from .utils import (
     convert_bool,
     convert_int,
     get_bool_string,
+    convert_enum,
 )
 from .enumerations import Priority, Rule, ConditionEdge, VersionBase
 from .actions import _GlobalActionFactory, _PrivateActionFactory
 
 
-class Init:
+class Init(VersionBase):
     &#34;&#34;&#34;the Init class, creates the init part of the storyboard
 
     Attributes
@@ -213,7 +214,7 @@ class Init:
         return element
 
 
-class StoryBoard:
+class StoryBoard(VersionBase):
     &#34;&#34;&#34;The StoryBoard class creates the storyboard of OpenScenario
 
     Parameters
@@ -396,7 +397,7 @@ class StoryBoard:
 
         Parameters
         ----------
-            maneuver (Maneuver): the Maneuver to add
+            maneuver (Maneuver or CatalogReference): the Maneuver to add
 
             actors (list of &#39;str&#39;, or &#39;str&#39;): list of all actors in the maneuver or just a name of the actor
 
@@ -410,9 +411,15 @@ class StoryBoard:
                 Default: ParameterDeclarations()
 
         &#34;&#34;&#34;
-        if not isinstance(maneuver, Maneuver):
+        if not (
+            isinstance(maneuver, Maneuver) or isinstance(maneuver, CatalogReference)
+        ):
             raise TypeError(&#34;maneuver input is not of type Maneuver&#34;)
-        mangr = ManeuverGroup(&#34;maneuvuergroup_&#34; + maneuver.name)
+        if isinstance(maneuver, Maneuver):
+            mangr = ManeuverGroup(&#34;maneuvuergroup_&#34; + maneuver.name)
+        else:
+            mangr = ManeuverGroup(&#34;maneuvuergroup_from_catalog&#34;)
+
         if actors is not None:
             if isinstance(actors, list):
                 for a in actors:
@@ -446,7 +453,7 @@ class StoryBoard:
         return element
 
 
-class Story:
+class Story(VersionBase):
     &#34;&#34;&#34;The Story class creates a story of the OpenScenario
 
     Parameters
@@ -560,7 +567,7 @@ class Story:
         return element
 
 
-class Act:
+class Act(VersionBase):
     &#34;&#34;&#34;the Act class creates the Act of the OpenScenario
 
     Parameters
@@ -701,7 +708,7 @@ class Act:
         return element
 
 
-class ManeuverGroup:
+class ManeuverGroup(VersionBase):
     &#34;&#34;&#34;the ManeuverGroup creates the ManeuverGroup of the OpenScenario
 
     Parameters
@@ -791,7 +798,7 @@ class ManeuverGroup:
         maneuver_group.actors = actors
         for m in element.findall(&#34;Maneuver&#34;):
             maneuver_group.add_maneuver(Maneuver.parse(m))
-        for cr in element.findall(&#34;CatalogReferece&#34;):
+        for cr in element.findall(&#34;CatalogReference&#34;):
             maneuver_group.add_maneuver(CatalogReference.parse(cr))
 
         return maneuver_group
@@ -835,7 +842,7 @@ class ManeuverGroup:
         return element
 
 
-class _Actors:
+class _Actors(VersionBase):
     &#34;&#34;&#34;_Actors is used to create the actors of a ManeuverGroup
 
     Parameters
@@ -934,7 +941,7 @@ class _Actors:
         return element
 
 
-class Maneuver:
+class Maneuver(VersionBase):
     &#34;&#34;&#34;The Maneuver class creates the Maneuver of OpenScenario
 
     Parameters
@@ -1130,9 +1137,7 @@ class Event(VersionBase):
 
     def __init__(self, name, priority, maxexecution=1):
         self.name = name
-        if not hasattr(Priority, str(priority)):
-            ValueError(&#34;Not a valid priority&#34;)
-        self.priority = priority
+        self.priority = convert_enum(priority, Priority)
         self.action = []
         self.trigger = None
         self.maxexecution = convert_int(maxexecution)
@@ -1291,7 +1296,7 @@ stoptrigger (*Trigger): stoptrigger of the act (optional)
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Act:
+<pre><code class="python">class Act(VersionBase):
     &#34;&#34;&#34;the Act class creates the Act of the OpenScenario
 
     Parameters
@@ -1431,6 +1436,10 @@ stoptrigger (*Trigger): stoptrigger of the act (optional)
         element.append(self.stoptrigger.get_element())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Static methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.storyboard.Act.parse"><code class="name flex">
@@ -1630,9 +1639,7 @@ get_attributes()
 
     def __init__(self, name, priority, maxexecution=1):
         self.name = name
-        if not hasattr(Priority, str(priority)):
-            ValueError(&#34;Not a valid priority&#34;)
-        self.priority = priority
+        self.priority = convert_enum(priority, Priority)
         self.action = []
         self.trigger = None
         self.maxexecution = convert_int(maxexecution)
@@ -1918,7 +1925,7 @@ add_user_defined_action(action):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Init:
+<pre><code class="python">class Init(VersionBase):
     &#34;&#34;&#34;the Init class, creates the init part of the storyboard
 
     Attributes
@@ -2062,6 +2069,10 @@ add_user_defined_action(action):
 
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Static methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.storyboard.Init.parse"><code class="name flex">
@@ -2284,7 +2295,7 @@ Parameters</p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Maneuver:
+<pre><code class="python">class Maneuver(VersionBase):
     &#34;&#34;&#34;The Maneuver class creates the Maneuver of OpenScenario
 
     Parameters
@@ -2434,6 +2445,10 @@ Parameters</p>
 
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Static methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.storyboard.Maneuver.parse"><code class="name flex">
@@ -2661,7 +2676,7 @@ selecttriggeringentities (bool): Have no idea what this does ??? TODO: check
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class ManeuverGroup:
+<pre><code class="python">class ManeuverGroup(VersionBase):
     &#34;&#34;&#34;the ManeuverGroup creates the ManeuverGroup of the OpenScenario
 
     Parameters
@@ -2751,7 +2766,7 @@ selecttriggeringentities (bool): Have no idea what this does ??? TODO: check
         maneuver_group.actors = actors
         for m in element.findall(&#34;Maneuver&#34;):
             maneuver_group.add_maneuver(Maneuver.parse(m))
-        for cr in element.findall(&#34;CatalogReferece&#34;):
+        for cr in element.findall(&#34;CatalogReference&#34;):
             maneuver_group.add_maneuver(CatalogReference.parse(cr))
 
         return maneuver_group
@@ -2794,6 +2809,10 @@ selecttriggeringentities (bool): Have no idea what this does ??? TODO: check
             element.append(man.get_element())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Static methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.storyboard.ManeuverGroup.parse"><code class="name flex">
@@ -2832,7 +2851,7 @@ def parse(element):
     maneuver_group.actors = actors
     for m in element.findall(&#34;Maneuver&#34;):
         maneuver_group.add_maneuver(Maneuver.parse(m))
-    for cr in element.findall(&#34;CatalogReferece&#34;):
+    for cr in element.findall(&#34;CatalogReference&#34;):
         maneuver_group.add_maneuver(CatalogReference.parse(cr))
 
     return maneuver_group</code></pre>
@@ -2969,7 +2988,7 @@ parameters (ParameterDeclarations): the parameters of the Story
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Story:
+<pre><code class="python">class Story(VersionBase):
     &#34;&#34;&#34;The Story class creates a story of the OpenScenario
 
     Parameters
@@ -3082,6 +3101,10 @@ parameters (ParameterDeclarations): the parameters of the Story
             element.append(a.get_element())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Static methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.storyboard.Story.parse"><code class="name flex">
@@ -3234,7 +3257,7 @@ stoptrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigge
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class StoryBoard:
+<pre><code class="python">class StoryBoard(VersionBase):
     &#34;&#34;&#34;The StoryBoard class creates the storyboard of OpenScenario
 
     Parameters
@@ -3417,7 +3440,7 @@ stoptrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigge
 
         Parameters
         ----------
-            maneuver (Maneuver): the Maneuver to add
+            maneuver (Maneuver or CatalogReference): the Maneuver to add
 
             actors (list of &#39;str&#39;, or &#39;str&#39;): list of all actors in the maneuver or just a name of the actor
 
@@ -3431,9 +3454,15 @@ stoptrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigge
                 Default: ParameterDeclarations()
 
         &#34;&#34;&#34;
-        if not isinstance(maneuver, Maneuver):
+        if not (
+            isinstance(maneuver, Maneuver) or isinstance(maneuver, CatalogReference)
+        ):
             raise TypeError(&#34;maneuver input is not of type Maneuver&#34;)
-        mangr = ManeuverGroup(&#34;maneuvuergroup_&#34; + maneuver.name)
+        if isinstance(maneuver, Maneuver):
+            mangr = ManeuverGroup(&#34;maneuvuergroup_&#34; + maneuver.name)
+        else:
+            mangr = ManeuverGroup(&#34;maneuvuergroup_from_catalog&#34;)
+
         if actors is not None:
             if isinstance(actors, list):
                 for a in actors:
@@ -3466,6 +3495,10 @@ stoptrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigge
 
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Static methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.storyboard.StoryBoard.parse"><code class="name flex">
@@ -3551,7 +3584,7 @@ parameters (ParameterDeclarations): the parameters of the story (optional)
 <div class="desc"><p>add_maneuver is a quick way to add a single maneuver to one story, for multi maneuver type of scenarios, use ManeuverGroup instead.</p>
 <p>NOTE: if used multiple times multiple stories will be created</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>maneuver (Maneuver): the Maneuver to add
+<pre><code>maneuver (Maneuver or CatalogReference): the Maneuver to add
 
 actors (list of 'str', or 'str'): list of all actors in the maneuver or just a name of the actor
 
@@ -3582,7 +3615,7 @@ parameters (ParameterDeclarations): the parameters of the story (optional)
 
     Parameters
     ----------
-        maneuver (Maneuver): the Maneuver to add
+        maneuver (Maneuver or CatalogReference): the Maneuver to add
 
         actors (list of &#39;str&#39;, or &#39;str&#39;): list of all actors in the maneuver or just a name of the actor
 
@@ -3596,9 +3629,15 @@ parameters (ParameterDeclarations): the parameters of the story (optional)
             Default: ParameterDeclarations()
 
     &#34;&#34;&#34;
-    if not isinstance(maneuver, Maneuver):
+    if not (
+        isinstance(maneuver, Maneuver) or isinstance(maneuver, CatalogReference)
+    ):
         raise TypeError(&#34;maneuver input is not of type Maneuver&#34;)
-    mangr = ManeuverGroup(&#34;maneuvuergroup_&#34; + maneuver.name)
+    if isinstance(maneuver, Maneuver):
+        mangr = ManeuverGroup(&#34;maneuvuergroup_&#34; + maneuver.name)
+    else:
+        mangr = ManeuverGroup(&#34;maneuvuergroup_from_catalog&#34;)
+
     if actors is not None:
         if isinstance(actors, list):
             for a in actors:

@@ -36,18 +36,19 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <pre><code class="python">&#34;&#34;&#34;
   scenariogeneration
   https://github.com/pyoscx/scenariogeneration
- 
+
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at https://mozilla.org/MPL/2.0/.
- 
+
   Copyright (c) 2022 The scenariogeneration Authors.
 
 &#34;&#34;&#34;
 import xml.etree.ElementTree as ET
+from .utils import XodrBase
 
 
-class ElevationProfile:
+class ElevationProfile(XodrBase):
     &#34;&#34;&#34;the ElevationProfile creates the elevationProfile element of the road in opendrive,
 
 
@@ -67,9 +68,10 @@ class ElevationProfile:
     def __init__(self):
         &#34;&#34;&#34;initalize the ElevationProfile class&#34;&#34;&#34;
         self.elevations = []
+        super().__init__()
 
     def __eq__(self, other):
-        if isinstance(other, ElevationProfile):
+        if isinstance(other, ElevationProfile) and super().__eq__(other):
             if self.elevations == other.elevations:
                 return True
         return False
@@ -94,13 +96,14 @@ class ElevationProfile:
         &#34;&#34;&#34;returns the elementTree of the ElevationProfile&#34;&#34;&#34;
 
         element = ET.Element(&#34;elevationProfile&#34;)
+        self._add_additional_data_to_element(element)
         for i in self.elevations:
             element.append(i.get_element(&#34;elevation&#34;))
 
         return element
 
 
-class LateralProfile:
+class LateralProfile(XodrBase):
     &#34;&#34;&#34;the LateralProfile creates the elevationProfile element of the road in opendrive,
 
 
@@ -124,11 +127,12 @@ class LateralProfile:
 
     def __init__(self):
         &#34;&#34;&#34;initalize the LateralProfile class&#34;&#34;&#34;
+        super().__init__()
         self.superelevations = []
         self.shapes = []
 
     def __eq__(self, other):
-        if isinstance(other, LateralProfile):
+        if isinstance(other, LateralProfile) and super().__eq__(other):
             if (
                 self.superelevations == other.superelevations
                 and self.shapes == other.shapes
@@ -171,6 +175,7 @@ class LateralProfile:
         &#34;&#34;&#34;returns the elementTree of the LateralProfile&#34;&#34;&#34;
 
         element = ET.Element(&#34;lateralProfile&#34;)
+        self._add_additional_data_to_element(element)
         for i in self.superelevations:
             element.append(i.get_element(&#34;superelevation&#34;))
         for i in self.shapes:
@@ -317,7 +322,7 @@ add_elevation(elevation)
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class ElevationProfile:
+<pre><code class="python">class ElevationProfile(XodrBase):
     &#34;&#34;&#34;the ElevationProfile creates the elevationProfile element of the road in opendrive,
 
 
@@ -337,9 +342,10 @@ add_elevation(elevation)
     def __init__(self):
         &#34;&#34;&#34;initalize the ElevationProfile class&#34;&#34;&#34;
         self.elevations = []
+        super().__init__()
 
     def __eq__(self, other):
-        if isinstance(other, ElevationProfile):
+        if isinstance(other, ElevationProfile) and super().__eq__(other):
             if self.elevations == other.elevations:
                 return True
         return False
@@ -364,11 +370,16 @@ add_elevation(elevation)
         &#34;&#34;&#34;returns the elementTree of the ElevationProfile&#34;&#34;&#34;
 
         element = ET.Element(&#34;elevationProfile&#34;)
+        self._add_additional_data_to_element(element)
         for i in self.elevations:
             element.append(i.get_element(&#34;elevation&#34;))
 
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.elevation.ElevationProfile.add_elevation"><code class="name flex">
@@ -413,6 +424,7 @@ add_elevation(elevation)
     &#34;&#34;&#34;returns the elementTree of the ElevationProfile&#34;&#34;&#34;
 
     element = ET.Element(&#34;elevationProfile&#34;)
+    self._add_additional_data_to_element(element)
     for i in self.elevations:
         element.append(i.get_element(&#34;elevation&#34;))
 
@@ -420,6 +432,15 @@ add_elevation(elevation)
 </details>
 </dd>
 </dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_dataquality" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_dataquality">add_dataquality</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_userdata" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_userdata">add_userdata</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 <dt id="scenariogeneration.xodr.elevation.LateralProfile"><code class="flex name class">
 <span>class <span class="ident">LateralProfile</span></span>
@@ -446,7 +467,7 @@ add_shape(shape)
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class LateralProfile:
+<pre><code class="python">class LateralProfile(XodrBase):
     &#34;&#34;&#34;the LateralProfile creates the elevationProfile element of the road in opendrive,
 
 
@@ -470,11 +491,12 @@ add_shape(shape)
 
     def __init__(self):
         &#34;&#34;&#34;initalize the LateralProfile class&#34;&#34;&#34;
+        super().__init__()
         self.superelevations = []
         self.shapes = []
 
     def __eq__(self, other):
-        if isinstance(other, LateralProfile):
+        if isinstance(other, LateralProfile) and super().__eq__(other):
             if (
                 self.superelevations == other.superelevations
                 and self.shapes == other.shapes
@@ -517,12 +539,17 @@ add_shape(shape)
         &#34;&#34;&#34;returns the elementTree of the LateralProfile&#34;&#34;&#34;
 
         element = ET.Element(&#34;lateralProfile&#34;)
+        self._add_additional_data_to_element(element)
         for i in self.superelevations:
             element.append(i.get_element(&#34;superelevation&#34;))
         for i in self.shapes:
             element.append(i.get_element(&#34;shape&#34;))
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.elevation.LateralProfile.add_shape"><code class="name flex">
@@ -595,6 +622,7 @@ add_shape(shape)
     &#34;&#34;&#34;returns the elementTree of the LateralProfile&#34;&#34;&#34;
 
     element = ET.Element(&#34;lateralProfile&#34;)
+    self._add_additional_data_to_element(element)
     for i in self.superelevations:
         element.append(i.get_element(&#34;superelevation&#34;))
     for i in self.shapes:
@@ -603,6 +631,15 @@ add_shape(shape)
 </details>
 </dd>
 </dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_dataquality" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_dataquality">add_dataquality</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_userdata" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_userdata">add_userdata</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 </dl>
 </section>

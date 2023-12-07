@@ -40,13 +40,13 @@ a new lane section to change the number of lanes instead.</p>
 <pre><code class="python">&#34;&#34;&#34;
   scenariogeneration
   https://github.com/pyoscx/scenariogeneration
- 
+
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at https://mozilla.org/MPL/2.0/.
- 
+
   Copyright (c) 2022 The scenariogeneration Authors.
-  
+
     Example for linking two roads with an unequal number of lanes.
 
     Note: This is possible and valid according to the OpenDRIVE standard. It is
@@ -54,47 +54,66 @@ a new lane section to change the number of lanes instead.</p>
     a new lane section to change the number of lanes instead.
 &#34;&#34;&#34;
 
-from scenariogeneration import xodr
+from scenariogeneration import xodr, prettyprint, ScenarioGenerator
 import os
 
-# Create roads
-length_road = 100.0
-road_first = xodr.create_road([xodr.Line(length_road)], 1, 2, 3)
-road_second = xodr.create_road([xodr.Line(length_road)], 2, 2, 4)
-# Make a new lane open up/branch out
-new_lane_width = 3.0
-road_second.lanes.lanesections[0].rightlanes[2].a = 0.0
-road_second.lanes.lanesections[0].rightlanes[2].b = 0.0
-road_second.lanes.lanesections[0].rightlanes[2].c = (
-    3.0 / length_road**2 * new_lane_width
-)
-road_second.lanes.lanesections[0].rightlanes[2].d = (
-    -2.0 / length_road**3 * new_lane_width
-)
 
-## Create the OpenDrive class (Master class)
-odr = xodr.OpenDrive(&#34;myroads&#34;)
+class Scenario(ScenarioGenerator):
+    def __init__(self):
+        super().__init__()
 
-## Finally add roads to Opendrive
-odr.add_road(road_first)
-odr.add_road(road_second)
+    def road(self, **kwargs):
+        # Create roads
+        length_road = 100.0
+        road_first = xodr.create_road([xodr.Line(length_road)], 1, 2, 3)
+        road_first.planview.adjust_geometries()
 
-# Link roads
-road_first.add_successor(xodr.ElementType.road, 2, xodr.ContactPoint.start)
-road_second.add_predecessor(xodr.ElementType.road, 1, xodr.ContactPoint.end)
+        road_second = xodr.create_road([xodr.Line(length_road)], 2, 2, 4)
+        road_second.planview.set_start_point(100, 0, 0)
+        road_second.planview.adjust_geometries()
+        # Make a new lane open up/branch out
+        new_lane_width = 3.0
+        road_second.lanes.lanesections[0].rightlanes[2].a = 0.0
+        road_second.lanes.lanesections[0].rightlanes[2].b = 0.0
+        road_second.lanes.lanesections[0].rightlanes[2].c = (
+            3.0 / length_road**2 * new_lane_width
+        )
+        road_second.lanes.lanesections[0].rightlanes[2].d = (
+            -2.0 / length_road**3 * new_lane_width
+        )
 
-# Link lanes but do not link the newly beginning lane
-link_lane_ids_first = [2, 1, -1, -2, -3]
-link_lane_ids_second = [2, 1, -1, -2, -4]
-xodr.create_lane_links_from_ids(
-    road_first, road_second, link_lane_ids_first, link_lane_ids_second
-)
+        ## Create the OpenDrive class (Master class)
+        odr = xodr.OpenDrive(&#34;myroads&#34;)
 
-# Adjust initial positions of the roads looking at succ-pred logic
-odr.adjust_startpoints()
+        ## Finally add roads to Opendrive
+        odr.add_road(road_first)
+        odr.add_road(road_second)
 
-# write the OpenDRIVE file as xodr using current script name
-odr.write_xml(os.path.basename(__file__).replace(&#34;.py&#34;, &#34;.xodr&#34;))</code></pre>
+        # Link roads
+        road_first.add_successor(xodr.ElementType.road, 2, xodr.ContactPoint.start)
+        road_second.add_predecessor(xodr.ElementType.road, 1, xodr.ContactPoint.end)
+
+        # Link lanes but do not link the newly beginning lane
+        link_lane_ids_first = [2, 1, -1, -2, -3]
+        link_lane_ids_second = [2, 1, -1, -2, -4]
+        xodr.create_lane_links_from_ids(
+            road_first, road_second, link_lane_ids_first, link_lane_ids_second
+        )
+
+        return odr
+
+
+if __name__ == &#34;__main__&#34;:
+    sce = Scenario()
+    # Print the resulting xml
+    prettyprint(sce.road().get_element())
+
+    # write the OpenSCENARIO file as xosc using current script name
+    sce.generate(&#34;.&#34;)
+
+    # uncomment the following lines to display the scenario using esmini
+    # from scenariogeneration import esmini
+    # esmini(sce,os.path.join(&#39;esmini&#39;))</code></pre>
 </details>
 </section>
 <section>
@@ -104,6 +123,100 @@ odr.write_xml(os.path.basename(__file__).replace(&#34;.py&#34;, &#34;.xodr&#34;)
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="examples.xodr.road_link_unequal_number_of_lanes.Scenario"><code class="flex name class">
+<span>class <span class="ident">Scenario</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>ScenarioTemplate is a class that should be inherited by a Scenario class in order to generate xodr and xosc files based on pyoscx and pyodrx</p>
+<p>Two main uses, in your generation class define self.parameters as either as
+- a dict of lists, where the lists are the values you want to sweep over, all permutations of these sets will be generated
+- a list of dicts, where the dicts are identical and each element in the list is one scenario</p>
+<h2 id="attributes">Attributes</h2>
+<pre><code>road_file (str): name of the roadfile
+
+parameters (dict of lists, or list of dicts): parameter sets to be used
+
+naming (str): two options "numerical" or "parameter"
+
+generate_all_roads (bool): will only generate unique roads
+
+number_of_parallel_writings (int): parallelize the writing of the xml files
+    Default: 1 (no parallelization)
+
+basename (str): basename of the scenariofiles,
+    Default: name of file
+
+encoding (str): encoding of the outputs
+    Default:
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Scenario(ScenarioGenerator):
+    def __init__(self):
+        super().__init__()
+
+    def road(self, **kwargs):
+        # Create roads
+        length_road = 100.0
+        road_first = xodr.create_road([xodr.Line(length_road)], 1, 2, 3)
+        road_first.planview.adjust_geometries()
+
+        road_second = xodr.create_road([xodr.Line(length_road)], 2, 2, 4)
+        road_second.planview.set_start_point(100, 0, 0)
+        road_second.planview.adjust_geometries()
+        # Make a new lane open up/branch out
+        new_lane_width = 3.0
+        road_second.lanes.lanesections[0].rightlanes[2].a = 0.0
+        road_second.lanes.lanesections[0].rightlanes[2].b = 0.0
+        road_second.lanes.lanesections[0].rightlanes[2].c = (
+            3.0 / length_road**2 * new_lane_width
+        )
+        road_second.lanes.lanesections[0].rightlanes[2].d = (
+            -2.0 / length_road**3 * new_lane_width
+        )
+
+        ## Create the OpenDrive class (Master class)
+        odr = xodr.OpenDrive(&#34;myroads&#34;)
+
+        ## Finally add roads to Opendrive
+        odr.add_road(road_first)
+        odr.add_road(road_second)
+
+        # Link roads
+        road_first.add_successor(xodr.ElementType.road, 2, xodr.ContactPoint.start)
+        road_second.add_predecessor(xodr.ElementType.road, 1, xodr.ContactPoint.end)
+
+        # Link lanes but do not link the newly beginning lane
+        link_lane_ids_first = [2, 1, -1, -2, -3]
+        link_lane_ids_second = [2, 1, -1, -2, -4]
+        xodr.create_lane_links_from_ids(
+            road_first, road_second, link_lane_ids_first, link_lane_ids_second
+        )
+
+        return odr</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.scenario_generator.ScenarioGenerator" href="../../scenariogeneration/scenario_generator.html#scenariogeneration.scenario_generator.ScenarioGenerator">ScenarioGenerator</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="scenariogeneration.scenario_generator.ScenarioGenerator" href="../../scenariogeneration/scenario_generator.html#scenariogeneration.scenario_generator.ScenarioGenerator">ScenarioGenerator</a></b></code>:
+<ul class="hlist">
+<li><code><a title="scenariogeneration.scenario_generator.ScenarioGenerator.generate" href="../../scenariogeneration/scenario_generator.html#scenariogeneration.scenario_generator.ScenarioGenerator.generate">generate</a></code></li>
+<li><code><a title="scenariogeneration.scenario_generator.ScenarioGenerator.generate_single" href="../../scenariogeneration/scenario_generator.html#scenariogeneration.scenario_generator.ScenarioGenerator.generate_single">generate_single</a></code></li>
+<li><code><a title="scenariogeneration.scenario_generator.ScenarioGenerator.print_permutations" href="../../scenariogeneration/scenario_generator.html#scenariogeneration.scenario_generator.ScenarioGenerator.print_permutations">print_permutations</a></code></li>
+<li><code><a title="scenariogeneration.scenario_generator.ScenarioGenerator.road" href="../../scenariogeneration/scenario_generator.html#scenariogeneration.scenario_generator.ScenarioGenerator.road">road</a></code></li>
+<li><code><a title="scenariogeneration.scenario_generator.ScenarioGenerator.scenario" href="../../scenariogeneration/scenario_generator.html#scenariogeneration.scenario_generator.ScenarioGenerator.scenario">scenario</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -115,6 +228,13 @@ odr.write_xml(os.path.basename(__file__).replace(&#34;.py&#34;, &#34;.xodr&#34;)
 <li><h3>Super-module</h3>
 <ul>
 <li><code><a title="examples.xodr" href="index.html">examples.xodr</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="examples.xodr.road_link_unequal_number_of_lanes.Scenario" href="#examples.xodr.road_link_unequal_number_of_lanes.Scenario">Scenario</a></code></h4>
+</li>
 </ul>
 </li>
 </ul>

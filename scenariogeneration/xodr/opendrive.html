@@ -36,11 +36,11 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <pre><code class="python">&#34;&#34;&#34;
   scenariogeneration
   https://github.com/pyoscx/scenariogeneration
- 
+
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at https://mozilla.org/MPL/2.0/.
- 
+
   Copyright (c) 2022 The scenariogeneration Authors.
 
 &#34;&#34;&#34;
@@ -58,6 +58,7 @@ import datetime as dt
 from itertools import combinations
 import numpy as np
 import copy as cpy
+from .utils import XodrBase
 
 
 class _Header:
@@ -135,7 +136,7 @@ class _Header:
         return element
 
 
-class Road:
+class Road(XodrBase):
     &#34;&#34;&#34;Road defines the road element of OpenDrive
 
     Parameters
@@ -239,6 +240,7 @@ class Road:
             rule (TrafficRule): traffic rule (optional)
 
         &#34;&#34;&#34;
+        super().__init__()
         self.id = road_id
         self.planview = planview
         self.lanes = lanes
@@ -261,7 +263,7 @@ class Road:
         self.lateralprofile = LateralProfile()
 
     def __eq__(self, other):
-        if isinstance(other, Road):
+        if isinstance(other, Road) and super().__eq__(other):
             if (
                 self.get_attributes() == other.get_attributes()
                 and self.objects == other.objects
@@ -428,6 +430,20 @@ class Road:
             self.objects.append(road_object)
         return self
 
+    def add_tunnel(self, tunnel):
+        &#34;&#34;&#34;Adds a tunnel or list of tunnels to a road
+
+        Parameters
+        ----------
+            tunnel (Tunnel/list(Tunnel)): tunnel(s) to be added to road
+
+        &#34;&#34;&#34;
+        if isinstance(tunnel, list):
+            self.objects.extend(tunnel)
+        else:
+            self.objects.append(tunnel)
+        return self
+
     def add_object_roadside(
         self,
         road_object_prototype,
@@ -483,42 +499,101 @@ class Road:
                 &#34;Could not add roadside object because roads and lanes need to be adjusted first. Consider calling &#39;adjust_roads_and_lanes()&#39;.&#34;
             )
 
-        hdg_factors = []
-        total_widths = []
-        road_objects = []
-        s_lanesections = []
+        total_widths = {RoadSide.right: [], RoadSide.left: []}
+        road_objects = {RoadSide.right: None, RoadSide.left: None}
+        repeat_lengths = {RoadSide.right: [], RoadSide.left: []}
+        repeat_s = {RoadSide.right: [], RoadSide.left: []}
+        repeat_t = {RoadSide.right: [], RoadSide.left: []}
+        lanesections_s = []
+        lanesections_length = []
         # TODO: handle width parameters apart from a
-        for lanesection in self.lanes.lanesections:
-            if side != RoadSide.right:
-                s_lanesections.append(lanesection.s)
-                hdg_factors.append(1)
-                total_widths.append(0)
-                road_objects.append(cpy.deepcopy(road_object_prototype))
-                for lane in lanesection.leftlanes:
-                    total_widths[-1] = total_widths[-1] + lane.widths[0].a
-            if side != RoadSide.left:
-                s_lanesections.append(lanesection.s)
-                hdg_factors.append(-1)
-                total_widths.append(0)
-                road_objects.append(cpy.deepcopy(road_object_prototype))
-                for lane in lanesection.rightlanes:
-                    total_widths[-1] = total_widths[-1] + lane.widths[0].a
+        for idx, lanesection in enumerate(self.lanes.lanesections):
+            # retrieve lengths and widths of lane sections
+            if idx == len(self.lanes.lanesections) - 1:
+                # last lanesection
+                lanesections_length.append(
+                    self.planview.get_total_length() - lanesection.s
+                )
 
-        for idx, road_object in enumerate(road_objects):
-            road_object.t = (total_widths[idx] + tOffset) * hdg_factors[idx]
-            road_object.s = sOffset + s_lanesections[idx]
-            road_object.hdg = np.pi * (1 + hdg_factors[idx]) / 2
-            road_object.repeat(
-                self.planview.get_total_length() - sOffset - s_lanesections[idx],
-                repeatDistance,
-                widthStart=widthStart,
-                widthEnd=widthEnd,
-                lengthStart=lengthStart,
-                lengthEnd=lengthEnd,
-                radiusStart=radiusStart,
-                radiusEnd=radiusEnd,
-            )
-        self.add_object(road_objects)
+            else:
+                lanesections_length.append(
+                    self.lanes.lanesections[idx + 1].s - lanesection.s
+                )
+            lanesections_s.append(lanesection.s)
+            if side != RoadSide.right:
+                # adding object for left side
+                road_objects[RoadSide.left] = cpy.deepcopy(road_object_prototype)
+                total_widths[RoadSide.left].append(0)
+                for lane in lanesection.leftlanes:
+                    total_widths[RoadSide.left][-1] = (
+                        total_widths[RoadSide.left][-1] + lane.widths[0].a
+                    )
+            if side != RoadSide.left:
+                # adding object for right side
+                road_objects[RoadSide.right] = cpy.deepcopy(road_object_prototype)
+                total_widths[RoadSide.right].append(0)
+                for lane in lanesection.rightlanes:
+                    total_widths[RoadSide.right][-1] = (
+                        total_widths[RoadSide.right][-1] + lane.widths[0].a
+                    )
+            # both sides are added if RoadSide.both
+
+        for road_side in [RoadSide.left, RoadSide.right]:
+            if road_objects[road_side] is None:
+                # no road_object is added to this roadside
+                continue
+
+            # initialize road objects with meaningful values
+            hdg_factor = 1
+            if road_side == RoadSide.right:
+                hdg_factor = -1
+            road_objects[road_side].t = (
+                total_widths[road_side][0] + tOffset
+            ) * hdg_factor
+            road_objects[road_side].hdg = np.pi * (1 + hdg_factor) / 2
+            road_objects[road_side].s = sOffset
+
+            accumulated_length = 0
+            for idx, length in enumerate(lanesections_length):
+                accumulated_length += length
+                if idx == 0:
+                    repeat_lengths[road_side].append(accumulated_length - sOffset)
+                    repeat_s[road_side].append(sOffset)
+                    repeat_t[road_side].append(
+                        (total_widths[road_side][idx] + tOffset) * hdg_factor
+                    )
+                else:
+                    if total_widths[road_side][idx] != total_widths[road_side][idx - 1]:
+                        # add another repeat record only if width is changing
+                        repeat_lengths[road_side].append(length)
+                        repeat_s[road_side].append(lanesections_s[idx])
+                        repeat_t[road_side].append(
+                            (total_widths[road_side][idx] + tOffset) * hdg_factor
+                        )
+                    else:
+                        # otherwise add the length to existing repeat entry
+                        repeat_lengths[road_side][-1] += length
+
+            for idx, repeat_length in enumerate(repeat_lengths[road_side]):
+                if repeat_length &lt; 0:
+                    raise ValueError(
+                        f&#34;Calculated negative value for s-coordinate of roadside object with name &#34;
+                        f&#34;&#39;{road_objects[road_side].name}&#39;. Ensure using sOffset &lt; length of road.&#34;
+                    )
+                road_objects[road_side].repeat(
+                    repeat_length,
+                    repeatDistance,
+                    sStart=repeat_s[road_side][idx],
+                    tStart=repeat_t[road_side][idx],
+                    tEnd=repeat_t[road_side][idx],
+                    widthStart=widthStart,
+                    widthEnd=widthEnd,
+                    lengthStart=lengthStart,
+                    lengthEnd=lengthEnd,
+                    radiusStart=radiusStart,
+                    radiusEnd=radiusEnd,
+                )
+            self.add_object(road_objects[road_side])
         return self
 
     def add_signal(self, signal):
@@ -578,6 +653,7 @@ class Road:
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the FileHeader&#34;&#34;&#34;
         element = ET.Element(&#34;road&#34;, attrib=self.get_attributes())
+        self._add_additional_data_to_element(element)
         element.append(self.links.get_element())
         if self.types:
             for r in self.types:
@@ -597,7 +673,7 @@ class Road:
         return element
 
 
-class OpenDrive:
+class OpenDrive(XodrBase):
     &#34;&#34;&#34;OpenDrive is the main class of the pyodrx to generate an OpenDrive road
 
     Parameters
@@ -657,6 +733,7 @@ class OpenDrive:
         name (str): name of the road
 
         &#34;&#34;&#34;
+        super().__init__()
         self.name = name
         self.revMajor = revMajor
         self.revMinor = revMinor
@@ -666,7 +743,7 @@ class OpenDrive:
         # self.road_ids = []
 
     def __eq__(self, other):
-        if isinstance(other, OpenDrive):
+        if isinstance(other, OpenDrive) and super().__eq__(other):
             if (
                 self.roads == other.roads
                 and self.junctions == other.junctions
@@ -725,6 +802,137 @@ class OpenDrive:
         for r in range(len(results)):
             # print(&#39;Analyzing roads&#39;, results[r][0], &#39;and&#39;, results[r][1] )
             create_lane_links(self.roads[results[r][0]], self.roads[results[r][1]])
+
+    def adjust_roadmarks(self):
+        &#34;&#34;&#34;Tries to adjust broken roadmarks (if same definition) along roads and lane sections&#34;&#34;&#34;
+
+        adjusted_road = self.roads[list(self.roads.keys())[0]]
+        if not adjusted_road.planview.adjusted:
+            raise RoadsAndLanesNotAdjusted(
+                &#34;Cannot adjust roadmarks if geometries are not adjusted properly first. Consider calling &#39;adjust_roads_and_lanes()&#39; first.&#34;
+            )
+        adjusted_road.lanes.adjust_road_marks_from_start(
+            adjusted_road.planview.get_total_length()
+        )
+
+        count_total_adjusted_roads = 1
+
+        while count_total_adjusted_roads &lt; len(self.roads):
+            for r in self.roads.keys():
+                if not self.roads[r].planview.adjusted:
+                    raise RoadsAndLanesNotAdjusted(
+                        &#34;Cannot adjust roadmarks if geometries are not adjusted properly first. Consider calling &#39;adjust_roads_and_lanes()&#39; first.&#34;
+                    )
+                if self.roads[r].lanes.roadmarks_adjusted:
+                    if self.roads[r].successor:
+                        if self.roads[r].successor.element_type == ElementType.road:
+                            if (
+                                self.roads[r].successor.contact_point
+                                == ContactPoint.start
+                            ):
+                                self.roads[
+                                    str(self.roads[r].successor.element_id)
+                                ].lanes.adjust_road_marks_from_start(
+                                    self.roads[
+                                        str(self.roads[r].successor.element_id)
+                                    ].planview.get_total_length(),
+                                    self.roads[r].lanes.lanesections[-1],
+                                    ContactPoint.end,
+                                )
+                                count_total_adjusted_roads += 1
+                            else:
+                                self.roads[
+                                    str(self.roads[r].successor.element_id)
+                                ].lanes.adjust_road_marks_from_end(
+                                    self.roads[
+                                        str(self.roads[r].successor.element_id)
+                                    ].planview.get_total_length(),
+                                    self.roads[r].lanes.lanesections[-1],
+                                    ContactPoint.end,
+                                )
+                                count_total_adjusted_roads += 1
+                        else:
+                            for j in self.junctions:
+                                if j.id == self.roads[r].successor.element_id:
+                                    junction = j
+                                    break
+
+                            for conn in junction.connections:
+                                if str(conn.incoming_road) == r:
+                                    if conn.contact_point == ContactPoint.start:
+                                        self.roads[
+                                            str(conn.connecting_road)
+                                        ].lanes.adjust_road_marks_from_start(
+                                            self.roads[
+                                                str(conn.connecting_road)
+                                            ].planview.get_total_length(),
+                                            self.roads[r].lanes.lanesections[0],
+                                            ContactPoint.start,
+                                        )
+                                    else:
+                                        self.roads[
+                                            str(conn.connecting_road)
+                                        ].lanes.adjust_road_marks_from_end(
+                                            self.roads[
+                                                str(conn.connecting_road)
+                                            ].planview.get_total_length(),
+                                            self.roads[r].lanes.lanesections[0],
+                                            ContactPoint.start,
+                                        )
+
+                                    count_total_adjusted_roads += 1
+
+                    if self.roads[r].predecessor:
+                        if self.roads[r].predecessor.element_type == ElementType.road:
+                            if (
+                                self.roads[r].predecessor.contact_point
+                                == ContactPoint.start
+                            ):
+                                self.roads[
+                                    str(self.roads[r].predecessor.element_id)
+                                ].lanes.adjust_road_marks_from_start(
+                                    self.roads[
+                                        str(self.roads[r].predecessor.element_id)
+                                    ].planview.get_total_length(),
+                                    self.roads[r].lanes.lanesections[0],
+                                    ContactPoint.start,
+                                )
+                                count_total_adjusted_roads += 1
+                            else:
+                                self.roads[
+                                    str(self.roads[r].predecessor.element_id)
+                                ].lanes.adjust_road_marks_from_end(
+                                    self.roads[
+                                        str(self.roads[r].predecessor.element_id)
+                                    ].planview.get_total_length(),
+                                    self.roads[r].lanes.lanesections[0],
+                                    ContactPoint.start,
+                                )
+                                count_total_adjusted_roads += 1
+                        else:
+                            for conn in self.junctions[0].connections:
+                                if str(conn.incoming_road) == r:
+                                    if conn.contact_point == ContactPoint.start:
+                                        self.roads[
+                                            str(conn.connecting_road)
+                                        ].lanes.adjust_road_marks_from_start(
+                                            self.roads[
+                                                str(conn.connecting_road)
+                                            ].planview.get_total_length(),
+                                            self.roads[r].lanes.lanesections[-1],
+                                            ContactPoint.end,
+                                        )
+                                    else:
+                                        self.roads[
+                                            str(conn.connecting_road)
+                                        ].lanes.adjust_road_marks_from_end(
+                                            self.roads[
+                                                str(conn.connecting_road)
+                                            ].planview.get_total_length(),
+                                            self.roads[r].lanes.lanesections[-1],
+                                            ContactPoint.end,
+                                        )
+                                    count_total_adjusted_roads += 1
 
     def _adjust_road_wrt_neighbour(
         self, road_id, neighbour_id, contact_point, neighbour_type
@@ -1048,6 +1256,7 @@ class OpenDrive:
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the FileHeader&#34;&#34;&#34;
         element = ET.Element(&#34;OpenDRIVE&#34;)
+        self._add_additional_data_to_element(element)
         element.append(self._header.get_element())
         for r in self.roads:
             element.append(self.roads[r].get_element())
@@ -1077,7 +1286,7 @@ class OpenDrive:
         printToFile(self.get_element(), filename, prettyprint, encoding)
 
 
-class _Type:
+class _Type(XodrBase):
     &#34;&#34;&#34;class to generate the type element of a road, (not the Enumeration it self).
 
     Parameters
@@ -1124,6 +1333,7 @@ class _Type:
 
 
         &#34;&#34;&#34;
+        super().__init__()
         self.road_type = road_type
         self.s = s
         self.country = country
@@ -1148,7 +1358,7 @@ class _Type:
         self.speed_unit = speed_unit
 
     def __eq__(self, other):
-        if isinstance(other, _Type):
+        if isinstance(other, _Type) and super().__eq__(other):
             if (
                 self.get_attributes() == other.get_attributes()
                 and self.speed == other.speed
@@ -1171,6 +1381,7 @@ class _Type:
         &#34;&#34;&#34;returns the elementTree of the _Type&#34;&#34;&#34;
 
         element = ET.Element(&#34;type&#34;, attrib=self.get_attributes())
+        self._add_additional_data_to_element(element)
         if self.speed:
             ET.SubElement(
                 element,
@@ -1246,7 +1457,7 @@ write_xml(filename)
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class OpenDrive:
+<pre><code class="python">class OpenDrive(XodrBase):
     &#34;&#34;&#34;OpenDrive is the main class of the pyodrx to generate an OpenDrive road
 
     Parameters
@@ -1306,6 +1517,7 @@ write_xml(filename)
         name (str): name of the road
 
         &#34;&#34;&#34;
+        super().__init__()
         self.name = name
         self.revMajor = revMajor
         self.revMinor = revMinor
@@ -1315,7 +1527,7 @@ write_xml(filename)
         # self.road_ids = []
 
     def __eq__(self, other):
-        if isinstance(other, OpenDrive):
+        if isinstance(other, OpenDrive) and super().__eq__(other):
             if (
                 self.roads == other.roads
                 and self.junctions == other.junctions
@@ -1374,6 +1586,137 @@ write_xml(filename)
         for r in range(len(results)):
             # print(&#39;Analyzing roads&#39;, results[r][0], &#39;and&#39;, results[r][1] )
             create_lane_links(self.roads[results[r][0]], self.roads[results[r][1]])
+
+    def adjust_roadmarks(self):
+        &#34;&#34;&#34;Tries to adjust broken roadmarks (if same definition) along roads and lane sections&#34;&#34;&#34;
+
+        adjusted_road = self.roads[list(self.roads.keys())[0]]
+        if not adjusted_road.planview.adjusted:
+            raise RoadsAndLanesNotAdjusted(
+                &#34;Cannot adjust roadmarks if geometries are not adjusted properly first. Consider calling &#39;adjust_roads_and_lanes()&#39; first.&#34;
+            )
+        adjusted_road.lanes.adjust_road_marks_from_start(
+            adjusted_road.planview.get_total_length()
+        )
+
+        count_total_adjusted_roads = 1
+
+        while count_total_adjusted_roads &lt; len(self.roads):
+            for r in self.roads.keys():
+                if not self.roads[r].planview.adjusted:
+                    raise RoadsAndLanesNotAdjusted(
+                        &#34;Cannot adjust roadmarks if geometries are not adjusted properly first. Consider calling &#39;adjust_roads_and_lanes()&#39; first.&#34;
+                    )
+                if self.roads[r].lanes.roadmarks_adjusted:
+                    if self.roads[r].successor:
+                        if self.roads[r].successor.element_type == ElementType.road:
+                            if (
+                                self.roads[r].successor.contact_point
+                                == ContactPoint.start
+                            ):
+                                self.roads[
+                                    str(self.roads[r].successor.element_id)
+                                ].lanes.adjust_road_marks_from_start(
+                                    self.roads[
+                                        str(self.roads[r].successor.element_id)
+                                    ].planview.get_total_length(),
+                                    self.roads[r].lanes.lanesections[-1],
+                                    ContactPoint.end,
+                                )
+                                count_total_adjusted_roads += 1
+                            else:
+                                self.roads[
+                                    str(self.roads[r].successor.element_id)
+                                ].lanes.adjust_road_marks_from_end(
+                                    self.roads[
+                                        str(self.roads[r].successor.element_id)
+                                    ].planview.get_total_length(),
+                                    self.roads[r].lanes.lanesections[-1],
+                                    ContactPoint.end,
+                                )
+                                count_total_adjusted_roads += 1
+                        else:
+                            for j in self.junctions:
+                                if j.id == self.roads[r].successor.element_id:
+                                    junction = j
+                                    break
+
+                            for conn in junction.connections:
+                                if str(conn.incoming_road) == r:
+                                    if conn.contact_point == ContactPoint.start:
+                                        self.roads[
+                                            str(conn.connecting_road)
+                                        ].lanes.adjust_road_marks_from_start(
+                                            self.roads[
+                                                str(conn.connecting_road)
+                                            ].planview.get_total_length(),
+                                            self.roads[r].lanes.lanesections[0],
+                                            ContactPoint.start,
+                                        )
+                                    else:
+                                        self.roads[
+                                            str(conn.connecting_road)
+                                        ].lanes.adjust_road_marks_from_end(
+                                            self.roads[
+                                                str(conn.connecting_road)
+                                            ].planview.get_total_length(),
+                                            self.roads[r].lanes.lanesections[0],
+                                            ContactPoint.start,
+                                        )
+
+                                    count_total_adjusted_roads += 1
+
+                    if self.roads[r].predecessor:
+                        if self.roads[r].predecessor.element_type == ElementType.road:
+                            if (
+                                self.roads[r].predecessor.contact_point
+                                == ContactPoint.start
+                            ):
+                                self.roads[
+                                    str(self.roads[r].predecessor.element_id)
+                                ].lanes.adjust_road_marks_from_start(
+                                    self.roads[
+                                        str(self.roads[r].predecessor.element_id)
+                                    ].planview.get_total_length(),
+                                    self.roads[r].lanes.lanesections[0],
+                                    ContactPoint.start,
+                                )
+                                count_total_adjusted_roads += 1
+                            else:
+                                self.roads[
+                                    str(self.roads[r].predecessor.element_id)
+                                ].lanes.adjust_road_marks_from_end(
+                                    self.roads[
+                                        str(self.roads[r].predecessor.element_id)
+                                    ].planview.get_total_length(),
+                                    self.roads[r].lanes.lanesections[0],
+                                    ContactPoint.start,
+                                )
+                                count_total_adjusted_roads += 1
+                        else:
+                            for conn in self.junctions[0].connections:
+                                if str(conn.incoming_road) == r:
+                                    if conn.contact_point == ContactPoint.start:
+                                        self.roads[
+                                            str(conn.connecting_road)
+                                        ].lanes.adjust_road_marks_from_start(
+                                            self.roads[
+                                                str(conn.connecting_road)
+                                            ].planview.get_total_length(),
+                                            self.roads[r].lanes.lanesections[-1],
+                                            ContactPoint.end,
+                                        )
+                                    else:
+                                        self.roads[
+                                            str(conn.connecting_road)
+                                        ].lanes.adjust_road_marks_from_end(
+                                            self.roads[
+                                                str(conn.connecting_road)
+                                            ].planview.get_total_length(),
+                                            self.roads[r].lanes.lanesections[-1],
+                                            ContactPoint.end,
+                                        )
+                                    count_total_adjusted_roads += 1
 
     def _adjust_road_wrt_neighbour(
         self, road_id, neighbour_id, contact_point, neighbour_type
@@ -1697,6 +2040,7 @@ write_xml(filename)
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the FileHeader&#34;&#34;&#34;
         element = ET.Element(&#34;OpenDRIVE&#34;)
+        self._add_additional_data_to_element(element)
         element.append(self._header.get_element())
         for r in self.roads:
             element.append(self.roads[r].get_element())
@@ -1725,6 +2069,10 @@ write_xml(filename)
             filename = self.name + &#34;.xodr&#34;
         printToFile(self.get_element(), filename, prettyprint, encoding)</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.opendrive.OpenDrive.add_junction"><code class="name flex">
@@ -1815,6 +2163,147 @@ to the opendrive</p>
         )
     self.roads[str(road.id)] = road
     return self</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.opendrive.OpenDrive.adjust_roadmarks"><code class="name flex">
+<span>def <span class="ident">adjust_roadmarks</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tries to adjust broken roadmarks (if same definition) along roads and lane sections</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def adjust_roadmarks(self):
+    &#34;&#34;&#34;Tries to adjust broken roadmarks (if same definition) along roads and lane sections&#34;&#34;&#34;
+
+    adjusted_road = self.roads[list(self.roads.keys())[0]]
+    if not adjusted_road.planview.adjusted:
+        raise RoadsAndLanesNotAdjusted(
+            &#34;Cannot adjust roadmarks if geometries are not adjusted properly first. Consider calling &#39;adjust_roads_and_lanes()&#39; first.&#34;
+        )
+    adjusted_road.lanes.adjust_road_marks_from_start(
+        adjusted_road.planview.get_total_length()
+    )
+
+    count_total_adjusted_roads = 1
+
+    while count_total_adjusted_roads &lt; len(self.roads):
+        for r in self.roads.keys():
+            if not self.roads[r].planview.adjusted:
+                raise RoadsAndLanesNotAdjusted(
+                    &#34;Cannot adjust roadmarks if geometries are not adjusted properly first. Consider calling &#39;adjust_roads_and_lanes()&#39; first.&#34;
+                )
+            if self.roads[r].lanes.roadmarks_adjusted:
+                if self.roads[r].successor:
+                    if self.roads[r].successor.element_type == ElementType.road:
+                        if (
+                            self.roads[r].successor.contact_point
+                            == ContactPoint.start
+                        ):
+                            self.roads[
+                                str(self.roads[r].successor.element_id)
+                            ].lanes.adjust_road_marks_from_start(
+                                self.roads[
+                                    str(self.roads[r].successor.element_id)
+                                ].planview.get_total_length(),
+                                self.roads[r].lanes.lanesections[-1],
+                                ContactPoint.end,
+                            )
+                            count_total_adjusted_roads += 1
+                        else:
+                            self.roads[
+                                str(self.roads[r].successor.element_id)
+                            ].lanes.adjust_road_marks_from_end(
+                                self.roads[
+                                    str(self.roads[r].successor.element_id)
+                                ].planview.get_total_length(),
+                                self.roads[r].lanes.lanesections[-1],
+                                ContactPoint.end,
+                            )
+                            count_total_adjusted_roads += 1
+                    else:
+                        for j in self.junctions:
+                            if j.id == self.roads[r].successor.element_id:
+                                junction = j
+                                break
+
+                        for conn in junction.connections:
+                            if str(conn.incoming_road) == r:
+                                if conn.contact_point == ContactPoint.start:
+                                    self.roads[
+                                        str(conn.connecting_road)
+                                    ].lanes.adjust_road_marks_from_start(
+                                        self.roads[
+                                            str(conn.connecting_road)
+                                        ].planview.get_total_length(),
+                                        self.roads[r].lanes.lanesections[0],
+                                        ContactPoint.start,
+                                    )
+                                else:
+                                    self.roads[
+                                        str(conn.connecting_road)
+                                    ].lanes.adjust_road_marks_from_end(
+                                        self.roads[
+                                            str(conn.connecting_road)
+                                        ].planview.get_total_length(),
+                                        self.roads[r].lanes.lanesections[0],
+                                        ContactPoint.start,
+                                    )
+
+                                count_total_adjusted_roads += 1
+
+                if self.roads[r].predecessor:
+                    if self.roads[r].predecessor.element_type == ElementType.road:
+                        if (
+                            self.roads[r].predecessor.contact_point
+                            == ContactPoint.start
+                        ):
+                            self.roads[
+                                str(self.roads[r].predecessor.element_id)
+                            ].lanes.adjust_road_marks_from_start(
+                                self.roads[
+                                    str(self.roads[r].predecessor.element_id)
+                                ].planview.get_total_length(),
+                                self.roads[r].lanes.lanesections[0],
+                                ContactPoint.start,
+                            )
+                            count_total_adjusted_roads += 1
+                        else:
+                            self.roads[
+                                str(self.roads[r].predecessor.element_id)
+                            ].lanes.adjust_road_marks_from_end(
+                                self.roads[
+                                    str(self.roads[r].predecessor.element_id)
+                                ].planview.get_total_length(),
+                                self.roads[r].lanes.lanesections[0],
+                                ContactPoint.start,
+                            )
+                            count_total_adjusted_roads += 1
+                    else:
+                        for conn in self.junctions[0].connections:
+                            if str(conn.incoming_road) == r:
+                                if conn.contact_point == ContactPoint.start:
+                                    self.roads[
+                                        str(conn.connecting_road)
+                                    ].lanes.adjust_road_marks_from_start(
+                                        self.roads[
+                                            str(conn.connecting_road)
+                                        ].planview.get_total_length(),
+                                        self.roads[r].lanes.lanesections[-1],
+                                        ContactPoint.end,
+                                    )
+                                else:
+                                    self.roads[
+                                        str(conn.connecting_road)
+                                    ].lanes.adjust_road_marks_from_end(
+                                        self.roads[
+                                            str(conn.connecting_road)
+                                        ].planview.get_total_length(),
+                                        self.roads[r].lanes.lanesections[-1],
+                                        ContactPoint.end,
+                                    )
+                                count_total_adjusted_roads += 1</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xodr.opendrive.OpenDrive.adjust_roads_and_lanes"><code class="name flex">
@@ -2060,6 +2549,7 @@ to the opendrive</p>
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the FileHeader&#34;&#34;&#34;
     element = ET.Element(&#34;OpenDRIVE&#34;)
+    self._add_additional_data_to_element(element)
     element.append(self._header.get_element())
     for r in self.roads:
         element.append(self.roads[r].get_element())
@@ -2110,6 +2600,15 @@ encoding (str): specifies the output encoding
 </details>
 </dd>
 </dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_dataquality" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_dataquality">add_dataquality</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_userdata" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_userdata">add_userdata</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 <dt id="scenariogeneration.xodr.opendrive.Road"><code class="flex name class">
 <span>class <span class="ident">Road</span></span>
@@ -2213,7 +2712,7 @@ rule (TrafficRule): traffic rule (optional)
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Road:
+<pre><code class="python">class Road(XodrBase):
     &#34;&#34;&#34;Road defines the road element of OpenDrive
 
     Parameters
@@ -2317,6 +2816,7 @@ rule (TrafficRule): traffic rule (optional)
             rule (TrafficRule): traffic rule (optional)
 
         &#34;&#34;&#34;
+        super().__init__()
         self.id = road_id
         self.planview = planview
         self.lanes = lanes
@@ -2339,7 +2839,7 @@ rule (TrafficRule): traffic rule (optional)
         self.lateralprofile = LateralProfile()
 
     def __eq__(self, other):
-        if isinstance(other, Road):
+        if isinstance(other, Road) and super().__eq__(other):
             if (
                 self.get_attributes() == other.get_attributes()
                 and self.objects == other.objects
@@ -2506,6 +3006,20 @@ rule (TrafficRule): traffic rule (optional)
             self.objects.append(road_object)
         return self
 
+    def add_tunnel(self, tunnel):
+        &#34;&#34;&#34;Adds a tunnel or list of tunnels to a road
+
+        Parameters
+        ----------
+            tunnel (Tunnel/list(Tunnel)): tunnel(s) to be added to road
+
+        &#34;&#34;&#34;
+        if isinstance(tunnel, list):
+            self.objects.extend(tunnel)
+        else:
+            self.objects.append(tunnel)
+        return self
+
     def add_object_roadside(
         self,
         road_object_prototype,
@@ -2561,42 +3075,101 @@ rule (TrafficRule): traffic rule (optional)
                 &#34;Could not add roadside object because roads and lanes need to be adjusted first. Consider calling &#39;adjust_roads_and_lanes()&#39;.&#34;
             )
 
-        hdg_factors = []
-        total_widths = []
-        road_objects = []
-        s_lanesections = []
+        total_widths = {RoadSide.right: [], RoadSide.left: []}
+        road_objects = {RoadSide.right: None, RoadSide.left: None}
+        repeat_lengths = {RoadSide.right: [], RoadSide.left: []}
+        repeat_s = {RoadSide.right: [], RoadSide.left: []}
+        repeat_t = {RoadSide.right: [], RoadSide.left: []}
+        lanesections_s = []
+        lanesections_length = []
         # TODO: handle width parameters apart from a
-        for lanesection in self.lanes.lanesections:
-            if side != RoadSide.right:
-                s_lanesections.append(lanesection.s)
-                hdg_factors.append(1)
-                total_widths.append(0)
-                road_objects.append(cpy.deepcopy(road_object_prototype))
-                for lane in lanesection.leftlanes:
-                    total_widths[-1] = total_widths[-1] + lane.widths[0].a
-            if side != RoadSide.left:
-                s_lanesections.append(lanesection.s)
-                hdg_factors.append(-1)
-                total_widths.append(0)
-                road_objects.append(cpy.deepcopy(road_object_prototype))
-                for lane in lanesection.rightlanes:
-                    total_widths[-1] = total_widths[-1] + lane.widths[0].a
+        for idx, lanesection in enumerate(self.lanes.lanesections):
+            # retrieve lengths and widths of lane sections
+            if idx == len(self.lanes.lanesections) - 1:
+                # last lanesection
+                lanesections_length.append(
+                    self.planview.get_total_length() - lanesection.s
+                )
 
-        for idx, road_object in enumerate(road_objects):
-            road_object.t = (total_widths[idx] + tOffset) * hdg_factors[idx]
-            road_object.s = sOffset + s_lanesections[idx]
-            road_object.hdg = np.pi * (1 + hdg_factors[idx]) / 2
-            road_object.repeat(
-                self.planview.get_total_length() - sOffset - s_lanesections[idx],
-                repeatDistance,
-                widthStart=widthStart,
-                widthEnd=widthEnd,
-                lengthStart=lengthStart,
-                lengthEnd=lengthEnd,
-                radiusStart=radiusStart,
-                radiusEnd=radiusEnd,
-            )
-        self.add_object(road_objects)
+            else:
+                lanesections_length.append(
+                    self.lanes.lanesections[idx + 1].s - lanesection.s
+                )
+            lanesections_s.append(lanesection.s)
+            if side != RoadSide.right:
+                # adding object for left side
+                road_objects[RoadSide.left] = cpy.deepcopy(road_object_prototype)
+                total_widths[RoadSide.left].append(0)
+                for lane in lanesection.leftlanes:
+                    total_widths[RoadSide.left][-1] = (
+                        total_widths[RoadSide.left][-1] + lane.widths[0].a
+                    )
+            if side != RoadSide.left:
+                # adding object for right side
+                road_objects[RoadSide.right] = cpy.deepcopy(road_object_prototype)
+                total_widths[RoadSide.right].append(0)
+                for lane in lanesection.rightlanes:
+                    total_widths[RoadSide.right][-1] = (
+                        total_widths[RoadSide.right][-1] + lane.widths[0].a
+                    )
+            # both sides are added if RoadSide.both
+
+        for road_side in [RoadSide.left, RoadSide.right]:
+            if road_objects[road_side] is None:
+                # no road_object is added to this roadside
+                continue
+
+            # initialize road objects with meaningful values
+            hdg_factor = 1
+            if road_side == RoadSide.right:
+                hdg_factor = -1
+            road_objects[road_side].t = (
+                total_widths[road_side][0] + tOffset
+            ) * hdg_factor
+            road_objects[road_side].hdg = np.pi * (1 + hdg_factor) / 2
+            road_objects[road_side].s = sOffset
+
+            accumulated_length = 0
+            for idx, length in enumerate(lanesections_length):
+                accumulated_length += length
+                if idx == 0:
+                    repeat_lengths[road_side].append(accumulated_length - sOffset)
+                    repeat_s[road_side].append(sOffset)
+                    repeat_t[road_side].append(
+                        (total_widths[road_side][idx] + tOffset) * hdg_factor
+                    )
+                else:
+                    if total_widths[road_side][idx] != total_widths[road_side][idx - 1]:
+                        # add another repeat record only if width is changing
+                        repeat_lengths[road_side].append(length)
+                        repeat_s[road_side].append(lanesections_s[idx])
+                        repeat_t[road_side].append(
+                            (total_widths[road_side][idx] + tOffset) * hdg_factor
+                        )
+                    else:
+                        # otherwise add the length to existing repeat entry
+                        repeat_lengths[road_side][-1] += length
+
+            for idx, repeat_length in enumerate(repeat_lengths[road_side]):
+                if repeat_length &lt; 0:
+                    raise ValueError(
+                        f&#34;Calculated negative value for s-coordinate of roadside object with name &#34;
+                        f&#34;&#39;{road_objects[road_side].name}&#39;. Ensure using sOffset &lt; length of road.&#34;
+                    )
+                road_objects[road_side].repeat(
+                    repeat_length,
+                    repeatDistance,
+                    sStart=repeat_s[road_side][idx],
+                    tStart=repeat_t[road_side][idx],
+                    tEnd=repeat_t[road_side][idx],
+                    widthStart=widthStart,
+                    widthEnd=widthEnd,
+                    lengthStart=lengthStart,
+                    lengthEnd=lengthEnd,
+                    radiusStart=radiusStart,
+                    radiusEnd=radiusEnd,
+                )
+            self.add_object(road_objects[road_side])
         return self
 
     def add_signal(self, signal):
@@ -2656,6 +3229,7 @@ rule (TrafficRule): traffic rule (optional)
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the FileHeader&#34;&#34;&#34;
         element = ET.Element(&#34;road&#34;, attrib=self.get_attributes())
+        self._add_additional_data_to_element(element)
         element.append(self.links.get_element())
         if self.types:
             for r in self.types:
@@ -2674,6 +3248,10 @@ rule (TrafficRule): traffic rule (optional)
                 signalselement.append(signal.get_element())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.opendrive.Road.add_elevation"><code class="name flex">
@@ -2878,42 +3456,101 @@ radiusEnd (float) : radius of object at end-coordinate (if not equal to radiusSt
             &#34;Could not add roadside object because roads and lanes need to be adjusted first. Consider calling &#39;adjust_roads_and_lanes()&#39;.&#34;
         )
 
-    hdg_factors = []
-    total_widths = []
-    road_objects = []
-    s_lanesections = []
+    total_widths = {RoadSide.right: [], RoadSide.left: []}
+    road_objects = {RoadSide.right: None, RoadSide.left: None}
+    repeat_lengths = {RoadSide.right: [], RoadSide.left: []}
+    repeat_s = {RoadSide.right: [], RoadSide.left: []}
+    repeat_t = {RoadSide.right: [], RoadSide.left: []}
+    lanesections_s = []
+    lanesections_length = []
     # TODO: handle width parameters apart from a
-    for lanesection in self.lanes.lanesections:
-        if side != RoadSide.right:
-            s_lanesections.append(lanesection.s)
-            hdg_factors.append(1)
-            total_widths.append(0)
-            road_objects.append(cpy.deepcopy(road_object_prototype))
-            for lane in lanesection.leftlanes:
-                total_widths[-1] = total_widths[-1] + lane.widths[0].a
-        if side != RoadSide.left:
-            s_lanesections.append(lanesection.s)
-            hdg_factors.append(-1)
-            total_widths.append(0)
-            road_objects.append(cpy.deepcopy(road_object_prototype))
-            for lane in lanesection.rightlanes:
-                total_widths[-1] = total_widths[-1] + lane.widths[0].a
+    for idx, lanesection in enumerate(self.lanes.lanesections):
+        # retrieve lengths and widths of lane sections
+        if idx == len(self.lanes.lanesections) - 1:
+            # last lanesection
+            lanesections_length.append(
+                self.planview.get_total_length() - lanesection.s
+            )
 
-    for idx, road_object in enumerate(road_objects):
-        road_object.t = (total_widths[idx] + tOffset) * hdg_factors[idx]
-        road_object.s = sOffset + s_lanesections[idx]
-        road_object.hdg = np.pi * (1 + hdg_factors[idx]) / 2
-        road_object.repeat(
-            self.planview.get_total_length() - sOffset - s_lanesections[idx],
-            repeatDistance,
-            widthStart=widthStart,
-            widthEnd=widthEnd,
-            lengthStart=lengthStart,
-            lengthEnd=lengthEnd,
-            radiusStart=radiusStart,
-            radiusEnd=radiusEnd,
-        )
-    self.add_object(road_objects)
+        else:
+            lanesections_length.append(
+                self.lanes.lanesections[idx + 1].s - lanesection.s
+            )
+        lanesections_s.append(lanesection.s)
+        if side != RoadSide.right:
+            # adding object for left side
+            road_objects[RoadSide.left] = cpy.deepcopy(road_object_prototype)
+            total_widths[RoadSide.left].append(0)
+            for lane in lanesection.leftlanes:
+                total_widths[RoadSide.left][-1] = (
+                    total_widths[RoadSide.left][-1] + lane.widths[0].a
+                )
+        if side != RoadSide.left:
+            # adding object for right side
+            road_objects[RoadSide.right] = cpy.deepcopy(road_object_prototype)
+            total_widths[RoadSide.right].append(0)
+            for lane in lanesection.rightlanes:
+                total_widths[RoadSide.right][-1] = (
+                    total_widths[RoadSide.right][-1] + lane.widths[0].a
+                )
+        # both sides are added if RoadSide.both
+
+    for road_side in [RoadSide.left, RoadSide.right]:
+        if road_objects[road_side] is None:
+            # no road_object is added to this roadside
+            continue
+
+        # initialize road objects with meaningful values
+        hdg_factor = 1
+        if road_side == RoadSide.right:
+            hdg_factor = -1
+        road_objects[road_side].t = (
+            total_widths[road_side][0] + tOffset
+        ) * hdg_factor
+        road_objects[road_side].hdg = np.pi * (1 + hdg_factor) / 2
+        road_objects[road_side].s = sOffset
+
+        accumulated_length = 0
+        for idx, length in enumerate(lanesections_length):
+            accumulated_length += length
+            if idx == 0:
+                repeat_lengths[road_side].append(accumulated_length - sOffset)
+                repeat_s[road_side].append(sOffset)
+                repeat_t[road_side].append(
+                    (total_widths[road_side][idx] + tOffset) * hdg_factor
+                )
+            else:
+                if total_widths[road_side][idx] != total_widths[road_side][idx - 1]:
+                    # add another repeat record only if width is changing
+                    repeat_lengths[road_side].append(length)
+                    repeat_s[road_side].append(lanesections_s[idx])
+                    repeat_t[road_side].append(
+                        (total_widths[road_side][idx] + tOffset) * hdg_factor
+                    )
+                else:
+                    # otherwise add the length to existing repeat entry
+                    repeat_lengths[road_side][-1] += length
+
+        for idx, repeat_length in enumerate(repeat_lengths[road_side]):
+            if repeat_length &lt; 0:
+                raise ValueError(
+                    f&#34;Calculated negative value for s-coordinate of roadside object with name &#34;
+                    f&#34;&#39;{road_objects[road_side].name}&#39;. Ensure using sOffset &lt; length of road.&#34;
+                )
+            road_objects[road_side].repeat(
+                repeat_length,
+                repeatDistance,
+                sStart=repeat_s[road_side][idx],
+                tStart=repeat_t[road_side][idx],
+                tEnd=repeat_t[road_side][idx],
+                widthStart=widthStart,
+                widthEnd=widthEnd,
+                lengthStart=lengthStart,
+                lengthEnd=lengthEnd,
+                radiusStart=radiusStart,
+                radiusEnd=radiusEnd,
+            )
+        self.add_object(road_objects[road_side])
     return self</code></pre>
 </details>
 </dd>
@@ -3112,6 +3749,33 @@ d (float): d coefficient of the polynomial
     return self</code></pre>
 </details>
 </dd>
+<dt id="scenariogeneration.xodr.opendrive.Road.add_tunnel"><code class="name flex">
+<span>def <span class="ident">add_tunnel</span></span>(<span>self, tunnel)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Adds a tunnel or list of tunnels to a road</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>tunnel (Tunnel/list(Tunnel)): tunnel(s) to be added to road
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_tunnel(self, tunnel):
+    &#34;&#34;&#34;Adds a tunnel or list of tunnels to a road
+
+    Parameters
+    ----------
+        tunnel (Tunnel/list(Tunnel)): tunnel(s) to be added to road
+
+    &#34;&#34;&#34;
+    if isinstance(tunnel, list):
+        self.objects.extend(tunnel)
+    else:
+        self.objects.append(tunnel)
+    return self</code></pre>
+</details>
+</dd>
 <dt id="scenariogeneration.xodr.opendrive.Road.add_type"><code class="name flex">
 <span>def <span class="ident">add_type</span></span>(<span>self, road_type, s=0, country=None, speed=None, speed_unit='m/s')</span>
 </code></dt>
@@ -3187,6 +3851,7 @@ sped_unit (str): unit of the speed, can be 'm/s','mph,'kph'
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the FileHeader&#34;&#34;&#34;
     element = ET.Element(&#34;road&#34;, attrib=self.get_attributes())
+    self._add_additional_data_to_element(element)
     element.append(self.links.get_element())
     if self.types:
         for r in self.types:
@@ -3234,6 +3899,15 @@ h (float): the end heading
 </details>
 </dd>
 </dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_dataquality" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_dataquality">add_dataquality</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_userdata" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_userdata">add_userdata</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 </dl>
 </section>
@@ -3257,6 +3931,7 @@ h (float): the end heading
 <li><code><a title="scenariogeneration.xodr.opendrive.OpenDrive.add_junction" href="#scenariogeneration.xodr.opendrive.OpenDrive.add_junction">add_junction</a></code></li>
 <li><code><a title="scenariogeneration.xodr.opendrive.OpenDrive.add_junction_creator" href="#scenariogeneration.xodr.opendrive.OpenDrive.add_junction_creator">add_junction_creator</a></code></li>
 <li><code><a title="scenariogeneration.xodr.opendrive.OpenDrive.add_road" href="#scenariogeneration.xodr.opendrive.OpenDrive.add_road">add_road</a></code></li>
+<li><code><a title="scenariogeneration.xodr.opendrive.OpenDrive.adjust_roadmarks" href="#scenariogeneration.xodr.opendrive.OpenDrive.adjust_roadmarks">adjust_roadmarks</a></code></li>
 <li><code><a title="scenariogeneration.xodr.opendrive.OpenDrive.adjust_roads_and_lanes" href="#scenariogeneration.xodr.opendrive.OpenDrive.adjust_roads_and_lanes">adjust_roads_and_lanes</a></code></li>
 <li><code><a title="scenariogeneration.xodr.opendrive.OpenDrive.adjust_startpoints" href="#scenariogeneration.xodr.opendrive.OpenDrive.adjust_startpoints">adjust_startpoints</a></code></li>
 <li><code><a title="scenariogeneration.xodr.opendrive.OpenDrive.get_element" href="#scenariogeneration.xodr.opendrive.OpenDrive.get_element">get_element</a></code></li>
@@ -3275,6 +3950,7 @@ h (float): the end heading
 <li><code><a title="scenariogeneration.xodr.opendrive.Road.add_signal" href="#scenariogeneration.xodr.opendrive.Road.add_signal">add_signal</a></code></li>
 <li><code><a title="scenariogeneration.xodr.opendrive.Road.add_successor" href="#scenariogeneration.xodr.opendrive.Road.add_successor">add_successor</a></code></li>
 <li><code><a title="scenariogeneration.xodr.opendrive.Road.add_superelevation" href="#scenariogeneration.xodr.opendrive.Road.add_superelevation">add_superelevation</a></code></li>
+<li><code><a title="scenariogeneration.xodr.opendrive.Road.add_tunnel" href="#scenariogeneration.xodr.opendrive.Road.add_tunnel">add_tunnel</a></code></li>
 <li><code><a title="scenariogeneration.xodr.opendrive.Road.add_type" href="#scenariogeneration.xodr.opendrive.Road.add_type">add_type</a></code></li>
 <li><code><a title="scenariogeneration.xodr.opendrive.Road.get_attributes" href="#scenariogeneration.xodr.opendrive.Road.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xodr.opendrive.Road.get_element" href="#scenariogeneration.xodr.opendrive.Road.get_element">get_element</a></code></li>

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>examples.xodr.multiple_geometries_one_road API documentation</title>
+<title>examples.xodr.road_with_lane_adjustment API documentation</title>
 <meta name="description" content="scenariogeneration
 https://github.com/pyoscx/scenariogeneration …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -20,7 +20,7 @@ https://github.com/pyoscx/scenariogeneration …" />
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>examples.xodr.multiple_geometries_one_road</code></h1>
+<h1 class="title">Module <code>examples.xodr.road_with_lane_adjustment</code></h1>
 </header>
 <section id="section-intro">
 <p>scenariogeneration
@@ -29,28 +29,24 @@ https://github.com/pyoscx/scenariogeneration …" />
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
 <p>Copyright (c) 2022 The scenariogeneration Authors.</p>
-<p>Fundamental example how to build up a road from scratch.</p>
-<p>This example should be seen as a developer example how roads are built up from the very basic classes in OpenDRIVE
-create_road will take care of this and much more, so a user is recommended to use that generator instead.</p>
-<p>Some features used:</p>
+<p>Example how to create a more customized a junction with different widths of lanes,
+using generators and LaneDef with different lane widths</p>
+<p>Some features used</p>
 <ul>
 <li>
-<p>PlanView</p>
+<p>CommonJunctionCreator</p>
 </li>
 <li>
-<p>Lane</p>
+<p>DirectJunctionCreator</p>
 </li>
 <li>
-<p>Lanes</p>
+<p>LaneDef</p>
 </li>
 <li>
-<p>LaneSection</p>
+<p>create_road</p>
 </li>
 <li>
-<p>RoadMark</p>
-</li>
-<li>
-<p>Road</p>
+<p>adjust_roadmarks</p>
 </li>
 </ul>
 <details class="source">
@@ -67,26 +63,22 @@ create_road will take care of this and much more, so a user is recommended to us
 
   Copyright (c) 2022 The scenariogeneration Authors.
 
-    Fundamental example how to build up a road from scratch.
+    Example how to create a more customized a junction with different widths of lanes,
+    using generators and LaneDef with different lane widths
 
-    This example should be seen as a developer example how roads are built up from the very basic classes in OpenDRIVE
-    create_road will take care of this and much more, so a user is recommended to use that generator instead.
+    Some features used
 
-    Some features used:
+    - CommonJunctionCreator
 
-    - PlanView
+    - DirectJunctionCreator
 
-    - Lane
+    - LaneDef
 
-    - Lanes
+    - create_road
 
-    - LaneSection
-
-    - RoadMark
-
-    - Road
-
+    - adjust_roadmarks
 &#34;&#34;&#34;
+
 from scenariogeneration import xodr, prettyprint, ScenarioGenerator
 import numpy as np
 import os
@@ -97,60 +89,122 @@ class Scenario(ScenarioGenerator):
         super().__init__()
 
     def road(self, **kwargs):
-        ## Multiple geometries in one only road.
+        # create a road with some strange lane sections
+        road1 = xodr.create_road(
+            xodr.Line(195),
+            1,
+            [
+                xodr.LaneDef(
+                    13,
+                    80,
+                    3,
+                    4,
+                    3,
+                    lane_start_widths=[3, 3, 3],
+                    lane_end_widths=[3, 3, 3, 3],
+                ),
+                xodr.LaneDef(
+                    120,
+                    140,
+                    4,
+                    3,
+                    2,
+                    lane_start_widths=[3, 3, 3, 3],
+                    lane_end_widths=[3, 3, 3],
+                ),
+            ],
+            [
+                xodr.LaneDef(
+                    13,
+                    80,
+                    3,
+                    4,
+                    -1,
+                    lane_start_widths=[3, 3, 3],
+                    lane_end_widths=[3, 3, 3, 3],
+                ),
+                xodr.LaneDef(
+                    120,
+                    140,
+                    4,
+                    3,
+                    -4,
+                    lane_start_widths=[3, 3, 3, 3],
+                    lane_end_widths=[3, 3, 3],
+                ),
+            ],
+            center_road_mark=xodr.std_roadmark_broken_broken(),
+        )
 
-        ##1. Create the planview
-        planview = xodr.PlanView()
+        # create more roads
+        road2 = xodr.create_road(
+            xodr.Line(103),
+            2,
+            xodr.LaneDef(40, 80, 3, 3, lane_start_widths=[3, 3, 3]),
+            3,
+            center_road_mark=xodr.std_roadmark_broken_broken(),
+        )
 
-        ##2. Create some geometries and add them to the planview
-        line1 = xodr.Line(100)
-        arc1 = xodr.Arc(0.05, angle=np.pi / 2)
-        line2 = xodr.Line(100)
-        cloth1 = xodr.Spiral(0.05, -0.1, 30)
-        line3 = xodr.Line(100)
+        road3 = xodr.create_road(xodr.Spiral(0.00001, 0.01, 100), 3, 3, 0)
+        road4 = xodr.create_road(xodr.Spiral(-0.0001, -0.01, 100), 4, 0, 3)
 
-        planview.add_geometry(line1)
-        planview.add_geometry(arc1)
-        planview.add_geometry(line2)
-        planview.add_geometry(cloth1)
-        planview.add_geometry(line3)
+        road5 = xodr.create_road(
+            xodr.Line(100),
+            5,
+            xodr.LaneDef(40, 80, 3, 3, lane_start_widths=[3, 3, 3]),
+            3,
+            center_road_mark=xodr.std_roadmark_broken_broken(),
+        )
+        road6 = xodr.create_road(
+            xodr.Line(100),
+            6,
+            xodr.LaneDef(40, 80, 3, 3, lane_start_widths=[3, 3, 3]),
+            3,
+            center_road_mark=xodr.std_roadmark_broken_broken(),
+        )
 
-        ##3. Create a solid roadmark
-        rm = xodr.RoadMark(xodr.RoadMarkType.solid, 0.2)
+        # connect all roads
+        road1.add_successor(xodr.ElementType.road, 2, xodr.ContactPoint.start)
+        road1.add_predecessor(xodr.ElementType.junction, 100)
 
-        ##4. Create centerlane
-        centerlane = xodr.Lane(a=2)
-        centerlane.add_roadmark(rm)
+        road2.add_predecessor(xodr.ElementType.road, 1, xodr.ContactPoint.end)
 
-        ##5. Create lane section form the centerlane
-        lanesec = xodr.LaneSection(0, centerlane)
+        road3.add_predecessor(xodr.ElementType.junction, 100)
+        road4.add_predecessor(xodr.ElementType.junction, 100)
 
-        ##6. Create left and right lanes
-        lane2 = xodr.Lane(a=3)
-        lane2.add_roadmark(rm)
-        lane3 = xodr.Lane(a=3)
-        lane3.add_roadmark(rm)
+        # create a direct junction
+        junc = xodr.DirectJunctionCreator(100, &#34;direct_junction&#34;)
 
-        ##7. Add lanes to lane section
-        lanesec.add_left_lane(lane2)
-        lanesec.add_right_lane(lane3)
+        junc.add_connection(road1, road3)
+        junc.add_connection(road1, road4)
 
-        ##8. Add lane section to Lanes
-        lanes = xodr.Lanes()
-        lanes.add_lanesection(lanesec)
+        # create a common junction
+        junc2 = xodr.CommonJunctionCreator(200, &#34;common junction&#34;)
+        junc2.add_incoming_road_cartesian_geometry(
+            road2, 0, 0, -3.14 * 3 / 2, &#34;successor&#34;
+        )
+        junc2.add_incoming_road_cartesian_geometry(road5, 30, 20, -3.14, &#34;successor&#34;)
+        junc2.add_incoming_road_cartesian_geometry(road6, -30, 20, 0, &#34;predecessor&#34;)
 
-        ##9. Create Road from Planview and Lanes
-        road = xodr.Road(1, planview, lanes)
+        junc2.add_connection(2, 5)
+        junc2.add_connection(2, 6)
 
-        ##10. Create the OpenDrive class (Master class)
-        odr = xodr.OpenDrive(&#34;myroad&#34;)
+        # add everything to the OpenDRIVE object
+        odr = xodr.OpenDrive(&#34;my adjusted road&#34;)
+        odr.add_road(road1)
+        odr.add_road(road2)
+        odr.add_road(road3)
+        odr.add_road(road4)
+        odr.add_road(road5)
+        odr.add_road(road6)
+        odr.add_junction_creator(junc)
+        odr.add_junction_creator(junc2)
 
-        ##11. Finally add roads to Opendrive
-        odr.add_road(road)
-
-        ##12. Adjust initial positions of the roads looking at succ-pred logic
+        # adjust roads and lanes
         odr.adjust_roads_and_lanes()
 
+        # adjust roadmarks (comment out to see difference)
+        odr.adjust_roadmarks()
         return odr
 
 
@@ -176,7 +230,7 @@ if __name__ == &#34;__main__&#34;:
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="examples.xodr.multiple_geometries_one_road.Scenario"><code class="flex name class">
+<dt id="examples.xodr.road_with_lane_adjustment.Scenario"><code class="flex name class">
 <span>class <span class="ident">Scenario</span></span>
 </code></dt>
 <dd>
@@ -211,60 +265,122 @@ encoding (str): encoding of the outputs
         super().__init__()
 
     def road(self, **kwargs):
-        ## Multiple geometries in one only road.
+        # create a road with some strange lane sections
+        road1 = xodr.create_road(
+            xodr.Line(195),
+            1,
+            [
+                xodr.LaneDef(
+                    13,
+                    80,
+                    3,
+                    4,
+                    3,
+                    lane_start_widths=[3, 3, 3],
+                    lane_end_widths=[3, 3, 3, 3],
+                ),
+                xodr.LaneDef(
+                    120,
+                    140,
+                    4,
+                    3,
+                    2,
+                    lane_start_widths=[3, 3, 3, 3],
+                    lane_end_widths=[3, 3, 3],
+                ),
+            ],
+            [
+                xodr.LaneDef(
+                    13,
+                    80,
+                    3,
+                    4,
+                    -1,
+                    lane_start_widths=[3, 3, 3],
+                    lane_end_widths=[3, 3, 3, 3],
+                ),
+                xodr.LaneDef(
+                    120,
+                    140,
+                    4,
+                    3,
+                    -4,
+                    lane_start_widths=[3, 3, 3, 3],
+                    lane_end_widths=[3, 3, 3],
+                ),
+            ],
+            center_road_mark=xodr.std_roadmark_broken_broken(),
+        )
 
-        ##1. Create the planview
-        planview = xodr.PlanView()
+        # create more roads
+        road2 = xodr.create_road(
+            xodr.Line(103),
+            2,
+            xodr.LaneDef(40, 80, 3, 3, lane_start_widths=[3, 3, 3]),
+            3,
+            center_road_mark=xodr.std_roadmark_broken_broken(),
+        )
 
-        ##2. Create some geometries and add them to the planview
-        line1 = xodr.Line(100)
-        arc1 = xodr.Arc(0.05, angle=np.pi / 2)
-        line2 = xodr.Line(100)
-        cloth1 = xodr.Spiral(0.05, -0.1, 30)
-        line3 = xodr.Line(100)
+        road3 = xodr.create_road(xodr.Spiral(0.00001, 0.01, 100), 3, 3, 0)
+        road4 = xodr.create_road(xodr.Spiral(-0.0001, -0.01, 100), 4, 0, 3)
 
-        planview.add_geometry(line1)
-        planview.add_geometry(arc1)
-        planview.add_geometry(line2)
-        planview.add_geometry(cloth1)
-        planview.add_geometry(line3)
+        road5 = xodr.create_road(
+            xodr.Line(100),
+            5,
+            xodr.LaneDef(40, 80, 3, 3, lane_start_widths=[3, 3, 3]),
+            3,
+            center_road_mark=xodr.std_roadmark_broken_broken(),
+        )
+        road6 = xodr.create_road(
+            xodr.Line(100),
+            6,
+            xodr.LaneDef(40, 80, 3, 3, lane_start_widths=[3, 3, 3]),
+            3,
+            center_road_mark=xodr.std_roadmark_broken_broken(),
+        )
 
-        ##3. Create a solid roadmark
-        rm = xodr.RoadMark(xodr.RoadMarkType.solid, 0.2)
+        # connect all roads
+        road1.add_successor(xodr.ElementType.road, 2, xodr.ContactPoint.start)
+        road1.add_predecessor(xodr.ElementType.junction, 100)
 
-        ##4. Create centerlane
-        centerlane = xodr.Lane(a=2)
-        centerlane.add_roadmark(rm)
+        road2.add_predecessor(xodr.ElementType.road, 1, xodr.ContactPoint.end)
 
-        ##5. Create lane section form the centerlane
-        lanesec = xodr.LaneSection(0, centerlane)
+        road3.add_predecessor(xodr.ElementType.junction, 100)
+        road4.add_predecessor(xodr.ElementType.junction, 100)
 
-        ##6. Create left and right lanes
-        lane2 = xodr.Lane(a=3)
-        lane2.add_roadmark(rm)
-        lane3 = xodr.Lane(a=3)
-        lane3.add_roadmark(rm)
+        # create a direct junction
+        junc = xodr.DirectJunctionCreator(100, &#34;direct_junction&#34;)
 
-        ##7. Add lanes to lane section
-        lanesec.add_left_lane(lane2)
-        lanesec.add_right_lane(lane3)
+        junc.add_connection(road1, road3)
+        junc.add_connection(road1, road4)
 
-        ##8. Add lane section to Lanes
-        lanes = xodr.Lanes()
-        lanes.add_lanesection(lanesec)
+        # create a common junction
+        junc2 = xodr.CommonJunctionCreator(200, &#34;common junction&#34;)
+        junc2.add_incoming_road_cartesian_geometry(
+            road2, 0, 0, -3.14 * 3 / 2, &#34;successor&#34;
+        )
+        junc2.add_incoming_road_cartesian_geometry(road5, 30, 20, -3.14, &#34;successor&#34;)
+        junc2.add_incoming_road_cartesian_geometry(road6, -30, 20, 0, &#34;predecessor&#34;)
 
-        ##9. Create Road from Planview and Lanes
-        road = xodr.Road(1, planview, lanes)
+        junc2.add_connection(2, 5)
+        junc2.add_connection(2, 6)
 
-        ##10. Create the OpenDrive class (Master class)
-        odr = xodr.OpenDrive(&#34;myroad&#34;)
+        # add everything to the OpenDRIVE object
+        odr = xodr.OpenDrive(&#34;my adjusted road&#34;)
+        odr.add_road(road1)
+        odr.add_road(road2)
+        odr.add_road(road3)
+        odr.add_road(road4)
+        odr.add_road(road5)
+        odr.add_road(road6)
+        odr.add_junction_creator(junc)
+        odr.add_junction_creator(junc2)
 
-        ##11. Finally add roads to Opendrive
-        odr.add_road(road)
-
-        ##12. Adjust initial positions of the roads looking at succ-pred logic
+        # adjust roads and lanes
         odr.adjust_roads_and_lanes()
 
+        # adjust roadmarks (comment out to see difference)
+        odr.adjust_roadmarks()
         return odr</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -301,7 +417,7 @@ encoding (str): encoding of the outputs
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="examples.xodr.multiple_geometries_one_road.Scenario" href="#examples.xodr.multiple_geometries_one_road.Scenario">Scenario</a></code></h4>
+<h4><code><a title="examples.xodr.road_with_lane_adjustment.Scenario" href="#examples.xodr.road_with_lane_adjustment.Scenario">Scenario</a></code></h4>
 </li>
 </ul>
 </li>

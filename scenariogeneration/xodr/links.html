@@ -36,11 +36,11 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <pre><code class="python">&#34;&#34;&#34;
   scenariogeneration
   https://github.com/pyoscx/scenariogeneration
- 
+
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at https://mozilla.org/MPL/2.0/.
- 
+
   Copyright (c) 2022 The scenariogeneration Authors.
 
 &#34;&#34;&#34;
@@ -55,9 +55,10 @@ from .exceptions import (
     GeneralIssueInputArguments,
 )
 import warnings
+from .utils import XodrBase
 
 
-class _Links:
+class _Links(XodrBase):
     &#34;&#34;&#34;Link creates a Link element used for roadlinking in OpenDrive
 
     Parameters
@@ -79,11 +80,11 @@ class _Links:
 
     def __init__(self):
         &#34;&#34;&#34;initalize the _Links&#34;&#34;&#34;
-
+        super().__init__()
         self.links = []
 
     def __eq__(self, other):
-        if isinstance(other, _Links):
+        if isinstance(other, _Links) and super().__eq__(other):
             if self.links == other.links:
                 return True
         return False
@@ -190,14 +191,16 @@ class _Links:
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the _Link&#34;&#34;&#34;
-
         element = ET.Element(&#34;link&#34;)
-        for l in self.links:
+        self._add_additional_data_to_element(element)
+        # sort links alphabetically by link type to ensure predecessor
+        # appears before successor to comply to schema
+        for l in sorted(self.links, key=lambda x: x.link_type):
             element.append(l.get_element())
         return element
 
 
-class _Link:
+class _Link(XodrBase):
     &#34;&#34;&#34;Link creates a predecessor/successor/neghbor element used for Links in OpenDrive
 
     Parameters
@@ -262,7 +265,7 @@ class _Link:
             direction (Direction): the direction of the link (used for neighbor)
                 Default: None
         &#34;&#34;&#34;
-
+        super().__init__()
         if link_type == &#34;neighbor&#34;:
             if direction == None:
                 raise ValueError(&#34;direction has to be defined for neighbor&#34;)
@@ -274,7 +277,7 @@ class _Link:
         self.direction = direction
 
     def __eq__(self, other):
-        if isinstance(other, _Link):
+        if isinstance(other, _Link) and super().__eq__(other):
             if (
                 self.get_attributes() == other.get_attributes()
                 and self.link_type == other.link_type
@@ -300,6 +303,7 @@ class _Link:
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the _Link&#34;&#34;&#34;
         element = ET.Element(self.link_type, attrib=self.get_attributes())
+        self._add_additional_data_to_element(element)
         return element
 
 
@@ -352,7 +356,7 @@ class _lanelink:
         self.used = False
 
 
-class Connection:
+class Connection(XodrBase):
     &#34;&#34;&#34;Connection creates a connection as a base of junction
 
     Parameters
@@ -402,7 +406,7 @@ class Connection:
 
             id (int): id of the junction (automated)
         &#34;&#34;&#34;
-
+        super().__init__()
         self.incoming_road = incoming_road
         self.connecting_road = connecting_road
         self.contact_point = contact_point
@@ -410,7 +414,7 @@ class Connection:
         self.links = []
 
     def __eq__(self, other):
-        if isinstance(other, Connection):
+        if isinstance(other, Connection) and super().__eq__(other):
             if (
                 self.get_attributes() == other.get_attributes()
                 and self.links == other.links
@@ -468,6 +472,7 @@ class Connection:
         &#34;&#34;&#34;
 
         element = ET.Element(&#34;connection&#34;, attrib=self.get_attributes(junctiontype))
+        self._add_additional_data_to_element(element)
         for l in sorted(self.links, key=lambda x: x[0], reverse=True):
             ET.SubElement(
                 element, &#34;laneLink&#34;, attrib={&#34;from&#34;: str(l[0]), &#34;to&#34;: str(l[1])}
@@ -475,7 +480,7 @@ class Connection:
         return element
 
 
-class Junction:
+class Junction(XodrBase):
     &#34;&#34;&#34;Junction creates a junction of OpenDRIVE
 
     Parameters
@@ -561,6 +566,7 @@ class Junction:
             mainroad (int): main road for a virtual junction
 
         &#34;&#34;&#34;
+        super().__init__()
         self.name = name
         self.id = id
         self.connections = []
@@ -585,7 +591,7 @@ class Junction:
         self.orientation = orientation
 
     def __eq__(self, other):
-        if isinstance(other, Junction):
+        if isinstance(other, Junction) and super().__eq__(other):
             if (
                 self.get_attributes() == other.get_attributes()
                 and self.connections == other.connections
@@ -627,6 +633,7 @@ class Junction:
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the Junction&#34;&#34;&#34;
         element = ET.Element(&#34;junction&#34;, attrib=self.get_attributes())
+        self._add_additional_data_to_element(element)
         for con in self.connections:
             element.append(con.get_element(self.junction_type))
         return element
@@ -731,6 +738,17 @@ def create_lane_links_from_ids(road1, road2, road1_lane_ids, road2_lane_ids):
         second_linktype, _, second_connecting_lanesec = _get_related_lanesection(
             road2, road1
         )
+
+        # The road links need to be reciprocal for the lane linking to succeed
+        if first_linktype == None or second_linktype == None:
+            raise ValueError(
+                &#34;Unable to create lane links for road with ID &#34;
+                + str(road1.id)
+                + &#34; and road with ID &#34;
+                + str(road2.id)
+                + &#34; due to non reciprocal road successor/predecessor links.&#34;
+            )
+
         for i in range(len(road1_lane_ids)):
             if road1_lane_ids[i] &gt; 0:
                 road1.lanes.lanesections[first_connecting_lanesec].leftlanes[
@@ -757,7 +775,6 @@ def create_lane_links_from_ids(road1, road2, road1_lane_ids, road2_lane_ids):
 def create_lane_links(road1, road2):
     &#34;&#34;&#34;create_lane_links takes two roads and if they are connected, match their lanes
     and creates lane links.
-    NOTE: now only works for roads/connecting roads with the same amount of lanes
 
     Parameters
     ----------
@@ -876,6 +893,7 @@ def _get_related_lanesection(road, connected_road):
         else:
             sign = -1
         road_lanesection_id = -1
+        return linktype, sign, road_lanesection_id
 
     elif road.predecessor and road.predecessor.element_id == connected_road.id:
         linktype = &#34;predecessor&#34;
@@ -884,6 +902,7 @@ def _get_related_lanesection(road, connected_road):
         else:
             sign = 1
         road_lanesection_id = 0
+        return linktype, sign, road_lanesection_id
 
     # treat direct junctions differently
     if (
@@ -897,6 +916,7 @@ def _get_related_lanesection(road, connected_road):
         linktype = &#34;predecessor&#34;
         sign = -1
         road_lanesection_id = 0
+        return linktype, sign, road_lanesection_id
 
     elif (
         road.successor
@@ -909,6 +929,7 @@ def _get_related_lanesection(road, connected_road):
         linktype = &#34;successor&#34;
         sign = 1
         road_lanesection_id = -1
+        return linktype, sign, road_lanesection_id
 
     elif (
         road.successor
@@ -921,6 +942,7 @@ def _get_related_lanesection(road, connected_road):
         linktype = &#34;successor&#34;
         sign = -1
         road_lanesection_id = -1
+        return linktype, sign, road_lanesection_id
 
     elif (
         road.predecessor
@@ -933,17 +955,23 @@ def _get_related_lanesection(road, connected_road):
         linktype = &#34;predecessor&#34;
         sign = 1
         road_lanesection_id = 0
+        return linktype, sign, road_lanesection_id
 
     if connected_road.road_type != -1:
         # treat connecting road in junction differently
-        if connected_road.predecessor.element_id == road.id:
+        if (
+            connected_road.predecessor
+            and connected_road.predecessor.element_id == road.id
+        ):
             if connected_road.predecessor.contact_point == ContactPoint.start:
                 road_lanesection_id = 0
                 sign = -1
             else:
                 road_lanesection_id = -1
                 sign = 1
-        elif connected_road.successor.element_id == road.id:
+        elif (
+            connected_road.successor and connected_road.successor.element_id == road.id
+        ):
             if connected_road.successor.contact_point == ContactPoint.start:
                 road_lanesection_id = 0
                 sign = 1
@@ -1079,7 +1107,7 @@ def _create_links_roads(pre_road, suc_road, same_type=&#34;&#34;):
             )
 
 
-class JunctionGroup:
+class JunctionGroup(XodrBase):
     &#34;&#34;&#34;JunctionGroup creates a JunctionGroup of OpenDRIVE
 
     Parameters
@@ -1123,13 +1151,14 @@ class JunctionGroup:
             junction_type (JunctionGroupType): type of junction
                 Default: JunctionGroupType.roundabout
         &#34;&#34;&#34;
+        super().__init__()
         self.name = name
         self.group_id = group_id
         self.junctions = []
         self.junction_type = junction_type
 
     def __eq__(self, other):
-        if isinstance(other, JunctionGroup):
+        if isinstance(other, JunctionGroup) and super().__eq__(other):
             if (
                 self.get_attributes() == other.get_attributes()
                 and self.junctions == other.junctions
@@ -1159,6 +1188,7 @@ class JunctionGroup:
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the Junction&#34;&#34;&#34;
         element = ET.Element(&#34;junctionGroup&#34;, attrib=self.get_attributes())
+        self._add_additional_data_to_element(element)
         for j in self.junctions:
             ET.SubElement(element, &#34;junctionReference&#34;, attrib={&#34;junction&#34;: str(j)})
         return element</code></pre>
@@ -1272,8 +1302,7 @@ road1 (Road): the second road
 </code></dt>
 <dd>
 <div class="desc"><p>create_lane_links takes two roads and if they are connected, match their lanes
-and creates lane links.
-NOTE: now only works for roads/connecting roads with the same amount of lanes</p>
+and creates lane links.</p>
 <h2 id="parameters">Parameters</h2>
 <pre><code>road1 (Road): first road to be lane linked
 
@@ -1286,7 +1315,6 @@ road2 (Road): second road to be lane linked
 <pre><code class="python">def create_lane_links(road1, road2):
     &#34;&#34;&#34;create_lane_links takes two roads and if they are connected, match their lanes
     and creates lane links.
-    NOTE: now only works for roads/connecting roads with the same amount of lanes
 
     Parameters
     ----------
@@ -1366,6 +1394,17 @@ road2_lane_ids (list of int): list of the ids of road2 (do not use the 0 lane)
         second_linktype, _, second_connecting_lanesec = _get_related_lanesection(
             road2, road1
         )
+
+        # The road links need to be reciprocal for the lane linking to succeed
+        if first_linktype == None or second_linktype == None:
+            raise ValueError(
+                &#34;Unable to create lane links for road with ID &#34;
+                + str(road1.id)
+                + &#34; and road with ID &#34;
+                + str(road2.id)
+                + &#34; due to non reciprocal road successor/predecessor links.&#34;
+            )
+
         for i in range(len(road1_lane_ids)):
             if road1_lane_ids[i] &gt; 0:
                 road1.lanes.lanesections[first_connecting_lanesec].leftlanes[
@@ -1444,7 +1483,7 @@ id (int): id of the junction (automated)
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Connection:
+<pre><code class="python">class Connection(XodrBase):
     &#34;&#34;&#34;Connection creates a connection as a base of junction
 
     Parameters
@@ -1494,7 +1533,7 @@ id (int): id of the junction (automated)
 
             id (int): id of the junction (automated)
         &#34;&#34;&#34;
-
+        super().__init__()
         self.incoming_road = incoming_road
         self.connecting_road = connecting_road
         self.contact_point = contact_point
@@ -1502,7 +1541,7 @@ id (int): id of the junction (automated)
         self.links = []
 
     def __eq__(self, other):
-        if isinstance(other, Connection):
+        if isinstance(other, Connection) and super().__eq__(other):
             if (
                 self.get_attributes() == other.get_attributes()
                 and self.links == other.links
@@ -1560,12 +1599,17 @@ id (int): id of the junction (automated)
         &#34;&#34;&#34;
 
         element = ET.Element(&#34;connection&#34;, attrib=self.get_attributes(junctiontype))
+        self._add_additional_data_to_element(element)
         for l in sorted(self.links, key=lambda x: x[0], reverse=True):
             ET.SubElement(
                 element, &#34;laneLink&#34;, attrib={&#34;from&#34;: str(l[0]), &#34;to&#34;: str(l[1])}
             )
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.links.Connection.add_lanelink"><code class="name flex">
@@ -1648,6 +1692,7 @@ out_lane: lane id of the outgoing road
     &#34;&#34;&#34;
 
     element = ET.Element(&#34;connection&#34;, attrib=self.get_attributes(junctiontype))
+    self._add_additional_data_to_element(element)
     for l in sorted(self.links, key=lambda x: x[0], reverse=True):
         ET.SubElement(
             element, &#34;laneLink&#34;, attrib={&#34;from&#34;: str(l[0]), &#34;to&#34;: str(l[1])}
@@ -1656,6 +1701,15 @@ out_lane: lane id of the outgoing road
 </details>
 </dd>
 </dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_dataquality" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_dataquality">add_dataquality</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_userdata" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_userdata">add_userdata</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 <dt id="scenariogeneration.xodr.links.Junction"><code class="flex name class">
 <span>class <span class="ident">Junction</span></span>
@@ -1732,7 +1786,7 @@ mainroad (int): main road for a virtual junction
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Junction:
+<pre><code class="python">class Junction(XodrBase):
     &#34;&#34;&#34;Junction creates a junction of OpenDRIVE
 
     Parameters
@@ -1818,6 +1872,7 @@ mainroad (int): main road for a virtual junction
             mainroad (int): main road for a virtual junction
 
         &#34;&#34;&#34;
+        super().__init__()
         self.name = name
         self.id = id
         self.connections = []
@@ -1842,7 +1897,7 @@ mainroad (int): main road for a virtual junction
         self.orientation = orientation
 
     def __eq__(self, other):
-        if isinstance(other, Junction):
+        if isinstance(other, Junction) and super().__eq__(other):
             if (
                 self.get_attributes() == other.get_attributes()
                 and self.connections == other.connections
@@ -1884,10 +1939,15 @@ mainroad (int): main road for a virtual junction
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the Junction&#34;&#34;&#34;
         element = ET.Element(&#34;junction&#34;, attrib=self.get_attributes())
+        self._add_additional_data_to_element(element)
         for con in self.connections:
             element.append(con.get_element(self.junction_type))
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.links.Junction.add_connection"><code class="name flex">
@@ -1956,12 +2016,22 @@ mainroad (int): main road for a virtual junction
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the Junction&#34;&#34;&#34;
     element = ET.Element(&#34;junction&#34;, attrib=self.get_attributes())
+    self._add_additional_data_to_element(element)
     for con in self.connections:
         element.append(con.get_element(self.junction_type))
     return element</code></pre>
 </details>
 </dd>
 </dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_dataquality" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_dataquality">add_dataquality</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_userdata" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_userdata">add_userdata</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 <dt id="scenariogeneration.xodr.links.JunctionGroup"><code class="flex name class">
 <span>class <span class="ident">JunctionGroup</span></span>
@@ -2007,7 +2077,7 @@ junction_type (JunctionGroupType): type of junction
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class JunctionGroup:
+<pre><code class="python">class JunctionGroup(XodrBase):
     &#34;&#34;&#34;JunctionGroup creates a JunctionGroup of OpenDRIVE
 
     Parameters
@@ -2051,13 +2121,14 @@ junction_type (JunctionGroupType): type of junction
             junction_type (JunctionGroupType): type of junction
                 Default: JunctionGroupType.roundabout
         &#34;&#34;&#34;
+        super().__init__()
         self.name = name
         self.group_id = group_id
         self.junctions = []
         self.junction_type = junction_type
 
     def __eq__(self, other):
-        if isinstance(other, JunctionGroup):
+        if isinstance(other, JunctionGroup) and super().__eq__(other):
             if (
                 self.get_attributes() == other.get_attributes()
                 and self.junctions == other.junctions
@@ -2087,10 +2158,15 @@ junction_type (JunctionGroupType): type of junction
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the Junction&#34;&#34;&#34;
         element = ET.Element(&#34;junctionGroup&#34;, attrib=self.get_attributes())
+        self._add_additional_data_to_element(element)
         for j in self.junctions:
             ET.SubElement(element, &#34;junctionReference&#34;, attrib={&#34;junction&#34;: str(j)})
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.links.JunctionGroup.add_junction"><code class="name flex">
@@ -2147,12 +2223,22 @@ junction_type (JunctionGroupType): type of junction
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the Junction&#34;&#34;&#34;
     element = ET.Element(&#34;junctionGroup&#34;, attrib=self.get_attributes())
+    self._add_additional_data_to_element(element)
     for j in self.junctions:
         ET.SubElement(element, &#34;junctionReference&#34;, attrib={&#34;junction&#34;: str(j)})
     return element</code></pre>
 </details>
 </dd>
 </dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_dataquality" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_dataquality">add_dataquality</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_userdata" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_userdata">add_userdata</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 <dt id="scenariogeneration.xodr.links.LaneLinker"><code class="flex name class">
 <span>class <span class="ident">LaneLinker</span></span>

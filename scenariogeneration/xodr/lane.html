@@ -36,11 +36,11 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <pre><code class="python">&#34;&#34;&#34;
   scenariogeneration
   https://github.com/pyoscx/scenariogeneration
- 
+
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at https://mozilla.org/MPL/2.0/.
- 
+
   Copyright (c) 2022 The scenariogeneration Authors.
 
 &#34;&#34;&#34;
@@ -55,11 +55,15 @@ from .enumerations import (
     RoadMarkColor,
     RoadMarkType,
     MarkRule,
+    ContactPoint,
 )
+from .exceptions import ToManyOptionalArguments
+from .utils import XodrBase
 from .links import _Links, _Link
+import numpy as np
 
 
-class Lanes:
+class Lanes(XodrBase):
     &#34;&#34;&#34;creates the Lanes element of opendrive
 
 
@@ -80,12 +84,14 @@ class Lanes:
     &#34;&#34;&#34;
 
     def __init__(self):
+        super().__init__()
         &#34;&#34;&#34;initalize Lanes&#34;&#34;&#34;
         self.lanesections = []
         self.laneoffsets = []
+        self.roadmarks_adjusted = False
 
     def __eq__(self, other):
-        if isinstance(other, Lanes):
+        if isinstance(other, Lanes) and super().__eq__(other):
             if (
                 self.laneoffsets == other.laneoffsets
                 and self.lanesections == other.lanesections
@@ -134,17 +140,532 @@ class Lanes:
         self.laneoffsets.append(laneoffset)
         return self
 
+    def _check_valid_mark_type(self, lane):
+        &#34;&#34;&#34;simple checker if the lanemark can be adjusted
+
+        Parameters
+        ----------
+            lane (Lane): the lane which roadmark should be checked
+        &#34;&#34;&#34;
+        return (
+            lane.roadmark[0].marking_type == RoadMarkType.broken
+            or lane.roadmark[0].marking_type == RoadMarkType.broken_broken
+        )
+
+    def _adjust_for_missing_line_offset(self, roadmark):
+        &#34;&#34;&#34;adds an explicit line if soofset is less than 0 (for adjusting from start) or longer than the space between lines (for adjusting from end)
+
+        Parameters
+        ----------
+            roadmark (RoadMark): the roadmark to be adjusted
+        &#34;&#34;&#34;
+        for line in roadmark._line:
+            if line.soffset &lt; 0 or line.soffset &gt; line.length + line.soffset:
+                roadmark.add_explicit_road_line(
+                    ExplicitRoadLine(
+                        line.width,
+                        line.length + line.soffset,
+                        line.toffset,
+                        0,
+                        line.rule,
+                    )
+                )
+            elif line.soffset &gt; line.space:
+                roadmark.add_explicit_road_line(
+                    ExplicitRoadLine(
+                        line.width,
+                        line.soffset - line.space,
+                        line.toffset,
+                        0,
+                        line.rule,
+                    )
+                )
+            if line.soffset &lt; 0:
+                line.shift_soffset()
+
+    def _validity_check_for_roadmark_adjustment(self):
+        &#34;&#34;&#34;does some simple checks if the the different lanes can be adjusted&#34;&#34;&#34;
+        self._right_lanes_adjustable = len(self.lanesections[0].rightlanes) &gt; 0
+        self._left_lanes_adjustable = len(self.lanesections[0].leftlanes) &gt; 0
+        self._center_lane_adjustable = True
+        for ls in range(len(self.lanesections) - 1):
+            if len(self.lanesections[ls].centerlane.roadmark) != 1:
+                self.center_lane_adjustable = False
+            if (
+                self.lanesections[ls].centerlane.roadmark
+                != self.lanesections[ls + 1].centerlane.roadmark
+            ):
+                self.center_lane_adjustable = False
+            if (
+                self.lanesections[ls].centerlane.roadmark[0].marking_type
+                != RoadMarkType.broken
+                and self.lanesections[ls].centerlane.roadmark[0].marking_type
+                != RoadMarkType.broken_broken
+            ):
+                self.center_lane_adjustable = False
+
+            for rl in range(len(self.lanesections[ls].rightlanes)):
+                if self._right_lanes_adjustable:
+                    if len(self.lanesections[ls].rightlanes[rl].roadmark) != 1:
+                        self._right_lanes_adjustable = False
+            for ll in range(len(self.lanesections[ls].leftlanes)):
+                if self._left_lanes_adjustable:
+                    if len(self.lanesections[ls].leftlanes[ll].roadmark) != 1:
+                        self._left_lanes_adjustable = False
+
+    def _get_previous_remainder(
+        self,
+        connected_lane_section,
+        i_line,
+        lane_side,
+        contact_point,
+        lane_index,
+        lane_section_index,
+        start_or_end,
+    ):
+        &#34;&#34;&#34;_get_previous_remainder is a helper method to get the remainder of a lanemarking of a connecting lane section (for lenght adjustment)
+
+        Parameters
+        ----------
+            connected_lane_section (LaneSection): connected lane section (on another road)
+
+            i_line (int): index of the line (roadmark._line)
+
+            lane_side (str): &#34;left&#34;, &#34;right&#34;, or &#34;center&#34; describing what lane is of interest
+
+            contact_point (ContactPoint): contact point of the connected_lane_section
+
+            lane_index (int): the lane index of the wanted lane
+
+            lane_section_index (int): index of the lane section
+
+            start_or_end (str): if the adjustment is done from the end or from the start of the road
+
+        Return
+        ------
+            float: remainder of the previous lanesection
+
+        &#34;&#34;&#34;
+        active_lane_sec = self.lanesections[lane_section_index]
+        neighbor_lane_sec = None
+        if start_or_end == &#34;end&#34;:
+            on_edge = lane_section_index == len(self.lanesections) - 1
+            connection = &#34;successor&#34;
+            if not on_edge:
+                neighbor_lane_sec = self.lanesections[lane_section_index + 1]
+        else:
+            on_edge = lane_section_index == 0
+            connection = &#34;predecessor&#34;
+            if not on_edge:
+                neighbor_lane_sec = self.lanesections[lane_section_index - 1]
+
+        linked_lane_id = 0
+        found_linked_lane_id = None
+        if lane_side == &#34;right&#34;:
+            found_linked_lane_id = active_lane_sec.rightlanes[
+                lane_index
+            ].get_linked_lane_id(connection)
+            if neighbor_lane_sec:
+                neighboring_lane = neighbor_lane_sec.rightlanes[linked_lane_id]
+        elif lane_side == &#34;left&#34;:
+            found_linked_lane_id = active_lane_sec.leftlanes[
+                lane_index
+            ].get_linked_lane_id(connection)
+            if neighbor_lane_sec:
+                neighboring_lane = neighbor_lane_sec.leftlanes[linked_lane_id]
+        else:  # center
+            if neighbor_lane_sec:
+                neighboring_lane = neighbor_lane_sec.centerlane
+        if found_linked_lane_id:
+            linked_lane_id = abs(found_linked_lane_id) - 1
+
+        prev_remainder = 0
+        if on_edge:
+            if lane_side == &#34;right&#34;:
+                if (
+                    contact_point == ContactPoint.end
+                    and connected_lane_section.rightlanes[linked_lane_id]
+                    .roadmark[0]
+                    ._line
+                ):
+                    prev_remainder = (
+                        connected_lane_section.rightlanes[linked_lane_id]
+                        .roadmark[0]
+                        ._line[i_line]
+                        ._remainder
+                    )
+                elif (
+                    contact_point == ContactPoint.start
+                    and connected_lane_section.leftlanes[linked_lane_id]
+                    .roadmark[0]
+                    ._line
+                ):
+                    prev_remainder = (
+                        connected_lane_section.leftlanes[linked_lane_id]
+                        .roadmark[0]
+                        ._line[i_line]
+                        .soffset
+                    )
+
+            if lane_side == &#34;left&#34;:
+                if (
+                    contact_point == ContactPoint.end
+                    and connected_lane_section.leftlanes[linked_lane_id]
+                    .roadmark[0]
+                    ._line
+                ):
+                    prev_remainder = (
+                        connected_lane_section.leftlanes[linked_lane_id]
+                        .roadmark[0]
+                        ._line[i_line]
+                        ._remainder
+                    )
+                elif (
+                    contact_point == ContactPoint.start
+                    and connected_lane_section.rightlanes[linked_lane_id]
+                    .roadmark[0]
+                    ._line
+                ):
+                    prev_remainder = (
+                        connected_lane_section.rightlanes[linked_lane_id]
+                        .roadmark[0]
+                        ._line[i_line]
+                        .soffset
+                    )
+
+            if (
+                lane_side == &#34;center&#34;
+                and connected_lane_section.centerlane.roadmark[0]._line
+            ):
+                if contact_point == ContactPoint.end:
+                    prev_remainder = (
+                        connected_lane_section.centerlane.roadmark[0]
+                        ._line[i_line]
+                        ._remainder
+                    )
+                elif contact_point == ContactPoint.start:
+                    prev_remainder = (
+                        connected_lane_section.centerlane.roadmark[0]
+                        ._line[i_line]
+                        .soffset
+                    )
+
+        else:
+            if start_or_end == &#34;start&#34;:
+                prev_remainder = neighboring_lane.roadmark[0]._line[i_line]._remainder
+            else:
+                prev_remainder = neighboring_lane.roadmark[0]._line[i_line].soffset
+        return prev_remainder
+
+    def _get_seg_length(self, total_road_length, lane_section_index):
+        &#34;&#34;&#34;_get_seg_length is a helper method to figure out how long a lane section is
+
+        Parameters
+        ----------
+            total_road_length (float): total length of the road
+
+            lane_section_index (int): the index of the wanted lanesection
+
+        Returns
+        -------
+            float: length of the lanesection
+
+        &#34;&#34;&#34;
+        if len(self.lanesections) == 1:
+            seg_length = total_road_length
+        elif lane_section_index == 0:
+            seg_length = self.lanesections[1].s
+        elif lane_section_index == len(self.lanesections) - 1:
+            seg_length = total_road_length - self.lanesections[lane_section_index].s
+        else:
+            seg_length = (
+                self.lanesections[lane_section_index + 1].s
+                - self.lanesections[lane_section_index].s
+            )
+        return seg_length
+
+    def adjust_road_marks_from_start(
+        self,
+        total_road_length,
+        connected_lane_section=None,
+        contact_point=ContactPoint.end,
+    ):
+        &#34;&#34;&#34;Adjusts road marks from the start of the road, based on the connected lane section.
+        If connected_lane_section is not provided, the last roadmark will be placed with zero
+        distance to the start of the road
+
+        Parameters
+        ----------
+            total_road_length (float): total length of the road
+
+            connected_lane_section (LaneSection): the lane section connected to the road
+                Default: None
+
+            contact_point (ContactPoint)
+                Default: ContactPoint.end
+        &#34;&#34;&#34;
+        if not self.roadmarks_adjusted:
+            self._validity_check_for_roadmark_adjustment()
+            self.roadmarks_adjusted = True
+
+            def set_zero_offset_to_lines(lane, seg_length):
+                for i_line in range(len(lane.roadmark[0]._line)):
+                    lane.roadmark[0]._line[i_line].adjust_remainder(
+                        seg_length, soffset=0
+                    )
+
+            for ls in range(0, len(self.lanesections)):
+                seg_length = self._get_seg_length(total_road_length, ls)
+                if self._right_lanes_adjustable:
+                    for rl in range(len(self.lanesections[ls].rightlanes)):
+                        if self._check_valid_mark_type(
+                            self.lanesections[ls].rightlanes[rl]
+                        ):
+                            if ls == 0 and connected_lane_section is None:
+                                set_zero_offset_to_lines(
+                                    self.lanesections[ls].rightlanes[rl], seg_length
+                                )
+                            else:
+                                for i_line in range(
+                                    len(
+                                        self.lanesections[ls]
+                                        .rightlanes[rl]
+                                        .roadmark[0]
+                                        ._line
+                                    )
+                                ):
+                                    prev_remainder = self._get_previous_remainder(
+                                        connected_lane_section,
+                                        i_line,
+                                        &#34;right&#34;,
+                                        contact_point,
+                                        rl,
+                                        ls,
+                                        &#34;start&#34;,
+                                    )
+                                    self.lanesections[ls].rightlanes[rl].roadmark[
+                                        0
+                                    ]._line[i_line].adjust_remainder(
+                                        seg_length, previous_remainder=prev_remainder
+                                    )
+                                self._adjust_for_missing_line_offset(
+                                    self.lanesections[ls].rightlanes[rl].roadmark[0]
+                                )
+                if self._left_lanes_adjustable:
+                    for ll in range(len(self.lanesections[ls].leftlanes)):
+                        if self._check_valid_mark_type(
+                            self.lanesections[ls].leftlanes[ll]
+                        ):
+                            if ls == 0 and connected_lane_section is None:
+                                set_zero_offset_to_lines(
+                                    self.lanesections[ls].leftlanes[ll], seg_length
+                                )
+                            else:
+                                for i_line in range(
+                                    len(
+                                        self.lanesections[ls]
+                                        .leftlanes[ll]
+                                        .roadmark[0]
+                                        ._line
+                                    )
+                                ):
+                                    prev_remainder = self._get_previous_remainder(
+                                        connected_lane_section,
+                                        i_line,
+                                        &#34;left&#34;,
+                                        contact_point,
+                                        ll,
+                                        ls,
+                                        &#34;start&#34;,
+                                    )
+                                    self.lanesections[ls].leftlanes[ll].roadmark[
+                                        0
+                                    ]._line[i_line].adjust_remainder(
+                                        seg_length, previous_remainder=prev_remainder
+                                    )
+                                self._adjust_for_missing_line_offset(
+                                    self.lanesections[ls].leftlanes[ll].roadmark[0]
+                                )
+                if self._center_lane_adjustable:
+                    if self._check_valid_mark_type(self.lanesections[ls].centerlane):
+                        if ls == 0 and connected_lane_section is None:
+                            set_zero_offset_to_lines(
+                                self.lanesections[ls].centerlane, seg_length
+                            )
+                        else:
+                            for i_line in range(
+                                len(self.lanesections[ls].centerlane.roadmark[0]._line)
+                            ):
+                                prev_remainder = self._get_previous_remainder(
+                                    connected_lane_section,
+                                    i_line,
+                                    &#34;center&#34;,
+                                    contact_point,
+                                    None,
+                                    ls,
+                                    &#34;start&#34;,
+                                )
+                                self.lanesections[ls].centerlane.roadmark[0]._line[
+                                    i_line
+                                ].adjust_remainder(
+                                    seg_length, previous_remainder=prev_remainder
+                                )
+                            self._adjust_for_missing_line_offset(
+                                self.lanesections[ls].centerlane.roadmark[0]
+                            )
+
+    def adjust_road_marks_from_end(
+        self,
+        total_road_length,
+        connected_lane_section=None,
+        contact_point=ContactPoint.end,
+    ):
+        &#34;&#34;&#34;Adjusts road marks from the end of the road, based on the connected lane section.
+        If connected_lane_section is not provided, the last roadmark will be placed with zero
+        distance to the end of the road
+
+        Parameters
+        ----------
+            total_road_length (float): total length of the road
+
+            connected_lane_section (LaneSection): the lane section connected to the road
+                Default: None
+
+            contact_point (ContactPoint)
+                Default: ContactPoint.end
+        &#34;&#34;&#34;
+        if not self.roadmarks_adjusted:
+            self._validity_check_for_roadmark_adjustment()
+            self.roadmarks_adjusted = True
+
+            def set_zero_remainder_to_lines(lane, seg_length):
+                for i_line in range(len(lane.roadmark[0]._line)):
+                    lane.roadmark[0]._line[i_line].adjust_soffset(
+                        seg_length, remainder=0
+                    )
+
+            for ls in range(len(self.lanesections) - 1, -1, -1):
+                seg_length = self._get_seg_length(total_road_length, ls)
+                if self._right_lanes_adjustable:
+                    for rl in range(len(self.lanesections[ls].rightlanes)):
+                        if self._check_valid_mark_type(
+                            self.lanesections[ls].rightlanes[rl]
+                        ):
+                            if (
+                                ls == len(self.lanesections) - 1
+                                and connected_lane_section is None
+                            ):
+                                set_zero_remainder_to_lines(
+                                    self.lanesections[ls].rightlanes[rl], seg_length
+                                )
+                            else:
+                                for i_line in range(
+                                    len(
+                                        self.lanesections[ls]
+                                        .rightlanes[rl]
+                                        .roadmark[0]
+                                        ._line
+                                    )
+                                ):
+                                    prev_remainder = self._get_previous_remainder(
+                                        connected_lane_section,
+                                        i_line,
+                                        &#34;right&#34;,
+                                        contact_point,
+                                        rl,
+                                        ls,
+                                        &#34;end&#34;,
+                                    )
+                                    self.lanesections[ls].rightlanes[rl].roadmark[
+                                        0
+                                    ]._line[i_line].adjust_soffset(
+                                        seg_length, previous_offset=prev_remainder
+                                    )
+                                self._adjust_for_missing_line_offset(
+                                    self.lanesections[ls].rightlanes[rl].roadmark[0]
+                                )
+                if self._left_lanes_adjustable:
+                    for ll in range(len(self.lanesections[ls].leftlanes)):
+                        if self._check_valid_mark_type(
+                            self.lanesections[ls].leftlanes[ll]
+                        ):
+                            if (
+                                ls == len(self.lanesections) - 1
+                                and connected_lane_section is None
+                            ):
+                                set_zero_remainder_to_lines(
+                                    self.lanesections[ls].leftlanes[ll], seg_length
+                                )
+                            else:
+                                for i_line in range(
+                                    len(
+                                        self.lanesections[ls]
+                                        .leftlanes[ll]
+                                        .roadmark[0]
+                                        ._line
+                                    )
+                                ):
+                                    prev_remainder = self._get_previous_remainder(
+                                        connected_lane_section,
+                                        i_line,
+                                        &#34;left&#34;,
+                                        contact_point,
+                                        ll,
+                                        ls,
+                                        &#34;end&#34;,
+                                    )
+                                    self.lanesections[ls].leftlanes[ll].roadmark[
+                                        0
+                                    ]._line[i_line].adjust_soffset(
+                                        seg_length, previous_offset=prev_remainder
+                                    )
+                                self._adjust_for_missing_line_offset(
+                                    self.lanesections[ls].leftlanes[ll].roadmark[0]
+                                )
+
+                if self._center_lane_adjustable:
+                    if self._check_valid_mark_type(self.lanesections[ls].centerlane):
+                        if (
+                            ls == len(self.lanesections) - 1
+                            and connected_lane_section is None
+                        ):
+                            set_zero_remainder_to_lines(
+                                self.lanesections[ls].centerlane, seg_length
+                            )
+                        else:
+                            for i_line in range(
+                                len(self.lanesections[ls].centerlane.roadmark[0]._line)
+                            ):
+                                prev_remainder = self._get_previous_remainder(
+                                    connected_lane_section,
+                                    i_line,
+                                    &#34;center&#34;,
+                                    contact_point,
+                                    None,
+                                    ls,
+                                    &#34;end&#34;,
+                                )
+                                self.lanesections[ls].centerlane.roadmark[0]._line[
+                                    i_line
+                                ].adjust_soffset(
+                                    seg_length, previous_offset=prev_remainder
+                                )
+                            self._adjust_for_missing_line_offset(
+                                self.lanesections[ls].centerlane.roadmark[0]
+                            )
+
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of Lanes&#34;&#34;&#34;
         element = ET.Element(&#34;lanes&#34;)
-        for l in self.lanesections:
-            element.append(l.get_element())
+        self._add_additional_data_to_element(element)
         for l in self.laneoffsets:
+            element.append(l.get_element())
+        for l in self.lanesections:
             element.append(l.get_element())
         return element
 
 
-class LaneOffset:
+class LaneOffset(XodrBase):
     &#34;&#34;&#34;the LaneOffset class defines an overall lateral offset along the road, described as a third degree polynomial
 
     Parameters
@@ -197,6 +718,7 @@ class LaneOffset:
             d (float): d coefficient of the polynomial
 
         &#34;&#34;&#34;
+        super().__init__()
         self.s = s
         self.a = a
         self.b = b
@@ -204,7 +726,7 @@ class LaneOffset:
         self.d = d
 
     def __eq__(self, other):
-        if isinstance(other, LaneOffset):
+        if isinstance(other, LaneOffset) and super().__eq__(other):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
@@ -223,11 +745,11 @@ class LaneOffset:
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the LaneOffset&#34;&#34;&#34;
         element = ET.Element(&#34;laneOffset&#34;, attrib=self.get_attributes())
-
+        self._add_additional_data_to_element(element)
         return element
 
 
-class LaneSection:
+class LaneSection(XodrBase):
     &#34;&#34;&#34;Creates the LaneSection element of opendrive
 
     Parameters
@@ -270,6 +792,7 @@ class LaneSection:
 
             centerlane (Lane): the centerline of the road
         &#34;&#34;&#34;
+        super().__init__()
         self.s = s
         self.centerlane = centerlane
         self.centerlane._set_lane_id(0)
@@ -279,7 +802,7 @@ class LaneSection:
         self._right_id = -1
 
     def __eq__(self, other):
-        if isinstance(other, LaneSection):
+        if isinstance(other, LaneSection) and super().__eq__(other):
             if (
                 self.get_attributes() == other.get_attributes()
                 and self.centerlane == other.centerlane
@@ -322,7 +845,7 @@ class LaneSection:
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the WorldPostion&#34;&#34;&#34;
         element = ET.Element(&#34;laneSection&#34;, attrib=self.get_attributes())
-
+        self._add_additional_data_to_element(element)
         if self.leftlanes:
             left = ET.SubElement(element, &#34;left&#34;)
             for l in reversed(self.leftlanes):
@@ -372,7 +895,7 @@ class _poly3struct:
         return polynomialdict
 
 
-class Lane:
+class Lane(XodrBase):
     &#34;&#34;&#34;creates a Lane of opendrive
 
     the inputs are on the following format:
@@ -460,6 +983,7 @@ class Lane:
                 Default: 0
 
         &#34;&#34;&#34;
+        super().__init__()
         self.lane_id = None
         self.lane_type = lane_type
         self.widths = []
@@ -474,7 +998,7 @@ class Lane:
         self.links = _Links()
 
     def __eq__(self, other):
-        if isinstance(other, Lane):
+        if isinstance(other, Lane) and super().__eq__(other):
             if (
                 self.links == other.links
                 and self.get_attributes() == other.get_attributes()
@@ -543,6 +1067,18 @@ class Lane:
         self.links.add_link(_Link(link_type, str(id)))
         return self
 
+    def get_linked_lane_id(self, link_type):
+        &#34;&#34;&#34;adds a link to the lane section
+
+        Parameters
+        ----------
+            link_type (str): type of link, successor or predecessor
+        &#34;&#34;&#34;
+        for link in self.links.links:
+            if link.link_type == link_type:
+                return int(link.element_id)
+        return None
+
     def _set_lane_id(self, lane_id):
         &#34;&#34;&#34;set the lane id of the lane and set lane type to &#39;none&#39; in case of centerlane&#34;&#34;&#34;
         self.lane_id = lane_id
@@ -597,9 +1133,9 @@ class Lane:
         return retdict
 
     def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the WorldPostion&#34;&#34;&#34;
+        &#34;&#34;&#34;returns the elementTree of the Lane&#34;&#34;&#34;
         element = ET.Element(&#34;lane&#34;, attrib=self.get_attributes())
-
+        self._add_additional_data_to_element(element)
         # according to standard if lane is centerlane it should
         # not have a width record and omit the link record
         if self.lane_id != 0:
@@ -622,7 +1158,7 @@ class Lane:
         return element
 
 
-class RoadMark:
+class RoadMark(XodrBase):
     &#34;&#34;&#34;creates a RoadMark of opendrive
 
     Parameters
@@ -630,7 +1166,7 @@ class RoadMark:
         marking_type (RoadMarkType): the type of marking
 
         width (float): with of the line
-
+            Default: None
         length (float): length of the line
             Default: 0
         toffset (float): offset in t
@@ -712,6 +1248,7 @@ class RoadMark:
                 Default: none
 
         &#34;&#34;&#34;
+        super().__init__()
         # required arguments - must be provided by user
         self.marking_type = marking_type
 
@@ -731,6 +1268,7 @@ class RoadMark:
 
         # TODO: there may be more line child elements per roadmark, which is currently unsupported
         self._line = []
+        self._explicit_line = []
         # check if arguments were passed that require line child element
         if any([length, space, toffset, rule]):
             # set defaults in case no values were provided
@@ -778,10 +1316,22 @@ class RoadMark:
         self._line.append(line)
         return self
 
+    def add_explicit_road_line(self, line):
+        &#34;&#34;&#34;function to add a explicit roadline to the RoadMark,
+
+        Parameters
+        ----------
+            line (RoadLine): the roadline to add
+
+        &#34;&#34;&#34;
+        self._explicit_line.append(line)
+        return self
+
     def __eq__(self, other):
-        if isinstance(other, RoadMark):
+        if isinstance(other, RoadMark) and super().__eq__(other):
             if (
                 self._line == other._line
+                and self._explicit_line == other._explicit_line
                 and self.get_attributes() == other.get_attributes()
                 and self.marking_type == other.marking_type
             ):
@@ -805,18 +1355,43 @@ class RoadMark:
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the RoadMark&#34;&#34;&#34;
         element = ET.Element(&#34;roadMark&#34;, attrib=self.get_attributes())
+        self._add_additional_data_to_element(element)
         if self._line:
+            attribs = {&#34;name&#34;: enum2str(self.marking_type)}
+            if self.width is not None:
+                attribs[&#34;width&#34;] = str(self.width)
+            else:
+                offsets = [x.toffset for x in self._line]
+
+                attribs[&#34;width&#34;] = str(
+                    max(offsets)
+                    - min(offsets)
+                    + sum(
+                        [
+                            x.width
+                            for x in self._line
+                            if x.toffset in [max(offsets), min(offsets)]
+                        ]
+                    )
+                )
             typeelement = ET.SubElement(
                 element,
                 &#34;type&#34;,
-                attrib={&#34;name&#34;: enum2str(self.marking_type), &#34;width&#34;: str(self.width)},
+                attrib=attribs,
             )
             for l in self._line:
+                typeelement.append(l.get_element())
+        if self._explicit_line:
+            typeelement = ET.SubElement(
+                element,
+                &#34;explicit&#34;,
+            )
+            for l in self._explicit_line:
                 typeelement.append(l.get_element())
         return element
 
 
-class RoadLine:
+class RoadLine(XodrBase):
     &#34;&#34;&#34;creates a Line type of to be used in roadmark
 
     Parameters
@@ -885,6 +1460,7 @@ class RoadLine:
 
 
         &#34;&#34;&#34;
+        super().__init__()
         self.length = length
         self.space = space
         self.toffset = toffset
@@ -892,12 +1468,72 @@ class RoadLine:
         self.soffset = soffset
         self.width = width
         self.color = color
+        self._remainder = 0
 
     def __eq__(self, other):
-        if isinstance(other, RoadLine):
+        if isinstance(other, RoadLine) and super().__eq__(other):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
+
+    def adjust_remainder(self, total_length, soffset=None, previous_remainder=None):
+        &#34;&#34;&#34;adjust_remainder is used to calculated and set the remainer of a broken mark for offset adjustments
+
+        Parameters
+        ----------
+            total_length (float): the lenght of the lanesection where this line is valid
+
+            soffset (float): the wanted soffset (at beginning of line), use this or previous remainder
+                Default: use defined in class
+
+            previous_remainder (float): the remainder of the previous line, use this or soffset
+                Default: use defined in class
+        &#34;&#34;&#34;
+        if soffset and previous_remainder:
+            raise ToManyOptionalArguments(
+                &#34;for adjusting line lengths, use only soffset or previous_remainder.&#34;
+            )
+        if soffset is not None:
+            self.soffset = soffset
+        if previous_remainder is not None:
+            self.soffset = self.space - previous_remainder
+        self._remainder = self._calculate_remainder_of_line(self.soffset, total_length)
+
+    def shift_soffset(self):
+        &#34;&#34;&#34;shifts the soffset one period&#34;&#34;&#34;
+        self.soffset += self.space + self.length
+
+    def adjust_soffset(self, total_length, remainder=None, previous_offset=None):
+        &#34;&#34;&#34;adjust_soffset is used to calculated and set the soffset of a broken mark for offset adjustments
+
+        Parameters
+        ----------
+            total_length (float): the lenght of the lanesection where this line is valid
+
+            remainder (float): the wanted remainder (&#34;soffset&#34; at end of line), use this or previous_offset
+                Default: use defined in class
+
+            previous_offset (float): the soffset of the previous line, use this or remainder
+                Default: use defined in class
+        &#34;&#34;&#34;
+        if remainder and previous_offset:
+            raise ToManyOptionalArguments(
+                &#34;for adjusting line lengths, use only soffset or previous_remainder.&#34;
+            )
+        if remainder is not None:
+            self._remainder = remainder
+        if previous_offset is not None:
+            self._remainder = self.space - previous_offset
+        self.soffset = self._calculate_remainder_of_line(self._remainder, total_length)
+
+    def _calculate_remainder_of_line(self, soffset, total_length):
+        n = (total_length - soffset + self.space) / (self.space + self.length)
+        return (
+            total_length
+            - soffset
+            - np.floor(n) * (self.space + self.length)
+            + self.space
+        )
 
     def get_attributes(self):
         &#34;&#34;&#34;returns the attributes of the Lane as a dict&#34;&#34;&#34;
@@ -914,8 +1550,95 @@ class RoadLine:
         return retdict
 
     def get_element(self):
+        &#34;&#34;&#34;returns the elementTree of the RoadLine&#34;&#34;&#34;
+        element = ET.Element(&#34;line&#34;, attrib=self.get_attributes())
+        self._add_additional_data_to_element(element)
+        return element
+
+
+class ExplicitRoadLine(XodrBase):
+    &#34;&#34;&#34;creates a Explicit RoadLine type of to be used in roadmark
+
+    Parameters
+    ----------
+        width (float): with of the line
+            Default: 0
+        length (float): length of the line
+            Default: 0
+        toffset (float): offset in t
+            Default: 0
+        soffset (float): offset in s
+            Default: 0
+        rule (MarkRule): mark rule (optional)
+
+    Attributes
+    ----------
+        length (float): length of the line
+
+        toffset (float): offset in t
+
+        soffset (float): offset in s
+
+        rule (MarkRule): mark rule
+
+        width (float): with of the line
+
+    Methods
+    -------
+        get_element(elementname)
+            Returns the full ElementTree of the class
+
+        get_attributes()
+            Returns a dictionary of all attributes of FileHeader
+
+    &#34;&#34;&#34;
+
+    # TODO: check this for 1.5
+    def __init__(self, width=0, length=0, toffset=0, soffset=0, rule=None):
+        &#34;&#34;&#34;initalizes the RoadLine
+
+        Parameters
+        ----------
+            width (float): with of the line
+                Default: 0
+            length (float): length of the line
+                Default: 0
+            toffset (float): offset in t
+                Default: 0
+            soffset (float): offset in s
+                Default: 0
+            rule (MarkRule): mark rule (optional)
+
+        &#34;&#34;&#34;
+        super().__init__()
+        self.length = length
+        self.toffset = toffset
+        self.rule = rule
+        self.soffset = soffset
+        self.width = width
+        self._remainder = 0
+
+    def __eq__(self, other):
+        if isinstance(other, ExplicitRoadLine) and super().__eq__(other):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+
+    def get_attributes(self):
+        &#34;&#34;&#34;returns the attributes of the Lane as a dict&#34;&#34;&#34;
+        retdict = {}
+        retdict[&#34;length&#34;] = str(self.length)
+        retdict[&#34;tOffset&#34;] = str(self.toffset)
+        retdict[&#34;width&#34;] = str(self.width)
+        retdict[&#34;sOffset&#34;] = str(self.soffset)
+        if self.rule:
+            retdict[&#34;rule&#34;] = enum2str(self.rule)
+        return retdict
+
+    def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the WorldPostion&#34;&#34;&#34;
         element = ET.Element(&#34;line&#34;, attrib=self.get_attributes())
+        self._add_additional_data_to_element(element)
         return element</code></pre>
 </details>
 </section>
@@ -928,6 +1651,196 @@ class RoadLine:
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="scenariogeneration.xodr.lane.ExplicitRoadLine"><code class="flex name class">
+<span>class <span class="ident">ExplicitRoadLine</span></span>
+<span>(</span><span>width=0, length=0, toffset=0, soffset=0, rule=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>creates a Explicit RoadLine type of to be used in roadmark</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>width (float): with of the line
+    Default: 0
+length (float): length of the line
+    Default: 0
+toffset (float): offset in t
+    Default: 0
+soffset (float): offset in s
+    Default: 0
+rule (MarkRule): mark rule (optional)
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>length (float): length of the line
+
+toffset (float): offset in t
+
+soffset (float): offset in s
+
+rule (MarkRule): mark rule
+
+width (float): with of the line
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element(elementname)
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of FileHeader
+</code></pre>
+<p>initalizes the RoadLine</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>width (float): with of the line
+    Default: 0
+length (float): length of the line
+    Default: 0
+toffset (float): offset in t
+    Default: 0
+soffset (float): offset in s
+    Default: 0
+rule (MarkRule): mark rule (optional)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ExplicitRoadLine(XodrBase):
+    &#34;&#34;&#34;creates a Explicit RoadLine type of to be used in roadmark
+
+    Parameters
+    ----------
+        width (float): with of the line
+            Default: 0
+        length (float): length of the line
+            Default: 0
+        toffset (float): offset in t
+            Default: 0
+        soffset (float): offset in s
+            Default: 0
+        rule (MarkRule): mark rule (optional)
+
+    Attributes
+    ----------
+        length (float): length of the line
+
+        toffset (float): offset in t
+
+        soffset (float): offset in s
+
+        rule (MarkRule): mark rule
+
+        width (float): with of the line
+
+    Methods
+    -------
+        get_element(elementname)
+            Returns the full ElementTree of the class
+
+        get_attributes()
+            Returns a dictionary of all attributes of FileHeader
+
+    &#34;&#34;&#34;
+
+    # TODO: check this for 1.5
+    def __init__(self, width=0, length=0, toffset=0, soffset=0, rule=None):
+        &#34;&#34;&#34;initalizes the RoadLine
+
+        Parameters
+        ----------
+            width (float): with of the line
+                Default: 0
+            length (float): length of the line
+                Default: 0
+            toffset (float): offset in t
+                Default: 0
+            soffset (float): offset in s
+                Default: 0
+            rule (MarkRule): mark rule (optional)
+
+        &#34;&#34;&#34;
+        super().__init__()
+        self.length = length
+        self.toffset = toffset
+        self.rule = rule
+        self.soffset = soffset
+        self.width = width
+        self._remainder = 0
+
+    def __eq__(self, other):
+        if isinstance(other, ExplicitRoadLine) and super().__eq__(other):
+            if self.get_attributes() == other.get_attributes():
+                return True
+        return False
+
+    def get_attributes(self):
+        &#34;&#34;&#34;returns the attributes of the Lane as a dict&#34;&#34;&#34;
+        retdict = {}
+        retdict[&#34;length&#34;] = str(self.length)
+        retdict[&#34;tOffset&#34;] = str(self.toffset)
+        retdict[&#34;width&#34;] = str(self.width)
+        retdict[&#34;sOffset&#34;] = str(self.soffset)
+        if self.rule:
+            retdict[&#34;rule&#34;] = enum2str(self.rule)
+        return retdict
+
+    def get_element(self):
+        &#34;&#34;&#34;returns the elementTree of the WorldPostion&#34;&#34;&#34;
+        element = ET.Element(&#34;line&#34;, attrib=self.get_attributes())
+        self._add_additional_data_to_element(element)
+        return element</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xodr.lane.ExplicitRoadLine.get_attributes"><code class="name flex">
+<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the attributes of the Lane as a dict</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_attributes(self):
+    &#34;&#34;&#34;returns the attributes of the Lane as a dict&#34;&#34;&#34;
+    retdict = {}
+    retdict[&#34;length&#34;] = str(self.length)
+    retdict[&#34;tOffset&#34;] = str(self.toffset)
+    retdict[&#34;width&#34;] = str(self.width)
+    retdict[&#34;sOffset&#34;] = str(self.soffset)
+    if self.rule:
+        retdict[&#34;rule&#34;] = enum2str(self.rule)
+    return retdict</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.lane.ExplicitRoadLine.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>returns the elementTree of the WorldPostion</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self):
+    &#34;&#34;&#34;returns the elementTree of the WorldPostion&#34;&#34;&#34;
+    element = ET.Element(&#34;line&#34;, attrib=self.get_attributes())
+    self._add_additional_data_to_element(element)
+    return element</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_dataquality" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_dataquality">add_dataquality</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_userdata" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_userdata">add_userdata</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
 <dt id="scenariogeneration.xodr.lane.Lane"><code class="flex name class">
 <span>class <span class="ident">Lane</span></span>
 <span>(</span><span>lane_type=LaneType.driving, a=0, b=0, c=0, d=0, soffset=0)</span>
@@ -1011,7 +1924,7 @@ soffset (float): soffset of lane renamed to s in case of centerlane
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Lane:
+<pre><code class="python">class Lane(XodrBase):
     &#34;&#34;&#34;creates a Lane of opendrive
 
     the inputs are on the following format:
@@ -1099,6 +2012,7 @@ soffset (float): soffset of lane renamed to s in case of centerlane
                 Default: 0
 
         &#34;&#34;&#34;
+        super().__init__()
         self.lane_id = None
         self.lane_type = lane_type
         self.widths = []
@@ -1113,7 +2027,7 @@ soffset (float): soffset of lane renamed to s in case of centerlane
         self.links = _Links()
 
     def __eq__(self, other):
-        if isinstance(other, Lane):
+        if isinstance(other, Lane) and super().__eq__(other):
             if (
                 self.links == other.links
                 and self.get_attributes() == other.get_attributes()
@@ -1182,6 +2096,18 @@ soffset (float): soffset of lane renamed to s in case of centerlane
         self.links.add_link(_Link(link_type, str(id)))
         return self
 
+    def get_linked_lane_id(self, link_type):
+        &#34;&#34;&#34;adds a link to the lane section
+
+        Parameters
+        ----------
+            link_type (str): type of link, successor or predecessor
+        &#34;&#34;&#34;
+        for link in self.links.links:
+            if link.link_type == link_type:
+                return int(link.element_id)
+        return None
+
     def _set_lane_id(self, lane_id):
         &#34;&#34;&#34;set the lane id of the lane and set lane type to &#39;none&#39; in case of centerlane&#34;&#34;&#34;
         self.lane_id = lane_id
@@ -1236,9 +2162,9 @@ soffset (float): soffset of lane renamed to s in case of centerlane
         return retdict
 
     def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the WorldPostion&#34;&#34;&#34;
+        &#34;&#34;&#34;returns the elementTree of the Lane&#34;&#34;&#34;
         element = ET.Element(&#34;lane&#34;, attrib=self.get_attributes())
-
+        self._add_additional_data_to_element(element)
         # according to standard if lane is centerlane it should
         # not have a width record and omit the link record
         if self.lane_id != 0:
@@ -1260,6 +2186,10 @@ soffset (float): soffset of lane renamed to s in case of centerlane
 
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.lane.Lane.add_height"><code class="name flex">
@@ -1431,15 +2361,15 @@ id (str/id): id of the linked lane
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the WorldPostion</p></div>
+<div class="desc"><p>returns the elementTree of the Lane</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_element(self):
-    &#34;&#34;&#34;returns the elementTree of the WorldPostion&#34;&#34;&#34;
+    &#34;&#34;&#34;returns the elementTree of the Lane&#34;&#34;&#34;
     element = ET.Element(&#34;lane&#34;, attrib=self.get_attributes())
-
+    self._add_additional_data_to_element(element)
     # according to standard if lane is centerlane it should
     # not have a width record and omit the link record
     if self.lane_id != 0:
@@ -1460,6 +2390,31 @@ id (str/id): id of the linked lane
         ET.SubElement(element, &#34;height&#34;, attrib=height)
 
     return element</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.lane.Lane.get_linked_lane_id"><code class="name flex">
+<span>def <span class="ident">get_linked_lane_id</span></span>(<span>self, link_type)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>adds a link to the lane section</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>link_type (str): type of link, successor or predecessor
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_linked_lane_id(self, link_type):
+    &#34;&#34;&#34;adds a link to the lane section
+
+    Parameters
+    ----------
+        link_type (str): type of link, successor or predecessor
+    &#34;&#34;&#34;
+    for link in self.links.links:
+        if link.link_type == link_type:
+            return int(link.element_id)
+    return None</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xodr.lane.Lane.get_width"><code class="name flex">
@@ -1501,6 +2456,15 @@ id (str/id): id of the linked lane
 </details>
 </dd>
 </dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_dataquality" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_dataquality">add_dataquality</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_userdata" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_userdata">add_userdata</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 <dt id="scenariogeneration.xodr.lane.LaneOffset"><code class="flex name class">
 <span>class <span class="ident">LaneOffset</span></span>
@@ -1553,7 +2517,7 @@ d (float): d coefficient of the polynomial
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class LaneOffset:
+<pre><code class="python">class LaneOffset(XodrBase):
     &#34;&#34;&#34;the LaneOffset class defines an overall lateral offset along the road, described as a third degree polynomial
 
     Parameters
@@ -1606,6 +2570,7 @@ d (float): d coefficient of the polynomial
             d (float): d coefficient of the polynomial
 
         &#34;&#34;&#34;
+        super().__init__()
         self.s = s
         self.a = a
         self.b = b
@@ -1613,7 +2578,7 @@ d (float): d coefficient of the polynomial
         self.d = d
 
     def __eq__(self, other):
-        if isinstance(other, LaneOffset):
+        if isinstance(other, LaneOffset) and super().__eq__(other):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
@@ -1632,9 +2597,13 @@ d (float): d coefficient of the polynomial
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the LaneOffset&#34;&#34;&#34;
         element = ET.Element(&#34;laneOffset&#34;, attrib=self.get_attributes())
-
+        self._add_additional_data_to_element(element)
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.lane.LaneOffset.get_attributes"><code class="name flex">
@@ -1670,11 +2639,20 @@ d (float): d coefficient of the polynomial
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the LaneOffset&#34;&#34;&#34;
     element = ET.Element(&#34;laneOffset&#34;, attrib=self.get_attributes())
-
+    self._add_additional_data_to_element(element)
     return element</code></pre>
 </details>
 </dd>
 </dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_dataquality" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_dataquality">add_dataquality</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_userdata" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_userdata">add_userdata</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 <dt id="scenariogeneration.xodr.lane.LaneSection"><code class="flex name class">
 <span>class <span class="ident">LaneSection</span></span>
@@ -1719,7 +2697,7 @@ centerlane (Lane): the centerline of the road
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class LaneSection:
+<pre><code class="python">class LaneSection(XodrBase):
     &#34;&#34;&#34;Creates the LaneSection element of opendrive
 
     Parameters
@@ -1762,6 +2740,7 @@ centerlane (Lane): the centerline of the road
 
             centerlane (Lane): the centerline of the road
         &#34;&#34;&#34;
+        super().__init__()
         self.s = s
         self.centerlane = centerlane
         self.centerlane._set_lane_id(0)
@@ -1771,7 +2750,7 @@ centerlane (Lane): the centerline of the road
         self._right_id = -1
 
     def __eq__(self, other):
-        if isinstance(other, LaneSection):
+        if isinstance(other, LaneSection) and super().__eq__(other):
             if (
                 self.get_attributes() == other.get_attributes()
                 and self.centerlane == other.centerlane
@@ -1814,7 +2793,7 @@ centerlane (Lane): the centerline of the road
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the WorldPostion&#34;&#34;&#34;
         element = ET.Element(&#34;laneSection&#34;, attrib=self.get_attributes())
-
+        self._add_additional_data_to_element(element)
         if self.leftlanes:
             left = ET.SubElement(element, &#34;left&#34;)
             for l in reversed(self.leftlanes):
@@ -1830,6 +2809,10 @@ centerlane (Lane): the centerline of the road
 
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.lane.LaneSection.add_left_lane"><code class="name flex">
@@ -1910,7 +2893,7 @@ centerlane (Lane): the centerline of the road
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the WorldPostion&#34;&#34;&#34;
     element = ET.Element(&#34;laneSection&#34;, attrib=self.get_attributes())
-
+    self._add_additional_data_to_element(element)
     if self.leftlanes:
         left = ET.SubElement(element, &#34;left&#34;)
         for l in reversed(self.leftlanes):
@@ -1928,6 +2911,15 @@ centerlane (Lane): the centerline of the road
 </details>
 </dd>
 </dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_dataquality" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_dataquality">add_dataquality</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_userdata" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_userdata">add_userdata</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 <dt id="scenariogeneration.xodr.lane.Lanes"><code class="flex name class">
 <span>class <span class="ident">Lanes</span></span>
@@ -1947,12 +2939,12 @@ add_lanesection(lanesection)
 add_laneoffset(laneoffset)
     adds a lane offset to Lanes
 </code></pre>
-<p>initalize Lanes</p></div>
+<p>initalize the UserData</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Lanes:
+<pre><code class="python">class Lanes(XodrBase):
     &#34;&#34;&#34;creates the Lanes element of opendrive
 
 
@@ -1973,12 +2965,14 @@ add_laneoffset(laneoffset)
     &#34;&#34;&#34;
 
     def __init__(self):
+        super().__init__()
         &#34;&#34;&#34;initalize Lanes&#34;&#34;&#34;
         self.lanesections = []
         self.laneoffsets = []
+        self.roadmarks_adjusted = False
 
     def __eq__(self, other):
-        if isinstance(other, Lanes):
+        if isinstance(other, Lanes) and super().__eq__(other):
             if (
                 self.laneoffsets == other.laneoffsets
                 and self.lanesections == other.lanesections
@@ -2027,15 +3021,534 @@ add_laneoffset(laneoffset)
         self.laneoffsets.append(laneoffset)
         return self
 
+    def _check_valid_mark_type(self, lane):
+        &#34;&#34;&#34;simple checker if the lanemark can be adjusted
+
+        Parameters
+        ----------
+            lane (Lane): the lane which roadmark should be checked
+        &#34;&#34;&#34;
+        return (
+            lane.roadmark[0].marking_type == RoadMarkType.broken
+            or lane.roadmark[0].marking_type == RoadMarkType.broken_broken
+        )
+
+    def _adjust_for_missing_line_offset(self, roadmark):
+        &#34;&#34;&#34;adds an explicit line if soofset is less than 0 (for adjusting from start) or longer than the space between lines (for adjusting from end)
+
+        Parameters
+        ----------
+            roadmark (RoadMark): the roadmark to be adjusted
+        &#34;&#34;&#34;
+        for line in roadmark._line:
+            if line.soffset &lt; 0 or line.soffset &gt; line.length + line.soffset:
+                roadmark.add_explicit_road_line(
+                    ExplicitRoadLine(
+                        line.width,
+                        line.length + line.soffset,
+                        line.toffset,
+                        0,
+                        line.rule,
+                    )
+                )
+            elif line.soffset &gt; line.space:
+                roadmark.add_explicit_road_line(
+                    ExplicitRoadLine(
+                        line.width,
+                        line.soffset - line.space,
+                        line.toffset,
+                        0,
+                        line.rule,
+                    )
+                )
+            if line.soffset &lt; 0:
+                line.shift_soffset()
+
+    def _validity_check_for_roadmark_adjustment(self):
+        &#34;&#34;&#34;does some simple checks if the the different lanes can be adjusted&#34;&#34;&#34;
+        self._right_lanes_adjustable = len(self.lanesections[0].rightlanes) &gt; 0
+        self._left_lanes_adjustable = len(self.lanesections[0].leftlanes) &gt; 0
+        self._center_lane_adjustable = True
+        for ls in range(len(self.lanesections) - 1):
+            if len(self.lanesections[ls].centerlane.roadmark) != 1:
+                self.center_lane_adjustable = False
+            if (
+                self.lanesections[ls].centerlane.roadmark
+                != self.lanesections[ls + 1].centerlane.roadmark
+            ):
+                self.center_lane_adjustable = False
+            if (
+                self.lanesections[ls].centerlane.roadmark[0].marking_type
+                != RoadMarkType.broken
+                and self.lanesections[ls].centerlane.roadmark[0].marking_type
+                != RoadMarkType.broken_broken
+            ):
+                self.center_lane_adjustable = False
+
+            for rl in range(len(self.lanesections[ls].rightlanes)):
+                if self._right_lanes_adjustable:
+                    if len(self.lanesections[ls].rightlanes[rl].roadmark) != 1:
+                        self._right_lanes_adjustable = False
+            for ll in range(len(self.lanesections[ls].leftlanes)):
+                if self._left_lanes_adjustable:
+                    if len(self.lanesections[ls].leftlanes[ll].roadmark) != 1:
+                        self._left_lanes_adjustable = False
+
+    def _get_previous_remainder(
+        self,
+        connected_lane_section,
+        i_line,
+        lane_side,
+        contact_point,
+        lane_index,
+        lane_section_index,
+        start_or_end,
+    ):
+        &#34;&#34;&#34;_get_previous_remainder is a helper method to get the remainder of a lanemarking of a connecting lane section (for lenght adjustment)
+
+        Parameters
+        ----------
+            connected_lane_section (LaneSection): connected lane section (on another road)
+
+            i_line (int): index of the line (roadmark._line)
+
+            lane_side (str): &#34;left&#34;, &#34;right&#34;, or &#34;center&#34; describing what lane is of interest
+
+            contact_point (ContactPoint): contact point of the connected_lane_section
+
+            lane_index (int): the lane index of the wanted lane
+
+            lane_section_index (int): index of the lane section
+
+            start_or_end (str): if the adjustment is done from the end or from the start of the road
+
+        Return
+        ------
+            float: remainder of the previous lanesection
+
+        &#34;&#34;&#34;
+        active_lane_sec = self.lanesections[lane_section_index]
+        neighbor_lane_sec = None
+        if start_or_end == &#34;end&#34;:
+            on_edge = lane_section_index == len(self.lanesections) - 1
+            connection = &#34;successor&#34;
+            if not on_edge:
+                neighbor_lane_sec = self.lanesections[lane_section_index + 1]
+        else:
+            on_edge = lane_section_index == 0
+            connection = &#34;predecessor&#34;
+            if not on_edge:
+                neighbor_lane_sec = self.lanesections[lane_section_index - 1]
+
+        linked_lane_id = 0
+        found_linked_lane_id = None
+        if lane_side == &#34;right&#34;:
+            found_linked_lane_id = active_lane_sec.rightlanes[
+                lane_index
+            ].get_linked_lane_id(connection)
+            if neighbor_lane_sec:
+                neighboring_lane = neighbor_lane_sec.rightlanes[linked_lane_id]
+        elif lane_side == &#34;left&#34;:
+            found_linked_lane_id = active_lane_sec.leftlanes[
+                lane_index
+            ].get_linked_lane_id(connection)
+            if neighbor_lane_sec:
+                neighboring_lane = neighbor_lane_sec.leftlanes[linked_lane_id]
+        else:  # center
+            if neighbor_lane_sec:
+                neighboring_lane = neighbor_lane_sec.centerlane
+        if found_linked_lane_id:
+            linked_lane_id = abs(found_linked_lane_id) - 1
+
+        prev_remainder = 0
+        if on_edge:
+            if lane_side == &#34;right&#34;:
+                if (
+                    contact_point == ContactPoint.end
+                    and connected_lane_section.rightlanes[linked_lane_id]
+                    .roadmark[0]
+                    ._line
+                ):
+                    prev_remainder = (
+                        connected_lane_section.rightlanes[linked_lane_id]
+                        .roadmark[0]
+                        ._line[i_line]
+                        ._remainder
+                    )
+                elif (
+                    contact_point == ContactPoint.start
+                    and connected_lane_section.leftlanes[linked_lane_id]
+                    .roadmark[0]
+                    ._line
+                ):
+                    prev_remainder = (
+                        connected_lane_section.leftlanes[linked_lane_id]
+                        .roadmark[0]
+                        ._line[i_line]
+                        .soffset
+                    )
+
+            if lane_side == &#34;left&#34;:
+                if (
+                    contact_point == ContactPoint.end
+                    and connected_lane_section.leftlanes[linked_lane_id]
+                    .roadmark[0]
+                    ._line
+                ):
+                    prev_remainder = (
+                        connected_lane_section.leftlanes[linked_lane_id]
+                        .roadmark[0]
+                        ._line[i_line]
+                        ._remainder
+                    )
+                elif (
+                    contact_point == ContactPoint.start
+                    and connected_lane_section.rightlanes[linked_lane_id]
+                    .roadmark[0]
+                    ._line
+                ):
+                    prev_remainder = (
+                        connected_lane_section.rightlanes[linked_lane_id]
+                        .roadmark[0]
+                        ._line[i_line]
+                        .soffset
+                    )
+
+            if (
+                lane_side == &#34;center&#34;
+                and connected_lane_section.centerlane.roadmark[0]._line
+            ):
+                if contact_point == ContactPoint.end:
+                    prev_remainder = (
+                        connected_lane_section.centerlane.roadmark[0]
+                        ._line[i_line]
+                        ._remainder
+                    )
+                elif contact_point == ContactPoint.start:
+                    prev_remainder = (
+                        connected_lane_section.centerlane.roadmark[0]
+                        ._line[i_line]
+                        .soffset
+                    )
+
+        else:
+            if start_or_end == &#34;start&#34;:
+                prev_remainder = neighboring_lane.roadmark[0]._line[i_line]._remainder
+            else:
+                prev_remainder = neighboring_lane.roadmark[0]._line[i_line].soffset
+        return prev_remainder
+
+    def _get_seg_length(self, total_road_length, lane_section_index):
+        &#34;&#34;&#34;_get_seg_length is a helper method to figure out how long a lane section is
+
+        Parameters
+        ----------
+            total_road_length (float): total length of the road
+
+            lane_section_index (int): the index of the wanted lanesection
+
+        Returns
+        -------
+            float: length of the lanesection
+
+        &#34;&#34;&#34;
+        if len(self.lanesections) == 1:
+            seg_length = total_road_length
+        elif lane_section_index == 0:
+            seg_length = self.lanesections[1].s
+        elif lane_section_index == len(self.lanesections) - 1:
+            seg_length = total_road_length - self.lanesections[lane_section_index].s
+        else:
+            seg_length = (
+                self.lanesections[lane_section_index + 1].s
+                - self.lanesections[lane_section_index].s
+            )
+        return seg_length
+
+    def adjust_road_marks_from_start(
+        self,
+        total_road_length,
+        connected_lane_section=None,
+        contact_point=ContactPoint.end,
+    ):
+        &#34;&#34;&#34;Adjusts road marks from the start of the road, based on the connected lane section.
+        If connected_lane_section is not provided, the last roadmark will be placed with zero
+        distance to the start of the road
+
+        Parameters
+        ----------
+            total_road_length (float): total length of the road
+
+            connected_lane_section (LaneSection): the lane section connected to the road
+                Default: None
+
+            contact_point (ContactPoint)
+                Default: ContactPoint.end
+        &#34;&#34;&#34;
+        if not self.roadmarks_adjusted:
+            self._validity_check_for_roadmark_adjustment()
+            self.roadmarks_adjusted = True
+
+            def set_zero_offset_to_lines(lane, seg_length):
+                for i_line in range(len(lane.roadmark[0]._line)):
+                    lane.roadmark[0]._line[i_line].adjust_remainder(
+                        seg_length, soffset=0
+                    )
+
+            for ls in range(0, len(self.lanesections)):
+                seg_length = self._get_seg_length(total_road_length, ls)
+                if self._right_lanes_adjustable:
+                    for rl in range(len(self.lanesections[ls].rightlanes)):
+                        if self._check_valid_mark_type(
+                            self.lanesections[ls].rightlanes[rl]
+                        ):
+                            if ls == 0 and connected_lane_section is None:
+                                set_zero_offset_to_lines(
+                                    self.lanesections[ls].rightlanes[rl], seg_length
+                                )
+                            else:
+                                for i_line in range(
+                                    len(
+                                        self.lanesections[ls]
+                                        .rightlanes[rl]
+                                        .roadmark[0]
+                                        ._line
+                                    )
+                                ):
+                                    prev_remainder = self._get_previous_remainder(
+                                        connected_lane_section,
+                                        i_line,
+                                        &#34;right&#34;,
+                                        contact_point,
+                                        rl,
+                                        ls,
+                                        &#34;start&#34;,
+                                    )
+                                    self.lanesections[ls].rightlanes[rl].roadmark[
+                                        0
+                                    ]._line[i_line].adjust_remainder(
+                                        seg_length, previous_remainder=prev_remainder
+                                    )
+                                self._adjust_for_missing_line_offset(
+                                    self.lanesections[ls].rightlanes[rl].roadmark[0]
+                                )
+                if self._left_lanes_adjustable:
+                    for ll in range(len(self.lanesections[ls].leftlanes)):
+                        if self._check_valid_mark_type(
+                            self.lanesections[ls].leftlanes[ll]
+                        ):
+                            if ls == 0 and connected_lane_section is None:
+                                set_zero_offset_to_lines(
+                                    self.lanesections[ls].leftlanes[ll], seg_length
+                                )
+                            else:
+                                for i_line in range(
+                                    len(
+                                        self.lanesections[ls]
+                                        .leftlanes[ll]
+                                        .roadmark[0]
+                                        ._line
+                                    )
+                                ):
+                                    prev_remainder = self._get_previous_remainder(
+                                        connected_lane_section,
+                                        i_line,
+                                        &#34;left&#34;,
+                                        contact_point,
+                                        ll,
+                                        ls,
+                                        &#34;start&#34;,
+                                    )
+                                    self.lanesections[ls].leftlanes[ll].roadmark[
+                                        0
+                                    ]._line[i_line].adjust_remainder(
+                                        seg_length, previous_remainder=prev_remainder
+                                    )
+                                self._adjust_for_missing_line_offset(
+                                    self.lanesections[ls].leftlanes[ll].roadmark[0]
+                                )
+                if self._center_lane_adjustable:
+                    if self._check_valid_mark_type(self.lanesections[ls].centerlane):
+                        if ls == 0 and connected_lane_section is None:
+                            set_zero_offset_to_lines(
+                                self.lanesections[ls].centerlane, seg_length
+                            )
+                        else:
+                            for i_line in range(
+                                len(self.lanesections[ls].centerlane.roadmark[0]._line)
+                            ):
+                                prev_remainder = self._get_previous_remainder(
+                                    connected_lane_section,
+                                    i_line,
+                                    &#34;center&#34;,
+                                    contact_point,
+                                    None,
+                                    ls,
+                                    &#34;start&#34;,
+                                )
+                                self.lanesections[ls].centerlane.roadmark[0]._line[
+                                    i_line
+                                ].adjust_remainder(
+                                    seg_length, previous_remainder=prev_remainder
+                                )
+                            self._adjust_for_missing_line_offset(
+                                self.lanesections[ls].centerlane.roadmark[0]
+                            )
+
+    def adjust_road_marks_from_end(
+        self,
+        total_road_length,
+        connected_lane_section=None,
+        contact_point=ContactPoint.end,
+    ):
+        &#34;&#34;&#34;Adjusts road marks from the end of the road, based on the connected lane section.
+        If connected_lane_section is not provided, the last roadmark will be placed with zero
+        distance to the end of the road
+
+        Parameters
+        ----------
+            total_road_length (float): total length of the road
+
+            connected_lane_section (LaneSection): the lane section connected to the road
+                Default: None
+
+            contact_point (ContactPoint)
+                Default: ContactPoint.end
+        &#34;&#34;&#34;
+        if not self.roadmarks_adjusted:
+            self._validity_check_for_roadmark_adjustment()
+            self.roadmarks_adjusted = True
+
+            def set_zero_remainder_to_lines(lane, seg_length):
+                for i_line in range(len(lane.roadmark[0]._line)):
+                    lane.roadmark[0]._line[i_line].adjust_soffset(
+                        seg_length, remainder=0
+                    )
+
+            for ls in range(len(self.lanesections) - 1, -1, -1):
+                seg_length = self._get_seg_length(total_road_length, ls)
+                if self._right_lanes_adjustable:
+                    for rl in range(len(self.lanesections[ls].rightlanes)):
+                        if self._check_valid_mark_type(
+                            self.lanesections[ls].rightlanes[rl]
+                        ):
+                            if (
+                                ls == len(self.lanesections) - 1
+                                and connected_lane_section is None
+                            ):
+                                set_zero_remainder_to_lines(
+                                    self.lanesections[ls].rightlanes[rl], seg_length
+                                )
+                            else:
+                                for i_line in range(
+                                    len(
+                                        self.lanesections[ls]
+                                        .rightlanes[rl]
+                                        .roadmark[0]
+                                        ._line
+                                    )
+                                ):
+                                    prev_remainder = self._get_previous_remainder(
+                                        connected_lane_section,
+                                        i_line,
+                                        &#34;right&#34;,
+                                        contact_point,
+                                        rl,
+                                        ls,
+                                        &#34;end&#34;,
+                                    )
+                                    self.lanesections[ls].rightlanes[rl].roadmark[
+                                        0
+                                    ]._line[i_line].adjust_soffset(
+                                        seg_length, previous_offset=prev_remainder
+                                    )
+                                self._adjust_for_missing_line_offset(
+                                    self.lanesections[ls].rightlanes[rl].roadmark[0]
+                                )
+                if self._left_lanes_adjustable:
+                    for ll in range(len(self.lanesections[ls].leftlanes)):
+                        if self._check_valid_mark_type(
+                            self.lanesections[ls].leftlanes[ll]
+                        ):
+                            if (
+                                ls == len(self.lanesections) - 1
+                                and connected_lane_section is None
+                            ):
+                                set_zero_remainder_to_lines(
+                                    self.lanesections[ls].leftlanes[ll], seg_length
+                                )
+                            else:
+                                for i_line in range(
+                                    len(
+                                        self.lanesections[ls]
+                                        .leftlanes[ll]
+                                        .roadmark[0]
+                                        ._line
+                                    )
+                                ):
+                                    prev_remainder = self._get_previous_remainder(
+                                        connected_lane_section,
+                                        i_line,
+                                        &#34;left&#34;,
+                                        contact_point,
+                                        ll,
+                                        ls,
+                                        &#34;end&#34;,
+                                    )
+                                    self.lanesections[ls].leftlanes[ll].roadmark[
+                                        0
+                                    ]._line[i_line].adjust_soffset(
+                                        seg_length, previous_offset=prev_remainder
+                                    )
+                                self._adjust_for_missing_line_offset(
+                                    self.lanesections[ls].leftlanes[ll].roadmark[0]
+                                )
+
+                if self._center_lane_adjustable:
+                    if self._check_valid_mark_type(self.lanesections[ls].centerlane):
+                        if (
+                            ls == len(self.lanesections) - 1
+                            and connected_lane_section is None
+                        ):
+                            set_zero_remainder_to_lines(
+                                self.lanesections[ls].centerlane, seg_length
+                            )
+                        else:
+                            for i_line in range(
+                                len(self.lanesections[ls].centerlane.roadmark[0]._line)
+                            ):
+                                prev_remainder = self._get_previous_remainder(
+                                    connected_lane_section,
+                                    i_line,
+                                    &#34;center&#34;,
+                                    contact_point,
+                                    None,
+                                    ls,
+                                    &#34;end&#34;,
+                                )
+                                self.lanesections[ls].centerlane.roadmark[0]._line[
+                                    i_line
+                                ].adjust_soffset(
+                                    seg_length, previous_offset=prev_remainder
+                                )
+                            self._adjust_for_missing_line_offset(
+                                self.lanesections[ls].centerlane.roadmark[0]
+                            )
+
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of Lanes&#34;&#34;&#34;
         element = ET.Element(&#34;lanes&#34;)
-        for l in self.lanesections:
-            element.append(l.get_element())
+        self._add_additional_data_to_element(element)
         for l in self.laneoffsets:
+            element.append(l.get_element())
+        for l in self.lanesections:
             element.append(l.get_element())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.lane.Lanes.add_laneoffset"><code class="name flex">
@@ -2107,6 +3620,318 @@ lanelink (LaneLinker): (optional) a LaneLink to add
     return self</code></pre>
 </details>
 </dd>
+<dt id="scenariogeneration.xodr.lane.Lanes.adjust_road_marks_from_end"><code class="name flex">
+<span>def <span class="ident">adjust_road_marks_from_end</span></span>(<span>self, total_road_length, connected_lane_section=None, contact_point=ContactPoint.end)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Adjusts road marks from the end of the road, based on the connected lane section.
+If connected_lane_section is not provided, the last roadmark will be placed with zero
+distance to the end of the road</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>total_road_length (float): total length of the road
+
+connected_lane_section (LaneSection): the lane section connected to the road
+    Default: None
+
+contact_point (ContactPoint)
+    Default: ContactPoint.end
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def adjust_road_marks_from_end(
+    self,
+    total_road_length,
+    connected_lane_section=None,
+    contact_point=ContactPoint.end,
+):
+    &#34;&#34;&#34;Adjusts road marks from the end of the road, based on the connected lane section.
+    If connected_lane_section is not provided, the last roadmark will be placed with zero
+    distance to the end of the road
+
+    Parameters
+    ----------
+        total_road_length (float): total length of the road
+
+        connected_lane_section (LaneSection): the lane section connected to the road
+            Default: None
+
+        contact_point (ContactPoint)
+            Default: ContactPoint.end
+    &#34;&#34;&#34;
+    if not self.roadmarks_adjusted:
+        self._validity_check_for_roadmark_adjustment()
+        self.roadmarks_adjusted = True
+
+        def set_zero_remainder_to_lines(lane, seg_length):
+            for i_line in range(len(lane.roadmark[0]._line)):
+                lane.roadmark[0]._line[i_line].adjust_soffset(
+                    seg_length, remainder=0
+                )
+
+        for ls in range(len(self.lanesections) - 1, -1, -1):
+            seg_length = self._get_seg_length(total_road_length, ls)
+            if self._right_lanes_adjustable:
+                for rl in range(len(self.lanesections[ls].rightlanes)):
+                    if self._check_valid_mark_type(
+                        self.lanesections[ls].rightlanes[rl]
+                    ):
+                        if (
+                            ls == len(self.lanesections) - 1
+                            and connected_lane_section is None
+                        ):
+                            set_zero_remainder_to_lines(
+                                self.lanesections[ls].rightlanes[rl], seg_length
+                            )
+                        else:
+                            for i_line in range(
+                                len(
+                                    self.lanesections[ls]
+                                    .rightlanes[rl]
+                                    .roadmark[0]
+                                    ._line
+                                )
+                            ):
+                                prev_remainder = self._get_previous_remainder(
+                                    connected_lane_section,
+                                    i_line,
+                                    &#34;right&#34;,
+                                    contact_point,
+                                    rl,
+                                    ls,
+                                    &#34;end&#34;,
+                                )
+                                self.lanesections[ls].rightlanes[rl].roadmark[
+                                    0
+                                ]._line[i_line].adjust_soffset(
+                                    seg_length, previous_offset=prev_remainder
+                                )
+                            self._adjust_for_missing_line_offset(
+                                self.lanesections[ls].rightlanes[rl].roadmark[0]
+                            )
+            if self._left_lanes_adjustable:
+                for ll in range(len(self.lanesections[ls].leftlanes)):
+                    if self._check_valid_mark_type(
+                        self.lanesections[ls].leftlanes[ll]
+                    ):
+                        if (
+                            ls == len(self.lanesections) - 1
+                            and connected_lane_section is None
+                        ):
+                            set_zero_remainder_to_lines(
+                                self.lanesections[ls].leftlanes[ll], seg_length
+                            )
+                        else:
+                            for i_line in range(
+                                len(
+                                    self.lanesections[ls]
+                                    .leftlanes[ll]
+                                    .roadmark[0]
+                                    ._line
+                                )
+                            ):
+                                prev_remainder = self._get_previous_remainder(
+                                    connected_lane_section,
+                                    i_line,
+                                    &#34;left&#34;,
+                                    contact_point,
+                                    ll,
+                                    ls,
+                                    &#34;end&#34;,
+                                )
+                                self.lanesections[ls].leftlanes[ll].roadmark[
+                                    0
+                                ]._line[i_line].adjust_soffset(
+                                    seg_length, previous_offset=prev_remainder
+                                )
+                            self._adjust_for_missing_line_offset(
+                                self.lanesections[ls].leftlanes[ll].roadmark[0]
+                            )
+
+            if self._center_lane_adjustable:
+                if self._check_valid_mark_type(self.lanesections[ls].centerlane):
+                    if (
+                        ls == len(self.lanesections) - 1
+                        and connected_lane_section is None
+                    ):
+                        set_zero_remainder_to_lines(
+                            self.lanesections[ls].centerlane, seg_length
+                        )
+                    else:
+                        for i_line in range(
+                            len(self.lanesections[ls].centerlane.roadmark[0]._line)
+                        ):
+                            prev_remainder = self._get_previous_remainder(
+                                connected_lane_section,
+                                i_line,
+                                &#34;center&#34;,
+                                contact_point,
+                                None,
+                                ls,
+                                &#34;end&#34;,
+                            )
+                            self.lanesections[ls].centerlane.roadmark[0]._line[
+                                i_line
+                            ].adjust_soffset(
+                                seg_length, previous_offset=prev_remainder
+                            )
+                        self._adjust_for_missing_line_offset(
+                            self.lanesections[ls].centerlane.roadmark[0]
+                        )</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.lane.Lanes.adjust_road_marks_from_start"><code class="name flex">
+<span>def <span class="ident">adjust_road_marks_from_start</span></span>(<span>self, total_road_length, connected_lane_section=None, contact_point=ContactPoint.end)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Adjusts road marks from the start of the road, based on the connected lane section.
+If connected_lane_section is not provided, the last roadmark will be placed with zero
+distance to the start of the road</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>total_road_length (float): total length of the road
+
+connected_lane_section (LaneSection): the lane section connected to the road
+    Default: None
+
+contact_point (ContactPoint)
+    Default: ContactPoint.end
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def adjust_road_marks_from_start(
+    self,
+    total_road_length,
+    connected_lane_section=None,
+    contact_point=ContactPoint.end,
+):
+    &#34;&#34;&#34;Adjusts road marks from the start of the road, based on the connected lane section.
+    If connected_lane_section is not provided, the last roadmark will be placed with zero
+    distance to the start of the road
+
+    Parameters
+    ----------
+        total_road_length (float): total length of the road
+
+        connected_lane_section (LaneSection): the lane section connected to the road
+            Default: None
+
+        contact_point (ContactPoint)
+            Default: ContactPoint.end
+    &#34;&#34;&#34;
+    if not self.roadmarks_adjusted:
+        self._validity_check_for_roadmark_adjustment()
+        self.roadmarks_adjusted = True
+
+        def set_zero_offset_to_lines(lane, seg_length):
+            for i_line in range(len(lane.roadmark[0]._line)):
+                lane.roadmark[0]._line[i_line].adjust_remainder(
+                    seg_length, soffset=0
+                )
+
+        for ls in range(0, len(self.lanesections)):
+            seg_length = self._get_seg_length(total_road_length, ls)
+            if self._right_lanes_adjustable:
+                for rl in range(len(self.lanesections[ls].rightlanes)):
+                    if self._check_valid_mark_type(
+                        self.lanesections[ls].rightlanes[rl]
+                    ):
+                        if ls == 0 and connected_lane_section is None:
+                            set_zero_offset_to_lines(
+                                self.lanesections[ls].rightlanes[rl], seg_length
+                            )
+                        else:
+                            for i_line in range(
+                                len(
+                                    self.lanesections[ls]
+                                    .rightlanes[rl]
+                                    .roadmark[0]
+                                    ._line
+                                )
+                            ):
+                                prev_remainder = self._get_previous_remainder(
+                                    connected_lane_section,
+                                    i_line,
+                                    &#34;right&#34;,
+                                    contact_point,
+                                    rl,
+                                    ls,
+                                    &#34;start&#34;,
+                                )
+                                self.lanesections[ls].rightlanes[rl].roadmark[
+                                    0
+                                ]._line[i_line].adjust_remainder(
+                                    seg_length, previous_remainder=prev_remainder
+                                )
+                            self._adjust_for_missing_line_offset(
+                                self.lanesections[ls].rightlanes[rl].roadmark[0]
+                            )
+            if self._left_lanes_adjustable:
+                for ll in range(len(self.lanesections[ls].leftlanes)):
+                    if self._check_valid_mark_type(
+                        self.lanesections[ls].leftlanes[ll]
+                    ):
+                        if ls == 0 and connected_lane_section is None:
+                            set_zero_offset_to_lines(
+                                self.lanesections[ls].leftlanes[ll], seg_length
+                            )
+                        else:
+                            for i_line in range(
+                                len(
+                                    self.lanesections[ls]
+                                    .leftlanes[ll]
+                                    .roadmark[0]
+                                    ._line
+                                )
+                            ):
+                                prev_remainder = self._get_previous_remainder(
+                                    connected_lane_section,
+                                    i_line,
+                                    &#34;left&#34;,
+                                    contact_point,
+                                    ll,
+                                    ls,
+                                    &#34;start&#34;,
+                                )
+                                self.lanesections[ls].leftlanes[ll].roadmark[
+                                    0
+                                ]._line[i_line].adjust_remainder(
+                                    seg_length, previous_remainder=prev_remainder
+                                )
+                            self._adjust_for_missing_line_offset(
+                                self.lanesections[ls].leftlanes[ll].roadmark[0]
+                            )
+            if self._center_lane_adjustable:
+                if self._check_valid_mark_type(self.lanesections[ls].centerlane):
+                    if ls == 0 and connected_lane_section is None:
+                        set_zero_offset_to_lines(
+                            self.lanesections[ls].centerlane, seg_length
+                        )
+                    else:
+                        for i_line in range(
+                            len(self.lanesections[ls].centerlane.roadmark[0]._line)
+                        ):
+                            prev_remainder = self._get_previous_remainder(
+                                connected_lane_section,
+                                i_line,
+                                &#34;center&#34;,
+                                contact_point,
+                                None,
+                                ls,
+                                &#34;start&#34;,
+                            )
+                            self.lanesections[ls].centerlane.roadmark[0]._line[
+                                i_line
+                            ].adjust_remainder(
+                                seg_length, previous_remainder=prev_remainder
+                            )
+                        self._adjust_for_missing_line_offset(
+                            self.lanesections[ls].centerlane.roadmark[0]
+                        )</code></pre>
+</details>
+</dd>
 <dt id="scenariogeneration.xodr.lane.Lanes.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
@@ -2119,14 +3944,24 @@ lanelink (LaneLinker): (optional) a LaneLink to add
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of Lanes&#34;&#34;&#34;
     element = ET.Element(&#34;lanes&#34;)
-    for l in self.lanesections:
-        element.append(l.get_element())
+    self._add_additional_data_to_element(element)
     for l in self.laneoffsets:
+        element.append(l.get_element())
+    for l in self.lanesections:
         element.append(l.get_element())
     return element</code></pre>
 </details>
 </dd>
 </dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_dataquality" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_dataquality">add_dataquality</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_userdata" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_userdata">add_userdata</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 <dt id="scenariogeneration.xodr.lane.RoadLine"><code class="flex name class">
 <span>class <span class="ident">RoadLine</span></span>
@@ -2191,7 +4026,7 @@ color (RoadMarkColor): color of line (optional)
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class RoadLine:
+<pre><code class="python">class RoadLine(XodrBase):
     &#34;&#34;&#34;creates a Line type of to be used in roadmark
 
     Parameters
@@ -2260,6 +4095,7 @@ color (RoadMarkColor): color of line (optional)
 
 
         &#34;&#34;&#34;
+        super().__init__()
         self.length = length
         self.space = space
         self.toffset = toffset
@@ -2267,12 +4103,72 @@ color (RoadMarkColor): color of line (optional)
         self.soffset = soffset
         self.width = width
         self.color = color
+        self._remainder = 0
 
     def __eq__(self, other):
-        if isinstance(other, RoadLine):
+        if isinstance(other, RoadLine) and super().__eq__(other):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
+
+    def adjust_remainder(self, total_length, soffset=None, previous_remainder=None):
+        &#34;&#34;&#34;adjust_remainder is used to calculated and set the remainer of a broken mark for offset adjustments
+
+        Parameters
+        ----------
+            total_length (float): the lenght of the lanesection where this line is valid
+
+            soffset (float): the wanted soffset (at beginning of line), use this or previous remainder
+                Default: use defined in class
+
+            previous_remainder (float): the remainder of the previous line, use this or soffset
+                Default: use defined in class
+        &#34;&#34;&#34;
+        if soffset and previous_remainder:
+            raise ToManyOptionalArguments(
+                &#34;for adjusting line lengths, use only soffset or previous_remainder.&#34;
+            )
+        if soffset is not None:
+            self.soffset = soffset
+        if previous_remainder is not None:
+            self.soffset = self.space - previous_remainder
+        self._remainder = self._calculate_remainder_of_line(self.soffset, total_length)
+
+    def shift_soffset(self):
+        &#34;&#34;&#34;shifts the soffset one period&#34;&#34;&#34;
+        self.soffset += self.space + self.length
+
+    def adjust_soffset(self, total_length, remainder=None, previous_offset=None):
+        &#34;&#34;&#34;adjust_soffset is used to calculated and set the soffset of a broken mark for offset adjustments
+
+        Parameters
+        ----------
+            total_length (float): the lenght of the lanesection where this line is valid
+
+            remainder (float): the wanted remainder (&#34;soffset&#34; at end of line), use this or previous_offset
+                Default: use defined in class
+
+            previous_offset (float): the soffset of the previous line, use this or remainder
+                Default: use defined in class
+        &#34;&#34;&#34;
+        if remainder and previous_offset:
+            raise ToManyOptionalArguments(
+                &#34;for adjusting line lengths, use only soffset or previous_remainder.&#34;
+            )
+        if remainder is not None:
+            self._remainder = remainder
+        if previous_offset is not None:
+            self._remainder = self.space - previous_offset
+        self.soffset = self._calculate_remainder_of_line(self._remainder, total_length)
+
+    def _calculate_remainder_of_line(self, soffset, total_length):
+        n = (total_length - soffset + self.space) / (self.space + self.length)
+        return (
+            total_length
+            - soffset
+            - np.floor(n) * (self.space + self.length)
+            + self.space
+        )
 
     def get_attributes(self):
         &#34;&#34;&#34;returns the attributes of the Lane as a dict&#34;&#34;&#34;
@@ -2289,12 +4185,101 @@ color (RoadMarkColor): color of line (optional)
         return retdict
 
     def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the WorldPostion&#34;&#34;&#34;
+        &#34;&#34;&#34;returns the elementTree of the RoadLine&#34;&#34;&#34;
         element = ET.Element(&#34;line&#34;, attrib=self.get_attributes())
+        self._add_additional_data_to_element(element)
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
+<dt id="scenariogeneration.xodr.lane.RoadLine.adjust_remainder"><code class="name flex">
+<span>def <span class="ident">adjust_remainder</span></span>(<span>self, total_length, soffset=None, previous_remainder=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>adjust_remainder is used to calculated and set the remainer of a broken mark for offset adjustments</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>total_length (float): the lenght of the lanesection where this line is valid
+
+soffset (float): the wanted soffset (at beginning of line), use this or previous remainder
+    Default: use defined in class
+
+previous_remainder (float): the remainder of the previous line, use this or soffset
+    Default: use defined in class
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def adjust_remainder(self, total_length, soffset=None, previous_remainder=None):
+    &#34;&#34;&#34;adjust_remainder is used to calculated and set the remainer of a broken mark for offset adjustments
+
+    Parameters
+    ----------
+        total_length (float): the lenght of the lanesection where this line is valid
+
+        soffset (float): the wanted soffset (at beginning of line), use this or previous remainder
+            Default: use defined in class
+
+        previous_remainder (float): the remainder of the previous line, use this or soffset
+            Default: use defined in class
+    &#34;&#34;&#34;
+    if soffset and previous_remainder:
+        raise ToManyOptionalArguments(
+            &#34;for adjusting line lengths, use only soffset or previous_remainder.&#34;
+        )
+    if soffset is not None:
+        self.soffset = soffset
+    if previous_remainder is not None:
+        self.soffset = self.space - previous_remainder
+    self._remainder = self._calculate_remainder_of_line(self.soffset, total_length)</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.lane.RoadLine.adjust_soffset"><code class="name flex">
+<span>def <span class="ident">adjust_soffset</span></span>(<span>self, total_length, remainder=None, previous_offset=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>adjust_soffset is used to calculated and set the soffset of a broken mark for offset adjustments</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>total_length (float): the lenght of the lanesection where this line is valid
+
+remainder (float): the wanted remainder ("soffset" at end of line), use this or previous_offset
+    Default: use defined in class
+
+previous_offset (float): the soffset of the previous line, use this or remainder
+    Default: use defined in class
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def adjust_soffset(self, total_length, remainder=None, previous_offset=None):
+    &#34;&#34;&#34;adjust_soffset is used to calculated and set the soffset of a broken mark for offset adjustments
+
+    Parameters
+    ----------
+        total_length (float): the lenght of the lanesection where this line is valid
+
+        remainder (float): the wanted remainder (&#34;soffset&#34; at end of line), use this or previous_offset
+            Default: use defined in class
+
+        previous_offset (float): the soffset of the previous line, use this or remainder
+            Default: use defined in class
+    &#34;&#34;&#34;
+    if remainder and previous_offset:
+        raise ToManyOptionalArguments(
+            &#34;for adjusting line lengths, use only soffset or previous_remainder.&#34;
+        )
+    if remainder is not None:
+        self._remainder = remainder
+    if previous_offset is not None:
+        self._remainder = self.space - previous_offset
+    self.soffset = self._calculate_remainder_of_line(self._remainder, total_length)</code></pre>
+</details>
+</dd>
 <dt id="scenariogeneration.xodr.lane.RoadLine.get_attributes"><code class="name flex">
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
@@ -2323,18 +4308,42 @@ color (RoadMarkColor): color of line (optional)
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the WorldPostion</p></div>
+<div class="desc"><p>returns the elementTree of the RoadLine</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_element(self):
-    &#34;&#34;&#34;returns the elementTree of the WorldPostion&#34;&#34;&#34;
+    &#34;&#34;&#34;returns the elementTree of the RoadLine&#34;&#34;&#34;
     element = ET.Element(&#34;line&#34;, attrib=self.get_attributes())
+    self._add_additional_data_to_element(element)
     return element</code></pre>
 </details>
 </dd>
+<dt id="scenariogeneration.xodr.lane.RoadLine.shift_soffset"><code class="name flex">
+<span>def <span class="ident">shift_soffset</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>shifts the soffset one period</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def shift_soffset(self):
+    &#34;&#34;&#34;shifts the soffset one period&#34;&#34;&#34;
+    self.soffset += self.space + self.length</code></pre>
+</details>
+</dd>
 </dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_dataquality" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_dataquality">add_dataquality</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_userdata" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_userdata">add_userdata</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 <dt id="scenariogeneration.xodr.lane.RoadMark"><code class="flex name class">
 <span>class <span class="ident">RoadMark</span></span>
@@ -2346,7 +4355,7 @@ color (RoadMarkColor): color of line (optional)
 <pre><code>marking_type (RoadMarkType): the type of marking
 
 width (float): with of the line
-
+    Default: None
 length (float): length of the line
     Default: 0
 toffset (float): offset in t
@@ -2411,7 +4420,7 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class RoadMark:
+<pre><code class="python">class RoadMark(XodrBase):
     &#34;&#34;&#34;creates a RoadMark of opendrive
 
     Parameters
@@ -2419,7 +4428,7 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
         marking_type (RoadMarkType): the type of marking
 
         width (float): with of the line
-
+            Default: None
         length (float): length of the line
             Default: 0
         toffset (float): offset in t
@@ -2501,6 +4510,7 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
                 Default: none
 
         &#34;&#34;&#34;
+        super().__init__()
         # required arguments - must be provided by user
         self.marking_type = marking_type
 
@@ -2520,6 +4530,7 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
 
         # TODO: there may be more line child elements per roadmark, which is currently unsupported
         self._line = []
+        self._explicit_line = []
         # check if arguments were passed that require line child element
         if any([length, space, toffset, rule]):
             # set defaults in case no values were provided
@@ -2567,10 +4578,22 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
         self._line.append(line)
         return self
 
+    def add_explicit_road_line(self, line):
+        &#34;&#34;&#34;function to add a explicit roadline to the RoadMark,
+
+        Parameters
+        ----------
+            line (RoadLine): the roadline to add
+
+        &#34;&#34;&#34;
+        self._explicit_line.append(line)
+        return self
+
     def __eq__(self, other):
-        if isinstance(other, RoadMark):
+        if isinstance(other, RoadMark) and super().__eq__(other):
             if (
                 self._line == other._line
+                and self._explicit_line == other._explicit_line
                 and self.get_attributes() == other.get_attributes()
                 and self.marking_type == other.marking_type
             ):
@@ -2594,18 +4617,71 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the RoadMark&#34;&#34;&#34;
         element = ET.Element(&#34;roadMark&#34;, attrib=self.get_attributes())
+        self._add_additional_data_to_element(element)
         if self._line:
+            attribs = {&#34;name&#34;: enum2str(self.marking_type)}
+            if self.width is not None:
+                attribs[&#34;width&#34;] = str(self.width)
+            else:
+                offsets = [x.toffset for x in self._line]
+
+                attribs[&#34;width&#34;] = str(
+                    max(offsets)
+                    - min(offsets)
+                    + sum(
+                        [
+                            x.width
+                            for x in self._line
+                            if x.toffset in [max(offsets), min(offsets)]
+                        ]
+                    )
+                )
             typeelement = ET.SubElement(
                 element,
                 &#34;type&#34;,
-                attrib={&#34;name&#34;: enum2str(self.marking_type), &#34;width&#34;: str(self.width)},
+                attrib=attribs,
             )
             for l in self._line:
                 typeelement.append(l.get_element())
+        if self._explicit_line:
+            typeelement = ET.SubElement(
+                element,
+                &#34;explicit&#34;,
+            )
+            for l in self._explicit_line:
+                typeelement.append(l.get_element())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
+<dt id="scenariogeneration.xodr.lane.RoadMark.add_explicit_road_line"><code class="name flex">
+<span>def <span class="ident">add_explicit_road_line</span></span>(<span>self, line)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>function to add a explicit roadline to the RoadMark,</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>line (RoadLine): the roadline to add
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_explicit_road_line(self, line):
+    &#34;&#34;&#34;function to add a explicit roadline to the RoadMark,
+
+    Parameters
+    ----------
+        line (RoadLine): the roadline to add
+
+    &#34;&#34;&#34;
+    self._explicit_line.append(line)
+    return self</code></pre>
+</details>
+</dd>
 <dt id="scenariogeneration.xodr.lane.RoadMark.add_specific_road_line"><code class="name flex">
 <span>def <span class="ident">add_specific_road_line</span></span>(<span>self, line)</span>
 </code></dt>
@@ -2666,18 +4742,52 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the RoadMark&#34;&#34;&#34;
     element = ET.Element(&#34;roadMark&#34;, attrib=self.get_attributes())
+    self._add_additional_data_to_element(element)
     if self._line:
+        attribs = {&#34;name&#34;: enum2str(self.marking_type)}
+        if self.width is not None:
+            attribs[&#34;width&#34;] = str(self.width)
+        else:
+            offsets = [x.toffset for x in self._line]
+
+            attribs[&#34;width&#34;] = str(
+                max(offsets)
+                - min(offsets)
+                + sum(
+                    [
+                        x.width
+                        for x in self._line
+                        if x.toffset in [max(offsets), min(offsets)]
+                    ]
+                )
+            )
         typeelement = ET.SubElement(
             element,
             &#34;type&#34;,
-            attrib={&#34;name&#34;: enum2str(self.marking_type), &#34;width&#34;: str(self.width)},
+            attrib=attribs,
         )
         for l in self._line:
+            typeelement.append(l.get_element())
+    if self._explicit_line:
+        typeelement = ET.SubElement(
+            element,
+            &#34;explicit&#34;,
+        )
+        for l in self._explicit_line:
             typeelement.append(l.get_element())
     return element</code></pre>
 </details>
 </dd>
 </dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_dataquality" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_dataquality">add_dataquality</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_userdata" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_userdata">add_userdata</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 </dl>
 </section>
@@ -2696,6 +4806,13 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
+<h4><code><a title="scenariogeneration.xodr.lane.ExplicitRoadLine" href="#scenariogeneration.xodr.lane.ExplicitRoadLine">ExplicitRoadLine</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xodr.lane.ExplicitRoadLine.get_attributes" href="#scenariogeneration.xodr.lane.ExplicitRoadLine.get_attributes">get_attributes</a></code></li>
+<li><code><a title="scenariogeneration.xodr.lane.ExplicitRoadLine.get_element" href="#scenariogeneration.xodr.lane.ExplicitRoadLine.get_element">get_element</a></code></li>
+</ul>
+</li>
+<li>
 <h4><code><a title="scenariogeneration.xodr.lane.Lane" href="#scenariogeneration.xodr.lane.Lane">Lane</a></code></h4>
 <ul class="two-column">
 <li><code><a title="scenariogeneration.xodr.lane.Lane.add_height" href="#scenariogeneration.xodr.lane.Lane.add_height">add_height</a></code></li>
@@ -2704,6 +4821,7 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
 <li><code><a title="scenariogeneration.xodr.lane.Lane.add_roadmark" href="#scenariogeneration.xodr.lane.Lane.add_roadmark">add_roadmark</a></code></li>
 <li><code><a title="scenariogeneration.xodr.lane.Lane.get_attributes" href="#scenariogeneration.xodr.lane.Lane.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xodr.lane.Lane.get_element" href="#scenariogeneration.xodr.lane.Lane.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xodr.lane.Lane.get_linked_lane_id" href="#scenariogeneration.xodr.lane.Lane.get_linked_lane_id">get_linked_lane_id</a></code></li>
 <li><code><a title="scenariogeneration.xodr.lane.Lane.get_width" href="#scenariogeneration.xodr.lane.Lane.get_width">get_width</a></code></li>
 </ul>
 </li>
@@ -2728,19 +4846,25 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
 <ul class="">
 <li><code><a title="scenariogeneration.xodr.lane.Lanes.add_laneoffset" href="#scenariogeneration.xodr.lane.Lanes.add_laneoffset">add_laneoffset</a></code></li>
 <li><code><a title="scenariogeneration.xodr.lane.Lanes.add_lanesection" href="#scenariogeneration.xodr.lane.Lanes.add_lanesection">add_lanesection</a></code></li>
+<li><code><a title="scenariogeneration.xodr.lane.Lanes.adjust_road_marks_from_end" href="#scenariogeneration.xodr.lane.Lanes.adjust_road_marks_from_end">adjust_road_marks_from_end</a></code></li>
+<li><code><a title="scenariogeneration.xodr.lane.Lanes.adjust_road_marks_from_start" href="#scenariogeneration.xodr.lane.Lanes.adjust_road_marks_from_start">adjust_road_marks_from_start</a></code></li>
 <li><code><a title="scenariogeneration.xodr.lane.Lanes.get_element" href="#scenariogeneration.xodr.lane.Lanes.get_element">get_element</a></code></li>
 </ul>
 </li>
 <li>
 <h4><code><a title="scenariogeneration.xodr.lane.RoadLine" href="#scenariogeneration.xodr.lane.RoadLine">RoadLine</a></code></h4>
 <ul class="">
+<li><code><a title="scenariogeneration.xodr.lane.RoadLine.adjust_remainder" href="#scenariogeneration.xodr.lane.RoadLine.adjust_remainder">adjust_remainder</a></code></li>
+<li><code><a title="scenariogeneration.xodr.lane.RoadLine.adjust_soffset" href="#scenariogeneration.xodr.lane.RoadLine.adjust_soffset">adjust_soffset</a></code></li>
 <li><code><a title="scenariogeneration.xodr.lane.RoadLine.get_attributes" href="#scenariogeneration.xodr.lane.RoadLine.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xodr.lane.RoadLine.get_element" href="#scenariogeneration.xodr.lane.RoadLine.get_element">get_element</a></code></li>
+<li><code><a title="scenariogeneration.xodr.lane.RoadLine.shift_soffset" href="#scenariogeneration.xodr.lane.RoadLine.shift_soffset">shift_soffset</a></code></li>
 </ul>
 </li>
 <li>
 <h4><code><a title="scenariogeneration.xodr.lane.RoadMark" href="#scenariogeneration.xodr.lane.RoadMark">RoadMark</a></code></h4>
 <ul class="">
+<li><code><a title="scenariogeneration.xodr.lane.RoadMark.add_explicit_road_line" href="#scenariogeneration.xodr.lane.RoadMark.add_explicit_road_line">add_explicit_road_line</a></code></li>
 <li><code><a title="scenariogeneration.xodr.lane.RoadMark.add_specific_road_line" href="#scenariogeneration.xodr.lane.RoadMark.add_specific_road_line">add_specific_road_line</a></code></li>
 <li><code><a title="scenariogeneration.xodr.lane.RoadMark.get_attributes" href="#scenariogeneration.xodr.lane.RoadMark.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xodr.lane.RoadMark.get_element" href="#scenariogeneration.xodr.lane.RoadMark.get_element">get_element</a></code></li>

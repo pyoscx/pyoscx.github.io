@@ -36,11 +36,11 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <pre><code class="python">&#34;&#34;&#34;
   scenariogeneration
   https://github.com/pyoscx/scenariogeneration
- 
+
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at https://mozilla.org/MPL/2.0/.
- 
+
   Copyright (c) 2022 The scenariogeneration Authors.
 
 &#34;&#34;&#34;
@@ -55,9 +55,10 @@ from .exceptions import (
     MixOfGeometryAddition,
 )
 from scipy.integrate import quad
+from .utils import XodrBase
 
 
-class PlanView:
+class PlanView(XodrBase):
     &#34;&#34;&#34;the PlanView is the geometrical description of a road,
 
     Parameters
@@ -106,6 +107,7 @@ class PlanView:
 
 
         &#34;&#34;&#34;
+        super().__init__()
         self.present_x = 0
         self.present_y = 0
         self.present_h = 0
@@ -136,7 +138,7 @@ class PlanView:
         self._addition_mode = None
 
     def __eq__(self, other):
-        if isinstance(other, PlanView):
+        if isinstance(other, PlanView) and super().__eq__(other):
             if self.adjusted and other.adjusted:
                 if self._adjusted_geometries == other._adjusted_geometries:
                     return True
@@ -342,19 +344,22 @@ class PlanView:
 
     def get_total_length(self):
         &#34;&#34;&#34;returns the total length of the planView&#34;&#34;&#34;
-
-        return self.present_s
+        if self.adjusted:
+            return self.present_s
+        else:
+            return sum([x.length for x in self._raw_geometries])
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the WorldPostion&#34;&#34;&#34;
 
         element = ET.Element(&#34;planView&#34;)
+        self._add_additional_data_to_element(element)
         for geom in self._adjusted_geometries:
             element.append(geom.get_element())
         return element
 
 
-class _Geometry:
+class _Geometry(XodrBase):
     &#34;&#34;&#34;the _Geometry describes the geometry entry of open drive
 
     Parameters
@@ -406,6 +411,7 @@ class _Geometry:
             geom_type (Line, Spiral,ParamPoly3, or Arc): the type of geometry
 
         &#34;&#34;&#34;
+        super().__init__()
         self.s = s
         self.x = x
         self.y = y
@@ -415,7 +421,7 @@ class _Geometry:
         _, _, _, self.length = self.geom_type.get_end_data(self.x, self.y, self.heading)
 
     def __eq__(self, other):
-        if isinstance(other, _Geometry):
+        if isinstance(other, _Geometry) and super().__eq__(other):
             if (
                 self.get_attributes() == other.get_attributes()
                 and self.geom_type == other.geom_type
@@ -452,11 +458,12 @@ class _Geometry:
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the _Geometry&#34;&#34;&#34;
         element = ET.Element(&#34;geometry&#34;, attrib=self.get_attributes())
+        self._add_additional_data_to_element(element)
         element.append(self.geom_type.get_element())
         return element
 
 
-class Line:
+class Line(XodrBase):
     &#34;&#34;&#34;the line class creates a line type of geometry
 
     Parameters
@@ -478,10 +485,11 @@ class Line:
     &#34;&#34;&#34;
 
     def __init__(self, length):
+        super().__init__()
         self.length = length
 
     def __eq__(self, other):
-        return True
+        return super().__eq__(other)
 
     def get_end_data(self, x, y, h):
         &#34;&#34;&#34;Returns the end point of the geometry
@@ -541,13 +549,13 @@ class Line:
         return start_x, start_y, start_h, self.length
 
     def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the WorldPostion&#34;&#34;&#34;
+        &#34;&#34;&#34;returns the elementTree of the Line&#34;&#34;&#34;
         element = ET.Element(&#34;line&#34;)
-
+        self._add_additional_data_to_element(element)
         return element
 
 
-class Arc:
+class Arc(XodrBase):
     &#34;&#34;&#34;the Arc creates a arc type of geometry
 
     Parameters
@@ -590,7 +598,7 @@ class Arc:
             angle (float): angle of the arc (optional or use length)
 
         &#34;&#34;&#34;
-
+        super().__init__()
         if length == None and angle == None:
             raise NotEnoughInputArguments(&#34;neither length nor angle defined, for arc&#34;)
 
@@ -614,7 +622,7 @@ class Arc:
             _, _, _, self.length = self.get_end_data(0, 0, 0)
 
     def __eq__(self, other):
-        if isinstance(other, Arc):
+        if isinstance(other, Arc) and super().__eq__(other):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
@@ -724,11 +732,11 @@ class Arc:
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the Arc&#34;&#34;&#34;
         element = ET.Element(&#34;arc&#34;, attrib=self.get_attributes())
-
+        self._add_additional_data_to_element(element)
         return element
 
 
-class ParamPoly3:
+class ParamPoly3(XodrBase):
     &#34;&#34;&#34;the ParamPoly3 class creates a parampoly3 type of geometry, in the coordinate systeme U (along road), V (normal to the road)
 
     the polynomials are on the form
@@ -820,7 +828,7 @@ class ParamPoly3:
 
             length (float): total length of arc, used if prange == arcLength
         &#34;&#34;&#34;
-
+        super().__init__()
         self.au = au
         self.bu = bu
         self.cu = cu
@@ -831,14 +839,16 @@ class ParamPoly3:
         self.dv = dv
         self.prange = prange
         if prange == &#34;arcLength&#34; and length == None:
-            raise ValueError(&#34;No length was provided for Arc with arcLength option&#34;)
+            raise ValueError(
+                &#34;No length was provided for ParamPoly3 with arcLength option&#34;
+            )
         if length:
             self.length = length
         else:
             _, _, _, self.length = self.get_end_data(0, 0, 0)
 
     def __eq__(self, other):
-        if isinstance(other, ParamPoly3):
+        if isinstance(other, ParamPoly3) and super().__eq__(other):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
@@ -943,11 +953,11 @@ class ParamPoly3:
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the ParamPoly3&#34;&#34;&#34;
         element = ET.Element(&#34;paramPoly3&#34;, attrib=self.get_attributes())
-
+        self._add_additional_data_to_element(element)
         return element
 
 
-class Spiral:
+class Spiral(XodrBase):
     &#34;&#34;&#34;the Spiral (Clothoid) creates a spiral type of geometry
 
     Parameters
@@ -995,6 +1005,7 @@ class Spiral:
 
             cdot (float): the curvature change of the spiral (optional, or use length, or angle)
         &#34;&#34;&#34;
+        super().__init__()
         self.curvstart = curvstart
         self.curvend = curvend
         if length == None and angle == None and cdot == None:
@@ -1012,7 +1023,7 @@ class Spiral:
             self.length = length
 
     def __eq__(self, other):
-        if isinstance(other, Spiral):
+        if isinstance(other, Spiral) and super().__eq__(other):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
@@ -1086,7 +1097,7 @@ class Spiral:
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the Line&#34;&#34;&#34;
         element = ET.Element(&#34;spiral&#34;, attrib=self.get_attributes())
-
+        self._add_additional_data_to_element(element)
         return element</code></pre>
 </details>
 </section>
@@ -1141,7 +1152,7 @@ angle (float): angle of the arc (optional or use length)
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Arc:
+<pre><code class="python">class Arc(XodrBase):
     &#34;&#34;&#34;the Arc creates a arc type of geometry
 
     Parameters
@@ -1184,7 +1195,7 @@ angle (float): angle of the arc (optional or use length)
             angle (float): angle of the arc (optional or use length)
 
         &#34;&#34;&#34;
-
+        super().__init__()
         if length == None and angle == None:
             raise NotEnoughInputArguments(&#34;neither length nor angle defined, for arc&#34;)
 
@@ -1208,7 +1219,7 @@ angle (float): angle of the arc (optional or use length)
             _, _, _, self.length = self.get_end_data(0, 0, 0)
 
     def __eq__(self, other):
-        if isinstance(other, Arc):
+        if isinstance(other, Arc) and super().__eq__(other):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
@@ -1318,9 +1329,13 @@ angle (float): angle of the arc (optional or use length)
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the Arc&#34;&#34;&#34;
         element = ET.Element(&#34;arc&#34;, attrib=self.get_attributes())
-
+        self._add_additional_data_to_element(element)
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.geometry.Arc.get_attributes"><code class="name flex">
@@ -1349,7 +1364,7 @@ angle (float): angle of the arc (optional or use length)
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the Arc&#34;&#34;&#34;
     element = ET.Element(&#34;arc&#34;, attrib=self.get_attributes())
-
+    self._add_additional_data_to_element(element)
     return element</code></pre>
 </details>
 </dd>
@@ -1504,6 +1519,15 @@ length (float): length of the element
 </details>
 </dd>
 </dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_dataquality" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_dataquality">add_dataquality</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_userdata" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_userdata">add_userdata</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.Line"><code class="flex name class">
 <span>class <span class="ident">Line</span></span>
@@ -1523,12 +1547,13 @@ length (float): length of the element
 
 get_end_data(x,y,h)
     Returns the end point of the geometry
-</code></pre></div>
+</code></pre>
+<p>initalize the UserData</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Line:
+<pre><code class="python">class Line(XodrBase):
     &#34;&#34;&#34;the line class creates a line type of geometry
 
     Parameters
@@ -1550,10 +1575,11 @@ get_end_data(x,y,h)
     &#34;&#34;&#34;
 
     def __init__(self, length):
+        super().__init__()
         self.length = length
 
     def __eq__(self, other):
-        return True
+        return super().__eq__(other)
 
     def get_end_data(self, x, y, h):
         &#34;&#34;&#34;Returns the end point of the geometry
@@ -1613,26 +1639,30 @@ get_end_data(x,y,h)
         return start_x, start_y, start_h, self.length
 
     def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the WorldPostion&#34;&#34;&#34;
+        &#34;&#34;&#34;returns the elementTree of the Line&#34;&#34;&#34;
         element = ET.Element(&#34;line&#34;)
-
+        self._add_additional_data_to_element(element)
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.geometry.Line.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the WorldPostion</p></div>
+<div class="desc"><p>returns the elementTree of the Line</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_element(self):
-    &#34;&#34;&#34;returns the elementTree of the WorldPostion&#34;&#34;&#34;
+    &#34;&#34;&#34;returns the elementTree of the Line&#34;&#34;&#34;
     element = ET.Element(&#34;line&#34;)
-
+    self._add_additional_data_to_element(element)
     return element</code></pre>
 </details>
 </dd>
@@ -1746,6 +1776,15 @@ length (float): length of the road
 </details>
 </dd>
 </dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_dataquality" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_dataquality">add_dataquality</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_userdata" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_userdata">add_userdata</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.ParamPoly3"><code class="flex name class">
 <span>class <span class="ident">ParamPoly3</span></span>
@@ -1836,7 +1875,7 @@ length (float): total length of arc, used if prange == arcLength
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class ParamPoly3:
+<pre><code class="python">class ParamPoly3(XodrBase):
     &#34;&#34;&#34;the ParamPoly3 class creates a parampoly3 type of geometry, in the coordinate systeme U (along road), V (normal to the road)
 
     the polynomials are on the form
@@ -1928,7 +1967,7 @@ length (float): total length of arc, used if prange == arcLength
 
             length (float): total length of arc, used if prange == arcLength
         &#34;&#34;&#34;
-
+        super().__init__()
         self.au = au
         self.bu = bu
         self.cu = cu
@@ -1939,14 +1978,16 @@ length (float): total length of arc, used if prange == arcLength
         self.dv = dv
         self.prange = prange
         if prange == &#34;arcLength&#34; and length == None:
-            raise ValueError(&#34;No length was provided for Arc with arcLength option&#34;)
+            raise ValueError(
+                &#34;No length was provided for ParamPoly3 with arcLength option&#34;
+            )
         if length:
             self.length = length
         else:
             _, _, _, self.length = self.get_end_data(0, 0, 0)
 
     def __eq__(self, other):
-        if isinstance(other, ParamPoly3):
+        if isinstance(other, ParamPoly3) and super().__eq__(other):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
@@ -2051,9 +2092,13 @@ length (float): total length of arc, used if prange == arcLength
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the ParamPoly3&#34;&#34;&#34;
         element = ET.Element(&#34;paramPoly3&#34;, attrib=self.get_attributes())
-
+        self._add_additional_data_to_element(element)
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.geometry.ParamPoly3.get_attributes"><code class="name flex">
@@ -2092,7 +2137,7 @@ length (float): total length of arc, used if prange == arcLength
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the ParamPoly3&#34;&#34;&#34;
     element = ET.Element(&#34;paramPoly3&#34;, attrib=self.get_attributes())
-
+    self._add_additional_data_to_element(element)
     return element</code></pre>
 </details>
 </dd>
@@ -2217,6 +2262,15 @@ length (float): the length of the geometry
 </details>
 </dd>
 </dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_dataquality" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_dataquality">add_dataquality</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_userdata" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_userdata">add_userdata</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.PlanView"><code class="flex name class">
 <span>class <span class="ident">PlanView</span></span>
@@ -2265,7 +2319,7 @@ Note: if multiple roads are used, the start values can be recalculated.</p></div
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class PlanView:
+<pre><code class="python">class PlanView(XodrBase):
     &#34;&#34;&#34;the PlanView is the geometrical description of a road,
 
     Parameters
@@ -2314,6 +2368,7 @@ Note: if multiple roads are used, the start values can be recalculated.</p></div
 
 
         &#34;&#34;&#34;
+        super().__init__()
         self.present_x = 0
         self.present_y = 0
         self.present_h = 0
@@ -2344,7 +2399,7 @@ Note: if multiple roads are used, the start values can be recalculated.</p></div
         self._addition_mode = None
 
     def __eq__(self, other):
-        if isinstance(other, PlanView):
+        if isinstance(other, PlanView) and super().__eq__(other):
             if self.adjusted and other.adjusted:
                 if self._adjusted_geometries == other._adjusted_geometries:
                     return True
@@ -2550,17 +2605,24 @@ Note: if multiple roads are used, the start values can be recalculated.</p></div
 
     def get_total_length(self):
         &#34;&#34;&#34;returns the total length of the planView&#34;&#34;&#34;
-
-        return self.present_s
+        if self.adjusted:
+            return self.present_s
+        else:
+            return sum([x.length for x in self._raw_geometries])
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the WorldPostion&#34;&#34;&#34;
 
         element = ET.Element(&#34;planView&#34;)
+        self._add_additional_data_to_element(element)
         for geom in self._adjusted_geometries:
             element.append(geom.get_element())
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.geometry.PlanView.add_fixed_geometry"><code class="name flex">
@@ -2780,6 +2842,7 @@ heading (float): override the previous heading (optional), not recommended
     &#34;&#34;&#34;returns the elementTree of the WorldPostion&#34;&#34;&#34;
 
     element = ET.Element(&#34;planView&#34;)
+    self._add_additional_data_to_element(element)
     for geom in self._adjusted_geometries:
         element.append(geom.get_element())
     return element</code></pre>
@@ -2851,8 +2914,10 @@ Default: 0</p></div>
 </summary>
 <pre><code class="python">def get_total_length(self):
     &#34;&#34;&#34;returns the total length of the planView&#34;&#34;&#34;
-
-    return self.present_s</code></pre>
+    if self.adjusted:
+        return self.present_s
+    else:
+        return sum([x.length for x in self._raw_geometries])</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.PlanView.set_start_point"><code class="name flex">
@@ -2893,6 +2958,15 @@ Default: 0</p></div>
 </details>
 </dd>
 </dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_dataquality" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_dataquality">add_dataquality</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_userdata" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_userdata">add_userdata</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.Spiral"><code class="flex name class">
 <span>class <span class="ident">Spiral</span></span>
@@ -2942,7 +3016,7 @@ cdot (float): the curvature change of the spiral (optional, or use length, or an
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Spiral:
+<pre><code class="python">class Spiral(XodrBase):
     &#34;&#34;&#34;the Spiral (Clothoid) creates a spiral type of geometry
 
     Parameters
@@ -2990,6 +3064,7 @@ cdot (float): the curvature change of the spiral (optional, or use length, or an
 
             cdot (float): the curvature change of the spiral (optional, or use length, or angle)
         &#34;&#34;&#34;
+        super().__init__()
         self.curvstart = curvstart
         self.curvend = curvend
         if length == None and angle == None and cdot == None:
@@ -3007,7 +3082,7 @@ cdot (float): the curvature change of the spiral (optional, or use length, or an
             self.length = length
 
     def __eq__(self, other):
-        if isinstance(other, Spiral):
+        if isinstance(other, Spiral) and super().__eq__(other):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
@@ -3081,9 +3156,13 @@ cdot (float): the curvature change of the spiral (optional, or use length, or an
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the Line&#34;&#34;&#34;
         element = ET.Element(&#34;spiral&#34;, attrib=self.get_attributes())
-
+        self._add_additional_data_to_element(element)
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.geometry.Spiral.get_attributes"><code class="name flex">
@@ -3112,7 +3191,7 @@ cdot (float): the curvature change of the spiral (optional, or use length, or an
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the Line&#34;&#34;&#34;
     element = ET.Element(&#34;spiral&#34;, attrib=self.get_attributes())
-
+    self._add_additional_data_to_element(element)
     return element</code></pre>
 </details>
 </dd>
@@ -3225,6 +3304,15 @@ l (float): length of the spiral
 </details>
 </dd>
 </dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_dataquality" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_dataquality">add_dataquality</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_userdata" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_userdata">add_userdata</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 </dl>
 </section>

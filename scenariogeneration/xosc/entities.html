@@ -36,11 +36,11 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <pre><code class="python">&#34;&#34;&#34;
   scenariogeneration
   https://github.com/pyoscx/scenariogeneration
- 
+
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at https://mozilla.org/MPL/2.0/.
- 
+
   Copyright (c) 2022 The scenariogeneration Authors.
 
 &#34;&#34;&#34;
@@ -60,6 +60,7 @@ from .utils import (
     CatalogFile,
     CatalogReference,
     ParameterDeclarations,
+    convert_enum,
 )
 from .exceptions import OpenSCENARIOVersionError
 from .enumerations import (
@@ -73,7 +74,7 @@ from .enumerations import (
 
 
 # TODO: Add functionality for lists in add_entity_byref &amp; add_entity_bytype
-class Entities:
+class Entities(VersionBase):
     &#34;&#34;&#34;The Entities class creates the entities part of OpenScenario
 
     Attributes
@@ -352,7 +353,7 @@ class ScenarioObject(VersionBase):
         return element
 
 
-class Entity:
+class Entity(VersionBase):
     &#34;&#34;&#34;The Entity class creates an Entity of OpenScenario
     Can either use a object_type or entityref (not both)
 
@@ -413,12 +414,10 @@ class Entity:
                 self.entity.append(EntityRef(entityref))
             self.object_type = None
         else:
-            if not hasattr(ObjectType, str(object_type)):
-                ValueError(&#34;object_type input not a valid ObjectType&#34;)
             if isinstance(object_type, list):
-                self.object_type = object_type
+                self.object_type = [convert_enum(x, ObjectType) for x in object_type]
             else:
-                self.object_type.append(object_type)
+                self.object_type.append(convert_enum(object_type, ObjectType))
             self.entity = None
 
     def __eq__(self, other):
@@ -452,7 +451,7 @@ class Entity:
         if members_element.find(&#34;ByType&#34;) != None:
             types = members_element.findall(&#34;ByType&#34;)
             for type in types:
-                bytypes.append(getattr(ObjectType, type.attrib[&#34;value&#34;]))
+                bytypes.append(convert_enum(type.attrib[&#34;objectType&#34;], ObjectType))
             entity_refs = None
         elif members_element.find(&#34;EntityRef&#34;) != None:
             entities = members_element.findall(&#34;EntityRef&#34;)
@@ -476,7 +475,7 @@ class Entity:
         if self.object_type:
             for object_type in self.object_type:
                 ET.SubElement(
-                    members, &#34;ByType&#34;, attrib={&#34;value&#34;: object_type.get_name()}
+                    members, &#34;ByType&#34;, attrib={&#34;objectType&#34;: object_type.get_name()}
                 )
         return element
 
@@ -568,18 +567,15 @@ class Pedestrian(VersionBase):
         self.name = name
         self.model = model
         self.mass = convert_float(mass)
-        if not hasattr(PedestrianCategory, str(category)):
-            ValueError(str(category) + &#34; is not a valid pedestrian type&#34;)
+
+        self.category = convert_enum(category, PedestrianCategory)
         if not isinstance(boundingbox, BoundingBox):
             raise TypeError(&#34;boundingbox input is not of type BoundingBox&#34;)
 
-        self.category = category
         self.boundingbox = boundingbox
         self.parameters = ParameterDeclarations()
         self.properties = Properties()
-        if role is not None and not hasattr(Role, str(role)):
-            raise TypeError(role + &#34; is not a valid vehicle role.&#34;)
-        self.role = role
+        self.role = convert_enum(role, Role, True)
 
     def __eq__(self, other):
         if isinstance(other, Pedestrian):
@@ -613,7 +609,9 @@ class Pedestrian(VersionBase):
             model = element.attrib[&#34;model3d&#34;]
         elif &#34;model&#34; in element.attrib:
             model = element.attrib[&#34;model&#34;]
-        category = getattr(PedestrianCategory, element.attrib[&#34;pedestrianCategory&#34;])
+        category = convert_enum(
+            element.attrib[&#34;pedestrianCategory&#34;], PedestrianCategory
+        )
         if element.find(&#34;ParameterDeclarations&#34;) != None:
             parameters = ParameterDeclarations.parse(
                 element.find(&#34;ParameterDeclarations&#34;)
@@ -624,7 +622,7 @@ class Pedestrian(VersionBase):
         properties = Properties.parse(element.find(&#34;Properties&#34;))
         role = None
         if &#34;role&#34; in element.attrib:
-            role = getattr(Role, element.attrib[&#34;role&#34;])
+            role = convert_enum(element.attrib[&#34;role&#34;], Role)
         pedestrian = Pedestrian(name, mass, category, boundingbox, model, role)
         pedestrian.parameters = parameters
         pedestrian.properties = properties
@@ -705,13 +703,21 @@ class Pedestrian(VersionBase):
         retdict = {}
         retdict[&#34;name&#34;] = str(self.name)
         retdict[&#34;pedestrianCategory&#34;] = self.category.get_name()
+
+        if self.isVersion(minor=0) and self.model is None:
+            raise OpenSCENARIOVersionError(&#34;model is required for OSC 1.0&#34;)
+
         if self.model is not None:
             if self.isVersion(minor=0):
                 retdict[&#34;model&#34;] = self.model
             else:
                 retdict[&#34;model3d&#34;] = self.model
         retdict[&#34;mass&#34;] = str(self.mass)
-        if self.role and not self.isVersion(minor=0) and not self.isVersion(minor=1):
+        if self.role:
+            if self.isVersionEqLess(minor=1):
+                raise OpenSCENARIOVersionError(
+                    &#34;role for Pedestrian was added in OSC V1.2&#34;
+                )
             retdict[&#34;role&#34;] = self.role.get_name()
         return retdict
 
@@ -804,9 +810,7 @@ class MiscObject(VersionBase):
         &#34;&#34;&#34;
         self.name = name
         self.mass = convert_float(mass)
-        if not hasattr(MiscObjectCategory, str(category)):
-            raise TypeError(str(category) + &#34; is not a valid MiscObject type&#34;)
-        self.category = category
+        self.category = convert_enum(category, MiscObjectCategory)
         if not isinstance(boundingbox, BoundingBox):
             raise TypeError(&#34;boundingbox input is not of type BoundingBox&#34;)
         self.boundingbox = boundingbox
@@ -845,7 +849,9 @@ class MiscObject(VersionBase):
         name = element.attrib[&#34;name&#34;]
         properties = Properties.parse(element.find(&#34;Properties&#34;))
         boundingbox = BoundingBox.parse(element.find(&#34;BoundingBox&#34;))
-        category = getattr(MiscObjectCategory, element.attrib[&#34;miscObjectCategory&#34;])
+        category = convert_enum(
+            element.attrib[&#34;miscObjectCategory&#34;], MiscObjectCategory
+        )
 
         if element.find(&#34;ParameterDeclarations&#34;) != None:
             parameters = ParameterDeclarations.parse(
@@ -1089,12 +1095,10 @@ class Vehicle(VersionBase):
                 Default: None
         &#34;&#34;&#34;
         self.name = name
-        if not hasattr(VehicleCategory, str(vehicle_type)):
-            raise TypeError(vehicle_type + &#34; is not a valid vehicle type.&#34;)
         if not isinstance(boundingbox, BoundingBox):
             raise TypeError(&#34;boundingbox input is not of type BoundingBox&#34;)
 
-        self.vehicle_type = vehicle_type
+        self.vehicle_type = convert_enum(vehicle_type, VehicleCategory)
         self.boundingbox = boundingbox
 
         self.axles = Axles(frontaxle, rearaxle)
@@ -1109,9 +1113,7 @@ class Vehicle(VersionBase):
         self.properties = Properties()
         self.mass = convert_float(mass)
         self.model3d = model3d
-        if role is not None and not hasattr(Role, str(role)):
-            raise TypeError(role + &#34; is not a valid vehicle role.&#34;)
-        self.role = role
+        self.role = convert_enum(role, Role, True)
 
     def __eq__(self, other):
         if isinstance(other, Vehicle):
@@ -1145,7 +1147,7 @@ class Vehicle(VersionBase):
         mass = None
         if &#34;mass&#34; in element.attrib:
             mass = convert_float(element.attrib[&#34;mass&#34;])
-        vehicle_type = getattr(VehicleCategory, element.attrib[&#34;vehicleCategory&#34;])
+        vehicle_type = convert_enum(element.attrib[&#34;vehicleCategory&#34;], VehicleCategory)
         model3d = None
         if &#34;model3d&#34; in element.attrib:
             model3d = element.attrib[&#34;model3d&#34;]
@@ -1172,7 +1174,7 @@ class Vehicle(VersionBase):
 
         role = None
         if &#34;role&#34; in element.attrib:
-            role = getattr(Role, element.attrib[&#34;role&#34;])
+            role = convert_enum(element.attrib[&#34;role&#34;], Role)
         vehicle = Vehicle(
             name,
             vehicle_type,
@@ -1280,21 +1282,33 @@ class Vehicle(VersionBase):
         return self
 
     def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes as a dict of the Center&#34;&#34;&#34;
+        &#34;&#34;&#34;returns the attributes as a dict of the Vehicle&#34;&#34;&#34;
         retdict = {}
         retdict[&#34;name&#34;] = str(self.name)
         retdict[&#34;vehicleCategory&#34;] = self.vehicle_type.get_name()
-        if self.mass and not self.isVersion(minor=0):
+        if self.mass:
+            if self.isVersion(minor=0):
+                raise OpenSCENARIOVersionError(
+                    &#34;Mass of a vehcile was introduced in OSC 1.1&#34;
+                )
             retdict[&#34;mass&#34;] = str(self.mass)
-        if not self.isVersion(minor=0) and self.model3d:
+        if self.model3d:
+            if self.isVersion(minor=0):
+                raise OpenSCENARIOVersionError(
+                    &#34;model3d of a vehcile was introduced in OSC 1.1&#34;
+                )
             retdict[&#34;model3d&#34;] = self.model3d
-        if self.role and not self.isVersion(minor=0) and not self.isVersion(minor=1):
+        if self.role:
+            if self.isVersionEqLess(minor=1):
+                raise OpenSCENARIOVersionError(
+                    &#34;the role of a vehcile was introduced in OSC 1.1&#34;
+                )
             retdict[&#34;role&#34;] = self.role.get_name()
 
         return retdict
 
     def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the Center&#34;&#34;&#34;
+        &#34;&#34;&#34;returns the elementTree of the Vehicle&#34;&#34;&#34;
         element = ET.Element(&#34;Vehicle&#34;, attrib=self.get_attributes())
         element.append(self.parameters.get_element())
         element.append(self.boundingbox.get_element())
@@ -1305,7 +1319,7 @@ class Vehicle(VersionBase):
         return element
 
 
-class Axle:
+class Axle(VersionBase):
     &#34;&#34;&#34;the Axle describes the axle properties of a vehicle
 
     Parameters
@@ -1408,7 +1422,7 @@ class Axle:
         return ET.Element(elementname, attrib=self.get_attributes())
 
 
-class Axles:
+class Axles(VersionBase):
     &#34;&#34;&#34;the Axles combines the different Axles to one Element
 
     Parameters
@@ -1514,7 +1528,7 @@ class Axles:
         return element
 
 
-class ExternalObjectReference:
+class ExternalObjectReference(VersionBase):
     &#34;&#34;&#34;the ExternalObjectReference describes the EntityObject ExternalObjectReference (valid from V1.1)
 
     Parameters
@@ -1576,6 +1590,10 @@ class ExternalObjectReference:
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the Axle&#34;&#34;&#34;
+        if self.isVersion(minor=0):
+            raise OpenSCENARIOVersionError(
+                &#34;ExternalObjectReference was introduced in OSC 1.1&#34;
+            )
         return ET.Element(&#34;ExternalObjectReference&#34;, attrib=self.get_attributes())</code></pre>
 </details>
 </section>
@@ -1642,7 +1660,7 @@ zpos (float): z position of axle relative to car reference
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Axle:
+<pre><code class="python">class Axle(VersionBase):
     &#34;&#34;&#34;the Axle describes the axle properties of a vehicle
 
     Parameters
@@ -1744,6 +1762,10 @@ zpos (float): z position of axle relative to car reference
         &#34;&#34;&#34;returns the elementTree of the Axle&#34;&#34;&#34;
         return ET.Element(elementname, attrib=self.get_attributes())</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Static methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.entities.Axle.parse"><code class="name flex">
@@ -1859,7 +1881,7 @@ rearaxle (Axle): Axle properties of the rear axle
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Axles:
+<pre><code class="python">class Axles(VersionBase):
     &#34;&#34;&#34;the Axles combines the different Axles to one Element
 
     Parameters
@@ -1964,6 +1986,10 @@ rearaxle (Axle): Axle properties of the rear axle
 
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Static methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.entities.Axles.parse"><code class="name flex">
@@ -2086,7 +2112,7 @@ get_element()
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Entities:
+<pre><code class="python">class Entities(VersionBase):
     &#34;&#34;&#34;The Entities class creates the entities part of OpenScenario
 
     Attributes
@@ -2212,6 +2238,10 @@ get_element()
 
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Static methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.entities.Entities.parse"><code class="name flex">
@@ -2420,7 +2450,7 @@ optionals (only use one):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Entity:
+<pre><code class="python">class Entity(VersionBase):
     &#34;&#34;&#34;The Entity class creates an Entity of OpenScenario
     Can either use a object_type or entityref (not both)
 
@@ -2481,12 +2511,10 @@ optionals (only use one):
                 self.entity.append(EntityRef(entityref))
             self.object_type = None
         else:
-            if not hasattr(ObjectType, str(object_type)):
-                ValueError(&#34;object_type input not a valid ObjectType&#34;)
             if isinstance(object_type, list):
-                self.object_type = object_type
+                self.object_type = [convert_enum(x, ObjectType) for x in object_type]
             else:
-                self.object_type.append(object_type)
+                self.object_type.append(convert_enum(object_type, ObjectType))
             self.entity = None
 
     def __eq__(self, other):
@@ -2520,7 +2548,7 @@ optionals (only use one):
         if members_element.find(&#34;ByType&#34;) != None:
             types = members_element.findall(&#34;ByType&#34;)
             for type in types:
-                bytypes.append(getattr(ObjectType, type.attrib[&#34;value&#34;]))
+                bytypes.append(convert_enum(type.attrib[&#34;objectType&#34;], ObjectType))
             entity_refs = None
         elif members_element.find(&#34;EntityRef&#34;) != None:
             entities = members_element.findall(&#34;EntityRef&#34;)
@@ -2544,10 +2572,14 @@ optionals (only use one):
         if self.object_type:
             for object_type in self.object_type:
                 ET.SubElement(
-                    members, &#34;ByType&#34;, attrib={&#34;value&#34;: object_type.get_name()}
+                    members, &#34;ByType&#34;, attrib={&#34;objectType&#34;: object_type.get_name()}
                 )
         return element</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Static methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.entities.Entity.parse"><code class="name flex">
@@ -2586,7 +2618,7 @@ def parse(element):
     if members_element.find(&#34;ByType&#34;) != None:
         types = members_element.findall(&#34;ByType&#34;)
         for type in types:
-            bytypes.append(getattr(ObjectType, type.attrib[&#34;value&#34;]))
+            bytypes.append(convert_enum(type.attrib[&#34;objectType&#34;], ObjectType))
         entity_refs = None
     elif members_element.find(&#34;EntityRef&#34;) != None:
         entities = members_element.findall(&#34;EntityRef&#34;)
@@ -2633,7 +2665,7 @@ def parse(element):
     if self.object_type:
         for object_type in self.object_type:
             ET.SubElement(
-                members, &#34;ByType&#34;, attrib={&#34;value&#34;: object_type.get_name()}
+                members, &#34;ByType&#34;, attrib={&#34;objectType&#34;: object_type.get_name()}
             )
     return element</code></pre>
 </details>
@@ -2670,7 +2702,7 @@ get_attributes()
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class ExternalObjectReference:
+<pre><code class="python">class ExternalObjectReference(VersionBase):
     &#34;&#34;&#34;the ExternalObjectReference describes the EntityObject ExternalObjectReference (valid from V1.1)
 
     Parameters
@@ -2732,8 +2764,16 @@ get_attributes()
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the Axle&#34;&#34;&#34;
+        if self.isVersion(minor=0):
+            raise OpenSCENARIOVersionError(
+                &#34;ExternalObjectReference was introduced in OSC 1.1&#34;
+            )
         return ET.Element(&#34;ExternalObjectReference&#34;, attrib=self.get_attributes())</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
+</ul>
 <h3>Static methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.entities.ExternalObjectReference.parse"><code class="name flex">
@@ -2796,6 +2836,10 @@ def parse(element):
 </summary>
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the Axle&#34;&#34;&#34;
+    if self.isVersion(minor=0):
+        raise OpenSCENARIOVersionError(
+            &#34;ExternalObjectReference was introduced in OSC 1.1&#34;
+        )
     return ET.Element(&#34;ExternalObjectReference&#34;, attrib=self.get_attributes())</code></pre>
 </details>
 </dd>
@@ -2956,9 +3000,7 @@ model3d (str): path to model file (valid from V1.1)
         &#34;&#34;&#34;
         self.name = name
         self.mass = convert_float(mass)
-        if not hasattr(MiscObjectCategory, str(category)):
-            raise TypeError(str(category) + &#34; is not a valid MiscObject type&#34;)
-        self.category = category
+        self.category = convert_enum(category, MiscObjectCategory)
         if not isinstance(boundingbox, BoundingBox):
             raise TypeError(&#34;boundingbox input is not of type BoundingBox&#34;)
         self.boundingbox = boundingbox
@@ -2997,7 +3039,9 @@ model3d (str): path to model file (valid from V1.1)
         name = element.attrib[&#34;name&#34;]
         properties = Properties.parse(element.find(&#34;Properties&#34;))
         boundingbox = BoundingBox.parse(element.find(&#34;BoundingBox&#34;))
-        category = getattr(MiscObjectCategory, element.attrib[&#34;miscObjectCategory&#34;])
+        category = convert_enum(
+            element.attrib[&#34;miscObjectCategory&#34;], MiscObjectCategory
+        )
 
         if element.find(&#34;ParameterDeclarations&#34;) != None:
             parameters = ParameterDeclarations.parse(
@@ -3140,7 +3184,9 @@ def parse(element):
     name = element.attrib[&#34;name&#34;]
     properties = Properties.parse(element.find(&#34;Properties&#34;))
     boundingbox = BoundingBox.parse(element.find(&#34;BoundingBox&#34;))
-    category = getattr(MiscObjectCategory, element.attrib[&#34;miscObjectCategory&#34;])
+    category = convert_enum(
+        element.attrib[&#34;miscObjectCategory&#34;], MiscObjectCategory
+    )
 
     if element.find(&#34;ParameterDeclarations&#34;) != None:
         parameters = ParameterDeclarations.parse(
@@ -3511,18 +3557,15 @@ role (Role): the role of the Vehicle
         self.name = name
         self.model = model
         self.mass = convert_float(mass)
-        if not hasattr(PedestrianCategory, str(category)):
-            ValueError(str(category) + &#34; is not a valid pedestrian type&#34;)
+
+        self.category = convert_enum(category, PedestrianCategory)
         if not isinstance(boundingbox, BoundingBox):
             raise TypeError(&#34;boundingbox input is not of type BoundingBox&#34;)
 
-        self.category = category
         self.boundingbox = boundingbox
         self.parameters = ParameterDeclarations()
         self.properties = Properties()
-        if role is not None and not hasattr(Role, str(role)):
-            raise TypeError(role + &#34; is not a valid vehicle role.&#34;)
-        self.role = role
+        self.role = convert_enum(role, Role, True)
 
     def __eq__(self, other):
         if isinstance(other, Pedestrian):
@@ -3556,7 +3599,9 @@ role (Role): the role of the Vehicle
             model = element.attrib[&#34;model3d&#34;]
         elif &#34;model&#34; in element.attrib:
             model = element.attrib[&#34;model&#34;]
-        category = getattr(PedestrianCategory, element.attrib[&#34;pedestrianCategory&#34;])
+        category = convert_enum(
+            element.attrib[&#34;pedestrianCategory&#34;], PedestrianCategory
+        )
         if element.find(&#34;ParameterDeclarations&#34;) != None:
             parameters = ParameterDeclarations.parse(
                 element.find(&#34;ParameterDeclarations&#34;)
@@ -3567,7 +3612,7 @@ role (Role): the role of the Vehicle
         properties = Properties.parse(element.find(&#34;Properties&#34;))
         role = None
         if &#34;role&#34; in element.attrib:
-            role = getattr(Role, element.attrib[&#34;role&#34;])
+            role = convert_enum(element.attrib[&#34;role&#34;], Role)
         pedestrian = Pedestrian(name, mass, category, boundingbox, model, role)
         pedestrian.parameters = parameters
         pedestrian.properties = properties
@@ -3648,13 +3693,21 @@ role (Role): the role of the Vehicle
         retdict = {}
         retdict[&#34;name&#34;] = str(self.name)
         retdict[&#34;pedestrianCategory&#34;] = self.category.get_name()
+
+        if self.isVersion(minor=0) and self.model is None:
+            raise OpenSCENARIOVersionError(&#34;model is required for OSC 1.0&#34;)
+
         if self.model is not None:
             if self.isVersion(minor=0):
                 retdict[&#34;model&#34;] = self.model
             else:
                 retdict[&#34;model3d&#34;] = self.model
         retdict[&#34;mass&#34;] = str(self.mass)
-        if self.role and not self.isVersion(minor=0) and not self.isVersion(minor=1):
+        if self.role:
+            if self.isVersionEqLess(minor=1):
+                raise OpenSCENARIOVersionError(
+                    &#34;role for Pedestrian was added in OSC V1.2&#34;
+                )
             retdict[&#34;role&#34;] = self.role.get_name()
         return retdict
 
@@ -3708,7 +3761,9 @@ def parse(element):
         model = element.attrib[&#34;model3d&#34;]
     elif &#34;model&#34; in element.attrib:
         model = element.attrib[&#34;model&#34;]
-    category = getattr(PedestrianCategory, element.attrib[&#34;pedestrianCategory&#34;])
+    category = convert_enum(
+        element.attrib[&#34;pedestrianCategory&#34;], PedestrianCategory
+    )
     if element.find(&#34;ParameterDeclarations&#34;) != None:
         parameters = ParameterDeclarations.parse(
             element.find(&#34;ParameterDeclarations&#34;)
@@ -3719,7 +3774,7 @@ def parse(element):
     properties = Properties.parse(element.find(&#34;Properties&#34;))
     role = None
     if &#34;role&#34; in element.attrib:
-        role = getattr(Role, element.attrib[&#34;role&#34;])
+        role = convert_enum(element.attrib[&#34;role&#34;], Role)
     pedestrian = Pedestrian(name, mass, category, boundingbox, model, role)
     pedestrian.parameters = parameters
     pedestrian.properties = properties
@@ -3886,13 +3941,21 @@ author (str): author of the catalog
     retdict = {}
     retdict[&#34;name&#34;] = str(self.name)
     retdict[&#34;pedestrianCategory&#34;] = self.category.get_name()
+
+    if self.isVersion(minor=0) and self.model is None:
+        raise OpenSCENARIOVersionError(&#34;model is required for OSC 1.0&#34;)
+
     if self.model is not None:
         if self.isVersion(minor=0):
             retdict[&#34;model&#34;] = self.model
         else:
             retdict[&#34;model3d&#34;] = self.model
     retdict[&#34;mass&#34;] = str(self.mass)
-    if self.role and not self.isVersion(minor=0) and not self.isVersion(minor=1):
+    if self.role:
+        if self.isVersionEqLess(minor=1):
+            raise OpenSCENARIOVersionError(
+                &#34;role for Pedestrian was added in OSC V1.2&#34;
+            )
         retdict[&#34;role&#34;] = self.role.get_name()
     return retdict</code></pre>
 </details>
@@ -4489,12 +4552,10 @@ role (Role): the role of the Vehicle
                 Default: None
         &#34;&#34;&#34;
         self.name = name
-        if not hasattr(VehicleCategory, str(vehicle_type)):
-            raise TypeError(vehicle_type + &#34; is not a valid vehicle type.&#34;)
         if not isinstance(boundingbox, BoundingBox):
             raise TypeError(&#34;boundingbox input is not of type BoundingBox&#34;)
 
-        self.vehicle_type = vehicle_type
+        self.vehicle_type = convert_enum(vehicle_type, VehicleCategory)
         self.boundingbox = boundingbox
 
         self.axles = Axles(frontaxle, rearaxle)
@@ -4509,9 +4570,7 @@ role (Role): the role of the Vehicle
         self.properties = Properties()
         self.mass = convert_float(mass)
         self.model3d = model3d
-        if role is not None and not hasattr(Role, str(role)):
-            raise TypeError(role + &#34; is not a valid vehicle role.&#34;)
-        self.role = role
+        self.role = convert_enum(role, Role, True)
 
     def __eq__(self, other):
         if isinstance(other, Vehicle):
@@ -4545,7 +4604,7 @@ role (Role): the role of the Vehicle
         mass = None
         if &#34;mass&#34; in element.attrib:
             mass = convert_float(element.attrib[&#34;mass&#34;])
-        vehicle_type = getattr(VehicleCategory, element.attrib[&#34;vehicleCategory&#34;])
+        vehicle_type = convert_enum(element.attrib[&#34;vehicleCategory&#34;], VehicleCategory)
         model3d = None
         if &#34;model3d&#34; in element.attrib:
             model3d = element.attrib[&#34;model3d&#34;]
@@ -4572,7 +4631,7 @@ role (Role): the role of the Vehicle
 
         role = None
         if &#34;role&#34; in element.attrib:
-            role = getattr(Role, element.attrib[&#34;role&#34;])
+            role = convert_enum(element.attrib[&#34;role&#34;], Role)
         vehicle = Vehicle(
             name,
             vehicle_type,
@@ -4680,21 +4739,33 @@ role (Role): the role of the Vehicle
         return self
 
     def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes as a dict of the Center&#34;&#34;&#34;
+        &#34;&#34;&#34;returns the attributes as a dict of the Vehicle&#34;&#34;&#34;
         retdict = {}
         retdict[&#34;name&#34;] = str(self.name)
         retdict[&#34;vehicleCategory&#34;] = self.vehicle_type.get_name()
-        if self.mass and not self.isVersion(minor=0):
+        if self.mass:
+            if self.isVersion(minor=0):
+                raise OpenSCENARIOVersionError(
+                    &#34;Mass of a vehcile was introduced in OSC 1.1&#34;
+                )
             retdict[&#34;mass&#34;] = str(self.mass)
-        if not self.isVersion(minor=0) and self.model3d:
+        if self.model3d:
+            if self.isVersion(minor=0):
+                raise OpenSCENARIOVersionError(
+                    &#34;model3d of a vehcile was introduced in OSC 1.1&#34;
+                )
             retdict[&#34;model3d&#34;] = self.model3d
-        if self.role and not self.isVersion(minor=0) and not self.isVersion(minor=1):
+        if self.role:
+            if self.isVersionEqLess(minor=1):
+                raise OpenSCENARIOVersionError(
+                    &#34;the role of a vehcile was introduced in OSC 1.1&#34;
+                )
             retdict[&#34;role&#34;] = self.role.get_name()
 
         return retdict
 
     def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the Center&#34;&#34;&#34;
+        &#34;&#34;&#34;returns the elementTree of the Vehicle&#34;&#34;&#34;
         element = ET.Element(&#34;Vehicle&#34;, attrib=self.get_attributes())
         element.append(self.parameters.get_element())
         element.append(self.boundingbox.get_element())
@@ -4742,7 +4813,7 @@ def parse(element):
     mass = None
     if &#34;mass&#34; in element.attrib:
         mass = convert_float(element.attrib[&#34;mass&#34;])
-    vehicle_type = getattr(VehicleCategory, element.attrib[&#34;vehicleCategory&#34;])
+    vehicle_type = convert_enum(element.attrib[&#34;vehicleCategory&#34;], VehicleCategory)
     model3d = None
     if &#34;model3d&#34; in element.attrib:
         model3d = element.attrib[&#34;model3d&#34;]
@@ -4769,7 +4840,7 @@ def parse(element):
 
     role = None
     if &#34;role&#34; in element.attrib:
-        role = getattr(Role, element.attrib[&#34;role&#34;])
+        role = convert_enum(element.attrib[&#34;role&#34;], Role)
     vehicle = Vehicle(
         name,
         vehicle_type,
@@ -4970,21 +5041,33 @@ author (str): author of the catalog
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes as a dict of the Center</p></div>
+<div class="desc"><p>returns the attributes as a dict of the Vehicle</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34;returns the attributes as a dict of the Center&#34;&#34;&#34;
+    &#34;&#34;&#34;returns the attributes as a dict of the Vehicle&#34;&#34;&#34;
     retdict = {}
     retdict[&#34;name&#34;] = str(self.name)
     retdict[&#34;vehicleCategory&#34;] = self.vehicle_type.get_name()
-    if self.mass and not self.isVersion(minor=0):
+    if self.mass:
+        if self.isVersion(minor=0):
+            raise OpenSCENARIOVersionError(
+                &#34;Mass of a vehcile was introduced in OSC 1.1&#34;
+            )
         retdict[&#34;mass&#34;] = str(self.mass)
-    if not self.isVersion(minor=0) and self.model3d:
+    if self.model3d:
+        if self.isVersion(minor=0):
+            raise OpenSCENARIOVersionError(
+                &#34;model3d of a vehcile was introduced in OSC 1.1&#34;
+            )
         retdict[&#34;model3d&#34;] = self.model3d
-    if self.role and not self.isVersion(minor=0) and not self.isVersion(minor=1):
+    if self.role:
+        if self.isVersionEqLess(minor=1):
+            raise OpenSCENARIOVersionError(
+                &#34;the role of a vehcile was introduced in OSC 1.1&#34;
+            )
         retdict[&#34;role&#34;] = self.role.get_name()
 
     return retdict</code></pre>
@@ -4994,13 +5077,13 @@ author (str): author of the catalog
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the Center</p></div>
+<div class="desc"><p>returns the elementTree of the Vehicle</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_element(self):
-    &#34;&#34;&#34;returns the elementTree of the Center&#34;&#34;&#34;
+    &#34;&#34;&#34;returns the elementTree of the Vehicle&#34;&#34;&#34;
     element = ET.Element(&#34;Vehicle&#34;, attrib=self.get_attributes())
     element.append(self.parameters.get_element())
     element.append(self.boundingbox.get_element())

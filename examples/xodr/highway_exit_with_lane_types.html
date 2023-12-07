@@ -56,13 +56,13 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <pre><code class="python">&#34;&#34;&#34;
   scenariogeneration
   https://github.com/pyoscx/scenariogeneration
- 
+
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at https://mozilla.org/MPL/2.0/.
- 
+
   Copyright (c) 2022 The scenariogeneration Authors.
-  
+
     An example, using the generators, showing how to create a simple highway with exits and entries
 
     Shows how to patch created roads together with successor/predecessor, together with the lane_offset option
@@ -80,63 +80,76 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
     - DirectJunctionCreator
 &#34;&#34;&#34;
 
-from scenariogeneration import xodr
+from scenariogeneration import xodr, prettyprint, ScenarioGenerator
 import os
 
-# create a road with an exit lane (three lane sections will be created)
-first_road = xodr.create_road(
-    xodr.Spiral(0.001, 0, 300),
-    1,
-    left_lanes=2,
-    right_lanes=[xodr.LaneDef(100, 200, 2, 3, -3)],
-)
 
-# add the type of lane to the exit and offramp
-first_road.lanes.lanesections[1].rightlanes[2].lane_type = xodr.LaneType.exit
-first_road.lanes.lanesections[2].rightlanes[2].lane_type = xodr.LaneType.exit
+class Scenario(ScenarioGenerator):
+    def __init__(self):
+        super().__init__()
 
-continuation_road = xodr.create_road(
-    xodr.Spiral(0.00001, 0.001, 200), 2, left_lanes=2, right_lanes=2
-)
-exit_road = xodr.create_road(
-    [
-        xodr.Spiral(0, -0.01, length=50),
-        xodr.Arc(-0.01, length=30),
-        xodr.Spiral(-0.01, 0, length=50),
-    ],
-    3,
-    0,
-    1,
-)
-exit_road.lanes.lanesections[0].rightlanes[0].lane_type = xodr.LaneType.offRamp
+    def road(self, **kwargs):
+        # create a road with an exit lane (three lane sections will be created)
+        first_road = xodr.create_road(
+            xodr.Spiral(0.001, 0, 300),
+            1,
+            left_lanes=2,
+            right_lanes=[xodr.LaneDef(100, 200, 2, 3, -3)],
+        )
 
-# add successors and predecessors as a direct junction
-first_road.add_successor(xodr.ElementType.junction, 100)
-continuation_road.add_predecessor(xodr.ElementType.junction, 100)
-exit_road.add_predecessor(xodr.ElementType.junction, 100)
+        # add the type of lane to the exit and offramp
+        first_road.lanes.lanesections[1].rightlanes[2].lane_type = xodr.LaneType.exit
+        first_road.lanes.lanesections[2].rightlanes[2].lane_type = xodr.LaneType.exit
 
-# create the junction struct
-direct_junction = xodr.DirectJunctionCreator(100, &#34;my exit&#34;)
-direct_junction.add_connection(first_road, continuation_road)
-direct_junction.add_connection(first_road, exit_road, -3, -1)
+        continuation_road = xodr.create_road(
+            xodr.Spiral(0.00001, 0.001, 200), 2, left_lanes=2, right_lanes=2
+        )
+        exit_road = xodr.create_road(
+            [
+                xodr.Spiral(0, -0.01, length=50),
+                xodr.Arc(-0.01, length=30),
+                xodr.Spiral(-0.01, 0, length=50),
+            ],
+            3,
+            0,
+            1,
+        )
+        exit_road.lanes.lanesections[0].rightlanes[0].lane_type = xodr.LaneType.offRamp
 
-# create the opendrive
-odr = xodr.OpenDrive(&#34;myroad&#34;)
-odr.add_road(first_road)
-odr.add_road(continuation_road)
-odr.add_road(exit_road)
+        # add successors and predecessors as a direct junction
+        first_road.add_successor(xodr.ElementType.junction, 100)
+        continuation_road.add_predecessor(xodr.ElementType.junction, 100)
+        exit_road.add_predecessor(xodr.ElementType.junction, 100)
 
-# adjust the roads and lanes properly
-odr.adjust_roads_and_lanes()
-odr.add_junction_creator(direct_junction)
+        # create the junction struct
+        direct_junction = xodr.DirectJunctionCreator(100, &#34;my exit&#34;)
+        direct_junction.add_connection(first_road, continuation_road)
+        direct_junction.add_connection(first_road, exit_road, -3, -1)
+
+        # create the opendrive
+        odr = xodr.OpenDrive(&#34;myroad&#34;)
+        odr.add_road(first_road)
+        odr.add_road(continuation_road)
+        odr.add_road(exit_road)
+
+        # adjust the roads and lanes properly
+        odr.adjust_roads_and_lanes()
+        odr.add_junction_creator(direct_junction)
+
+        return odr
 
 
-# write the OpenDRIVE file as xodr using current script name
-odr.write_xml(os.path.basename(__file__).replace(&#34;.py&#34;, &#34;.xodr&#34;))
+if __name__ == &#34;__main__&#34;:
+    sce = Scenario()
+    # Print the resulting xml
+    prettyprint(sce.road().get_element())
 
-# uncomment the following lines to display the road using esmini
-# from scenariogeneration import esmini
-# esmini(odr,os.path.join(&#39;esmini&#39;))</code></pre>
+    # write the OpenSCENARIO file as xosc using current script name
+    sce.generate(&#34;.&#34;)
+
+    # uncomment the following lines to display the scenario using esmini
+    # from scenariogeneration import esmini
+    # esmini(sce,os.path.join(&#39;esmini&#39;))</code></pre>
 </details>
 </section>
 <section>
@@ -146,6 +159,110 @@ odr.write_xml(os.path.basename(__file__).replace(&#34;.py&#34;, &#34;.xodr&#34;)
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="examples.xodr.highway_exit_with_lane_types.Scenario"><code class="flex name class">
+<span>class <span class="ident">Scenario</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>ScenarioTemplate is a class that should be inherited by a Scenario class in order to generate xodr and xosc files based on pyoscx and pyodrx</p>
+<p>Two main uses, in your generation class define self.parameters as either as
+- a dict of lists, where the lists are the values you want to sweep over, all permutations of these sets will be generated
+- a list of dicts, where the dicts are identical and each element in the list is one scenario</p>
+<h2 id="attributes">Attributes</h2>
+<pre><code>road_file (str): name of the roadfile
+
+parameters (dict of lists, or list of dicts): parameter sets to be used
+
+naming (str): two options "numerical" or "parameter"
+
+generate_all_roads (bool): will only generate unique roads
+
+number_of_parallel_writings (int): parallelize the writing of the xml files
+    Default: 1 (no parallelization)
+
+basename (str): basename of the scenariofiles,
+    Default: name of file
+
+encoding (str): encoding of the outputs
+    Default:
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Scenario(ScenarioGenerator):
+    def __init__(self):
+        super().__init__()
+
+    def road(self, **kwargs):
+        # create a road with an exit lane (three lane sections will be created)
+        first_road = xodr.create_road(
+            xodr.Spiral(0.001, 0, 300),
+            1,
+            left_lanes=2,
+            right_lanes=[xodr.LaneDef(100, 200, 2, 3, -3)],
+        )
+
+        # add the type of lane to the exit and offramp
+        first_road.lanes.lanesections[1].rightlanes[2].lane_type = xodr.LaneType.exit
+        first_road.lanes.lanesections[2].rightlanes[2].lane_type = xodr.LaneType.exit
+
+        continuation_road = xodr.create_road(
+            xodr.Spiral(0.00001, 0.001, 200), 2, left_lanes=2, right_lanes=2
+        )
+        exit_road = xodr.create_road(
+            [
+                xodr.Spiral(0, -0.01, length=50),
+                xodr.Arc(-0.01, length=30),
+                xodr.Spiral(-0.01, 0, length=50),
+            ],
+            3,
+            0,
+            1,
+        )
+        exit_road.lanes.lanesections[0].rightlanes[0].lane_type = xodr.LaneType.offRamp
+
+        # add successors and predecessors as a direct junction
+        first_road.add_successor(xodr.ElementType.junction, 100)
+        continuation_road.add_predecessor(xodr.ElementType.junction, 100)
+        exit_road.add_predecessor(xodr.ElementType.junction, 100)
+
+        # create the junction struct
+        direct_junction = xodr.DirectJunctionCreator(100, &#34;my exit&#34;)
+        direct_junction.add_connection(first_road, continuation_road)
+        direct_junction.add_connection(first_road, exit_road, -3, -1)
+
+        # create the opendrive
+        odr = xodr.OpenDrive(&#34;myroad&#34;)
+        odr.add_road(first_road)
+        odr.add_road(continuation_road)
+        odr.add_road(exit_road)
+
+        # adjust the roads and lanes properly
+        odr.adjust_roads_and_lanes()
+        odr.add_junction_creator(direct_junction)
+
+        return odr</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.scenario_generator.ScenarioGenerator" href="../../scenariogeneration/scenario_generator.html#scenariogeneration.scenario_generator.ScenarioGenerator">ScenarioGenerator</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="scenariogeneration.scenario_generator.ScenarioGenerator" href="../../scenariogeneration/scenario_generator.html#scenariogeneration.scenario_generator.ScenarioGenerator">ScenarioGenerator</a></b></code>:
+<ul class="hlist">
+<li><code><a title="scenariogeneration.scenario_generator.ScenarioGenerator.generate" href="../../scenariogeneration/scenario_generator.html#scenariogeneration.scenario_generator.ScenarioGenerator.generate">generate</a></code></li>
+<li><code><a title="scenariogeneration.scenario_generator.ScenarioGenerator.generate_single" href="../../scenariogeneration/scenario_generator.html#scenariogeneration.scenario_generator.ScenarioGenerator.generate_single">generate_single</a></code></li>
+<li><code><a title="scenariogeneration.scenario_generator.ScenarioGenerator.print_permutations" href="../../scenariogeneration/scenario_generator.html#scenariogeneration.scenario_generator.ScenarioGenerator.print_permutations">print_permutations</a></code></li>
+<li><code><a title="scenariogeneration.scenario_generator.ScenarioGenerator.road" href="../../scenariogeneration/scenario_generator.html#scenariogeneration.scenario_generator.ScenarioGenerator.road">road</a></code></li>
+<li><code><a title="scenariogeneration.scenario_generator.ScenarioGenerator.scenario" href="../../scenariogeneration/scenario_generator.html#scenariogeneration.scenario_generator.ScenarioGenerator.scenario">scenario</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -157,6 +274,13 @@ odr.write_xml(os.path.basename(__file__).replace(&#34;.py&#34;, &#34;.xodr&#34;)
 <li><h3>Super-module</h3>
 <ul>
 <li><code><a title="examples.xodr" href="index.html">examples.xodr</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="examples.xodr.highway_exit_with_lane_types.Scenario" href="#examples.xodr.highway_exit_with_lane_types.Scenario">Scenario</a></code></h4>
+</li>
 </ul>
 </li>
 </ul>

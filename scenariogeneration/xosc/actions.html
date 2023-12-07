@@ -63,6 +63,7 @@ from .utils import (
     convert_float,
     convert_int,
     get_bool_string,
+    convert_enum,
     _AnimationType,
     _VehicleComponent,
     _ComponentAnimation,
@@ -653,14 +654,8 @@ class LongitudinalDistanceAction(_PrivateActionType):
         self.distance = convert_float(distance)
         self.timeGap = convert_float(timeGap)
 
-        if not hasattr(CoordinateSystem, str(coordinate_system)):
-            raise ValueError(coordinate_system + &#34;; is not a valid CoordinateSystem.&#34;)
-        if not hasattr(LongitudinalDisplacement, str(displacement)):
-            raise ValueError(
-                displacement + &#34;; is not a valid LongitudinalDisplacement.&#34;
-            )
-        self.coordinate_system = coordinate_system
-        self.displacement = displacement
+        self.coordinate_system = convert_enum(coordinate_system, CoordinateSystem)
+        self.displacement = convert_enum(displacement, LongitudinalDisplacement)
 
     def __eq__(self, other):
         if isinstance(other, LongitudinalDistanceAction):
@@ -697,13 +692,13 @@ class LongitudinalDistanceAction(_PrivateActionType):
 
         coordinate_system = CoordinateSystem.entity
         if &#34;coordinateSystem&#34; in lda_element.attrib:
-            coordinate_system = getattr(
-                CoordinateSystem, lda_element.attrib[&#34;coordinateSystem&#34;]
+            coordinate_system = convert_enum(
+                lda_element.attrib[&#34;coordinateSystem&#34;], CoordinateSystem, False
             )
         displacement = LongitudinalDisplacement.any
         if &#34;displacement&#34; in lda_element.attrib:
-            displcement = getattr(
-                LongitudinalDisplacement, lda_element.attrib[&#34;displacement&#34;]
+            displacement = convert_enum(
+                lda_element.attrib[&#34;displacement&#34;], LongitudinalDisplacement, False
             )
         max_acceleration = None
         max_deceleration = None
@@ -829,11 +824,8 @@ class SpeedProfileAction(_PrivateActionType):
             dynamics_constraint, DynamicsConstraints
         ):
             raise TypeError(&#34;dynamics_constraint input not of type DynamicsConstraints&#34;)
-        if not hasattr(FollowingMode, str(following_mode)):
-            raise TypeError(&#34;following_mode input not of type FollowingMode&#34;)
-
         self.dynamics_constraint = dynamics_constraint
-        self.following_mode = following_mode
+        self.following_mode = convert_enum(following_mode, FollowingMode)
         if times:
             self.times = [convert_float(x) for x in times]
         else:
@@ -866,8 +858,8 @@ class SpeedProfileAction(_PrivateActionType):
 
         &#34;&#34;&#34;
         speed_profile_element = element.find(&#34;LongitudinalAction/SpeedProfileAction&#34;)
-        following_mode = getattr(
-            FollowingMode, speed_profile_element.attrib[&#34;followingMode&#34;]
+        following_mode = convert_enum(
+            speed_profile_element.attrib[&#34;followingMode&#34;], FollowingMode
         )
         dynamics_constraint = None
         entity = None
@@ -879,7 +871,6 @@ class SpeedProfileAction(_PrivateActionType):
                 speed_profile_element.find(&#34;DynamicConstraints&#34;)
             )
 
-        td_element = element.find(&#34;LongitudinalAction/SpeedAction/SpeedActionDynamics&#34;)
         entires = speed_profile_element.findall(&#34;SpeedProfileEntry&#34;)
         speeds = []
         times = []
@@ -1213,9 +1204,7 @@ class AbsoluteLaneOffsetAction(_PrivateActionType):
         &#34;&#34;&#34;
         self.continuous = convert_bool(continuous)
         self.value = convert_float(value)
-        if not hasattr(DynamicsShapes, str(shape)):
-            raise ValueError(shape + &#34;; is not a valid shape.&#34;)
-        self.dynshape = shape
+        self.dynshape = convert_enum(shape, DynamicsShapes)
         self.maxlatacc = convert_float(maxlatacc)
 
     def __eq__(self, other):
@@ -1247,7 +1236,7 @@ class AbsoluteLaneOffsetAction(_PrivateActionType):
         continuous = convert_bool(loa_element.attrib[&#34;continuous&#34;])
         load_element = loa_element.find(&#34;LaneOffsetActionDynamics&#34;)
         maxacc = convert_float(load_element.attrib[&#34;maxLateralAcc&#34;])
-        dynamics = getattr(DynamicsShapes, load_element.attrib[&#34;dynamicsShape&#34;])
+        dynamics = convert_enum(load_element.attrib[&#34;dynamicsShape&#34;], DynamicsShapes)
 
         atlo_element = loa_element.find(&#34;LaneOffsetTarget/AbsoluteTargetLaneOffset&#34;)
         value = atlo_element.attrib[&#34;value&#34;]
@@ -1529,12 +1518,8 @@ class LateralDistanceAction(_PrivateActionType):
         self.dynamic_constraint = DynamicsConstraints(
             max_acceleration, max_deceleration, max_speed
         )
-        if not hasattr(CoordinateSystem, str(coordinate_system)):
-            raise ValueError(coordinate_system + &#34;; is not a valid CoordinateSystem.&#34;)
-        if not hasattr(LateralDisplacement, str(displacement)):
-            raise ValueError(displacement + &#34;; is not a valid LateralDisplacement.&#34;)
-        self.coordinate_system = coordinate_system
-        self.displacement = displacement
+        self.coordinate_system = convert_enum(coordinate_system, CoordinateSystem)
+        self.displacement = convert_enum(displacement, LateralDisplacement)
 
     def __eq__(self, other):
         if isinstance(other, LateralDistanceAction):
@@ -1567,13 +1552,13 @@ class LateralDistanceAction(_PrivateActionType):
             distance = lda_element.attrib[&#34;distance&#34;]
         coordinate = None
         if &#34;coordinateSystem&#34; in lda_element.attrib:
-            coordinate = getattr(
-                CoordinateSystem, lda_element.attrib[&#34;coordinateSystem&#34;]
+            coordinate = convert_enum(
+                lda_element.attrib[&#34;coordinateSystem&#34;], CoordinateSystem
             )
         displacement = None
         if &#34;displacement&#34; in lda_element.attrib:
-            displacement = getattr(
-                LateralDisplacement, lda_element.attrib[&#34;displacement&#34;]
+            displacement = convert_enum(
+                lda_element.attrib[&#34;displacement&#34;], LateralDisplacement
             )
         constraints = None
         max_acc = None
@@ -1911,7 +1896,7 @@ class FollowTrajectoryAction(_PrivateActionType):
         ):
             raise TypeError(&#34;route input not of type Route or CatalogReference&#34;)
         self.trajectory = trajectory
-        self.following_mode = following_mode
+        self.following_mode = convert_enum(following_mode, FollowingMode)
         # TODO: check reference_domain
         self.timeref = TimeReference(reference_domain, scale, offset)
         self.initialDistanceOffset = convert_float(initialDistanceOffset)
@@ -1953,7 +1938,9 @@ class FollowTrajectoryAction(_PrivateActionType):
         scale = timeref.scale
 
         tfm_element = fta_element.find(&#34;TrajectoryFollowingMode&#34;)
-        following_mode = getattr(FollowingMode, tfm_element.attrib[&#34;followingMode&#34;])
+        following_mode = convert_enum(
+            tfm_element.attrib[&#34;followingMode&#34;], FollowingMode
+        )
 
         if fta_element.find(&#34;TrajectoryRef&#34;) != None:
             fta_element = fta_element.find(&#34;TrajectoryRef&#34;)
@@ -2065,6 +2052,10 @@ class ControllerAction(_PrivateActionType):
         self.assignControllerAction = assignControllerAction
         self.overrideControllerValueAction = overrideControllerValueAction
         self.activateControllerAction = activateControllerAction
+        if self.assignControllerAction is not None:
+            self.assignControllerAction._used_by_parent = True
+        if self.overrideControllerValueAction is not None:
+            self.overrideControllerValueAction._used_by_parent = True
 
     def __eq__(self, other):
         if isinstance(other, ControllerAction):
@@ -2372,6 +2363,7 @@ class AssignControllerAction(_PrivateActionType):
         self.activateLongitudinal = convert_bool(activateLongitudinal)
         self.activateLighting = convert_bool(activateLighting)
         self.activateAnimation = convert_bool(activateAnimation)
+        self._used_by_parent = False
 
     def __eq__(self, other):
         if isinstance(other, AssignControllerAction):
@@ -2432,18 +2424,22 @@ class AssignControllerAction(_PrivateActionType):
         &#34;&#34;&#34;returns the attributes of the AssignControllerAction as a dict&#34;&#34;&#34;
         retdict = {}
 
-        if self.isVersion(minor=1):
+        if self.isVersionEqLarger(minor=1):
             retdict = {
                 &#34;activateLateral&#34;: get_bool_string(self.activateLateral),
                 &#34;activateLongitudinal&#34;: get_bool_string(self.activateLongitudinal),
             }
-        if self.isVersion(minor=2):
+        if self.isVersionEqLarger(minor=2):
             retdict[&#34;activateLighting&#34;] = get_bool_string(self.activateLighting)
             retdict[&#34;activateAnimation&#34;] = get_bool_string(self.activateAnimation)
         return retdict
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the AssignControllerAction&#34;&#34;&#34;
+        if self.isVersion(minor=0) and not self._used_by_parent:
+            raise OpenSCENARIOVersionError(
+                &#34;AssignControllerAction cannot be used alone in OSC 1.0, please add it to a ControllerAction.&#34;
+            )
         element = ET.Element(&#34;PrivateAction&#34;)
         controlleraction = ET.SubElement(element, &#34;ControllerAction&#34;)
         assigncontrolleraction = ET.SubElement(
@@ -2543,6 +2539,8 @@ class OverrideControllerValueAction(_PrivateActionType):
         self.parkingbrake_value = convert_float(0)
         self.parkingbrake_rate = None
         self.parkingbrake_force = False
+
+        self._used_by_parent = False
 
     def __eq__(self, other):
         if isinstance(other, OverrideControllerValueAction):
@@ -2859,6 +2857,10 @@ class OverrideControllerValueAction(_PrivateActionType):
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the OverrideControllerValueAction&#34;&#34;&#34;
+        if self.isVersion(minor=0) and not self._used_by_parent:
+            raise OpenSCENARIOVersionError(
+                &#34;OverrideControllerValueAction cannot be used alone in OSC 1.0, please add it to a ControllerAction&#34;
+            )
         element = ET.Element(&#34;PrivateAction&#34;)
         controlleraction = ET.SubElement(element, &#34;ControllerAction&#34;)
         overrideaction = ET.SubElement(
@@ -3012,7 +3014,7 @@ class OverrideControllerValueAction(_PrivateActionType):
                     ET.SubElement(
                         override_gear_action,
                         &#34;ManualGear&#34;,
-                        {&#34;number&#34;: str(self.gear_value)},
+                        {&#34;number&#34;: str(int(self.gear_value))},
                     )
                 else:
                     ET.SubElement(
@@ -3133,10 +3135,8 @@ class VisibilityAction(_PrivateActionType):
             element, &#34;VisibilityAction&#34;, self.get_attributes()
         )
         if self.sensor_refs:
-            if self.version_minor &lt; 2:
-                raise OpenSCENARIOVersionError(
-                    &#34;VehicleRoleDistribution was added in OSC V1.2&#34;
-                )
+            if self.isVersionEqLess(minor=1):
+                raise OpenSCENARIOVersionError(&#34;SensorReference was added in OSC V1.2&#34;)
             sensor_ref_element = ET.SubElement(visibility_element, &#34;SensorReferenceSet&#34;)
             for sensor in self.sensor_refs:
                 ET.SubElement(
@@ -3390,19 +3390,20 @@ class LightStateAction(_PrivateActionType):
 
             color (Color): the color of the light
         &#34;&#34;&#34;
-
-        if not (
-            hasattr(VehicleLightType, str(light_type))
-            or isinstance(light_type, UserDefinedLight)
-        ):
-            raise TypeError(
-                &#34;light_type input is not of type VehicleLightType or UserDefinedLight&#34;
-            )
+        try:
+            self.light_type = convert_enum(light_type, VehicleLightType)
+        except Exception as e:
+            if not isinstance(light_type, UserDefinedLight):
+                raise TypeError(
+                    &#34;light_type input is not of type VehicleLightType or UserDefinedLight&#34;
+                )
+            else:
+                self.light_type = light_type
 
         self.lightstate = _LightState(
             mode, color, intensity, flashing_off_duration, flashing_on_duration
         )
-        self.light_type = light_type
+
         self.transition_time = convert_float(transition_time)
 
     def __eq__(self, other):
@@ -3437,9 +3438,9 @@ class LightStateAction(_PrivateActionType):
         if type_element.find(&#34;UserDefinedLight&#34;) is not None:
             light_type = UserDefinedLight.parse(type_element.find(&#34;UserDefinedLight&#34;))
         else:
-            light_type = getattr(
-                VehicleLightType,
+            light_type = convert_enum(
                 type_element.find(&#34;VehicleLight&#34;).attrib[&#34;vehicleLightType&#34;],
+                VehicleLightType,
             )
         # create with dummy mode
         light_state_action = LightStateAction(light_type, LightMode.on, transition_time)
@@ -3536,13 +3537,12 @@ class AnimationAction(_PrivateActionType):
                 Default: None
         &#34;&#34;&#34;
 
-        if not (
-            isinstance(animation_type, _AnimationType)
-            or hasattr(VehicleComponentType, str(animation_type))
-        ):
-            raise TypeError(&#34;animation_type is not a valid AnimationType&#34;)
-        if hasattr(VehicleComponentType, str(animation_type)):
+        try:
             self.animation_type = _ComponentAnimation(_VehicleComponent(animation_type))
+        except Exception as e:
+            self.animation_type = None
+        if self.animation_type:
+            pass
         elif isinstance(animation_type, UserDefinedComponent):
             self.animation_type = _ComponentAnimation(animation_type)
         else:
@@ -3550,7 +3550,7 @@ class AnimationAction(_PrivateActionType):
         self.duration = convert_float(duration)
         if loop is not None and not isinstance(loop, bool):
             raise TypeError(&#34;loop input is not of type bool&#34;)
-        self.loop = bool
+        self.loop = loop
         self.state = convert_float(state)
 
     def __eq__(self, other):
@@ -3849,7 +3849,7 @@ class ParameterSetAction(_ActionType):
 
         &#34;&#34;&#34;
         self.parameter_ref = parameter_ref
-        self.value = convert_float(value)
+        self.value = value
 
     def __eq__(self, other):
         if isinstance(other, ParameterSetAction):
@@ -3876,7 +3876,7 @@ class ParameterSetAction(_ActionType):
         pa_element = element.find(&#34;ParameterAction&#34;)
         parameterRef = pa_element.attrib[&#34;parameterRef&#34;]
         psa_element = pa_element.find(&#34;SetAction&#34;)
-        value = convert_float(psa_element.attrib[&#34;value&#34;])
+        value = psa_element.attrib[&#34;value&#34;]
         psa = ParameterSetAction(parameterRef, value)
         psa.setVersion(minor=1)
         return psa  # ParameterSetAction(parameterRef, value)
@@ -4960,7 +4960,7 @@ class TrafficSwarmAction(_ActionType):
             dot = DirectionOfTravelDistribution.parse(
                 tsa_element.find(&#34;DirectionOfTravelDistribution&#34;)
             )
-        central_element = tsa_element.find(&#34;CentralSwarmObject&#34;)
+        central_element = tsa_element.find(&#34;CentralObject&#34;)
         centralobject = central_element.attrib[&#34;entityRef&#34;]
 
         tsa_object = TrafficSwarmAction(
@@ -5002,7 +5002,7 @@ class TrafficSwarmAction(_ActionType):
         )
         swarmaction.append(self.trafficdefinition.get_element())
         ET.SubElement(
-            swarmaction, &#34;CentralSwarmObject&#34;, attrib={&#34;entityRef&#34;: self.centralobject}
+            swarmaction, &#34;CentralObject&#34;, attrib={&#34;entityRef&#34;: self.centralobject}
         )
         if self.velocity is not None:
             if self.version_minor &gt; 1:
@@ -5201,37 +5201,19 @@ class UserDefinedAction(_ActionType):
             Returns the full ElementTree of the class
     &#34;&#34;&#34;
 
-    def __init__(self):
+    def __init__(self, custom_command_action):
         &#34;&#34;&#34;initalize the UserDefinedAction
 
         Parameters
         ----------
 
         &#34;&#34;&#34;
-        self.custom_command_actions = []
-
-    def add_custom_command_action(self, custom_command_action):
-        &#34;&#34;&#34;add a CustomCommandAction
-
-        Parameters
-        ----------
-            custom_command_action (CustomCommandAction): A CustomCommandAction element
-
-        &#34;&#34;&#34;
-        self.custom_command_actions.append(custom_command_action)
-        return self
+        self.custom_command_action = custom_command_action
 
     def __eq__(self, other):
         if isinstance(other, UserDefinedAction):
-            if len(self.custom_command_actions) == len(other.custom_command_actions):
-                if all(
-                    [
-                        self.custom_command_actions[i]
-                        == other.custom_command_actions[i]
-                        for i in range(len(self.custom_command_actions))
-                    ]
-                ):
-                    return True
+            if self.custom_command_action == other.custom_command_action:
+                return True
         return False
 
     @staticmethod
@@ -5247,17 +5229,16 @@ class UserDefinedAction(_ActionType):
             userDefinedAction (UserDefinedAction): a UserDefinedAction object
 
         &#34;&#34;&#34;
-        user_defined_action = UserDefinedAction()
-        for custom_command_element in element.findall(&#34;CustomCommandAction&#34;):
-            custom_command_action = CustomCommandAction.parse(custom_command_element)
-            user_defined_action.add_custom_command_action(custom_command_action)
+        custom_command_action = CustomCommandAction.parse(
+            element.find(&#34;CustomCommandAction&#34;)
+        )
+        user_defined_action = UserDefinedAction(custom_command_action)
         return user_defined_action
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the UserDefinedAction&#34;&#34;&#34;
         element = ET.Element(&#34;UserDefinedAction&#34;)
-        for custom_command_action in self.custom_command_actions:
-            element.append(custom_command_action.get_element())
+        element.append(self.custom_command_action.get_element())
         return element
 
 
@@ -5280,15 +5261,17 @@ class CustomCommandAction(_ActionType):
 
     &#34;&#34;&#34;
 
-    def __init__(self, type):
+    def __init__(self, type, content):
         &#34;&#34;&#34;initalize the CustomCommandAction
 
         Parameters
         ----------
             type (str): type of the custom command
 
+            content (str): content of the custom command
         &#34;&#34;&#34;
         self.type = type
+        self.content = content
 
     def __eq__(self, other):
         if isinstance(other, CustomCommandAction):
@@ -5318,11 +5301,13 @@ class CustomCommandAction(_ActionType):
             raise NotAValidElement(
                 &#39;CustomCommandAction is missing required argument &#34;type&#34;.&#39;
             )
-        return CustomCommandAction(action_type)
+
+        return CustomCommandAction(action_type, element.text)
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the CustomCommandAction&#34;&#34;&#34;
         element = ET.Element(&#34;CustomCommandAction&#34;, attrib={&#34;type&#34;: self.type})
+        element.text = self.content
         return element</code></pre>
 </details>
 </section>
@@ -5698,9 +5683,7 @@ continuous (bool): if the controller tries to keep the relative speed
         &#34;&#34;&#34;
         self.continuous = convert_bool(continuous)
         self.value = convert_float(value)
-        if not hasattr(DynamicsShapes, str(shape)):
-            raise ValueError(shape + &#34;; is not a valid shape.&#34;)
-        self.dynshape = shape
+        self.dynshape = convert_enum(shape, DynamicsShapes)
         self.maxlatacc = convert_float(maxlatacc)
 
     def __eq__(self, other):
@@ -5732,7 +5715,7 @@ continuous (bool): if the controller tries to keep the relative speed
         continuous = convert_bool(loa_element.attrib[&#34;continuous&#34;])
         load_element = loa_element.find(&#34;LaneOffsetActionDynamics&#34;)
         maxacc = convert_float(load_element.attrib[&#34;maxLateralAcc&#34;])
-        dynamics = getattr(DynamicsShapes, load_element.attrib[&#34;dynamicsShape&#34;])
+        dynamics = convert_enum(load_element.attrib[&#34;dynamicsShape&#34;], DynamicsShapes)
 
         atlo_element = loa_element.find(&#34;LaneOffsetTarget/AbsoluteTargetLaneOffset&#34;)
         value = atlo_element.attrib[&#34;value&#34;]
@@ -5808,7 +5791,7 @@ def parse(element):
     continuous = convert_bool(loa_element.attrib[&#34;continuous&#34;])
     load_element = loa_element.find(&#34;LaneOffsetActionDynamics&#34;)
     maxacc = convert_float(load_element.attrib[&#34;maxLateralAcc&#34;])
-    dynamics = getattr(DynamicsShapes, load_element.attrib[&#34;dynamicsShape&#34;])
+    dynamics = convert_enum(load_element.attrib[&#34;dynamicsShape&#34;], DynamicsShapes)
 
     atlo_element = loa_element.find(&#34;LaneOffsetTarget/AbsoluteTargetLaneOffset&#34;)
     value = atlo_element.attrib[&#34;value&#34;]
@@ -6863,13 +6846,12 @@ state (float): what state the animation should be put to
                 Default: None
         &#34;&#34;&#34;
 
-        if not (
-            isinstance(animation_type, _AnimationType)
-            or hasattr(VehicleComponentType, str(animation_type))
-        ):
-            raise TypeError(&#34;animation_type is not a valid AnimationType&#34;)
-        if hasattr(VehicleComponentType, str(animation_type)):
+        try:
             self.animation_type = _ComponentAnimation(_VehicleComponent(animation_type))
+        except Exception as e:
+            self.animation_type = None
+        if self.animation_type:
+            pass
         elif isinstance(animation_type, UserDefinedComponent):
             self.animation_type = _ComponentAnimation(animation_type)
         else:
@@ -6877,7 +6859,7 @@ state (float): what state the animation should be put to
         self.duration = convert_float(duration)
         if loop is not None and not isinstance(loop, bool):
             raise TypeError(&#34;loop input is not of type bool&#34;)
-        self.loop = bool
+        self.loop = loop
         self.state = convert_float(state)
 
     def __eq__(self, other):
@@ -7177,6 +7159,7 @@ activateLongitudinal (bool): if the longitudinal control should be activated (va
         self.activateLongitudinal = convert_bool(activateLongitudinal)
         self.activateLighting = convert_bool(activateLighting)
         self.activateAnimation = convert_bool(activateAnimation)
+        self._used_by_parent = False
 
     def __eq__(self, other):
         if isinstance(other, AssignControllerAction):
@@ -7237,18 +7220,22 @@ activateLongitudinal (bool): if the longitudinal control should be activated (va
         &#34;&#34;&#34;returns the attributes of the AssignControllerAction as a dict&#34;&#34;&#34;
         retdict = {}
 
-        if self.isVersion(minor=1):
+        if self.isVersionEqLarger(minor=1):
             retdict = {
                 &#34;activateLateral&#34;: get_bool_string(self.activateLateral),
                 &#34;activateLongitudinal&#34;: get_bool_string(self.activateLongitudinal),
             }
-        if self.isVersion(minor=2):
+        if self.isVersionEqLarger(minor=2):
             retdict[&#34;activateLighting&#34;] = get_bool_string(self.activateLighting)
             retdict[&#34;activateAnimation&#34;] = get_bool_string(self.activateAnimation)
         return retdict
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the AssignControllerAction&#34;&#34;&#34;
+        if self.isVersion(minor=0) and not self._used_by_parent:
+            raise OpenSCENARIOVersionError(
+                &#34;AssignControllerAction cannot be used alone in OSC 1.0, please add it to a ControllerAction.&#34;
+            )
         element = ET.Element(&#34;PrivateAction&#34;)
         controlleraction = ET.SubElement(element, &#34;ControllerAction&#34;)
         assigncontrolleraction = ET.SubElement(
@@ -7344,12 +7331,12 @@ def parse(element):
     &#34;&#34;&#34;returns the attributes of the AssignControllerAction as a dict&#34;&#34;&#34;
     retdict = {}
 
-    if self.isVersion(minor=1):
+    if self.isVersionEqLarger(minor=1):
         retdict = {
             &#34;activateLateral&#34;: get_bool_string(self.activateLateral),
             &#34;activateLongitudinal&#34;: get_bool_string(self.activateLongitudinal),
         }
-    if self.isVersion(minor=2):
+    if self.isVersionEqLarger(minor=2):
         retdict[&#34;activateLighting&#34;] = get_bool_string(self.activateLighting)
         retdict[&#34;activateAnimation&#34;] = get_bool_string(self.activateAnimation)
     return retdict</code></pre>
@@ -7366,6 +7353,10 @@ def parse(element):
 </summary>
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the AssignControllerAction&#34;&#34;&#34;
+    if self.isVersion(minor=0) and not self._used_by_parent:
+        raise OpenSCENARIOVersionError(
+            &#34;AssignControllerAction cannot be used alone in OSC 1.0, please add it to a ControllerAction.&#34;
+        )
     element = ET.Element(&#34;PrivateAction&#34;)
     controlleraction = ET.SubElement(element, &#34;ControllerAction&#34;)
     assigncontrolleraction = ET.SubElement(
@@ -7644,6 +7635,10 @@ activateControllerAction (ActivateControllerAction): activate/deactivate a contr
         self.assignControllerAction = assignControllerAction
         self.overrideControllerValueAction = overrideControllerValueAction
         self.activateControllerAction = activateControllerAction
+        if self.assignControllerAction is not None:
+            self.assignControllerAction._used_by_parent = True
+        if self.overrideControllerValueAction is not None:
+            self.overrideControllerValueAction._used_by_parent = True
 
     def __eq__(self, other):
         if isinstance(other, ControllerAction):
@@ -7847,7 +7842,7 @@ def parse(element):
 </dd>
 <dt id="scenariogeneration.xosc.actions.CustomCommandAction"><code class="flex name class">
 <span>class <span class="ident">CustomCommandAction</span></span>
-<span>(</span><span>type)</span>
+<span>(</span><span>type, content)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>The CustomCommandAction creates a simulator defined action</p>
@@ -7862,6 +7857,8 @@ def parse(element):
 <p>initalize the CustomCommandAction</p>
 <h2 id="parameters_1">Parameters</h2>
 <pre><code>type (str): type of the custom command
+
+content (str): content of the custom command
 </code></pre></div>
 <details class="source">
 <summary>
@@ -7886,15 +7883,17 @@ def parse(element):
 
     &#34;&#34;&#34;
 
-    def __init__(self, type):
+    def __init__(self, type, content):
         &#34;&#34;&#34;initalize the CustomCommandAction
 
         Parameters
         ----------
             type (str): type of the custom command
 
+            content (str): content of the custom command
         &#34;&#34;&#34;
         self.type = type
+        self.content = content
 
     def __eq__(self, other):
         if isinstance(other, CustomCommandAction):
@@ -7924,11 +7923,13 @@ def parse(element):
             raise NotAValidElement(
                 &#39;CustomCommandAction is missing required argument &#34;type&#34;.&#39;
             )
-        return CustomCommandAction(action_type)
+
+        return CustomCommandAction(action_type, element.text)
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the CustomCommandAction&#34;&#34;&#34;
         element = ET.Element(&#34;CustomCommandAction&#34;, attrib={&#34;type&#34;: self.type})
+        element.text = self.content
         return element</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -7975,7 +7976,8 @@ def parse(element):
         raise NotAValidElement(
             &#39;CustomCommandAction is missing required argument &#34;type&#34;.&#39;
         )
-    return CustomCommandAction(action_type)</code></pre>
+
+    return CustomCommandAction(action_type, element.text)</code></pre>
 </details>
 </dd>
 </dl>
@@ -7993,6 +7995,7 @@ def parse(element):
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the CustomCommandAction&#34;&#34;&#34;
     element = ET.Element(&#34;CustomCommandAction&#34;, attrib={&#34;type&#34;: self.type})
+    element.text = self.content
     return element</code></pre>
 </details>
 </dd>
@@ -8480,7 +8483,7 @@ initialDistanceOffset (float): start at this offset into the trajectory (v1.1)
         ):
             raise TypeError(&#34;route input not of type Route or CatalogReference&#34;)
         self.trajectory = trajectory
-        self.following_mode = following_mode
+        self.following_mode = convert_enum(following_mode, FollowingMode)
         # TODO: check reference_domain
         self.timeref = TimeReference(reference_domain, scale, offset)
         self.initialDistanceOffset = convert_float(initialDistanceOffset)
@@ -8522,7 +8525,9 @@ initialDistanceOffset (float): start at this offset into the trajectory (v1.1)
         scale = timeref.scale
 
         tfm_element = fta_element.find(&#34;TrajectoryFollowingMode&#34;)
-        following_mode = getattr(FollowingMode, tfm_element.attrib[&#34;followingMode&#34;])
+        following_mode = convert_enum(
+            tfm_element.attrib[&#34;followingMode&#34;], FollowingMode
+        )
 
         if fta_element.find(&#34;TrajectoryRef&#34;) != None:
             fta_element = fta_element.find(&#34;TrajectoryRef&#34;)
@@ -8619,7 +8624,9 @@ def parse(element):
     scale = timeref.scale
 
     tfm_element = fta_element.find(&#34;TrajectoryFollowingMode&#34;)
-    following_mode = getattr(FollowingMode, tfm_element.attrib[&#34;followingMode&#34;])
+    following_mode = convert_enum(
+        tfm_element.attrib[&#34;followingMode&#34;], FollowingMode
+    )
 
     if fta_element.find(&#34;TrajectoryRef&#34;) != None:
         fta_element = fta_element.find(&#34;TrajectoryRef&#34;)
@@ -8895,12 +8902,8 @@ displacement (LateralDisplacement): type of displacement wanted
         self.dynamic_constraint = DynamicsConstraints(
             max_acceleration, max_deceleration, max_speed
         )
-        if not hasattr(CoordinateSystem, str(coordinate_system)):
-            raise ValueError(coordinate_system + &#34;; is not a valid CoordinateSystem.&#34;)
-        if not hasattr(LateralDisplacement, str(displacement)):
-            raise ValueError(displacement + &#34;; is not a valid LateralDisplacement.&#34;)
-        self.coordinate_system = coordinate_system
-        self.displacement = displacement
+        self.coordinate_system = convert_enum(coordinate_system, CoordinateSystem)
+        self.displacement = convert_enum(displacement, LateralDisplacement)
 
     def __eq__(self, other):
         if isinstance(other, LateralDistanceAction):
@@ -8933,13 +8936,13 @@ displacement (LateralDisplacement): type of displacement wanted
             distance = lda_element.attrib[&#34;distance&#34;]
         coordinate = None
         if &#34;coordinateSystem&#34; in lda_element.attrib:
-            coordinate = getattr(
-                CoordinateSystem, lda_element.attrib[&#34;coordinateSystem&#34;]
+            coordinate = convert_enum(
+                lda_element.attrib[&#34;coordinateSystem&#34;], CoordinateSystem
             )
         displacement = None
         if &#34;displacement&#34; in lda_element.attrib:
-            displacement = getattr(
-                LateralDisplacement, lda_element.attrib[&#34;displacement&#34;]
+            displacement = convert_enum(
+                lda_element.attrib[&#34;displacement&#34;], LateralDisplacement
             )
         constraints = None
         max_acc = None
@@ -9035,13 +9038,13 @@ def parse(element):
         distance = lda_element.attrib[&#34;distance&#34;]
     coordinate = None
     if &#34;coordinateSystem&#34; in lda_element.attrib:
-        coordinate = getattr(
-            CoordinateSystem, lda_element.attrib[&#34;coordinateSystem&#34;]
+        coordinate = convert_enum(
+            lda_element.attrib[&#34;coordinateSystem&#34;], CoordinateSystem
         )
     displacement = None
     if &#34;displacement&#34; in lda_element.attrib:
-        displacement = getattr(
-            LateralDisplacement, lda_element.attrib[&#34;displacement&#34;]
+        displacement = convert_enum(
+            lda_element.attrib[&#34;displacement&#34;], LateralDisplacement
         )
     constraints = None
     max_acc = None
@@ -9238,19 +9241,20 @@ color (Color): the color of the light
 
             color (Color): the color of the light
         &#34;&#34;&#34;
-
-        if not (
-            hasattr(VehicleLightType, str(light_type))
-            or isinstance(light_type, UserDefinedLight)
-        ):
-            raise TypeError(
-                &#34;light_type input is not of type VehicleLightType or UserDefinedLight&#34;
-            )
+        try:
+            self.light_type = convert_enum(light_type, VehicleLightType)
+        except Exception as e:
+            if not isinstance(light_type, UserDefinedLight):
+                raise TypeError(
+                    &#34;light_type input is not of type VehicleLightType or UserDefinedLight&#34;
+                )
+            else:
+                self.light_type = light_type
 
         self.lightstate = _LightState(
             mode, color, intensity, flashing_off_duration, flashing_on_duration
         )
-        self.light_type = light_type
+
         self.transition_time = convert_float(transition_time)
 
     def __eq__(self, other):
@@ -9285,9 +9289,9 @@ color (Color): the color of the light
         if type_element.find(&#34;UserDefinedLight&#34;) is not None:
             light_type = UserDefinedLight.parse(type_element.find(&#34;UserDefinedLight&#34;))
         else:
-            light_type = getattr(
-                VehicleLightType,
+            light_type = convert_enum(
                 type_element.find(&#34;VehicleLight&#34;).attrib[&#34;vehicleLightType&#34;],
+                VehicleLightType,
             )
         # create with dummy mode
         light_state_action = LightStateAction(light_type, LightMode.on, transition_time)
@@ -9365,9 +9369,9 @@ def parse(element):
     if type_element.find(&#34;UserDefinedLight&#34;) is not None:
         light_type = UserDefinedLight.parse(type_element.find(&#34;UserDefinedLight&#34;))
     else:
-        light_type = getattr(
-            VehicleLightType,
+        light_type = convert_enum(
             type_element.find(&#34;VehicleLight&#34;).attrib[&#34;vehicleLightType&#34;],
+            VehicleLightType,
         )
     # create with dummy mode
     light_state_action = LightStateAction(light_type, LightMode.on, transition_time)
@@ -9635,14 +9639,8 @@ displacement (LongitudinalDisplacement): type of displacement wanted
         self.distance = convert_float(distance)
         self.timeGap = convert_float(timeGap)
 
-        if not hasattr(CoordinateSystem, str(coordinate_system)):
-            raise ValueError(coordinate_system + &#34;; is not a valid CoordinateSystem.&#34;)
-        if not hasattr(LongitudinalDisplacement, str(displacement)):
-            raise ValueError(
-                displacement + &#34;; is not a valid LongitudinalDisplacement.&#34;
-            )
-        self.coordinate_system = coordinate_system
-        self.displacement = displacement
+        self.coordinate_system = convert_enum(coordinate_system, CoordinateSystem)
+        self.displacement = convert_enum(displacement, LongitudinalDisplacement)
 
     def __eq__(self, other):
         if isinstance(other, LongitudinalDistanceAction):
@@ -9679,13 +9677,13 @@ displacement (LongitudinalDisplacement): type of displacement wanted
 
         coordinate_system = CoordinateSystem.entity
         if &#34;coordinateSystem&#34; in lda_element.attrib:
-            coordinate_system = getattr(
-                CoordinateSystem, lda_element.attrib[&#34;coordinateSystem&#34;]
+            coordinate_system = convert_enum(
+                lda_element.attrib[&#34;coordinateSystem&#34;], CoordinateSystem, False
             )
         displacement = LongitudinalDisplacement.any
         if &#34;displacement&#34; in lda_element.attrib:
-            displcement = getattr(
-                LongitudinalDisplacement, lda_element.attrib[&#34;displacement&#34;]
+            displacement = convert_enum(
+                lda_element.attrib[&#34;displacement&#34;], LongitudinalDisplacement, False
             )
         max_acceleration = None
         max_deceleration = None
@@ -9788,13 +9786,13 @@ def parse(element):
 
     coordinate_system = CoordinateSystem.entity
     if &#34;coordinateSystem&#34; in lda_element.attrib:
-        coordinate_system = getattr(
-            CoordinateSystem, lda_element.attrib[&#34;coordinateSystem&#34;]
+        coordinate_system = convert_enum(
+            lda_element.attrib[&#34;coordinateSystem&#34;], CoordinateSystem, False
         )
     displacement = LongitudinalDisplacement.any
     if &#34;displacement&#34; in lda_element.attrib:
-        displcement = getattr(
-            LongitudinalDisplacement, lda_element.attrib[&#34;displacement&#34;]
+        displacement = convert_enum(
+            lda_element.attrib[&#34;displacement&#34;], LongitudinalDisplacement, False
         )
     max_acceleration = None
     max_deceleration = None
@@ -10032,6 +10030,8 @@ set_parkingbrake(active,value)
         self.parkingbrake_value = convert_float(0)
         self.parkingbrake_rate = None
         self.parkingbrake_force = False
+
+        self._used_by_parent = False
 
     def __eq__(self, other):
         if isinstance(other, OverrideControllerValueAction):
@@ -10348,6 +10348,10 @@ set_parkingbrake(active,value)
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the OverrideControllerValueAction&#34;&#34;&#34;
+        if self.isVersion(minor=0) and not self._used_by_parent:
+            raise OpenSCENARIOVersionError(
+                &#34;OverrideControllerValueAction cannot be used alone in OSC 1.0, please add it to a ControllerAction&#34;
+            )
         element = ET.Element(&#34;PrivateAction&#34;)
         controlleraction = ET.SubElement(element, &#34;ControllerAction&#34;)
         overrideaction = ET.SubElement(
@@ -10501,7 +10505,7 @@ set_parkingbrake(active,value)
                     ET.SubElement(
                         override_gear_action,
                         &#34;ManualGear&#34;,
-                        {&#34;number&#34;: str(self.gear_value)},
+                        {&#34;number&#34;: str(int(self.gear_value))},
                     )
                 else:
                     ET.SubElement(
@@ -10682,6 +10686,10 @@ def parse(element):
 </summary>
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the OverrideControllerValueAction&#34;&#34;&#34;
+    if self.isVersion(minor=0) and not self._used_by_parent:
+        raise OpenSCENARIOVersionError(
+            &#34;OverrideControllerValueAction cannot be used alone in OSC 1.0, please add it to a ControllerAction&#34;
+        )
     element = ET.Element(&#34;PrivateAction&#34;)
     controlleraction = ET.SubElement(element, &#34;ControllerAction&#34;)
     overrideaction = ET.SubElement(
@@ -10835,7 +10843,7 @@ def parse(element):
                 ET.SubElement(
                     override_gear_action,
                     &#34;ManualGear&#34;,
-                    {&#34;number&#34;: str(self.gear_value)},
+                    {&#34;number&#34;: str(int(self.gear_value))},
                 )
             else:
                 ET.SubElement(
@@ -11606,7 +11614,7 @@ value (float): the value that should be added to the parameter
 
         &#34;&#34;&#34;
         self.parameter_ref = parameter_ref
-        self.value = convert_float(value)
+        self.value = value
 
     def __eq__(self, other):
         if isinstance(other, ParameterSetAction):
@@ -11633,7 +11641,7 @@ value (float): the value that should be added to the parameter
         pa_element = element.find(&#34;ParameterAction&#34;)
         parameterRef = pa_element.attrib[&#34;parameterRef&#34;]
         psa_element = pa_element.find(&#34;SetAction&#34;)
-        value = convert_float(psa_element.attrib[&#34;value&#34;])
+        value = psa_element.attrib[&#34;value&#34;]
         psa = ParameterSetAction(parameterRef, value)
         psa.setVersion(minor=1)
         return psa  # ParameterSetAction(parameterRef, value)
@@ -11694,7 +11702,7 @@ def parse(element):
     pa_element = element.find(&#34;ParameterAction&#34;)
     parameterRef = pa_element.attrib[&#34;parameterRef&#34;]
     psa_element = pa_element.find(&#34;SetAction&#34;)
-    value = convert_float(psa_element.attrib[&#34;value&#34;])
+    value = psa_element.attrib[&#34;value&#34;]
     psa = ParameterSetAction(parameterRef, value)
     psa.setVersion(minor=1)
     return psa  # ParameterSetAction(parameterRef, value)</code></pre>
@@ -12727,11 +12735,8 @@ entity (str): name of an entity, the speeds will then be interpreted as relative
             dynamics_constraint, DynamicsConstraints
         ):
             raise TypeError(&#34;dynamics_constraint input not of type DynamicsConstraints&#34;)
-        if not hasattr(FollowingMode, str(following_mode)):
-            raise TypeError(&#34;following_mode input not of type FollowingMode&#34;)
-
         self.dynamics_constraint = dynamics_constraint
-        self.following_mode = following_mode
+        self.following_mode = convert_enum(following_mode, FollowingMode)
         if times:
             self.times = [convert_float(x) for x in times]
         else:
@@ -12764,8 +12769,8 @@ entity (str): name of an entity, the speeds will then be interpreted as relative
 
         &#34;&#34;&#34;
         speed_profile_element = element.find(&#34;LongitudinalAction/SpeedProfileAction&#34;)
-        following_mode = getattr(
-            FollowingMode, speed_profile_element.attrib[&#34;followingMode&#34;]
+        following_mode = convert_enum(
+            speed_profile_element.attrib[&#34;followingMode&#34;], FollowingMode
         )
         dynamics_constraint = None
         entity = None
@@ -12777,7 +12782,6 @@ entity (str): name of an entity, the speeds will then be interpreted as relative
                 speed_profile_element.find(&#34;DynamicConstraints&#34;)
             )
 
-        td_element = element.find(&#34;LongitudinalAction/SpeedAction/SpeedActionDynamics&#34;)
         entires = speed_profile_element.findall(&#34;SpeedProfileEntry&#34;)
         speeds = []
         times = []
@@ -12856,8 +12860,8 @@ def parse(element):
 
     &#34;&#34;&#34;
     speed_profile_element = element.find(&#34;LongitudinalAction/SpeedProfileAction&#34;)
-    following_mode = getattr(
-        FollowingMode, speed_profile_element.attrib[&#34;followingMode&#34;]
+    following_mode = convert_enum(
+        speed_profile_element.attrib[&#34;followingMode&#34;], FollowingMode
     )
     dynamics_constraint = None
     entity = None
@@ -12869,7 +12873,6 @@ def parse(element):
             speed_profile_element.find(&#34;DynamicConstraints&#34;)
         )
 
-    td_element = element.find(&#34;LongitudinalAction/SpeedAction/SpeedActionDynamics&#34;)
     entires = speed_profile_element.findall(&#34;SpeedProfileEntry&#34;)
     speeds = []
     times = []
@@ -14957,7 +14960,7 @@ direction_of_travel (DirectionOfTravelDistribution): adds the DirectionOfTravelD
             dot = DirectionOfTravelDistribution.parse(
                 tsa_element.find(&#34;DirectionOfTravelDistribution&#34;)
             )
-        central_element = tsa_element.find(&#34;CentralSwarmObject&#34;)
+        central_element = tsa_element.find(&#34;CentralObject&#34;)
         centralobject = central_element.attrib[&#34;entityRef&#34;]
 
         tsa_object = TrafficSwarmAction(
@@ -14999,7 +15002,7 @@ direction_of_travel (DirectionOfTravelDistribution): adds the DirectionOfTravelD
         )
         swarmaction.append(self.trafficdefinition.get_element())
         ET.SubElement(
-            swarmaction, &#34;CentralSwarmObject&#34;, attrib={&#34;entityRef&#34;: self.centralobject}
+            swarmaction, &#34;CentralObject&#34;, attrib={&#34;entityRef&#34;: self.centralobject}
         )
         if self.velocity is not None:
             if self.version_minor &gt; 1:
@@ -15080,7 +15083,7 @@ def parse(element):
         dot = DirectionOfTravelDistribution.parse(
             tsa_element.find(&#34;DirectionOfTravelDistribution&#34;)
         )
-    central_element = tsa_element.find(&#34;CentralSwarmObject&#34;)
+    central_element = tsa_element.find(&#34;CentralObject&#34;)
     centralobject = central_element.attrib[&#34;entityRef&#34;]
 
     tsa_object = TrafficSwarmAction(
@@ -15145,7 +15148,7 @@ def parse(element):
     )
     swarmaction.append(self.trafficdefinition.get_element())
     ET.SubElement(
-        swarmaction, &#34;CentralSwarmObject&#34;, attrib={&#34;entityRef&#34;: self.centralobject}
+        swarmaction, &#34;CentralObject&#34;, attrib={&#34;entityRef&#34;: self.centralobject}
     )
     if self.velocity is not None:
         if self.version_minor &gt; 1:
@@ -15170,6 +15173,7 @@ def parse(element):
 </dd>
 <dt id="scenariogeneration.xosc.actions.UserDefinedAction"><code class="flex name class">
 <span>class <span class="ident">UserDefinedAction</span></span>
+<span>(</span><span>custom_command_action)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>The UserDefinedAction enables adding simulator-specific CustomCommandActions.</p>
@@ -15206,37 +15210,19 @@ get_element()
             Returns the full ElementTree of the class
     &#34;&#34;&#34;
 
-    def __init__(self):
+    def __init__(self, custom_command_action):
         &#34;&#34;&#34;initalize the UserDefinedAction
 
         Parameters
         ----------
 
         &#34;&#34;&#34;
-        self.custom_command_actions = []
-
-    def add_custom_command_action(self, custom_command_action):
-        &#34;&#34;&#34;add a CustomCommandAction
-
-        Parameters
-        ----------
-            custom_command_action (CustomCommandAction): A CustomCommandAction element
-
-        &#34;&#34;&#34;
-        self.custom_command_actions.append(custom_command_action)
-        return self
+        self.custom_command_action = custom_command_action
 
     def __eq__(self, other):
         if isinstance(other, UserDefinedAction):
-            if len(self.custom_command_actions) == len(other.custom_command_actions):
-                if all(
-                    [
-                        self.custom_command_actions[i]
-                        == other.custom_command_actions[i]
-                        for i in range(len(self.custom_command_actions))
-                    ]
-                ):
-                    return True
+            if self.custom_command_action == other.custom_command_action:
+                return True
         return False
 
     @staticmethod
@@ -15252,17 +15238,16 @@ get_element()
             userDefinedAction (UserDefinedAction): a UserDefinedAction object
 
         &#34;&#34;&#34;
-        user_defined_action = UserDefinedAction()
-        for custom_command_element in element.findall(&#34;CustomCommandAction&#34;):
-            custom_command_action = CustomCommandAction.parse(custom_command_element)
-            user_defined_action.add_custom_command_action(custom_command_action)
+        custom_command_action = CustomCommandAction.parse(
+            element.find(&#34;CustomCommandAction&#34;)
+        )
+        user_defined_action = UserDefinedAction(custom_command_action)
         return user_defined_action
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the UserDefinedAction&#34;&#34;&#34;
         element = ET.Element(&#34;UserDefinedAction&#34;)
-        for custom_command_action in self.custom_command_actions:
-            element.append(custom_command_action.get_element())
+        element.append(self.custom_command_action.get_element())
         return element</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -15300,40 +15285,16 @@ def parse(element):
         userDefinedAction (UserDefinedAction): a UserDefinedAction object
 
     &#34;&#34;&#34;
-    user_defined_action = UserDefinedAction()
-    for custom_command_element in element.findall(&#34;CustomCommandAction&#34;):
-        custom_command_action = CustomCommandAction.parse(custom_command_element)
-        user_defined_action.add_custom_command_action(custom_command_action)
+    custom_command_action = CustomCommandAction.parse(
+        element.find(&#34;CustomCommandAction&#34;)
+    )
+    user_defined_action = UserDefinedAction(custom_command_action)
     return user_defined_action</code></pre>
 </details>
 </dd>
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="scenariogeneration.xosc.actions.UserDefinedAction.add_custom_command_action"><code class="name flex">
-<span>def <span class="ident">add_custom_command_action</span></span>(<span>self, custom_command_action)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>add a CustomCommandAction</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>custom_command_action (CustomCommandAction): A CustomCommandAction element
-</code></pre></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def add_custom_command_action(self, custom_command_action):
-    &#34;&#34;&#34;add a CustomCommandAction
-
-    Parameters
-    ----------
-        custom_command_action (CustomCommandAction): A CustomCommandAction element
-
-    &#34;&#34;&#34;
-    self.custom_command_actions.append(custom_command_action)
-    return self</code></pre>
-</details>
-</dd>
 <dt id="scenariogeneration.xosc.actions.UserDefinedAction.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
@@ -15346,8 +15307,7 @@ def parse(element):
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the UserDefinedAction&#34;&#34;&#34;
     element = ET.Element(&#34;UserDefinedAction&#34;)
-    for custom_command_action in self.custom_command_actions:
-        element.append(custom_command_action.get_element())
+    element.append(self.custom_command_action.get_element())
     return element</code></pre>
 </details>
 </dd>
@@ -16145,10 +16105,8 @@ get_attributes()
             element, &#34;VisibilityAction&#34;, self.get_attributes()
         )
         if self.sensor_refs:
-            if self.version_minor &lt; 2:
-                raise OpenSCENARIOVersionError(
-                    &#34;VehicleRoleDistribution was added in OSC V1.2&#34;
-                )
+            if self.isVersionEqLess(minor=1):
+                raise OpenSCENARIOVersionError(&#34;SensorReference was added in OSC V1.2&#34;)
             sensor_ref_element = ET.SubElement(visibility_element, &#34;SensorReferenceSet&#34;)
             for sensor in self.sensor_refs:
                 ET.SubElement(
@@ -16264,10 +16222,8 @@ def parse(element):
         element, &#34;VisibilityAction&#34;, self.get_attributes()
     )
     if self.sensor_refs:
-        if self.version_minor &lt; 2:
-            raise OpenSCENARIOVersionError(
-                &#34;VehicleRoleDistribution was added in OSC V1.2&#34;
-            )
+        if self.isVersionEqLess(minor=1):
+            raise OpenSCENARIOVersionError(&#34;SensorReference was added in OSC V1.2&#34;)
         sensor_ref_element = ET.SubElement(visibility_element, &#34;SensorReferenceSet&#34;)
         for sensor in self.sensor_refs:
             ET.SubElement(
@@ -16560,7 +16516,6 @@ def parse(element):
 <li>
 <h4><code><a title="scenariogeneration.xosc.actions.UserDefinedAction" href="#scenariogeneration.xosc.actions.UserDefinedAction">UserDefinedAction</a></code></h4>
 <ul class="">
-<li><code><a title="scenariogeneration.xosc.actions.UserDefinedAction.add_custom_command_action" href="#scenariogeneration.xosc.actions.UserDefinedAction.add_custom_command_action">add_custom_command_action</a></code></li>
 <li><code><a title="scenariogeneration.xosc.actions.UserDefinedAction.get_element" href="#scenariogeneration.xosc.actions.UserDefinedAction.get_element">get_element</a></code></li>
 <li><code><a title="scenariogeneration.xosc.actions.UserDefinedAction.parse" href="#scenariogeneration.xosc.actions.UserDefinedAction.parse">parse</a></code></li>
 </ul>

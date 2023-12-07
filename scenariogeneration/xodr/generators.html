@@ -36,11 +36,11 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <pre><code class="python">&#34;&#34;&#34;
   scenariogeneration
   https://github.com/pyoscx/scenariogeneration
- 
+
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at https://mozilla.org/MPL/2.0/.
- 
+
   Copyright (c) 2022 The scenariogeneration Authors.
 
 &#34;&#34;&#34;
@@ -55,7 +55,7 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 &#34;&#34;&#34;
 import numpy as np
 import pyclothoids as pcloth
-
+import copy
 from .lane import Lane, RoadMark, LaneSection, Lanes, RoadLine
 from .enumerations import (
     JunctionType,
@@ -76,30 +76,69 @@ from .exceptions import (
 )
 
 
-STD_ROADMARK_SOLID = RoadMark(RoadMarkType.solid, 0.2)
+def std_roadmark_solid():
+    return RoadMark(RoadMarkType.solid, 0.2)
 
-STD_ROADMARK_BROKEN = RoadMark(RoadMarkType.broken, 0.2)
 
-STD_ROADMARK_BROKEN_BROKEN = RoadMark(RoadMarkType.broken_broken)
-STD_ROADMARK_BROKEN_BROKEN.add_specific_road_line(RoadLine(0.2, 3, 3, 0.2, 0))
-STD_ROADMARK_BROKEN_BROKEN.add_specific_road_line(RoadLine(0.2, 3, 3, -0.2, 0))
+def std_roadmark_broken():
+    roadmark = RoadMark(RoadMarkType.broken, 0.2)
+    roadmark.add_specific_road_line(RoadLine(0.15, 3, 9, 0, 0))
+    return roadmark
 
-STD_ROADMARK_SOLID_SOLID = RoadMark(RoadMarkType.solid_solid)
-STD_ROADMARK_SOLID_SOLID.add_specific_road_line(RoadLine(0.2, 0, 0, 0.2, 0))
-STD_ROADMARK_SOLID_SOLID.add_specific_road_line(RoadLine(0.2, 0, 0, -0.2, 0))
 
-STD_ROADMARK_SOLID_BROKEN = RoadMark(RoadMarkType.solid_broken)
-STD_ROADMARK_SOLID_BROKEN.add_specific_road_line(RoadLine(0.2, 0, 0, 0.2, 0))
-STD_ROADMARK_SOLID_BROKEN.add_specific_road_line(RoadLine(0.2, 3, 3, -0.2, 0))
+def std_roadmark_broken_long_line():
+    roadmark = RoadMark(RoadMarkType.broken, 0.2)
+    roadmark.add_specific_road_line(RoadLine(0.15, 9, 3, 0, 0))
+    return roadmark
 
-STD_ROADMARK_BROKEN_SOLID = RoadMark(RoadMarkType.broken_solid)
-STD_ROADMARK_BROKEN_SOLID.add_specific_road_line(RoadLine(0.2, 0, 0, -0.2, 0))
-STD_ROADMARK_BROKEN_SOLID.add_specific_road_line(RoadLine(0.2, 3, 3, 0.2, 0))
+
+def std_roadmark_broken_tight():
+    roadmark = RoadMark(RoadMarkType.broken, 0.2)
+    roadmark.add_specific_road_line(RoadLine(0.15, 3, 3, 0, 0))
+    return roadmark
+
+
+def std_roadmark_broken_broken():
+    roadmark = RoadMark(RoadMarkType.broken_broken)
+    roadmark.add_specific_road_line(RoadLine(0.2, 3, 3, 0.2, 0))
+    roadmark.add_specific_road_line(RoadLine(0.2, 3, 3, -0.2, 0))
+    return roadmark
+
+
+def std_roadmark_solid_solid():
+    roadmark = RoadMark(RoadMarkType.solid_solid)
+    roadmark.add_specific_road_line(RoadLine(0.2, 0, 0, 0.2, 0))
+    roadmark.add_specific_road_line(RoadLine(0.2, 0, 0, -0.2, 0))
+    return roadmark
+
+
+def std_roadmark_solid_broken():
+    roadmark = RoadMark(RoadMarkType.solid_broken)
+    roadmark.add_specific_road_line(RoadLine(0.2, 0, 0, 0.2, 0))
+    roadmark.add_specific_road_line(RoadLine(0.2, 3, 3, -0.2, 0))
+    return roadmark
+
+
+def std_roadmark_broken_solid():
+    roadmark = RoadMark(RoadMarkType.broken_solid)
+    roadmark.add_specific_road_line(RoadLine(0.2, 0, 0, -0.2, 0))
+    roadmark.add_specific_road_line(RoadLine(0.2, 3, 3, 0.2, 0))
+    return roadmark
+
+
+STD_ROADMARK_SOLID = std_roadmark_broken()
+STD_ROADMARK_BROKEN = std_roadmark_broken()
+STD_ROADMARK_BROKEN_TIGHT = std_roadmark_broken_tight()
+STD_ROADMARK_BROKEN_BROKEN = std_roadmark_broken_broken()
+STD_ROADMARK_SOLID_SOLID = std_roadmark_solid_solid()
+STD_ROADMARK_SOLID_BROKEN = std_roadmark_solid_broken()
+STD_ROADMARK_BROKEN_SOLID = std_roadmark_broken_solid()
+
 
 STD_START_CLOTH = 1 / 1000000000
 
 
-def standard_lane(offset=3, rm=STD_ROADMARK_BROKEN):
+def standard_lane(offset=3, rm=std_roadmark_broken()):
     &#34;&#34;&#34;standard_lane creates a simple lane with an offset an a roadmark
 
     Parameters
@@ -120,7 +159,12 @@ def standard_lane(offset=3, rm=STD_ROADMARK_BROKEN):
 
 
 def create_lanes_merge_split(
-    right_lane_def, left_lane_def, road_length, center_road_mark, lane_width
+    right_lane_def,
+    left_lane_def,
+    road_length,
+    center_road_mark,
+    lane_width,
+    lane_width_end,
 ):
     &#34;&#34;&#34;create_lanes_merge_split is a generator that will create the Lanes of a road road that can contain one or more lane merges/splits
     This is a simple implementation and has some constraints:
@@ -141,6 +185,8 @@ def create_lanes_merge_split(
 
         lane_width (float): the width of the lanes
 
+        lane_width_end (float): the end width of the lanes
+
     Return
     ------
         road (Lanes): the lanes of a road
@@ -148,24 +194,23 @@ def create_lanes_merge_split(
 
     lanesections = []
     # expand the lane list
-    right_lane, left_lane = _create_lane_lists(
-        right_lane_def, left_lane_def, road_length
-    )
 
-    # create centerlane
-    lc = Lane(a=0)
-    lc.add_roadmark(center_road_mark)
+    right_lane, left_lane = _create_lane_lists(
+        right_lane_def, left_lane_def, road_length, lane_width
+    )
 
     # create the lanesections needed
     for ls in range(len(left_lane)):
+        lc = Lane(a=0)
+        lc.add_roadmark(copy.deepcopy(center_road_mark))
         lsec = LaneSection(left_lane[ls].s_start, lc)
         # do the right lanes
         for i in range(max(right_lane[ls].n_lanes_start, right_lane[ls].n_lanes_end)):
             # add broken roadmarks for all lanes, except for the outer lane where a solid line is added
             if i == max(right_lane[ls].n_lanes_start, right_lane[ls].n_lanes_end) - 1:
-                rm = STD_ROADMARK_SOLID
+                rm = std_roadmark_solid()
             else:
-                rm = STD_ROADMARK_BROKEN
+                rm = std_roadmark_broken()
 
             # check if the number of lanes should change or not
             if (
@@ -174,7 +219,10 @@ def create_lanes_merge_split(
             ):
                 # lane merge
                 coeff = get_coeffs_for_poly3(
-                    right_lane[ls].s_end - right_lane[ls].s_start, lane_width, False
+                    right_lane[ls].s_end - right_lane[ls].s_start,
+                    right_lane[ls].lane_start_widths[i],
+                    False,
+                    right_lane[ls].lane_end_widths[i],
                 )
                 rightlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
                 rightlane.add_roadmark(rm)
@@ -184,7 +232,28 @@ def create_lanes_merge_split(
             ):
                 # lane split
                 coeff = get_coeffs_for_poly3(
-                    right_lane[ls].s_end - right_lane[ls].s_start, lane_width, True
+                    right_lane[ls].s_end - right_lane[ls].s_start,
+                    right_lane[ls].lane_start_widths[i],
+                    True,
+                    right_lane[ls].lane_end_widths[i],
+                )
+                rightlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
+                rightlane.add_roadmark(rm)
+            elif (lane_width_end is not None) and (lane_width != lane_width_end):
+                coeff = get_coeffs_for_poly3(
+                    right_lane[ls].s_end - right_lane[ls].s_start,
+                    lane_width,
+                    False,
+                    lane_width_end=lane_width_end,
+                )
+                rightlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
+                rightlane.add_roadmark(rm)
+            elif right_lane[ls].lane_start_widths:
+                coeff = get_coeffs_for_poly3(
+                    right_lane[ls].s_end - right_lane[ls].s_start,
+                    right_lane[ls].lane_start_widths[i],
+                    False,
+                    lane_width_end=right_lane[ls].lane_end_widths[i],
                 )
                 rightlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
                 rightlane.add_roadmark(rm)
@@ -196,9 +265,9 @@ def create_lanes_merge_split(
         for i in range(max(left_lane[ls].n_lanes_start, left_lane[ls].n_lanes_end)):
             # add broken roadmarks for all lanes, except for the outer lane where a solid line is added
             if i == max(left_lane[ls].n_lanes_start, left_lane[ls].n_lanes_end) - 1:
-                rm = STD_ROADMARK_SOLID
+                rm = std_roadmark_solid()
             else:
-                rm = STD_ROADMARK_BROKEN
+                rm = std_roadmark_broken()
 
             # check if the number of lanes should change or not
             if (
@@ -207,7 +276,10 @@ def create_lanes_merge_split(
             ):
                 # lane split
                 coeff = get_coeffs_for_poly3(
-                    left_lane[ls].s_end - left_lane[ls].s_start, lane_width, True
+                    left_lane[ls].s_end - left_lane[ls].s_start,
+                    left_lane[ls].lane_start_widths[i],
+                    True,
+                    left_lane[ls].lane_end_widths[i],
                 )
                 leftlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
                 leftlane.add_roadmark(rm)
@@ -217,7 +289,28 @@ def create_lanes_merge_split(
             ):
                 # lane merge
                 coeff = get_coeffs_for_poly3(
-                    left_lane[ls].s_end - left_lane[ls].s_start, lane_width, False
+                    left_lane[ls].s_end - left_lane[ls].s_start,
+                    left_lane[ls].lane_start_widths[i],
+                    False,
+                    left_lane[ls].lane_end_widths[i],
+                )
+                leftlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
+                leftlane.add_roadmark(rm)
+            elif (lane_width_end is not None) and (lane_width != lane_width_end):
+                coeff = get_coeffs_for_poly3(
+                    left_lane[ls].s_end - left_lane[ls].s_start,
+                    lane_width,
+                    False,
+                    lane_width_end=lane_width_end,
+                )
+                leftlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
+                leftlane.add_roadmark(rm)
+            elif left_lane[ls].lane_start_widths:
+                coeff = get_coeffs_for_poly3(
+                    left_lane[ls].s_end - left_lane[ls].s_start,
+                    left_lane[ls].lane_start_widths[i],
+                    False,
+                    lane_width_end=left_lane[ls].lane_end_widths[i],
                 )
                 leftlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
                 leftlane.add_roadmark(rm)
@@ -313,11 +406,13 @@ def create_road(
     left_lanes=1,
     right_lanes=1,
     road_type=-1,
-    center_road_mark=STD_ROADMARK_SOLID,
+    center_road_mark=std_roadmark_solid(),
     lane_width=3,
+    lane_width_end=None,
 ):
     &#34;&#34;&#34;create_road creates a road with one lanesection with different number of lanes, lane marks will be of type broken,
     except the outer lane, that will be solid.
+    The lane_width_end parameter can only be used when inputs for left_lanes and right_lanes are int
 
     Parameters
     ----------
@@ -335,7 +430,9 @@ def create_road(
 
         center_road_mark (RoadMark): roadmark for the center line
 
-        lane_width (float): the with of all lanes
+        lane_width (float): the width of all lanes
+
+        lane_width_end (float): the end width of all lanes
 
     Returns
     -------
@@ -351,8 +448,25 @@ def create_road(
         pv.add_geometry(geometry)
         raw_length += geometry.length
 
+    if isinstance(left_lanes, LaneDef):
+        left_lanes = [left_lanes]
+    if isinstance(right_lanes, LaneDef):
+        right_lanes = [right_lanes]
+
+    if (lane_width_end is not None) and (
+        (type(left_lanes) != int) or (type(right_lanes) != int)
+    ):
+        raise RuntimeError(
+            &#34;lane_width_end can only be used when left_lanes and right_lanes are int&#34;
+        )
+
     lanes = create_lanes_merge_split(
-        right_lanes, left_lanes, raw_length, center_road_mark, lane_width
+        right_lanes,
+        left_lanes,
+        raw_length,
+        center_road_mark,
+        lane_width,
+        lane_width_end=lane_width_end,
     )
 
     road = Road(id, pv, lanes, road_type=road_type)
@@ -362,26 +476,26 @@ def create_road(
 
 def create_straight_road(road_id, length=100, junction=-1, n_lanes=1, lane_offset=3):
     &#34;&#34;&#34;creates a standard straight road with two lanes
+    STD_ROADMARK_SOLID
+        Parameters
+        ----------
+            road_id (int): id of the road to create
 
-    Parameters
-    ----------
-        road_id (int): id of the road to create
+            length (float): length of the road
+                default: 100
 
-        length (float): length of the road
-            default: 100
+            junction (int): if the road belongs to a junction or not
+                default: -1
 
-        junction (int): if the road belongs to a junction or not
-            default: -1
+            n_lanes (int): number of lanes
+                default: 1
 
-        n_lanes (int): number of lanes
-            default: 1
+            lane_offset (int): width of the road
+                default: 3
 
-        lane_offset (int): width of the road
-            default: 3
-
-    Returns
-    -------
-        road (Road): a straight road
+        Returns
+        -------
+            road (Road): a straight road
     &#34;&#34;&#34;
     # create geometry
     line1 = Line(length)
@@ -485,7 +599,7 @@ def create_3cloths(
     junction=1,
     n_lanes=1,
     lane_offset=3,
-    road_marks=STD_ROADMARK_BROKEN,
+    road_marks=std_roadmark_broken(),
 ):
     &#34;&#34;&#34;creates a curved Road  with a Spiral - Arc - Spiral, and two lanes
 
@@ -823,7 +937,7 @@ def create_junction_roads(
     arc_part=1 / 3,
     startnum=100,
     inner_road_marks=None,
-    outer_road_marks=STD_ROADMARK_SOLID,
+    outer_road_marks=std_roadmark_solid(),
 ):
     &#34;&#34;&#34;creates all needed roads for some simple junctions, the curved parts of the junction are created as a spiral-arc-spiral combo
     R is value to the the radius of the whole junction (meaning R = distance between the center of the junction and any external road attached to the junction)
@@ -1131,6 +1245,12 @@ class LaneDef:
 
         sub_lane (int): the lane that should be created (split) or removed (merge)
 
+        lane_start_widths (list of float): widths of lanes at start, must be [] or same length as n_lanes_start
+            Default: []
+
+        lane_end_widths (list of float): widths of lanes at end, must be [] or same length as n_lanes_end
+            Default: same as lane_start_widths
+
     Attributes
     ----------
         s_start (float): s coordinate of the start of the change
@@ -1143,17 +1263,47 @@ class LaneDef:
 
         sub_lane (int): the lane that should be created (split) or removed (merge)
 
+        lane_start_widths (list of float): widths of lanes at start, must be [] or same length as n_lanes_start
+
+        lane_end_widths (list of float): widths of lanes at end, must be [] or same length as n_lanes_end
     &#34;&#34;&#34;
 
-    def __init__(self, s_start, s_end, n_lanes_start, n_lanes_end, sub_lane=None):
+    def __init__(
+        self,
+        s_start,
+        s_end,
+        n_lanes_start,
+        n_lanes_end,
+        sub_lane=None,
+        lane_start_widths=[],
+        lane_end_widths=[],
+    ):
         self.s_start = s_start
         self.s_end = s_end
         self.n_lanes_start = n_lanes_start
         self.n_lanes_end = n_lanes_end
         self.sub_lane = sub_lane
+        self.lane_start_widths = lane_start_widths
+        if lane_end_widths == []:
+            self.lane_end_widths = self.lane_start_widths.copy()
+        else:
+            self.lane_end_widths = lane_end_widths
+
+    def _adjust_lane_widths(self):
+        if self.sub_lane:
+            if self.lane_end_widths and len(self.lane_end_widths) &lt; self.n_lanes_start:
+                # mergeo
+                self.lane_end_widths.insert(abs(self.sub_lane) - 1, 0)
+            elif (
+                self.lane_start_widths
+                and len(self.lane_start_widths) &lt; self.n_lanes_end
+            ):
+                # split
+                self.lane_start_widths.insert(abs(self.sub_lane) - 1, 0)
+        # TODO: add some checks here?
 
 
-def _create_lane_lists(right, left, tot_length):
+def _create_lane_lists(right, left, tot_length, default_lane_width):
     &#34;&#34;&#34;_create_lane_lists is a function used by create_lanes_merge_split to expand the list of LaneDefs to be used to create stuffs
 
     Parameters
@@ -1164,7 +1314,17 @@ def _create_lane_lists(right, left, tot_length):
 
         tot_length (float): the total length of the road
 
+        default_lane_width (float): lane_width to be used if not defined in LaneDef
     &#34;&#34;&#34;
+
+    # TODO: implement for left and right lanesection...
+    def _check_lane_widths(lane):
+        if lane.lane_start_widths == []:
+            lane.lane_start_widths = [
+                default_lane_width for x in range(lane.n_lanes_start)
+            ]
+        if lane.lane_end_widths == []:
+            lane.lane_end_widths = [default_lane_width for x in range(lane.n_lanes_end)]
 
     const_right_lanes = None
     const_left_lanes = None
@@ -1224,11 +1384,79 @@ def _create_lane_lists(right, left, tot_length):
         if not add_left and not add_right:
             # no LaneDefs, just add same amout of lanes
             s_end = min(next_left, next_right)
-            retlanes_right.append(LaneDef(present_s, s_end, n_r_lanes, n_r_lanes))
-            retlanes_left.append(LaneDef(present_s, s_end, n_l_lanes, n_l_lanes))
+            if const_right_lanes is not None:
+                retlanes_right.append(
+                    LaneDef(
+                        present_s,
+                        s_end,
+                        n_r_lanes,
+                        n_r_lanes,
+                        lane_start_widths=[
+                            default_lane_width for x in range(n_r_lanes)
+                        ],
+                        lane_end_widths=[default_lane_width for x in range(n_r_lanes)],
+                    )
+                )
+            else:
+                lane_start_widths = [default_lane_width for x in range(n_r_lanes)]
+                lane_end_widths = [default_lane_width for x in range(n_r_lanes)]
+                if r_it == len(right):
+                    if right[r_it - 1].lane_end_widths:
+                        lane_start_widths = right[r_it - 1].lane_end_widths.copy()
+                        lane_end_widths = right[r_it - 1].lane_end_widths.copy()
+                elif right[r_it].lane_start_widths:
+                    lane_start_widths = right[r_it].lane_start_widths.copy()
+                    lane_end_widths = right[r_it].lane_start_widths.copy()
+                retlanes_right.append(
+                    LaneDef(
+                        present_s,
+                        s_end,
+                        n_r_lanes,
+                        n_r_lanes,
+                        lane_start_widths=lane_start_widths,
+                        lane_end_widths=lane_end_widths,
+                    )
+                )
+            if const_left_lanes is not None:
+                retlanes_left.append(
+                    LaneDef(
+                        present_s,
+                        s_end,
+                        n_l_lanes,
+                        n_l_lanes,
+                        lane_start_widths=[
+                            default_lane_width for x in range(n_l_lanes)
+                        ],
+                        lane_end_widths=[default_lane_width for x in range(n_l_lanes)],
+                    )
+                )
+            else:
+                lane_start_widths = [default_lane_width for x in range(n_l_lanes)]
+                lane_end_widths = [default_lane_width for x in range(n_l_lanes)]
+                if l_it == len(left):
+                    if left[l_it - 1].lane_end_widths:
+                        lane_start_widths = left[l_it - 1].lane_end_widths.copy()
+                        lane_end_widths = left[l_it - 1].lane_end_widths.copy()
+                elif left[l_it].lane_start_widths:
+                    lane_start_widths = left[l_it].lane_start_widths.copy()
+                    lane_end_widths = left[l_it].lane_start_widths.copy()
+
+                retlanes_left.append(
+                    LaneDef(
+                        present_s,
+                        s_end,
+                        n_l_lanes,
+                        n_l_lanes,
+                        lane_start_widths=lane_start_widths,
+                        lane_end_widths=lane_end_widths,
+                    )
+                )
+
             present_s = s_end
         elif add_left and add_right:
             # Both have changes in the amount of lanes,
+            _check_lane_widths(left[l_it])
+            _check_lane_widths(right[r_it])
             retlanes_left.append(left[l_it])
             retlanes_right.append(right[r_it])
             present_s = left[l_it].s_end
@@ -1236,21 +1464,42 @@ def _create_lane_lists(right, left, tot_length):
             l_it += 1
         elif add_right:
             # only the right lane changes the amount of lanes, and add a LaneDef with the same amount of lanes to the left
+            _check_lane_widths(right[r_it])
             retlanes_right.append(right[r_it])
-            retlanes_left.append(LaneDef(present_s, s_end, n_l_lanes, n_l_lanes))
+            retlanes_left.append(
+                LaneDef(
+                    present_s,
+                    right[r_it].s_end,
+                    n_l_lanes,
+                    n_l_lanes,
+                    lane_start_widths=[default_lane_width for x in range(n_l_lanes)],
+                    lane_end_widths=[default_lane_width for x in range(n_l_lanes)],
+                )
+            )
             present_s = right[r_it].s_end
             r_it += 1
         elif add_left:
             # only the left lane changes the amount of lanes, and add a LaneDef with the same amount of lanes to the right
+            _check_lane_widths(left[l_it])
             retlanes_left.append(left[l_it])
-            retlanes_right.append(LaneDef(present_s, s_end, n_r_lanes, n_r_lanes))
+            retlanes_right.append(
+                LaneDef(
+                    present_s,
+                    left[l_it].s_end,
+                    n_r_lanes,
+                    n_r_lanes,
+                    lane_start_widths=[default_lane_width for x in range(n_r_lanes)],
+                    lane_end_widths=[default_lane_width for x in range(n_r_lanes)],
+                )
+            )
             present_s = left[l_it].s_end
             l_it += 1
-
+    [x._adjust_lane_widths() for x in retlanes_right]
+    [x._adjust_lane_widths() for x in retlanes_left]
     return retlanes_right, retlanes_left
 
 
-def get_coeffs_for_poly3(length, lane_offset, zero_start):
+def get_coeffs_for_poly3(length, lane_offset, zero_start, lane_width_end=None):
     &#34;&#34;&#34;get_coeffs_for_poly3 creates the coefficients for a third degree polynomial, can be used for all kinds of descriptions in xodr.
 
     Assuming that the derivative is 0 at the start and end of the segment.
@@ -1263,6 +1512,9 @@ def get_coeffs_for_poly3(length, lane_offset, zero_start):
 
         zero_start (bool): True; start with zero and ends with lane_offset width,
                            False; start with lane_offset and ends with zero width
+
+        lane_width_end (float): specify the ending lane width for lanes that may start
+                                and end with different widths
 
     Return
     ------
@@ -1287,6 +1539,10 @@ def get_coeffs_for_poly3(length, lane_offset, zero_start):
         B = [start_heading, end_heading, 0, lane_offset]
     else:
         B = [start_heading, end_heading, lane_offset, 0]
+
+    if lane_width_end is not None:
+        B = [start_heading, end_heading, lane_offset, lane_width_end]
+
     # calculate and return the coefficients
     return np.linalg.solve(A, B)</code></pre>
 </details>
@@ -1357,7 +1613,7 @@ lane_offset (int): width of the road
     junction=1,
     n_lanes=1,
     lane_offset=3,
-    road_marks=STD_ROADMARK_BROKEN,
+    road_marks=std_roadmark_broken(),
 ):
     &#34;&#34;&#34;creates a curved Road  with a Spiral - Arc - Spiral, and two lanes
 
@@ -1709,7 +1965,7 @@ outer_road_marks (RoadMark): the roadmark that will be on the edge of the connec
     arc_part=1 / 3,
     startnum=100,
     inner_road_marks=None,
-    outer_road_marks=STD_ROADMARK_SOLID,
+    outer_road_marks=std_roadmark_solid(),
 ):
     &#34;&#34;&#34;creates all needed roads for some simple junctions, the curved parts of the junction are created as a spiral-arc-spiral combo
     R is value to the the radius of the whole junction (meaning R = distance between the center of the junction and any external road attached to the junction)
@@ -2153,7 +2409,7 @@ lane_width (float): the lane width of the lanes in the junction
 </details>
 </dd>
 <dt id="scenariogeneration.xodr.generators.create_lanes_merge_split"><code class="name flex">
-<span>def <span class="ident">create_lanes_merge_split</span></span>(<span>right_lane_def, left_lane_def, road_length, center_road_mark, lane_width)</span>
+<span>def <span class="ident">create_lanes_merge_split</span></span>(<span>right_lane_def, left_lane_def, road_length, center_road_mark, lane_width, lane_width_end)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>create_lanes_merge_split is a generator that will create the Lanes of a road road that can contain one or more lane merges/splits
@@ -2171,6 +2427,8 @@ road_length (float): the full length of the road
 center_road_mark (RoadMark): roadmark for the center line
 
 lane_width (float): the width of the lanes
+
+lane_width_end (float): the end width of the lanes
 </code></pre>
 <h2 id="return">Return</h2>
 <pre><code>road (Lanes): the lanes of a road
@@ -2180,7 +2438,12 @@ lane_width (float): the width of the lanes
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def create_lanes_merge_split(
-    right_lane_def, left_lane_def, road_length, center_road_mark, lane_width
+    right_lane_def,
+    left_lane_def,
+    road_length,
+    center_road_mark,
+    lane_width,
+    lane_width_end,
 ):
     &#34;&#34;&#34;create_lanes_merge_split is a generator that will create the Lanes of a road road that can contain one or more lane merges/splits
     This is a simple implementation and has some constraints:
@@ -2201,6 +2464,8 @@ lane_width (float): the width of the lanes
 
         lane_width (float): the width of the lanes
 
+        lane_width_end (float): the end width of the lanes
+
     Return
     ------
         road (Lanes): the lanes of a road
@@ -2208,24 +2473,23 @@ lane_width (float): the width of the lanes
 
     lanesections = []
     # expand the lane list
-    right_lane, left_lane = _create_lane_lists(
-        right_lane_def, left_lane_def, road_length
-    )
 
-    # create centerlane
-    lc = Lane(a=0)
-    lc.add_roadmark(center_road_mark)
+    right_lane, left_lane = _create_lane_lists(
+        right_lane_def, left_lane_def, road_length, lane_width
+    )
 
     # create the lanesections needed
     for ls in range(len(left_lane)):
+        lc = Lane(a=0)
+        lc.add_roadmark(copy.deepcopy(center_road_mark))
         lsec = LaneSection(left_lane[ls].s_start, lc)
         # do the right lanes
         for i in range(max(right_lane[ls].n_lanes_start, right_lane[ls].n_lanes_end)):
             # add broken roadmarks for all lanes, except for the outer lane where a solid line is added
             if i == max(right_lane[ls].n_lanes_start, right_lane[ls].n_lanes_end) - 1:
-                rm = STD_ROADMARK_SOLID
+                rm = std_roadmark_solid()
             else:
-                rm = STD_ROADMARK_BROKEN
+                rm = std_roadmark_broken()
 
             # check if the number of lanes should change or not
             if (
@@ -2234,7 +2498,10 @@ lane_width (float): the width of the lanes
             ):
                 # lane merge
                 coeff = get_coeffs_for_poly3(
-                    right_lane[ls].s_end - right_lane[ls].s_start, lane_width, False
+                    right_lane[ls].s_end - right_lane[ls].s_start,
+                    right_lane[ls].lane_start_widths[i],
+                    False,
+                    right_lane[ls].lane_end_widths[i],
                 )
                 rightlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
                 rightlane.add_roadmark(rm)
@@ -2244,7 +2511,28 @@ lane_width (float): the width of the lanes
             ):
                 # lane split
                 coeff = get_coeffs_for_poly3(
-                    right_lane[ls].s_end - right_lane[ls].s_start, lane_width, True
+                    right_lane[ls].s_end - right_lane[ls].s_start,
+                    right_lane[ls].lane_start_widths[i],
+                    True,
+                    right_lane[ls].lane_end_widths[i],
+                )
+                rightlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
+                rightlane.add_roadmark(rm)
+            elif (lane_width_end is not None) and (lane_width != lane_width_end):
+                coeff = get_coeffs_for_poly3(
+                    right_lane[ls].s_end - right_lane[ls].s_start,
+                    lane_width,
+                    False,
+                    lane_width_end=lane_width_end,
+                )
+                rightlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
+                rightlane.add_roadmark(rm)
+            elif right_lane[ls].lane_start_widths:
+                coeff = get_coeffs_for_poly3(
+                    right_lane[ls].s_end - right_lane[ls].s_start,
+                    right_lane[ls].lane_start_widths[i],
+                    False,
+                    lane_width_end=right_lane[ls].lane_end_widths[i],
                 )
                 rightlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
                 rightlane.add_roadmark(rm)
@@ -2256,9 +2544,9 @@ lane_width (float): the width of the lanes
         for i in range(max(left_lane[ls].n_lanes_start, left_lane[ls].n_lanes_end)):
             # add broken roadmarks for all lanes, except for the outer lane where a solid line is added
             if i == max(left_lane[ls].n_lanes_start, left_lane[ls].n_lanes_end) - 1:
-                rm = STD_ROADMARK_SOLID
+                rm = std_roadmark_solid()
             else:
-                rm = STD_ROADMARK_BROKEN
+                rm = std_roadmark_broken()
 
             # check if the number of lanes should change or not
             if (
@@ -2267,7 +2555,10 @@ lane_width (float): the width of the lanes
             ):
                 # lane split
                 coeff = get_coeffs_for_poly3(
-                    left_lane[ls].s_end - left_lane[ls].s_start, lane_width, True
+                    left_lane[ls].s_end - left_lane[ls].s_start,
+                    left_lane[ls].lane_start_widths[i],
+                    True,
+                    left_lane[ls].lane_end_widths[i],
                 )
                 leftlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
                 leftlane.add_roadmark(rm)
@@ -2277,7 +2568,28 @@ lane_width (float): the width of the lanes
             ):
                 # lane merge
                 coeff = get_coeffs_for_poly3(
-                    left_lane[ls].s_end - left_lane[ls].s_start, lane_width, False
+                    left_lane[ls].s_end - left_lane[ls].s_start,
+                    left_lane[ls].lane_start_widths[i],
+                    False,
+                    left_lane[ls].lane_end_widths[i],
+                )
+                leftlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
+                leftlane.add_roadmark(rm)
+            elif (lane_width_end is not None) and (lane_width != lane_width_end):
+                coeff = get_coeffs_for_poly3(
+                    left_lane[ls].s_end - left_lane[ls].s_start,
+                    lane_width,
+                    False,
+                    lane_width_end=lane_width_end,
+                )
+                leftlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
+                leftlane.add_roadmark(rm)
+            elif left_lane[ls].lane_start_widths:
+                coeff = get_coeffs_for_poly3(
+                    left_lane[ls].s_end - left_lane[ls].s_start,
+                    left_lane[ls].lane_start_widths[i],
+                    False,
+                    lane_width_end=left_lane[ls].lane_end_widths[i],
                 )
                 leftlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
                 leftlane.add_roadmark(rm)
@@ -2368,11 +2680,12 @@ lane_width (float): the width of the lanes
 </details>
 </dd>
 <dt id="scenariogeneration.xodr.generators.create_road"><code class="name flex">
-<span>def <span class="ident">create_road</span></span>(<span>geometry, id, left_lanes=1, right_lanes=1, road_type=-1, center_road_mark=&lt;scenariogeneration.xodr.lane.RoadMark object&gt;, lane_width=3)</span>
+<span>def <span class="ident">create_road</span></span>(<span>geometry, id, left_lanes=1, right_lanes=1, road_type=-1, center_road_mark=&lt;scenariogeneration.xodr.lane.RoadMark object&gt;, lane_width=3, lane_width_end=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>create_road creates a road with one lanesection with different number of lanes, lane marks will be of type broken,
-except the outer lane, that will be solid.</p>
+except the outer lane, that will be solid.
+The lane_width_end parameter can only be used when inputs for left_lanes and right_lanes are int</p>
 <h2 id="parameters">Parameters</h2>
 <pre><code>geometry (Line, Spiral, ParamPoly3, or Arc, or list with these): geometries to build the road
 
@@ -2388,7 +2701,9 @@ road_type (int): type of road, -1 normal road, otherwise connecting road
 
 center_road_mark (RoadMark): roadmark for the center line
 
-lane_width (float): the with of all lanes
+lane_width (float): the width of all lanes
+
+lane_width_end (float): the end width of all lanes
 </code></pre>
 <h2 id="returns">Returns</h2>
 <pre><code>road (Road): a straight road
@@ -2403,11 +2718,13 @@ lane_width (float): the with of all lanes
     left_lanes=1,
     right_lanes=1,
     road_type=-1,
-    center_road_mark=STD_ROADMARK_SOLID,
+    center_road_mark=std_roadmark_solid(),
     lane_width=3,
+    lane_width_end=None,
 ):
     &#34;&#34;&#34;create_road creates a road with one lanesection with different number of lanes, lane marks will be of type broken,
     except the outer lane, that will be solid.
+    The lane_width_end parameter can only be used when inputs for left_lanes and right_lanes are int
 
     Parameters
     ----------
@@ -2425,7 +2742,9 @@ lane_width (float): the with of all lanes
 
         center_road_mark (RoadMark): roadmark for the center line
 
-        lane_width (float): the with of all lanes
+        lane_width (float): the width of all lanes
+
+        lane_width_end (float): the end width of all lanes
 
     Returns
     -------
@@ -2441,8 +2760,25 @@ lane_width (float): the with of all lanes
         pv.add_geometry(geometry)
         raw_length += geometry.length
 
+    if isinstance(left_lanes, LaneDef):
+        left_lanes = [left_lanes]
+    if isinstance(right_lanes, LaneDef):
+        right_lanes = [right_lanes]
+
+    if (lane_width_end is not None) and (
+        (type(left_lanes) != int) or (type(right_lanes) != int)
+    ):
+        raise RuntimeError(
+            &#34;lane_width_end can only be used when left_lanes and right_lanes are int&#34;
+        )
+
     lanes = create_lanes_merge_split(
-        right_lanes, left_lanes, raw_length, center_road_mark, lane_width
+        right_lanes,
+        left_lanes,
+        raw_length,
+        center_road_mark,
+        lane_width,
+        lane_width_end=lane_width_end,
     )
 
     road = Road(id, pv, lanes, road_type=road_type)
@@ -2454,24 +2790,26 @@ lane_width (float): the with of all lanes
 <span>def <span class="ident">create_straight_road</span></span>(<span>road_id, length=100, junction=-1, n_lanes=1, lane_offset=3)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>creates a standard straight road with two lanes</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>road_id (int): id of the road to create
+<div class="desc"><p>creates a standard straight road with two lanes
+STD_ROADMARK_SOLID
+Parameters
+----------
+road_id (int): id of the road to create</p>
+<pre><code>    length (float): length of the road
+        default: 100
 
-length (float): length of the road
-    default: 100
+    junction (int): if the road belongs to a junction or not
+        default: -1
 
-junction (int): if the road belongs to a junction or not
-    default: -1
+    n_lanes (int): number of lanes
+        default: 1
 
-n_lanes (int): number of lanes
-    default: 1
+    lane_offset (int): width of the road
+        default: 3
 
-lane_offset (int): width of the road
-    default: 3
-</code></pre>
-<h2 id="returns">Returns</h2>
-<pre><code>road (Road): a straight road
+Returns
+-------
+    road (Road): a straight road
 </code></pre></div>
 <details class="source">
 <summary>
@@ -2479,26 +2817,26 @@ lane_offset (int): width of the road
 </summary>
 <pre><code class="python">def create_straight_road(road_id, length=100, junction=-1, n_lanes=1, lane_offset=3):
     &#34;&#34;&#34;creates a standard straight road with two lanes
+    STD_ROADMARK_SOLID
+        Parameters
+        ----------
+            road_id (int): id of the road to create
 
-    Parameters
-    ----------
-        road_id (int): id of the road to create
+            length (float): length of the road
+                default: 100
 
-        length (float): length of the road
-            default: 100
+            junction (int): if the road belongs to a junction or not
+                default: -1
 
-        junction (int): if the road belongs to a junction or not
-            default: -1
+            n_lanes (int): number of lanes
+                default: 1
 
-        n_lanes (int): number of lanes
-            default: 1
+            lane_offset (int): width of the road
+                default: 3
 
-        lane_offset (int): width of the road
-            default: 3
-
-    Returns
-    -------
-        road (Road): a straight road
+        Returns
+        -------
+            road (Road): a straight road
     &#34;&#34;&#34;
     # create geometry
     line1 = Line(length)
@@ -2522,7 +2860,7 @@ lane_offset (int): width of the road
 </details>
 </dd>
 <dt id="scenariogeneration.xodr.generators.get_coeffs_for_poly3"><code class="name flex">
-<span>def <span class="ident">get_coeffs_for_poly3</span></span>(<span>length, lane_offset, zero_start)</span>
+<span>def <span class="ident">get_coeffs_for_poly3</span></span>(<span>length, lane_offset, zero_start, lane_width_end=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>get_coeffs_for_poly3 creates the coefficients for a third degree polynomial, can be used for all kinds of descriptions in xodr.</p>
@@ -2534,6 +2872,9 @@ lane_offset (float): the lane offset (width) of the lane
 
 zero_start (bool): True; start with zero and ends with lane_offset width,
                    False; start with lane_offset and ends with zero width
+
+lane_width_end (float): specify the ending lane width for lanes that may start
+                        and end with different widths
 </code></pre>
 <h2 id="return">Return</h2>
 <pre><code>coefficients (float,float,float,float): polynomial coefficients corresponding to "a, b, c, d" in the OpenDrive polynomials
@@ -2542,7 +2883,7 @@ zero_start (bool): True; start with zero and ends with lane_offset width,
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_coeffs_for_poly3(length, lane_offset, zero_start):
+<pre><code class="python">def get_coeffs_for_poly3(length, lane_offset, zero_start, lane_width_end=None):
     &#34;&#34;&#34;get_coeffs_for_poly3 creates the coefficients for a third degree polynomial, can be used for all kinds of descriptions in xodr.
 
     Assuming that the derivative is 0 at the start and end of the segment.
@@ -2555,6 +2896,9 @@ zero_start (bool): True; start with zero and ends with lane_offset width,
 
         zero_start (bool): True; start with zero and ends with lane_offset width,
                            False; start with lane_offset and ends with zero width
+
+        lane_width_end (float): specify the ending lane width for lanes that may start
+                                and end with different widths
 
     Return
     ------
@@ -2579,6 +2923,10 @@ zero_start (bool): True; start with zero and ends with lane_offset width,
         B = [start_heading, end_heading, 0, lane_offset]
     else:
         B = [start_heading, end_heading, lane_offset, 0]
+
+    if lane_width_end is not None:
+        B = [start_heading, end_heading, lane_offset, lane_width_end]
+
     # calculate and return the coefficients
     return np.linalg.solve(A, B)</code></pre>
 </details>
@@ -2697,7 +3045,7 @@ rm (RoadMark): road mark used for the standard lane
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def standard_lane(offset=3, rm=STD_ROADMARK_BROKEN):
+<pre><code class="python">def standard_lane(offset=3, rm=std_roadmark_broken()):
     &#34;&#34;&#34;standard_lane creates a simple lane with an offset an a roadmark
 
     Parameters
@@ -2717,6 +3065,128 @@ rm (RoadMark): road mark used for the standard lane
     return lc</code></pre>
 </details>
 </dd>
+<dt id="scenariogeneration.xodr.generators.std_roadmark_broken"><code class="name flex">
+<span>def <span class="ident">std_roadmark_broken</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def std_roadmark_broken():
+    roadmark = RoadMark(RoadMarkType.broken, 0.2)
+    roadmark.add_specific_road_line(RoadLine(0.15, 3, 9, 0, 0))
+    return roadmark</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.generators.std_roadmark_broken_broken"><code class="name flex">
+<span>def <span class="ident">std_roadmark_broken_broken</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def std_roadmark_broken_broken():
+    roadmark = RoadMark(RoadMarkType.broken_broken)
+    roadmark.add_specific_road_line(RoadLine(0.2, 3, 3, 0.2, 0))
+    roadmark.add_specific_road_line(RoadLine(0.2, 3, 3, -0.2, 0))
+    return roadmark</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.generators.std_roadmark_broken_long_line"><code class="name flex">
+<span>def <span class="ident">std_roadmark_broken_long_line</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def std_roadmark_broken_long_line():
+    roadmark = RoadMark(RoadMarkType.broken, 0.2)
+    roadmark.add_specific_road_line(RoadLine(0.15, 9, 3, 0, 0))
+    return roadmark</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.generators.std_roadmark_broken_solid"><code class="name flex">
+<span>def <span class="ident">std_roadmark_broken_solid</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def std_roadmark_broken_solid():
+    roadmark = RoadMark(RoadMarkType.broken_solid)
+    roadmark.add_specific_road_line(RoadLine(0.2, 0, 0, -0.2, 0))
+    roadmark.add_specific_road_line(RoadLine(0.2, 3, 3, 0.2, 0))
+    return roadmark</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.generators.std_roadmark_broken_tight"><code class="name flex">
+<span>def <span class="ident">std_roadmark_broken_tight</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def std_roadmark_broken_tight():
+    roadmark = RoadMark(RoadMarkType.broken, 0.2)
+    roadmark.add_specific_road_line(RoadLine(0.15, 3, 3, 0, 0))
+    return roadmark</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.generators.std_roadmark_solid"><code class="name flex">
+<span>def <span class="ident">std_roadmark_solid</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def std_roadmark_solid():
+    return RoadMark(RoadMarkType.solid, 0.2)</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.generators.std_roadmark_solid_broken"><code class="name flex">
+<span>def <span class="ident">std_roadmark_solid_broken</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def std_roadmark_solid_broken():
+    roadmark = RoadMark(RoadMarkType.solid_broken)
+    roadmark.add_specific_road_line(RoadLine(0.2, 0, 0, 0.2, 0))
+    roadmark.add_specific_road_line(RoadLine(0.2, 3, 3, -0.2, 0))
+    return roadmark</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xodr.generators.std_roadmark_solid_solid"><code class="name flex">
+<span>def <span class="ident">std_roadmark_solid_solid</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def std_roadmark_solid_solid():
+    roadmark = RoadMark(RoadMarkType.solid_solid)
+    roadmark.add_specific_road_line(RoadLine(0.2, 0, 0, 0.2, 0))
+    roadmark.add_specific_road_line(RoadLine(0.2, 0, 0, -0.2, 0))
+    return roadmark</code></pre>
+</details>
+</dd>
 </dl>
 </section>
 <section>
@@ -2724,7 +3194,7 @@ rm (RoadMark): road mark used for the standard lane
 <dl>
 <dt id="scenariogeneration.xodr.generators.LaneDef"><code class="flex name class">
 <span>class <span class="ident">LaneDef</span></span>
-<span>(</span><span>s_start, s_end, n_lanes_start, n_lanes_end, sub_lane=None)</span>
+<span>(</span><span>s_start, s_end, n_lanes_start, n_lanes_end, sub_lane=None, lane_start_widths=[], lane_end_widths=[])</span>
 </code></dt>
 <dd>
 <div class="desc"><p>LaneDef is used to help create a lane merge or split. Can handle one lane merging or spliting.</p>
@@ -2739,6 +3209,12 @@ n_lanes_start (int): number of lanes at s_start
 n_lanes_end (int): number of lanes at s_end
 
 sub_lane (int): the lane that should be created (split) or removed (merge)
+
+lane_start_widths (list of float): widths of lanes at start, must be [] or same length as n_lanes_start
+    Default: []
+
+lane_end_widths (list of float): widths of lanes at end, must be [] or same length as n_lanes_end
+    Default: same as lane_start_widths
 </code></pre>
 <h2 id="attributes">Attributes</h2>
 <pre><code>s_start (float): s coordinate of the start of the change
@@ -2750,6 +3226,10 @@ n_lanes_start (int): number of lanes at s_start
 n_lanes_end (int): number of lanes at s_end
 
 sub_lane (int): the lane that should be created (split) or removed (merge)
+
+lane_start_widths (list of float): widths of lanes at start, must be [] or same length as n_lanes_start
+
+lane_end_widths (list of float): widths of lanes at end, must be [] or same length as n_lanes_end
 </code></pre></div>
 <details class="source">
 <summary>
@@ -2772,6 +3252,12 @@ sub_lane (int): the lane that should be created (split) or removed (merge)
 
         sub_lane (int): the lane that should be created (split) or removed (merge)
 
+        lane_start_widths (list of float): widths of lanes at start, must be [] or same length as n_lanes_start
+            Default: []
+
+        lane_end_widths (list of float): widths of lanes at end, must be [] or same length as n_lanes_end
+            Default: same as lane_start_widths
+
     Attributes
     ----------
         s_start (float): s coordinate of the start of the change
@@ -2784,14 +3270,44 @@ sub_lane (int): the lane that should be created (split) or removed (merge)
 
         sub_lane (int): the lane that should be created (split) or removed (merge)
 
+        lane_start_widths (list of float): widths of lanes at start, must be [] or same length as n_lanes_start
+
+        lane_end_widths (list of float): widths of lanes at end, must be [] or same length as n_lanes_end
     &#34;&#34;&#34;
 
-    def __init__(self, s_start, s_end, n_lanes_start, n_lanes_end, sub_lane=None):
+    def __init__(
+        self,
+        s_start,
+        s_end,
+        n_lanes_start,
+        n_lanes_end,
+        sub_lane=None,
+        lane_start_widths=[],
+        lane_end_widths=[],
+    ):
         self.s_start = s_start
         self.s_end = s_end
         self.n_lanes_start = n_lanes_start
         self.n_lanes_end = n_lanes_end
-        self.sub_lane = sub_lane</code></pre>
+        self.sub_lane = sub_lane
+        self.lane_start_widths = lane_start_widths
+        if lane_end_widths == []:
+            self.lane_end_widths = self.lane_start_widths.copy()
+        else:
+            self.lane_end_widths = lane_end_widths
+
+    def _adjust_lane_widths(self):
+        if self.sub_lane:
+            if self.lane_end_widths and len(self.lane_end_widths) &lt; self.n_lanes_start:
+                # mergeo
+                self.lane_end_widths.insert(abs(self.sub_lane) - 1, 0)
+            elif (
+                self.lane_start_widths
+                and len(self.lane_start_widths) &lt; self.n_lanes_end
+            ):
+                # split
+                self.lane_start_widths.insert(abs(self.sub_lane) - 1, 0)
+        # TODO: add some checks here?</code></pre>
 </details>
 </dd>
 </dl>
@@ -2824,6 +3340,14 @@ sub_lane (int): the lane that should be created (split) or removed (merge)
 <li><code><a title="scenariogeneration.xodr.generators.get_lanes_offset" href="#scenariogeneration.xodr.generators.get_lanes_offset">get_lanes_offset</a></code></li>
 <li><code><a title="scenariogeneration.xodr.generators.get_road_by_id" href="#scenariogeneration.xodr.generators.get_road_by_id">get_road_by_id</a></code></li>
 <li><code><a title="scenariogeneration.xodr.generators.standard_lane" href="#scenariogeneration.xodr.generators.standard_lane">standard_lane</a></code></li>
+<li><code><a title="scenariogeneration.xodr.generators.std_roadmark_broken" href="#scenariogeneration.xodr.generators.std_roadmark_broken">std_roadmark_broken</a></code></li>
+<li><code><a title="scenariogeneration.xodr.generators.std_roadmark_broken_broken" href="#scenariogeneration.xodr.generators.std_roadmark_broken_broken">std_roadmark_broken_broken</a></code></li>
+<li><code><a title="scenariogeneration.xodr.generators.std_roadmark_broken_long_line" href="#scenariogeneration.xodr.generators.std_roadmark_broken_long_line">std_roadmark_broken_long_line</a></code></li>
+<li><code><a title="scenariogeneration.xodr.generators.std_roadmark_broken_solid" href="#scenariogeneration.xodr.generators.std_roadmark_broken_solid">std_roadmark_broken_solid</a></code></li>
+<li><code><a title="scenariogeneration.xodr.generators.std_roadmark_broken_tight" href="#scenariogeneration.xodr.generators.std_roadmark_broken_tight">std_roadmark_broken_tight</a></code></li>
+<li><code><a title="scenariogeneration.xodr.generators.std_roadmark_solid" href="#scenariogeneration.xodr.generators.std_roadmark_solid">std_roadmark_solid</a></code></li>
+<li><code><a title="scenariogeneration.xodr.generators.std_roadmark_solid_broken" href="#scenariogeneration.xodr.generators.std_roadmark_solid_broken">std_roadmark_solid_broken</a></code></li>
+<li><code><a title="scenariogeneration.xodr.generators.std_roadmark_solid_solid" href="#scenariogeneration.xodr.generators.std_roadmark_solid_solid">std_roadmark_solid_solid</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>

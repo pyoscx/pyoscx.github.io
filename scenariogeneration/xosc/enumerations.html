@@ -62,7 +62,13 @@ class VersionBase:
     version_minor = _MINOR_VERSION
 
     def isVersion(self, major=1, minor=_MINOR_VERSION):
+        return major == self.version_major and minor == self.version_minor
+
+    def isVersionEqLess(self, major=1, minor=_MINOR_VERSION):
         return major &gt;= self.version_major and minor &gt;= self.version_minor
+
+    def isVersionEqLarger(self, major=1, minor=_MINOR_VERSION):
+        return major &lt;= self.version_major and minor &lt;= self.version_minor
 
     def setVersion(self, major=1, minor=_MINOR_VERSION):
         VersionBase.version_major = major
@@ -2361,7 +2367,13 @@ class ColorType:
     version_minor = _MINOR_VERSION
 
     def isVersion(self, major=1, minor=_MINOR_VERSION):
+        return major == self.version_major and minor == self.version_minor
+
+    def isVersionEqLess(self, major=1, minor=_MINOR_VERSION):
         return major &gt;= self.version_major and minor &gt;= self.version_minor
+
+    def isVersionEqLarger(self, major=1, minor=_MINOR_VERSION):
+        return major &lt;= self.version_major and minor &lt;= self.version_minor
 
     def setVersion(self, major=1, minor=_MINOR_VERSION):
         VersionBase.version_major = major
@@ -2371,12 +2383,26 @@ class ColorType:
 <ul class="hlist">
 <li>scenariogeneration.xosc.actions._Action</li>
 <li>scenariogeneration.xosc.actions._ActionType</li>
+<li><a title="scenariogeneration.xosc.entities.Axle" href="entities.html#scenariogeneration.xosc.entities.Axle">Axle</a></li>
+<li><a title="scenariogeneration.xosc.entities.Axles" href="entities.html#scenariogeneration.xosc.entities.Axles">Axles</a></li>
+<li><a title="scenariogeneration.xosc.entities.Entities" href="entities.html#scenariogeneration.xosc.entities.Entities">Entities</a></li>
+<li><a title="scenariogeneration.xosc.entities.Entity" href="entities.html#scenariogeneration.xosc.entities.Entity">Entity</a></li>
+<li><a title="scenariogeneration.xosc.entities.ExternalObjectReference" href="entities.html#scenariogeneration.xosc.entities.ExternalObjectReference">ExternalObjectReference</a></li>
 <li><a title="scenariogeneration.xosc.entities.MiscObject" href="entities.html#scenariogeneration.xosc.entities.MiscObject">MiscObject</a></li>
 <li><a title="scenariogeneration.xosc.entities.Pedestrian" href="entities.html#scenariogeneration.xosc.entities.Pedestrian">Pedestrian</a></li>
 <li><a title="scenariogeneration.xosc.entities.ScenarioObject" href="entities.html#scenariogeneration.xosc.entities.ScenarioObject">ScenarioObject</a></li>
 <li><a title="scenariogeneration.xosc.entities.Vehicle" href="entities.html#scenariogeneration.xosc.entities.Vehicle">Vehicle</a></li>
 <li>scenariogeneration.xosc.enumerations._OscEnum</li>
+<li><a title="scenariogeneration.xosc.parameters.Deterministic" href="parameters.html#scenariogeneration.xosc.parameters.Deterministic">Deterministic</a></li>
+<li><a title="scenariogeneration.xosc.parameters.DeterministicMultiParameterDistribution" href="parameters.html#scenariogeneration.xosc.parameters.DeterministicMultiParameterDistribution">DeterministicMultiParameterDistribution</a></li>
+<li><a title="scenariogeneration.xosc.parameters.DistributionRange" href="parameters.html#scenariogeneration.xosc.parameters.DistributionRange">DistributionRange</a></li>
+<li><a title="scenariogeneration.xosc.parameters.DistributionSet" href="parameters.html#scenariogeneration.xosc.parameters.DistributionSet">DistributionSet</a></li>
 <li><a title="scenariogeneration.xosc.parameters.ParameterValueDistribution" href="parameters.html#scenariogeneration.xosc.parameters.ParameterValueDistribution">ParameterValueDistribution</a></li>
+<li><a title="scenariogeneration.xosc.parameters.ParameterValueSet" href="parameters.html#scenariogeneration.xosc.parameters.ParameterValueSet">ParameterValueSet</a></li>
+<li><a title="scenariogeneration.xosc.parameters.Range" href="parameters.html#scenariogeneration.xosc.parameters.Range">Range</a></li>
+<li><a title="scenariogeneration.xosc.parameters.Stochastic" href="parameters.html#scenariogeneration.xosc.parameters.Stochastic">Stochastic</a></li>
+<li>scenariogeneration.xosc.parameters._HistogramBin</li>
+<li>scenariogeneration.xosc.parameters._ProbabilityDistributionSetElement</li>
 <li><a title="scenariogeneration.xosc.position.Clothoid" href="position.html#scenariogeneration.xosc.position.Clothoid">Clothoid</a></li>
 <li><a title="scenariogeneration.xosc.position.ControlPoint" href="position.html#scenariogeneration.xosc.position.ControlPoint">ControlPoint</a></li>
 <li><a title="scenariogeneration.xosc.position.Nurbs" href="position.html#scenariogeneration.xosc.position.Nurbs">Nurbs</a></li>
@@ -2385,7 +2411,15 @@ class ColorType:
 <li><a title="scenariogeneration.xosc.position.Trajectory" href="position.html#scenariogeneration.xosc.position.Trajectory">Trajectory</a></li>
 <li><a title="scenariogeneration.xosc.position.Waypoint" href="position.html#scenariogeneration.xosc.position.Waypoint">Waypoint</a></li>
 <li><a title="scenariogeneration.xosc.scenario.RoadNetwork" href="scenario.html#scenariogeneration.xosc.scenario.RoadNetwork">RoadNetwork</a></li>
+<li><a title="scenariogeneration.xosc.scenario.Scenario" href="scenario.html#scenariogeneration.xosc.scenario.Scenario">Scenario</a></li>
+<li><a title="scenariogeneration.xosc.storyboard.Act" href="storyboard.html#scenariogeneration.xosc.storyboard.Act">Act</a></li>
 <li><a title="scenariogeneration.xosc.storyboard.Event" href="storyboard.html#scenariogeneration.xosc.storyboard.Event">Event</a></li>
+<li><a title="scenariogeneration.xosc.storyboard.Init" href="storyboard.html#scenariogeneration.xosc.storyboard.Init">Init</a></li>
+<li><a title="scenariogeneration.xosc.storyboard.Maneuver" href="storyboard.html#scenariogeneration.xosc.storyboard.Maneuver">Maneuver</a></li>
+<li><a title="scenariogeneration.xosc.storyboard.ManeuverGroup" href="storyboard.html#scenariogeneration.xosc.storyboard.ManeuverGroup">ManeuverGroup</a></li>
+<li><a title="scenariogeneration.xosc.storyboard.Story" href="storyboard.html#scenariogeneration.xosc.storyboard.Story">Story</a></li>
+<li><a title="scenariogeneration.xosc.storyboard.StoryBoard" href="storyboard.html#scenariogeneration.xosc.storyboard.StoryBoard">StoryBoard</a></li>
+<li>scenariogeneration.xosc.storyboard._Actors</li>
 <li><a title="scenariogeneration.xosc.triggers.TriggeringEntities" href="triggers.html#scenariogeneration.xosc.triggers.TriggeringEntities">TriggeringEntities</a></li>
 <li><a title="scenariogeneration.xosc.utils.AbsoluteSpeed" href="utils.html#scenariogeneration.xosc.utils.AbsoluteSpeed">AbsoluteSpeed</a></li>
 <li><a title="scenariogeneration.xosc.utils.BoundingBox" href="utils.html#scenariogeneration.xosc.utils.BoundingBox">BoundingBox</a></li>
@@ -2461,6 +2495,32 @@ class ColorType:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def isVersion(self, major=1, minor=_MINOR_VERSION):
+    return major == self.version_major and minor == self.version_minor</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VersionBase.isVersionEqLarger"><code class="name flex">
+<span>def <span class="ident">isVersionEqLarger</span></span>(<span>self, major=1, minor=2)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def isVersionEqLarger(self, major=1, minor=_MINOR_VERSION):
+    return major &lt;= self.version_major and minor &lt;= self.version_minor</code></pre>
+</details>
+</dd>
+<dt id="scenariogeneration.xosc.enumerations.VersionBase.isVersionEqLess"><code class="name flex">
+<span>def <span class="ident">isVersionEqLess</span></span>(<span>self, major=1, minor=2)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def isVersionEqLess(self, major=1, minor=_MINOR_VERSION):
     return major &gt;= self.version_major and minor &gt;= self.version_minor</code></pre>
 </details>
 </dd>
@@ -2925,8 +2985,10 @@ class ColorType:
 </li>
 <li>
 <h4><code><a title="scenariogeneration.xosc.enumerations.VersionBase" href="#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></code></h4>
-<ul class="">
+<ul class="two-column">
 <li><code><a title="scenariogeneration.xosc.enumerations.VersionBase.isVersion" href="#scenariogeneration.xosc.enumerations.VersionBase.isVersion">isVersion</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VersionBase.isVersionEqLarger" href="#scenariogeneration.xosc.enumerations.VersionBase.isVersionEqLarger">isVersionEqLarger</a></code></li>
+<li><code><a title="scenariogeneration.xosc.enumerations.VersionBase.isVersionEqLess" href="#scenariogeneration.xosc.enumerations.VersionBase.isVersionEqLess">isVersionEqLess</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.VersionBase.setVersion" href="#scenariogeneration.xosc.enumerations.VersionBase.setVersion">setVersion</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.VersionBase.version_major" href="#scenariogeneration.xosc.enumerations.VersionBase.version_major">version_major</a></code></li>
 <li><code><a title="scenariogeneration.xosc.enumerations.VersionBase.version_minor" href="#scenariogeneration.xosc.enumerations.VersionBase.version_minor">version_minor</a></code></li>

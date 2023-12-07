@@ -36,11 +36,11 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <pre><code class="python">&#34;&#34;&#34;
   scenariogeneration
   https://github.com/pyoscx/scenariogeneration
- 
+
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at https://mozilla.org/MPL/2.0/.
- 
+
   Copyright (c) 2022 The scenariogeneration Authors.
 
 &#34;&#34;&#34;
@@ -212,6 +212,13 @@ class ObjectType(Enum):
     roadMark = auto()
 
 
+class TunnelType(Enum):
+    &#34;&#34;&#34;Enum for TunnelType&#34;&#34;&#34;
+
+    standard = auto()
+    underpass = auto()
+
+
 class Dynamic(Enum):
     &#34;&#34;&#34;Enum for Dynamic&#34;&#34;&#34;
 
@@ -243,7 +250,7 @@ class JunctionType(Enum):
 
 
 class FillType(Enum):
-    &#34;&#34;&#34;Enum for JunctionType&#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for FillType&#34;&#34;&#34;
 
     asphalt = auto()
     cobble = auto()
@@ -251,7 +258,37 @@ class FillType(Enum):
     grass = auto()
     gravel = auto()
     pavement = auto()
-    soil = auto()</code></pre>
+    soil = auto()
+
+
+class Access(Enum):
+    &#34;&#34;&#34;Enum for ParkingSpace Access&#34;&#34;&#34;
+
+    all = auto()
+    bus = auto()
+    car = auto()
+    electric = auto()
+    handicapped = auto()
+    residents = auto()
+    truck = auto()
+    woman = auto()
+
+
+class RawDataPostProcessing(Enum):
+    &#34;&#34;&#34;Enum for dataQuality RawData PostProcessing&#34;&#34;&#34;
+
+    cleaned = auto()
+    fused = auto()
+    property = auto()
+    raw = auto()
+
+
+class RawDataSource(Enum):
+    &#34;&#34;&#34;Enum for dataQuality RawData PostProcessing&#34;&#34;&#34;
+
+    cadaster = auto()
+    custom = auto()
+    sensor = auto()</code></pre>
 </details>
 </section>
 <section>
@@ -263,6 +300,68 @@ class FillType(Enum):
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="scenariogeneration.xodr.enumerations.Access"><code class="flex name class">
+<span>class <span class="ident">Access</span></span>
+<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enum for ParkingSpace Access</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Access(Enum):
+    &#34;&#34;&#34;Enum for ParkingSpace Access&#34;&#34;&#34;
+
+    all = auto()
+    bus = auto()
+    car = auto()
+    electric = auto()
+    handicapped = auto()
+    residents = auto()
+    truck = auto()
+    woman = auto()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="scenariogeneration.xodr.enumerations.Access.all"><code class="name">var <span class="ident">all</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xodr.enumerations.Access.bus"><code class="name">var <span class="ident">bus</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xodr.enumerations.Access.car"><code class="name">var <span class="ident">car</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xodr.enumerations.Access.electric"><code class="name">var <span class="ident">electric</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xodr.enumerations.Access.handicapped"><code class="name">var <span class="ident">handicapped</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xodr.enumerations.Access.residents"><code class="name">var <span class="ident">residents</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xodr.enumerations.Access.truck"><code class="name">var <span class="ident">truck</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xodr.enumerations.Access.woman"><code class="name">var <span class="ident">woman</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
 <dt id="scenariogeneration.xodr.enumerations.ContactPoint"><code class="flex name class">
 <span>class <span class="ident">ContactPoint</span></span>
 <span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
@@ -396,13 +495,13 @@ class FillType(Enum):
 <span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Enum for JunctionType</p></div>
+<div class="desc"><p>Enum for FillType</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class FillType(Enum):
-    &#34;&#34;&#34;Enum for JunctionType&#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for FillType&#34;&#34;&#34;
 
     asphalt = auto()
     cobble = auto()
@@ -897,6 +996,85 @@ class FillType(Enum):
 </dd>
 </dl>
 </dd>
+<dt id="scenariogeneration.xodr.enumerations.RawDataPostProcessing"><code class="flex name class">
+<span>class <span class="ident">RawDataPostProcessing</span></span>
+<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enum for dataQuality RawData PostProcessing</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class RawDataPostProcessing(Enum):
+    &#34;&#34;&#34;Enum for dataQuality RawData PostProcessing&#34;&#34;&#34;
+
+    cleaned = auto()
+    fused = auto()
+    property = auto()
+    raw = auto()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="scenariogeneration.xodr.enumerations.RawDataPostProcessing.cleaned"><code class="name">var <span class="ident">cleaned</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xodr.enumerations.RawDataPostProcessing.fused"><code class="name">var <span class="ident">fused</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xodr.enumerations.RawDataPostProcessing.property"><code class="name">var <span class="ident">property</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xodr.enumerations.RawDataPostProcessing.raw"><code class="name">var <span class="ident">raw</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="scenariogeneration.xodr.enumerations.RawDataSource"><code class="flex name class">
+<span>class <span class="ident">RawDataSource</span></span>
+<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enum for dataQuality RawData PostProcessing</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class RawDataSource(Enum):
+    &#34;&#34;&#34;Enum for dataQuality RawData PostProcessing&#34;&#34;&#34;
+
+    cadaster = auto()
+    custom = auto()
+    sensor = auto()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="scenariogeneration.xodr.enumerations.RawDataSource.cadaster"><code class="name">var <span class="ident">cadaster</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xodr.enumerations.RawDataSource.custom"><code class="name">var <span class="ident">custom</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xodr.enumerations.RawDataSource.sensor"><code class="name">var <span class="ident">sensor</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
 <dt id="scenariogeneration.xodr.enumerations.RoadMarkColor"><code class="flex name class">
 <span>class <span class="ident">RoadMarkColor</span></span>
 <span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
@@ -1229,6 +1407,38 @@ class FillType(Enum):
 </dd>
 </dl>
 </dd>
+<dt id="scenariogeneration.xodr.enumerations.TunnelType"><code class="flex name class">
+<span>class <span class="ident">TunnelType</span></span>
+<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enum for TunnelType</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TunnelType(Enum):
+    &#34;&#34;&#34;Enum for TunnelType&#34;&#34;&#34;
+
+    standard = auto()
+    underpass = auto()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="scenariogeneration.xodr.enumerations.TunnelType.standard"><code class="name">var <span class="ident">standard</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xodr.enumerations.TunnelType.underpass"><code class="name">var <span class="ident">underpass</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
 </dl>
 </section>
 </article>
@@ -1245,6 +1455,19 @@ class FillType(Enum):
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
+<li>
+<h4><code><a title="scenariogeneration.xodr.enumerations.Access" href="#scenariogeneration.xodr.enumerations.Access">Access</a></code></h4>
+<ul class="two-column">
+<li><code><a title="scenariogeneration.xodr.enumerations.Access.all" href="#scenariogeneration.xodr.enumerations.Access.all">all</a></code></li>
+<li><code><a title="scenariogeneration.xodr.enumerations.Access.bus" href="#scenariogeneration.xodr.enumerations.Access.bus">bus</a></code></li>
+<li><code><a title="scenariogeneration.xodr.enumerations.Access.car" href="#scenariogeneration.xodr.enumerations.Access.car">car</a></code></li>
+<li><code><a title="scenariogeneration.xodr.enumerations.Access.electric" href="#scenariogeneration.xodr.enumerations.Access.electric">electric</a></code></li>
+<li><code><a title="scenariogeneration.xodr.enumerations.Access.handicapped" href="#scenariogeneration.xodr.enumerations.Access.handicapped">handicapped</a></code></li>
+<li><code><a title="scenariogeneration.xodr.enumerations.Access.residents" href="#scenariogeneration.xodr.enumerations.Access.residents">residents</a></code></li>
+<li><code><a title="scenariogeneration.xodr.enumerations.Access.truck" href="#scenariogeneration.xodr.enumerations.Access.truck">truck</a></code></li>
+<li><code><a title="scenariogeneration.xodr.enumerations.Access.woman" href="#scenariogeneration.xodr.enumerations.Access.woman">woman</a></code></li>
+</ul>
+</li>
 <li>
 <h4><code><a title="scenariogeneration.xodr.enumerations.ContactPoint" href="#scenariogeneration.xodr.enumerations.ContactPoint">ContactPoint</a></code></h4>
 <ul class="">
@@ -1380,6 +1603,23 @@ class FillType(Enum):
 </ul>
 </li>
 <li>
+<h4><code><a title="scenariogeneration.xodr.enumerations.RawDataPostProcessing" href="#scenariogeneration.xodr.enumerations.RawDataPostProcessing">RawDataPostProcessing</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xodr.enumerations.RawDataPostProcessing.cleaned" href="#scenariogeneration.xodr.enumerations.RawDataPostProcessing.cleaned">cleaned</a></code></li>
+<li><code><a title="scenariogeneration.xodr.enumerations.RawDataPostProcessing.fused" href="#scenariogeneration.xodr.enumerations.RawDataPostProcessing.fused">fused</a></code></li>
+<li><code><a title="scenariogeneration.xodr.enumerations.RawDataPostProcessing.property" href="#scenariogeneration.xodr.enumerations.RawDataPostProcessing.property">property</a></code></li>
+<li><code><a title="scenariogeneration.xodr.enumerations.RawDataPostProcessing.raw" href="#scenariogeneration.xodr.enumerations.RawDataPostProcessing.raw">raw</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xodr.enumerations.RawDataSource" href="#scenariogeneration.xodr.enumerations.RawDataSource">RawDataSource</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xodr.enumerations.RawDataSource.cadaster" href="#scenariogeneration.xodr.enumerations.RawDataSource.cadaster">cadaster</a></code></li>
+<li><code><a title="scenariogeneration.xodr.enumerations.RawDataSource.custom" href="#scenariogeneration.xodr.enumerations.RawDataSource.custom">custom</a></code></li>
+<li><code><a title="scenariogeneration.xodr.enumerations.RawDataSource.sensor" href="#scenariogeneration.xodr.enumerations.RawDataSource.sensor">sensor</a></code></li>
+</ul>
+</li>
+<li>
 <h4><code><a title="scenariogeneration.xodr.enumerations.RoadMarkColor" href="#scenariogeneration.xodr.enumerations.RoadMarkColor">RoadMarkColor</a></code></h4>
 <ul class="two-column">
 <li><code><a title="scenariogeneration.xodr.enumerations.RoadMarkColor.blue" href="#scenariogeneration.xodr.enumerations.RoadMarkColor.blue">blue</a></code></li>
@@ -1447,6 +1687,13 @@ class FillType(Enum):
 <li><code><a title="scenariogeneration.xodr.enumerations.TrafficRule.LHT" href="#scenariogeneration.xodr.enumerations.TrafficRule.LHT">LHT</a></code></li>
 <li><code><a title="scenariogeneration.xodr.enumerations.TrafficRule.RHT" href="#scenariogeneration.xodr.enumerations.TrafficRule.RHT">RHT</a></code></li>
 <li><code><a title="scenariogeneration.xodr.enumerations.TrafficRule.none" href="#scenariogeneration.xodr.enumerations.TrafficRule.none">none</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xodr.enumerations.TunnelType" href="#scenariogeneration.xodr.enumerations.TunnelType">TunnelType</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xodr.enumerations.TunnelType.standard" href="#scenariogeneration.xodr.enumerations.TunnelType.standard">standard</a></code></li>
+<li><code><a title="scenariogeneration.xodr.enumerations.TunnelType.underpass" href="#scenariogeneration.xodr.enumerations.TunnelType.underpass">underpass</a></code></li>
 </ul>
 </li>
 </ul>

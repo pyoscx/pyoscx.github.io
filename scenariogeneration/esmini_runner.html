@@ -195,7 +195,7 @@ def esmini(
     if timestep != None:
         additional_args += &#34; --fixed_timestep &#34; + str(timestep)
 
-    additional_args += &#34; &#34; + args + &#34;--path &#34; + resource_path
+    additional_args += &#34; &#34; + args + &#34; --path &#34; + resource_path
 
     # find executable based on OS
     if os.name == &#34;posix&#34;:
@@ -210,8 +210,6 @@ def esmini(
         )
 
     # run esmini
-    print(&#39;hej&#39;)
-    print(executable_path + filetype + filename + additional_args)
     if os.system(executable_path + filetype + filename + additional_args) != 0:
         print(&#34;An error occurred while trying to execute the scenario&#34;)
         return
@@ -428,7 +426,7 @@ headless (boolean): run esmini in headless mode (no viewer)
     if timestep != None:
         additional_args += &#34; --fixed_timestep &#34; + str(timestep)
 
-    additional_args += &#34; &#34; + args + &#34;--path &#34; + resource_path
+    additional_args += &#34; &#34; + args + &#34; --path &#34; + resource_path
 
     # find executable based on OS
     if os.name == &#34;posix&#34;:
@@ -443,8 +441,6 @@ headless (boolean): run esmini in headless mode (no viewer)
         )
 
     # run esmini
-    print(&#39;hej&#39;)
-    print(executable_path + filetype + filename + additional_args)
     if os.system(executable_path + filetype + filename + additional_args) != 0:
         print(&#34;An error occurred while trying to execute the scenario&#34;)
         return

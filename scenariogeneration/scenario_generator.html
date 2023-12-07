@@ -53,14 +53,20 @@ from .helpers import printToFile
 
 
 class _generation_struct:
-    def __init__(self, data, filename, prettyprint):
+    def __init__(self, data, filename, prettyprint, encoding=&#34;utf-8&#34;):
         self.data = data
         self.filename = filename
         self.prettyprint = prettyprint
+        self.encoding = encoding
 
 
 def _write_xml_file(data_struct):
-    printToFile(data_struct.data, data_struct.filename, data_struct.prettyprint)
+    printToFile(
+        data_struct.data,
+        data_struct.filename,
+        data_struct.prettyprint,
+        data_struct.encoding,
+    )
 
 
 class ScenarioGenerator:
@@ -82,6 +88,12 @@ class ScenarioGenerator:
 
         number_of_parallel_writings (int): parallelize the writing of the xml files
             Default: 1 (no parallelization)
+
+        basename (str): basename of the scenariofiles,
+            Default: name of file
+
+        encoding (str): encoding of the outputs
+            Default:
     &#34;&#34;&#34;
 
     def __init__(self):
@@ -96,6 +108,10 @@ class ScenarioGenerator:
         self._name_separator = &#34;_&#34;
         self.number_of_parallel_writings = 1
         self._prettyprint = True
+        self.basename = os.path.basename(
+            sys.modules[self.__class__.__module__].__file__
+        ).split(&#34;.&#34;)[0]
+        self.encoding = &#34;utf-8&#34;
 
     def road(self, **kwargs):
         &#34;&#34;&#34;Dummy method for generating an OpenDRIVE road
@@ -207,7 +223,10 @@ class ScenarioGenerator:
                 else:
                     files_to_write.append(
                         _generation_struct(
-                            road.get_element(), self.road_file, self._prettyprint
+                            road.get_element(),
+                            self.road_file,
+                            self._prettyprint,
+                            self.encoding,
                         )
                     )
 
@@ -228,7 +247,10 @@ class ScenarioGenerator:
             else:
                 files_to_write.append(
                     _generation_struct(
-                        sce.get_element(), scenario_file, self._prettyprint
+                        sce.get_element(),
+                        scenario_file,
+                        self._prettyprint,
+                        self.encoding,
                     )
                 )
         return scenario_file, self.road_file, files_to_write
@@ -249,26 +271,27 @@ class ScenarioGenerator:
         if self.naming == &#34;numerical&#34;:
             name_prefix = str(self._it)
             self._it += 1
-        elif self.naming == &#34;parameter&#34;:
+        elif self.naming == &#34;parameter&#34; or self.naming == &#34;parameter_no_lists&#34;:
             for key, value in permutation.items():
+                if isinstance(value, list) and self.naming == &#34;parameter_no_lists&#34;:
+                    value_str = str(self._it)
+                    self._it += 1
+                else:
+                    value_str = str(value).replace(&#34;\\&#34;, &#34;-&#34;).replace(&#34;/&#34;, &#34;-&#34;)
                 name_prefix += (
                     self._name_separator
                     + key.replace(&#34;\\&#34;, &#34;-&#34;).replace(&#34;/&#34;, &#34;-&#34;)
                     + &#34;-&#34;
-                    + str(value).replace(&#34;\\&#34;, &#34;-&#34;).replace(&#34;/&#34;, &#34;-&#34;)
+                    + value_str
                 )
+
         else:
             raise NameError(
                 &#39;Attribute naming, can only be &#34;numerical&#34; or &#34;parameter&#34;, not &#39;
                 + self.naming
             )
 
-        return (
-            os.path.basename(sys.modules[self.__class__.__module__].__file__).split(
-                &#34;.&#34;
-            )[0]
-            + name_prefix
-        )
+        return self.basename + name_prefix
 
     def generate_single(
         self,
@@ -428,6 +451,12 @@ generate_all_roads (bool): will only generate unique roads
 
 number_of_parallel_writings (int): parallelize the writing of the xml files
     Default: 1 (no parallelization)
+
+basename (str): basename of the scenariofiles,
+    Default: name of file
+
+encoding (str): encoding of the outputs
+    Default:
 </code></pre></div>
 <details class="source">
 <summary>
@@ -452,6 +481,12 @@ number_of_parallel_writings (int): parallelize the writing of the xml files
 
         number_of_parallel_writings (int): parallelize the writing of the xml files
             Default: 1 (no parallelization)
+
+        basename (str): basename of the scenariofiles,
+            Default: name of file
+
+        encoding (str): encoding of the outputs
+            Default:
     &#34;&#34;&#34;
 
     def __init__(self):
@@ -466,6 +501,10 @@ number_of_parallel_writings (int): parallelize the writing of the xml files
         self._name_separator = &#34;_&#34;
         self.number_of_parallel_writings = 1
         self._prettyprint = True
+        self.basename = os.path.basename(
+            sys.modules[self.__class__.__module__].__file__
+        ).split(&#34;.&#34;)[0]
+        self.encoding = &#34;utf-8&#34;
 
     def road(self, **kwargs):
         &#34;&#34;&#34;Dummy method for generating an OpenDRIVE road
@@ -577,7 +616,10 @@ number_of_parallel_writings (int): parallelize the writing of the xml files
                 else:
                     files_to_write.append(
                         _generation_struct(
-                            road.get_element(), self.road_file, self._prettyprint
+                            road.get_element(),
+                            self.road_file,
+                            self._prettyprint,
+                            self.encoding,
                         )
                     )
 
@@ -598,7 +640,10 @@ number_of_parallel_writings (int): parallelize the writing of the xml files
             else:
                 files_to_write.append(
                     _generation_struct(
-                        sce.get_element(), scenario_file, self._prettyprint
+                        sce.get_element(),
+                        scenario_file,
+                        self._prettyprint,
+                        self.encoding,
                     )
                 )
         return scenario_file, self.road_file, files_to_write
@@ -619,26 +664,27 @@ number_of_parallel_writings (int): parallelize the writing of the xml files
         if self.naming == &#34;numerical&#34;:
             name_prefix = str(self._it)
             self._it += 1
-        elif self.naming == &#34;parameter&#34;:
+        elif self.naming == &#34;parameter&#34; or self.naming == &#34;parameter_no_lists&#34;:
             for key, value in permutation.items():
+                if isinstance(value, list) and self.naming == &#34;parameter_no_lists&#34;:
+                    value_str = str(self._it)
+                    self._it += 1
+                else:
+                    value_str = str(value).replace(&#34;\\&#34;, &#34;-&#34;).replace(&#34;/&#34;, &#34;-&#34;)
                 name_prefix += (
                     self._name_separator
                     + key.replace(&#34;\\&#34;, &#34;-&#34;).replace(&#34;/&#34;, &#34;-&#34;)
                     + &#34;-&#34;
-                    + str(value).replace(&#34;\\&#34;, &#34;-&#34;).replace(&#34;/&#34;, &#34;-&#34;)
+                    + value_str
                 )
+
         else:
             raise NameError(
                 &#39;Attribute naming, can only be &#34;numerical&#34; or &#34;parameter&#34;, not &#39;
                 + self.naming
             )
 
-        return (
-            os.path.basename(sys.modules[self.__class__.__module__].__file__).split(
-                &#34;.&#34;
-            )[0]
-            + name_prefix
-        )
+        return self.basename + name_prefix
 
     def generate_single(
         self,
@@ -777,6 +823,33 @@ number_of_parallel_writings (int): parallelize the writing of the xml files
 <li><a title="examples.generator.generate_from_main.Scenario" href="../examples/generator/generate_from_main.html#examples.generator.generate_from_main.Scenario">Scenario</a></li>
 <li><a title="examples.generator.generate_with_fixed_parameter_sets.Scenario" href="../examples/generator/generate_with_fixed_parameter_sets.html#examples.generator.generate_with_fixed_parameter_sets.Scenario">Scenario</a></li>
 <li><a title="examples.generator.generate_with_permutations.Scenario" href="../examples/generator/generate_with_permutations.html#examples.generator.generate_with_permutations.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.common_junction_creator.Scenario" href="../examples/xodr/common_junction_creator.html#examples.xodr.common_junction_creator.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.direct_junction_creator.Scenario" href="../examples/xodr/direct_junction_creator.html#examples.xodr.direct_junction_creator.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.full_junction.Scenario" href="../examples/xodr/full_junction.html#examples.xodr.full_junction.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.full_junction_with_LaneDef.Scenario" href="../examples/xodr/full_junction_with_LaneDef.html#examples.xodr.full_junction_with_LaneDef.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.highway_bridge_example.Scenario" href="../examples/xodr/highway_bridge_example.html#examples.xodr.highway_bridge_example.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.highway_example.Scenario" href="../examples/xodr/highway_example.html#examples.xodr.highway_example.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.highway_example_with_merge_and_split.Scenario" href="../examples/xodr/highway_example_with_merge_and_split.html#examples.xodr.highway_example_with_merge_and_split.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.highway_exit_with_lane_types.Scenario" href="../examples/xodr/highway_exit_with_lane_types.html#examples.xodr.highway_exit_with_lane_types.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.junction_trippel_twoway.Scenario" href="../examples/xodr/junction_trippel_twoway.html#examples.xodr.junction_trippel_twoway.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.junction_with_signals.Scenario" href="../examples/xodr/junction_with_signals.html#examples.xodr.junction_with_signals.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.junction_with_varying_lane_widths.Scenario" href="../examples/xodr/junction_with_varying_lane_widths.html#examples.xodr.junction_with_varying_lane_widths.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.lane_number_change_merge.Scenario" href="../examples/xodr/lane_number_change_merge.html#examples.xodr.lane_number_change_merge.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.manual_add_of_geometries.Scenario" href="../examples/xodr/manual_add_of_geometries.html#examples.xodr.manual_add_of_geometries.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.multiple_geometries_one_road.Scenario" href="../examples/xodr/multiple_geometries_one_road.html#examples.xodr.multiple_geometries_one_road.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.multiple_geometries_one_road_with_objects.Scenario" href="../examples/xodr/multiple_geometries_one_road_with_objects.html#examples.xodr.multiple_geometries_one_road_with_objects.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.road_link_unequal_number_of_lanes.Scenario" href="../examples/xodr/road_link_unequal_number_of_lanes.html#examples.xodr.road_link_unequal_number_of_lanes.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.road_merge.Scenario" href="../examples/xodr/road_merge.html#examples.xodr.road_merge.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.road_merge_w_lane_merge.Scenario" href="../examples/xodr/road_merge_w_lane_merge.html#examples.xodr.road_merge_w_lane_merge.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.road_split.Scenario" href="../examples/xodr/road_split.html#examples.xodr.road_split.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.road_split_w_lane_split.Scenario" href="../examples/xodr/road_split_w_lane_split.html#examples.xodr.road_split_w_lane_split.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.road_with_changing_lane_width.Scenario" href="../examples/xodr/road_with_changing_lane_width.html#examples.xodr.road_with_changing_lane_width.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.road_with_custom_lanes.Scenario" href="../examples/xodr/road_with_custom_lanes.html#examples.xodr.road_with_custom_lanes.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.road_with_custom_roadmarkers.Scenario" href="../examples/xodr/road_with_custom_roadmarkers.html#examples.xodr.road_with_custom_roadmarkers.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.road_with_lane_adjustment.Scenario" href="../examples/xodr/road_with_lane_adjustment.html#examples.xodr.road_with_lane_adjustment.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.road_with_multiple_lane_widths.Scenario" href="../examples/xodr/road_with_multiple_lane_widths.html#examples.xodr.road_with_multiple_lane_widths.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.simple_road_with_objects.Scenario" href="../examples/xodr/simple_road_with_objects.html#examples.xodr.simple_road_with_objects.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.two_roads.Scenario" href="../examples/xodr/two_roads.html#examples.xodr.two_roads.Scenario">Scenario</a></li>
 <li><a title="examples.xosc.Acceleration_condition.Scenario" href="../examples/xosc/Acceleration_condition.html#examples.xosc.Acceleration_condition.Scenario">Scenario</a></li>
 <li><a title="examples.xosc.Speed_condition.Scenario" href="../examples/xosc/Speed_condition.html#examples.xosc.Speed_condition.Scenario">Scenario</a></li>
 <li><a title="examples.xosc.Stop_on_offroad.Scenario" href="../examples/xosc/Stop_on_offroad.html#examples.xosc.Stop_on_offroad.Scenario">Scenario</a></li>
