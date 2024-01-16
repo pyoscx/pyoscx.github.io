@@ -58,6 +58,32 @@ from scipy.integrate import quad
 from .utils import XodrBase
 
 
+def wrap_pi(angle):
+    return angle % (2 * np.pi)
+
+
+class AdjustablePlanview:
+    &#34;&#34;&#34;AdjustablePlanview can be used to fit a geometry between two fixed roads.
+    Especially useful when connecting larger networks with Spiral geometries included.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        left_lane_defs=None,
+        right_lane_defs=None,
+        center_road_mark=None,
+        lane_width=None,
+        lane_width_end=None,
+    ):
+        self.fixed = False
+        self.adjusted = False
+        self.left_lane_defs = left_lane_defs
+        self.right_lane_defs = right_lane_defs
+        self.center_road_mark = center_road_mark
+        self.lane_width = lane_width
+        self.lane_width_end = lane_width_end
+
+
 class PlanView(XodrBase):
     &#34;&#34;&#34;the PlanView is the geometrical description of a road,
 
@@ -304,7 +330,7 @@ class PlanView(XodrBase):
                 self._adjusted_geometries.append(newgeom)
             self.x_end = self.present_x
             self.y_end = self.present_y
-            self.h_end = self.present_h
+            self.h_end = wrap_pi(self.present_h)
 
         else:
             self.x_end = self.present_x
@@ -331,7 +357,7 @@ class PlanView(XodrBase):
 
             self.x_start = self.present_x
             self.y_start = self.present_y
-            self.h_start = self.present_h + np.pi
+            self.h_start = wrap_pi(self.present_h + np.pi)
 
             length = sum(lengths)
             self.present_s = 0
@@ -340,6 +366,8 @@ class PlanView(XodrBase):
                 self._adjusted_geometries[i].set_s(self.present_s)
                 self.present_s += lengths[i]
             self._adjusted_geometries.reverse()
+        self.h_start = wrap_pi(self.h_start)
+        self.h_end = wrap_pi(self.h_end)
         self.adjusted = True
 
     def get_total_length(self):
@@ -1106,10 +1134,59 @@ class Spiral(XodrBase):
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="scenariogeneration.xodr.geometry.wrap_pi"><code class="name flex">
+<span>def <span class="ident">wrap_pi</span></span>(<span>angle)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def wrap_pi(angle):
+    return angle % (2 * np.pi)</code></pre>
+</details>
+</dd>
+</dl>
 </section>
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="scenariogeneration.xodr.geometry.AdjustablePlanview"><code class="flex name class">
+<span>class <span class="ident">AdjustablePlanview</span></span>
+<span>(</span><span>left_lane_defs=None, right_lane_defs=None, center_road_mark=None, lane_width=None, lane_width_end=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>AdjustablePlanview can be used to fit a geometry between two fixed roads.
+Especially useful when connecting larger networks with Spiral geometries included.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AdjustablePlanview:
+    &#34;&#34;&#34;AdjustablePlanview can be used to fit a geometry between two fixed roads.
+    Especially useful when connecting larger networks with Spiral geometries included.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        left_lane_defs=None,
+        right_lane_defs=None,
+        center_road_mark=None,
+        lane_width=None,
+        lane_width_end=None,
+    ):
+        self.fixed = False
+        self.adjusted = False
+        self.left_lane_defs = left_lane_defs
+        self.right_lane_defs = right_lane_defs
+        self.center_road_mark = center_road_mark
+        self.lane_width = lane_width
+        self.lane_width_end = lane_width_end</code></pre>
+</details>
+</dd>
 <dt id="scenariogeneration.xodr.geometry.Arc"><code class="flex name class">
 <span>class <span class="ident">Arc</span></span>
 <span>(</span><span>curvature, length=None, angle=None)</span>
@@ -2565,7 +2642,7 @@ Note: if multiple roads are used, the start values can be recalculated.</p></div
                 self._adjusted_geometries.append(newgeom)
             self.x_end = self.present_x
             self.y_end = self.present_y
-            self.h_end = self.present_h
+            self.h_end = wrap_pi(self.present_h)
 
         else:
             self.x_end = self.present_x
@@ -2592,7 +2669,7 @@ Note: if multiple roads are used, the start values can be recalculated.</p></div
 
             self.x_start = self.present_x
             self.y_start = self.present_y
-            self.h_start = self.present_h + np.pi
+            self.h_start = wrap_pi(self.present_h + np.pi)
 
             length = sum(lengths)
             self.present_s = 0
@@ -2601,6 +2678,8 @@ Note: if multiple roads are used, the start values can be recalculated.</p></div
                 self._adjusted_geometries[i].set_s(self.present_s)
                 self.present_s += lengths[i]
             self._adjusted_geometries.reverse()
+        self.h_start = wrap_pi(self.h_start)
+        self.h_end = wrap_pi(self.h_end)
         self.adjusted = True
 
     def get_total_length(self):
@@ -2790,7 +2869,7 @@ heading (float): override the previous heading (optional), not recommended
             self._adjusted_geometries.append(newgeom)
         self.x_end = self.present_x
         self.y_end = self.present_y
-        self.h_end = self.present_h
+        self.h_end = wrap_pi(self.present_h)
 
     else:
         self.x_end = self.present_x
@@ -2817,7 +2896,7 @@ heading (float): override the previous heading (optional), not recommended
 
         self.x_start = self.present_x
         self.y_start = self.present_y
-        self.h_start = self.present_h + np.pi
+        self.h_start = wrap_pi(self.present_h + np.pi)
 
         length = sum(lengths)
         self.present_s = 0
@@ -2826,6 +2905,8 @@ heading (float): override the previous heading (optional), not recommended
             self._adjusted_geometries[i].set_s(self.present_s)
             self.present_s += lengths[i]
         self._adjusted_geometries.reverse()
+    self.h_start = wrap_pi(self.h_start)
+    self.h_end = wrap_pi(self.h_end)
     self.adjusted = True</code></pre>
 </details>
 </dd>
@@ -3328,8 +3409,16 @@ l (float): length of the spiral
 <li><code><a title="scenariogeneration.xodr" href="index.html">scenariogeneration.xodr</a></code></li>
 </ul>
 </li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="scenariogeneration.xodr.geometry.wrap_pi" href="#scenariogeneration.xodr.geometry.wrap_pi">wrap_pi</a></code></li>
+</ul>
+</li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
+<li>
+<h4><code><a title="scenariogeneration.xodr.geometry.AdjustablePlanview" href="#scenariogeneration.xodr.geometry.AdjustablePlanview">AdjustablePlanview</a></code></h4>
+</li>
 <li>
 <h4><code><a title="scenariogeneration.xodr.geometry.Arc" href="#scenariogeneration.xodr.geometry.Arc">Arc</a></code></h4>
 <ul class="">

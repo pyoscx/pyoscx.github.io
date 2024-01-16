@@ -204,10 +204,11 @@ class ParameterDeclarations(VersionBase):
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the ParameterDeclarations&#34;&#34;&#34;
-        element = ET.Element(&#34;ParameterDeclarations&#34;)
-        for p in self.parameters:
-            element.append(p.get_element())
-        return element
+        if self.parameters:
+            element = ET.Element(&#34;ParameterDeclarations&#34;)
+            for p in self.parameters:
+                element.append(p.get_element())
+            return element
 
 
 class VariableDeclarations(VersionBase):
@@ -1926,7 +1927,7 @@ class CatalogFile(VersionBase):
         self.filename = &#34;&#34;
         self.encoding = encoding
 
-    def add_to_catalog(self, obj, osc_minor_version=1):
+    def add_to_catalog(self, obj, osc_minor_version=_MINOR_VERSION):
         &#34;&#34;&#34;add_to_catalog adds an element to the catalog
 
         Parameters
@@ -1934,7 +1935,7 @@ class CatalogFile(VersionBase):
             obj (*pyoscx): any pyoscx object (should be matching with the catalog)
 
             osc_minor_version (int): the minor version of OpenSCENARIO to write to the catalog
-                Default: 1
+                Default: same as package
         &#34;&#34;&#34;
         if self.catalog_element == None:
             OSError(&#34;No file has been created or opened&#34;)
@@ -2010,6 +2011,65 @@ class CatalogFile(VersionBase):
         printToFile(
             self.catalog_element, self.filename, self.prettyprint, self.encoding
         )
+
+
+class _BaseCatalog(VersionBase):
+    &#34;&#34;&#34;the _BaseCatalog should be inherited by other classes that should be able to create catalogs from their elements&#34;&#34;&#34;
+
+    def __init__(self):
+        super().__init__()
+        self.parameters = ParameterDeclarations()
+
+    def add_parameter(self, parameter):
+        &#34;&#34;&#34;adds a parameter to the Trajectory
+
+        Parameters
+        ----------
+            parameter (Parameter): the parameter to add
+
+        &#34;&#34;&#34;
+        if not isinstance(parameter, Parameter):
+            raise TypeError(&#34;input parameter is not of type Parameter&#34;)
+        self.parameters.add_parameter(parameter)
+        return self
+
+    def add_parameters_to_element(self, element):
+        &#34;&#34;&#34;adds the parameterdeclaration to the element&#34;&#34;&#34;
+        param_element = self.parameters.get_element()
+        if param_element:
+            element.append(param_element)
+
+    def dump_to_catalog(self, filename, catalogtype, description, author):
+        &#34;&#34;&#34;dump_to_catalog creates a new catalog and adds the element to it
+
+        Parameters
+        ----------
+            filename (str): path of the new catalog file
+
+            catalogtype (str): name of the catalog
+
+            description (str): description of the catalog
+
+            author (str): author of the catalog
+
+        &#34;&#34;&#34;
+        cf = CatalogFile()
+        cf.create_catalog(filename, catalogtype, description, author)
+        cf.add_to_catalog(self)
+        cf.dump()
+
+    def append_to_catalog(self, filename):
+        &#34;&#34;&#34;adds the the element to an existing catalog
+
+        Parameters
+        ----------
+            filename (str): path to the catalog file
+
+        &#34;&#34;&#34;
+        cf = CatalogFile()
+        cf.open_catalog(filename)
+        cf.add_to_catalog(self)
+        cf.dump()
 
 
 class Catalog(VersionBase):
@@ -3193,7 +3253,7 @@ class RoadCondition(VersionBase):
 
 
 # TODO: add name (string)
-class Environment(VersionBase):
+class Environment(_BaseCatalog):
     &#34;&#34;&#34;The Environment class creates a environment used by Environment
 
     Parameters
@@ -3255,6 +3315,7 @@ class Environment(VersionBase):
             parameters (ParameterDeclarations): the parameters to be used in the scenario
                 Default: None
         &#34;&#34;&#34;
+        super().__init__()
         self.name = name
         if timeofday is not None and not isinstance(timeofday, TimeOfDay):
             raise TypeError(&#34;timeofday input is not of type TimeOfDay&#34;)
@@ -3267,7 +3328,8 @@ class Environment(VersionBase):
         self.timeofday = timeofday
         self.weather = weather
         self.roadcondition = roadcondition
-        self.parameters = parameters
+        if parameters is not None:
+            self.parameters = parameters
 
     def __eq__(self, other):
         if isinstance(other, Environment):
@@ -3311,38 +3373,6 @@ class Environment(VersionBase):
 
         return Environment(name, timeofday, weather, roadcondition, parameters)
 
-    def dump_to_catalog(self, filename, catalogtype, description, author):
-        &#34;&#34;&#34;dump_to_catalog creates a new catalog and adds the environment to it
-
-        Parameters
-        ----------
-            filename (str): path of the new catalog file
-
-            catalogtype (str): name of the catalog
-
-            description (str): description of the catalog
-
-            author (str): author of the catalog
-
-        &#34;&#34;&#34;
-        cf = CatalogFile()
-        cf.create_catalog(filename, catalogtype, description, author)
-        cf.add_to_catalog(self)
-        cf.dump()
-
-    def append_to_catalog(self, filename):
-        &#34;&#34;&#34;adds the environment to an existing catalog
-
-        Parameters
-        ----------
-            filename (str): path to the catalog file
-
-        &#34;&#34;&#34;
-        cf = CatalogFile()
-        cf.open_catalog(filename)
-        cf.add_to_catalog(self)
-        cf.dump()
-
     def get_attributes(self):
         &#34;&#34;&#34;returns the attributes of the Environment as a dict&#34;&#34;&#34;
         return {&#34;name&#34;: str(self.name)}
@@ -3356,12 +3386,11 @@ class Environment(VersionBase):
             element.append(self.weather.get_element())
         if self.roadcondition:
             element.append(self.roadcondition.get_element())
-        if self.parameters:
-            element.append(self.parameters.get_element())
+        self.add_parameters_to_element(element)
         return element
 
 
-class Controller(VersionBase):
+class Controller(_BaseCatalog):
     &#34;&#34;&#34;the Controller class creates a controller of openScenario
 
     Parameters
@@ -3414,9 +3443,9 @@ class Controller(VersionBase):
             controller_type (ControllerType): controller type (valid from V1.2)
                 Default: None
         &#34;&#34;&#34;
+        super().__init__()
         self.name = name
 
-        self.parameters = ParameterDeclarations()
         if not isinstance(properties, Properties):
             raise TypeError(&#34;properties input is not of type Properties&#34;)
         self.properties = properties
@@ -3462,51 +3491,6 @@ class Controller(VersionBase):
 
         return controller
 
-    def dump_to_catalog(self, filename, catalogtype, description, author):
-        &#34;&#34;&#34;dump_to_catalog creates a new catalog and adds the Controller to it
-
-        Parameters
-        ----------
-            filename (str): path of the new catalog file
-
-            catalogtype (str): name of the catalog
-
-            description (str): description of the catalog
-
-            author (str): author of the catalog
-
-        &#34;&#34;&#34;
-        cf = CatalogFile()
-        cf.create_catalog(filename, catalogtype, description, author)
-        cf.add_to_catalog(self)
-        cf.dump()
-
-    def append_to_catalog(self, filename):
-        &#34;&#34;&#34;adds the Controller to an existing catalog
-
-        Parameters
-        ----------
-            filename (str): path to the catalog file
-
-        &#34;&#34;&#34;
-        cf = CatalogFile()
-        cf.open_catalog(filename)
-        cf.add_to_catalog(self)
-        cf.dump()
-
-    def add_parameter(self, parameter):
-        &#34;&#34;&#34;adds a parameter declaration to the Controller
-
-        Parameters
-        ----------
-            parameter (Parameter): A new parameter declaration for the Controller
-
-        &#34;&#34;&#34;
-        if not isinstance(parameter, Parameter):
-            raise TypeError(&#34;parameter input is not of type Parameter&#34;)
-        self.parameters.add_parameter(parameter)
-        return self
-
     def get_attributes(self):
         &#34;&#34;&#34;returns the attributes of the Controller as a dict&#34;&#34;&#34;
         retdict = {&#34;name&#34;: self.name}
@@ -3523,7 +3507,7 @@ class Controller(VersionBase):
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the Controller&#34;&#34;&#34;
         element = ET.Element(&#34;Controller&#34;, attrib=self.get_attributes())
-        element.append(self.parameters.get_element())
+        self.add_parameters_to_element(element)
         element.append(self.properties.get_element())
 
         return element
@@ -6874,7 +6858,7 @@ add_catalog(catalogname, path)
         self.filename = &#34;&#34;
         self.encoding = encoding
 
-    def add_to_catalog(self, obj, osc_minor_version=1):
+    def add_to_catalog(self, obj, osc_minor_version=_MINOR_VERSION):
         &#34;&#34;&#34;add_to_catalog adds an element to the catalog
 
         Parameters
@@ -6882,7 +6866,7 @@ add_catalog(catalogname, path)
             obj (*pyoscx): any pyoscx object (should be matching with the catalog)
 
             osc_minor_version (int): the minor version of OpenSCENARIO to write to the catalog
-                Default: 1
+                Default: same as package
         &#34;&#34;&#34;
         if self.catalog_element == None:
             OSError(&#34;No file has been created or opened&#34;)
@@ -6966,7 +6950,7 @@ add_catalog(catalogname, path)
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.utils.CatalogFile.add_to_catalog"><code class="name flex">
-<span>def <span class="ident">add_to_catalog</span></span>(<span>self, obj, osc_minor_version=1)</span>
+<span>def <span class="ident">add_to_catalog</span></span>(<span>self, obj, osc_minor_version=2)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>add_to_catalog adds an element to the catalog</p>
@@ -6974,13 +6958,13 @@ add_catalog(catalogname, path)
 <pre><code>obj (*pyoscx): any pyoscx object (should be matching with the catalog)
 
 osc_minor_version (int): the minor version of OpenSCENARIO to write to the catalog
-    Default: 1
+    Default: same as package
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_to_catalog(self, obj, osc_minor_version=1):
+<pre><code class="python">def add_to_catalog(self, obj, osc_minor_version=_MINOR_VERSION):
     &#34;&#34;&#34;add_to_catalog adds an element to the catalog
 
     Parameters
@@ -6988,7 +6972,7 @@ osc_minor_version (int): the minor version of OpenSCENARIO to write to the catal
         obj (*pyoscx): any pyoscx object (should be matching with the catalog)
 
         osc_minor_version (int): the minor version of OpenSCENARIO to write to the catalog
-            Default: 1
+            Default: same as package
     &#34;&#34;&#34;
     if self.catalog_element == None:
         OSError(&#34;No file has been created or opened&#34;)
@@ -8322,7 +8306,7 @@ controller_type (ControllerType): controller type (valid from V1.2)
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Controller(VersionBase):
+<pre><code class="python">class Controller(_BaseCatalog):
     &#34;&#34;&#34;the Controller class creates a controller of openScenario
 
     Parameters
@@ -8375,9 +8359,9 @@ controller_type (ControllerType): controller type (valid from V1.2)
             controller_type (ControllerType): controller type (valid from V1.2)
                 Default: None
         &#34;&#34;&#34;
+        super().__init__()
         self.name = name
 
-        self.parameters = ParameterDeclarations()
         if not isinstance(properties, Properties):
             raise TypeError(&#34;properties input is not of type Properties&#34;)
         self.properties = properties
@@ -8423,51 +8407,6 @@ controller_type (ControllerType): controller type (valid from V1.2)
 
         return controller
 
-    def dump_to_catalog(self, filename, catalogtype, description, author):
-        &#34;&#34;&#34;dump_to_catalog creates a new catalog and adds the Controller to it
-
-        Parameters
-        ----------
-            filename (str): path of the new catalog file
-
-            catalogtype (str): name of the catalog
-
-            description (str): description of the catalog
-
-            author (str): author of the catalog
-
-        &#34;&#34;&#34;
-        cf = CatalogFile()
-        cf.create_catalog(filename, catalogtype, description, author)
-        cf.add_to_catalog(self)
-        cf.dump()
-
-    def append_to_catalog(self, filename):
-        &#34;&#34;&#34;adds the Controller to an existing catalog
-
-        Parameters
-        ----------
-            filename (str): path to the catalog file
-
-        &#34;&#34;&#34;
-        cf = CatalogFile()
-        cf.open_catalog(filename)
-        cf.add_to_catalog(self)
-        cf.dump()
-
-    def add_parameter(self, parameter):
-        &#34;&#34;&#34;adds a parameter declaration to the Controller
-
-        Parameters
-        ----------
-            parameter (Parameter): A new parameter declaration for the Controller
-
-        &#34;&#34;&#34;
-        if not isinstance(parameter, Parameter):
-            raise TypeError(&#34;parameter input is not of type Parameter&#34;)
-        self.parameters.add_parameter(parameter)
-        return self
-
     def get_attributes(self):
         &#34;&#34;&#34;returns the attributes of the Controller as a dict&#34;&#34;&#34;
         retdict = {&#34;name&#34;: self.name}
@@ -8484,13 +8423,14 @@ controller_type (ControllerType): controller type (valid from V1.2)
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the Controller&#34;&#34;&#34;
         element = ET.Element(&#34;Controller&#34;, attrib=self.get_attributes())
-        element.append(self.parameters.get_element())
+        self.add_parameters_to_element(element)
         element.append(self.properties.get_element())
 
         return element</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
+<li>scenariogeneration.xosc.utils._BaseCatalog</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Static methods</h3>
@@ -8543,96 +8483,6 @@ def parse(element):
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="scenariogeneration.xosc.utils.Controller.add_parameter"><code class="name flex">
-<span>def <span class="ident">add_parameter</span></span>(<span>self, parameter)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>adds a parameter declaration to the Controller</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>parameter (Parameter): A new parameter declaration for the Controller
-</code></pre></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def add_parameter(self, parameter):
-    &#34;&#34;&#34;adds a parameter declaration to the Controller
-
-    Parameters
-    ----------
-        parameter (Parameter): A new parameter declaration for the Controller
-
-    &#34;&#34;&#34;
-    if not isinstance(parameter, Parameter):
-        raise TypeError(&#34;parameter input is not of type Parameter&#34;)
-    self.parameters.add_parameter(parameter)
-    return self</code></pre>
-</details>
-</dd>
-<dt id="scenariogeneration.xosc.utils.Controller.append_to_catalog"><code class="name flex">
-<span>def <span class="ident">append_to_catalog</span></span>(<span>self, filename)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>adds the Controller to an existing catalog</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>filename (str): path to the catalog file
-</code></pre></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def append_to_catalog(self, filename):
-    &#34;&#34;&#34;adds the Controller to an existing catalog
-
-    Parameters
-    ----------
-        filename (str): path to the catalog file
-
-    &#34;&#34;&#34;
-    cf = CatalogFile()
-    cf.open_catalog(filename)
-    cf.add_to_catalog(self)
-    cf.dump()</code></pre>
-</details>
-</dd>
-<dt id="scenariogeneration.xosc.utils.Controller.dump_to_catalog"><code class="name flex">
-<span>def <span class="ident">dump_to_catalog</span></span>(<span>self, filename, catalogtype, description, author)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>dump_to_catalog creates a new catalog and adds the Controller to it</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>filename (str): path of the new catalog file
-
-catalogtype (str): name of the catalog
-
-description (str): description of the catalog
-
-author (str): author of the catalog
-</code></pre></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def dump_to_catalog(self, filename, catalogtype, description, author):
-    &#34;&#34;&#34;dump_to_catalog creates a new catalog and adds the Controller to it
-
-    Parameters
-    ----------
-        filename (str): path of the new catalog file
-
-        catalogtype (str): name of the catalog
-
-        description (str): description of the catalog
-
-        author (str): author of the catalog
-
-    &#34;&#34;&#34;
-    cf = CatalogFile()
-    cf.create_catalog(filename, catalogtype, description, author)
-    cf.add_to_catalog(self)
-    cf.dump()</code></pre>
-</details>
-</dd>
 <dt id="scenariogeneration.xosc.utils.Controller.get_attributes"><code class="name flex">
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
@@ -8668,7 +8518,7 @@ author (str): author of the catalog
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the Controller&#34;&#34;&#34;
     element = ET.Element(&#34;Controller&#34;, attrib=self.get_attributes())
-    element.append(self.parameters.get_element())
+    self.add_parameters_to_element(element)
     element.append(self.properties.get_element())
 
     return element</code></pre>
@@ -9629,7 +9479,7 @@ parameters (ParameterDeclarations): the parameters to be used in the scenario
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Environment(VersionBase):
+<pre><code class="python">class Environment(_BaseCatalog):
     &#34;&#34;&#34;The Environment class creates a environment used by Environment
 
     Parameters
@@ -9691,6 +9541,7 @@ parameters (ParameterDeclarations): the parameters to be used in the scenario
             parameters (ParameterDeclarations): the parameters to be used in the scenario
                 Default: None
         &#34;&#34;&#34;
+        super().__init__()
         self.name = name
         if timeofday is not None and not isinstance(timeofday, TimeOfDay):
             raise TypeError(&#34;timeofday input is not of type TimeOfDay&#34;)
@@ -9703,7 +9554,8 @@ parameters (ParameterDeclarations): the parameters to be used in the scenario
         self.timeofday = timeofday
         self.weather = weather
         self.roadcondition = roadcondition
-        self.parameters = parameters
+        if parameters is not None:
+            self.parameters = parameters
 
     def __eq__(self, other):
         if isinstance(other, Environment):
@@ -9747,38 +9599,6 @@ parameters (ParameterDeclarations): the parameters to be used in the scenario
 
         return Environment(name, timeofday, weather, roadcondition, parameters)
 
-    def dump_to_catalog(self, filename, catalogtype, description, author):
-        &#34;&#34;&#34;dump_to_catalog creates a new catalog and adds the environment to it
-
-        Parameters
-        ----------
-            filename (str): path of the new catalog file
-
-            catalogtype (str): name of the catalog
-
-            description (str): description of the catalog
-
-            author (str): author of the catalog
-
-        &#34;&#34;&#34;
-        cf = CatalogFile()
-        cf.create_catalog(filename, catalogtype, description, author)
-        cf.add_to_catalog(self)
-        cf.dump()
-
-    def append_to_catalog(self, filename):
-        &#34;&#34;&#34;adds the environment to an existing catalog
-
-        Parameters
-        ----------
-            filename (str): path to the catalog file
-
-        &#34;&#34;&#34;
-        cf = CatalogFile()
-        cf.open_catalog(filename)
-        cf.add_to_catalog(self)
-        cf.dump()
-
     def get_attributes(self):
         &#34;&#34;&#34;returns the attributes of the Environment as a dict&#34;&#34;&#34;
         return {&#34;name&#34;: str(self.name)}
@@ -9792,12 +9612,12 @@ parameters (ParameterDeclarations): the parameters to be used in the scenario
             element.append(self.weather.get_element())
         if self.roadcondition:
             element.append(self.roadcondition.get_element())
-        if self.parameters:
-            element.append(self.parameters.get_element())
+        self.add_parameters_to_element(element)
         return element</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
+<li>scenariogeneration.xosc.utils._BaseCatalog</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Static methods</h3>
@@ -9851,70 +9671,6 @@ def parse(element):
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="scenariogeneration.xosc.utils.Environment.append_to_catalog"><code class="name flex">
-<span>def <span class="ident">append_to_catalog</span></span>(<span>self, filename)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>adds the environment to an existing catalog</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>filename (str): path to the catalog file
-</code></pre></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def append_to_catalog(self, filename):
-    &#34;&#34;&#34;adds the environment to an existing catalog
-
-    Parameters
-    ----------
-        filename (str): path to the catalog file
-
-    &#34;&#34;&#34;
-    cf = CatalogFile()
-    cf.open_catalog(filename)
-    cf.add_to_catalog(self)
-    cf.dump()</code></pre>
-</details>
-</dd>
-<dt id="scenariogeneration.xosc.utils.Environment.dump_to_catalog"><code class="name flex">
-<span>def <span class="ident">dump_to_catalog</span></span>(<span>self, filename, catalogtype, description, author)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>dump_to_catalog creates a new catalog and adds the environment to it</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>filename (str): path of the new catalog file
-
-catalogtype (str): name of the catalog
-
-description (str): description of the catalog
-
-author (str): author of the catalog
-</code></pre></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def dump_to_catalog(self, filename, catalogtype, description, author):
-    &#34;&#34;&#34;dump_to_catalog creates a new catalog and adds the environment to it
-
-    Parameters
-    ----------
-        filename (str): path of the new catalog file
-
-        catalogtype (str): name of the catalog
-
-        description (str): description of the catalog
-
-        author (str): author of the catalog
-
-    &#34;&#34;&#34;
-    cf = CatalogFile()
-    cf.create_catalog(filename, catalogtype, description, author)
-    cf.add_to_catalog(self)
-    cf.dump()</code></pre>
-</details>
-</dd>
 <dt id="scenariogeneration.xosc.utils.Environment.get_attributes"><code class="name flex">
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
@@ -9947,8 +9703,7 @@ author (str): author of the catalog
         element.append(self.weather.get_element())
     if self.roadcondition:
         element.append(self.roadcondition.get_element())
-    if self.parameters:
-        element.append(self.parameters.get_element())
+    self.add_parameters_to_element(element)
     return element</code></pre>
 </details>
 </dd>
@@ -11607,10 +11362,11 @@ parse(element)
 
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the ParameterDeclarations&#34;&#34;&#34;
-        element = ET.Element(&#34;ParameterDeclarations&#34;)
-        for p in self.parameters:
-            element.append(p.get_element())
-        return element</code></pre>
+        if self.parameters:
+            element = ET.Element(&#34;ParameterDeclarations&#34;)
+            for p in self.parameters:
+                element.append(p.get_element())
+            return element</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -11695,10 +11451,11 @@ def parse(element):
 </summary>
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the ParameterDeclarations&#34;&#34;&#34;
-    element = ET.Element(&#34;ParameterDeclarations&#34;)
-    for p in self.parameters:
-        element.append(p.get_element())
-    return element</code></pre>
+    if self.parameters:
+        element = ET.Element(&#34;ParameterDeclarations&#34;)
+        for p in self.parameters:
+            element.append(p.get_element())
+        return element</code></pre>
 </details>
 </dd>
 </dl>
@@ -17583,10 +17340,7 @@ def parse(element):
 </li>
 <li>
 <h4><code><a title="scenariogeneration.xosc.utils.Controller" href="#scenariogeneration.xosc.utils.Controller">Controller</a></code></h4>
-<ul class="two-column">
-<li><code><a title="scenariogeneration.xosc.utils.Controller.add_parameter" href="#scenariogeneration.xosc.utils.Controller.add_parameter">add_parameter</a></code></li>
-<li><code><a title="scenariogeneration.xosc.utils.Controller.append_to_catalog" href="#scenariogeneration.xosc.utils.Controller.append_to_catalog">append_to_catalog</a></code></li>
-<li><code><a title="scenariogeneration.xosc.utils.Controller.dump_to_catalog" href="#scenariogeneration.xosc.utils.Controller.dump_to_catalog">dump_to_catalog</a></code></li>
+<ul class="">
 <li><code><a title="scenariogeneration.xosc.utils.Controller.get_attributes" href="#scenariogeneration.xosc.utils.Controller.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.utils.Controller.get_element" href="#scenariogeneration.xosc.utils.Controller.get_element">get_element</a></code></li>
 <li><code><a title="scenariogeneration.xosc.utils.Controller.parse" href="#scenariogeneration.xosc.utils.Controller.parse">parse</a></code></li>
@@ -17628,8 +17382,6 @@ def parse(element):
 <li>
 <h4><code><a title="scenariogeneration.xosc.utils.Environment" href="#scenariogeneration.xosc.utils.Environment">Environment</a></code></h4>
 <ul class="">
-<li><code><a title="scenariogeneration.xosc.utils.Environment.append_to_catalog" href="#scenariogeneration.xosc.utils.Environment.append_to_catalog">append_to_catalog</a></code></li>
-<li><code><a title="scenariogeneration.xosc.utils.Environment.dump_to_catalog" href="#scenariogeneration.xosc.utils.Environment.dump_to_catalog">dump_to_catalog</a></code></li>
 <li><code><a title="scenariogeneration.xosc.utils.Environment.get_attributes" href="#scenariogeneration.xosc.utils.Environment.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.utils.Environment.get_element" href="#scenariogeneration.xosc.utils.Environment.get_element">get_element</a></code></li>
 <li><code><a title="scenariogeneration.xosc.utils.Environment.parse" href="#scenariogeneration.xosc.utils.Environment.parse">parse</a></code></li>

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>examples.xodr.road_link_unequal_number_of_lanes API documentation</title>
+<title>examples.xodr.adjustable_planview API documentation</title>
 <meta name="description" content="scenariogeneration
 https://github.com/pyoscx/scenariogeneration …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -20,7 +20,7 @@ https://github.com/pyoscx/scenariogeneration …" />
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>examples.xodr.road_link_unequal_number_of_lanes</code></h1>
+<h1 class="title">Module <code>examples.xodr.adjustable_planview</code></h1>
 </header>
 <section id="section-intro">
 <p>scenariogeneration
@@ -28,11 +28,17 @@ https://github.com/pyoscx/scenariogeneration …" />
 <p>This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
-<p>Copyright (c) 2022 The scenariogeneration Authors.</p>
-<p>Example for linking two roads with an unequal number of lanes.</p>
-<p>Note: This is possible and valid according to the OpenDRIVE standard. It is
-sometimes necessary to use this approach but it might often be prefered to begin
-a new lane section to change the number of lanes instead.</p>
+<p>Copyright (c) 2023 The scenariogeneration Authors.</p>
+<p>Example how to utilze AdjustablePlanview to make a loop with to difficult geometries to manually calculate</p>
+<p>Some features used:</p>
+<ul>
+<li>
+<p>AdjustablePlanview</p>
+</li>
+<li>
+<p>CommonJunctionCreator</p>
+</li>
+</ul>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -45,17 +51,21 @@ a new lane section to change the number of lanes instead.</p>
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-  Copyright (c) 2022 The scenariogeneration Authors.
+  Copyright (c) 2023 The scenariogeneration Authors.
 
-    Example for linking two roads with an unequal number of lanes.
+    Example how to utilze AdjustablePlanview to make a loop with to difficult geometries to manually calculate
 
-    Note: This is possible and valid according to the OpenDRIVE standard. It is
-    sometimes necessary to use this approach but it might often be prefered to begin
-    a new lane section to change the number of lanes instead.
+
+    Some features used:
+
+    - AdjustablePlanview
+
+    - CommonJunctionCreator
+
 &#34;&#34;&#34;
 
+
 from scenariogeneration import xodr, prettyprint, ScenarioGenerator
-import os
 
 
 class Scenario(ScenarioGenerator):
@@ -63,42 +73,47 @@ class Scenario(ScenarioGenerator):
         super().__init__()
 
     def road(self, **kwargs):
-        # Create roads
-        length_road = 100.0
-        road_first = xodr.create_road([xodr.Line(length_road)], 1, 2, 3)
-        road_first.planview.adjust_geometries()
-
-        road_second = xodr.create_road([xodr.Line(length_road)], 2, 2, 4)
-        road_second.planview.set_start_point(100, 0, 0)
-        road_second.planview.adjust_geometries()
-        # Make a new lane open up/branch out
-        new_lane_width = 3.0
-        road_second.lanes.lanesections[0].rightlanes[2].a = 0.0
-        road_second.lanes.lanesections[0].rightlanes[2].b = 0.0
-        road_second.lanes.lanesections[0].rightlanes[2].c = (
-            3.0 / length_road**2 * new_lane_width
+        ## create 3 roads
+        road1 = xodr.create_road(
+            [xodr.Line(30), xodr.Spiral(-0.00001, -0.035, 200)], 1, 2, 2
         )
-        road_second.lanes.lanesections[0].rightlanes[2].d = (
-            -2.0 / length_road**3 * new_lane_width
-        )
+        road2 = xodr.create_road(xodr.Line(100), 2, 2, 2)
+        road3 = xodr.create_road(xodr.Line(100), 3, 2, 2)
 
-        ## Create the OpenDrive class (Master class)
-        odr = xodr.OpenDrive(&#34;myroads&#34;)
+        ## make a common junction
 
-        ## Finally add roads to Opendrive
-        odr.add_road(road_first)
-        odr.add_road(road_second)
+        jc = xodr.CommonJunctionCreator(100, &#34;my junc&#34;)
 
-        # Link roads
-        road_first.add_successor(xodr.ElementType.road, 2, xodr.ContactPoint.start)
-        road_second.add_predecessor(xodr.ElementType.road, 1, xodr.ContactPoint.end)
+        jc.add_incoming_road_cartesian_geometry(road1, 0, 0, 0, &#34;successor&#34;)
+        jc.add_incoming_road_cartesian_geometry(road2, 30, 0, -3.14, &#34;predecessor&#34;)
+        jc.add_incoming_road_cartesian_geometry(road3, 15, 15, -3.14 / 2, &#34;successor&#34;)
 
-        # Link lanes but do not link the newly beginning lane
-        link_lane_ids_first = [2, 1, -1, -2, -3]
-        link_lane_ids_second = [2, 1, -1, -2, -4]
-        xodr.create_lane_links_from_ids(
-            road_first, road_second, link_lane_ids_first, link_lane_ids_second
-        )
+        jc.add_connection(1, 2)
+        jc.add_connection(3, 2)
+        jc.add_connection(3, 1)
+
+        ## make a forth road to connect two of the roads connected to the junction
+        # since road1 has a Spiral as one geometry, it is very hard to determine the geometry of road4
+        # instead use AdjustablePlanview as geometry!
+        road4 = xodr.create_road(xodr.AdjustablePlanview(100), 4, 2, 2)
+
+        # add predecessors and successors to the roads
+        road4.add_predecessor(xodr.ElementType.road, 2, xodr.ContactPoint.end)
+        road4.add_successor(xodr.ElementType.road, 1, xodr.ContactPoint.start)
+
+        road2.add_successor(xodr.ElementType.road, 4, xodr.ContactPoint.start)
+        road1.add_predecessor(xodr.ElementType.road, 4, xodr.ContactPoint.end)
+
+        ## add roads to OpenDrive
+        odr = xodr.OpenDrive(&#34;my road&#34;)
+        odr.add_road(road1)
+        odr.add_road(road2)
+        odr.add_road(road3)
+        odr.add_road(road4)
+        odr.add_junction_creator(jc)
+
+        ## Adjust initial positions of the roads looking at succ-pred logic
+        odr.adjust_roads_and_lanes()
 
         return odr
 
@@ -125,7 +140,7 @@ if __name__ == &#34;__main__&#34;:
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="examples.xodr.road_link_unequal_number_of_lanes.Scenario"><code class="flex name class">
+<dt id="examples.xodr.adjustable_planview.Scenario"><code class="flex name class">
 <span>class <span class="ident">Scenario</span></span>
 </code></dt>
 <dd>
@@ -160,42 +175,47 @@ encoding (str): encoding of the outputs
         super().__init__()
 
     def road(self, **kwargs):
-        # Create roads
-        length_road = 100.0
-        road_first = xodr.create_road([xodr.Line(length_road)], 1, 2, 3)
-        road_first.planview.adjust_geometries()
-
-        road_second = xodr.create_road([xodr.Line(length_road)], 2, 2, 4)
-        road_second.planview.set_start_point(100, 0, 0)
-        road_second.planview.adjust_geometries()
-        # Make a new lane open up/branch out
-        new_lane_width = 3.0
-        road_second.lanes.lanesections[0].rightlanes[2].a = 0.0
-        road_second.lanes.lanesections[0].rightlanes[2].b = 0.0
-        road_second.lanes.lanesections[0].rightlanes[2].c = (
-            3.0 / length_road**2 * new_lane_width
+        ## create 3 roads
+        road1 = xodr.create_road(
+            [xodr.Line(30), xodr.Spiral(-0.00001, -0.035, 200)], 1, 2, 2
         )
-        road_second.lanes.lanesections[0].rightlanes[2].d = (
-            -2.0 / length_road**3 * new_lane_width
-        )
+        road2 = xodr.create_road(xodr.Line(100), 2, 2, 2)
+        road3 = xodr.create_road(xodr.Line(100), 3, 2, 2)
 
-        ## Create the OpenDrive class (Master class)
-        odr = xodr.OpenDrive(&#34;myroads&#34;)
+        ## make a common junction
 
-        ## Finally add roads to Opendrive
-        odr.add_road(road_first)
-        odr.add_road(road_second)
+        jc = xodr.CommonJunctionCreator(100, &#34;my junc&#34;)
 
-        # Link roads
-        road_first.add_successor(xodr.ElementType.road, 2, xodr.ContactPoint.start)
-        road_second.add_predecessor(xodr.ElementType.road, 1, xodr.ContactPoint.end)
+        jc.add_incoming_road_cartesian_geometry(road1, 0, 0, 0, &#34;successor&#34;)
+        jc.add_incoming_road_cartesian_geometry(road2, 30, 0, -3.14, &#34;predecessor&#34;)
+        jc.add_incoming_road_cartesian_geometry(road3, 15, 15, -3.14 / 2, &#34;successor&#34;)
 
-        # Link lanes but do not link the newly beginning lane
-        link_lane_ids_first = [2, 1, -1, -2, -3]
-        link_lane_ids_second = [2, 1, -1, -2, -4]
-        xodr.create_lane_links_from_ids(
-            road_first, road_second, link_lane_ids_first, link_lane_ids_second
-        )
+        jc.add_connection(1, 2)
+        jc.add_connection(3, 2)
+        jc.add_connection(3, 1)
+
+        ## make a forth road to connect two of the roads connected to the junction
+        # since road1 has a Spiral as one geometry, it is very hard to determine the geometry of road4
+        # instead use AdjustablePlanview as geometry!
+        road4 = xodr.create_road(xodr.AdjustablePlanview(100), 4, 2, 2)
+
+        # add predecessors and successors to the roads
+        road4.add_predecessor(xodr.ElementType.road, 2, xodr.ContactPoint.end)
+        road4.add_successor(xodr.ElementType.road, 1, xodr.ContactPoint.start)
+
+        road2.add_successor(xodr.ElementType.road, 4, xodr.ContactPoint.start)
+        road1.add_predecessor(xodr.ElementType.road, 4, xodr.ContactPoint.end)
+
+        ## add roads to OpenDrive
+        odr = xodr.OpenDrive(&#34;my road&#34;)
+        odr.add_road(road1)
+        odr.add_road(road2)
+        odr.add_road(road3)
+        odr.add_road(road4)
+        odr.add_junction_creator(jc)
+
+        ## Adjust initial positions of the roads looking at succ-pred logic
+        odr.adjust_roads_and_lanes()
 
         return odr</code></pre>
 </details>
@@ -233,7 +253,7 @@ encoding (str): encoding of the outputs
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="examples.xodr.road_link_unequal_number_of_lanes.Scenario" href="#examples.xodr.road_link_unequal_number_of_lanes.Scenario">Scenario</a></code></h4>
+<h4><code><a title="examples.xodr.adjustable_planview.Scenario" href="#examples.xodr.adjustable_planview.Scenario">Scenario</a></code></h4>
 </li>
 </ul>
 </li>

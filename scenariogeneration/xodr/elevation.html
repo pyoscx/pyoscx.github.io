@@ -150,7 +150,7 @@ class LateralProfile(XodrBase):
         &#34;&#34;&#34;
         if not isinstance(superelevation, _Poly3Profile):
             raise TypeError(
-                &#34;add_elevation requires an _Elevation as input, not &#34;
+                &#34;add_elevation requires an _Poly3Profile as input, not &#34;
                 + str(type(superelevation))
             )
         self.superelevations.append(superelevation)
@@ -166,7 +166,8 @@ class LateralProfile(XodrBase):
         &#34;&#34;&#34;
         if not isinstance(shape, _Poly3Profile):
             raise TypeError(
-                &#34;add_elevation requires an _Elevation as input, not &#34; + str(type(shape))
+                &#34;add_elevation requires an _Poly3Profile as input, not &#34;
+                + str(type(shape))
             )
         self.shapes.append(shape)
         return self
@@ -514,7 +515,7 @@ add_shape(shape)
         &#34;&#34;&#34;
         if not isinstance(superelevation, _Poly3Profile):
             raise TypeError(
-                &#34;add_elevation requires an _Elevation as input, not &#34;
+                &#34;add_elevation requires an _Poly3Profile as input, not &#34;
                 + str(type(superelevation))
             )
         self.superelevations.append(superelevation)
@@ -530,7 +531,8 @@ add_shape(shape)
         &#34;&#34;&#34;
         if not isinstance(shape, _Poly3Profile):
             raise TypeError(
-                &#34;add_elevation requires an _Elevation as input, not &#34; + str(type(shape))
+                &#34;add_elevation requires an _Poly3Profile as input, not &#34;
+                + str(type(shape))
             )
         self.shapes.append(shape)
         return self
@@ -574,7 +576,8 @@ add_shape(shape)
     &#34;&#34;&#34;
     if not isinstance(shape, _Poly3Profile):
         raise TypeError(
-            &#34;add_elevation requires an _Elevation as input, not &#34; + str(type(shape))
+            &#34;add_elevation requires an _Poly3Profile as input, not &#34;
+            + str(type(shape))
         )
     self.shapes.append(shape)
     return self</code></pre>
@@ -602,7 +605,7 @@ add_shape(shape)
     &#34;&#34;&#34;
     if not isinstance(superelevation, _Poly3Profile):
         raise TypeError(
-            &#34;add_elevation requires an _Elevation as input, not &#34;
+            &#34;add_elevation requires an _Poly3Profile as input, not &#34;
             + str(type(superelevation))
         )
     self.superelevations.append(superelevation)

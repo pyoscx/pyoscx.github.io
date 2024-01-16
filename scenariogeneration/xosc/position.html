@@ -60,6 +60,7 @@ from .utils import (
     CatalogFile,
     Parameter,
     convert_enum,
+    _BaseCatalog,
 )
 from .exceptions import (
     OpenSCENARIOVersionError,
@@ -2088,7 +2089,7 @@ class Waypoint(VersionBase):
         return element
 
 
-class Route(VersionBase):
+class Route(_BaseCatalog):
     &#34;&#34;&#34;the Route class creates a route, needs atleast two waypoints to be valid
 
     Parameters
@@ -2141,10 +2142,10 @@ class Route(VersionBase):
                 Default: False
 
         &#34;&#34;&#34;
+        super().__init__()
         self.name = name
         self.closed = convert_bool(closed)
         self.waypoints = []
-        self.parameters = ParameterDeclarations()
 
     def __eq__(self, other):
         if isinstance(other, Route):
@@ -2178,51 +2179,6 @@ class Route(VersionBase):
             route.waypoints.append(waypoint)
         return route
 
-    def dump_to_catalog(self, filename, catalogtype, description, author):
-        &#34;&#34;&#34;dump_to_catalog creates a new catalog and adds the Controller to it
-
-        Parameters
-        ----------
-            filename (str): path of the new catalog file
-
-            catalogtype (str): name of the catalog
-
-            description (str): description of the catalog
-
-            author (str): author of the catalog
-
-        &#34;&#34;&#34;
-        cf = CatalogFile()
-        cf.create_catalog(filename, catalogtype, description, author)
-        cf.add_to_catalog(self)
-        cf.dump()
-
-    def append_to_catalog(self, filename):
-        &#34;&#34;&#34;adds the Controller to an existing catalog
-
-        Parameters
-        ----------
-            filename (str): path to the catalog file
-
-        &#34;&#34;&#34;
-        cf = CatalogFile()
-        cf.open_catalog(filename)
-        cf.add_to_catalog(self)
-        cf.dump()
-
-    def add_parameter(self, parameter):
-        &#34;&#34;&#34;adds a parameter to the Route
-
-        Parameters
-        ----------
-            parameter (Parameter): the parameter to add
-
-        &#34;&#34;&#34;
-        if not isinstance(parameter, Parameter):
-            raise TypeError(&#34;parameter input is not of type Parameter&#34;)
-        self.parameters.add_parameter(parameter)
-        return self
-
     def add_waypoint(self, position, routestrategy):
         &#34;&#34;&#34;adds a waypoint to the Route
 
@@ -2249,13 +2205,13 @@ class Route(VersionBase):
         if len(self.waypoints) &lt; 2:
             ValueError(&#34;Too few waypoints&#34;)
         element = ET.Element(&#34;Route&#34;, attrib=self.get_attributes())
-        element.append(self.parameters.get_element())
+        self.add_parameters_to_element(element)
         for w in self.waypoints:
             element.append(w.get_element())
         return element
 
 
-class Trajectory(VersionBase):
+class Trajectory(_BaseCatalog):
     &#34;&#34;&#34;the Trajectory class creates a Trajectory,
 
     Parameters
@@ -2309,10 +2265,9 @@ class Trajectory(VersionBase):
         closed (boolean): if the trajectory is closed at the end
 
         &#34;&#34;&#34;
-
+        super().__init__()
         self.name = name
         self.closed = convert_bool(closed)
-        self.parameters = ParameterDeclarations()
         self.shapes = None
 
     def __eq__(self, other):
@@ -2346,38 +2301,6 @@ class Trajectory(VersionBase):
         trajectory.add_shape(shape)
         return trajectory
 
-    def dump_to_catalog(self, filename, catalogtype, description, author):
-        &#34;&#34;&#34;dump_to_catalog creates a new catalog and adds the Controller to it
-
-        Parameters
-        ----------
-            filename (str): path of the new catalog file
-
-            catalogtype (str): name of the catalog
-
-            description (str): description of the catalog
-
-            author (str): author of the catalog
-
-        &#34;&#34;&#34;
-        cf = CatalogFile()
-        cf.create_catalog(filename, catalogtype, description, author)
-        cf.add_to_catalog(self)
-        cf.dump()
-
-    def append_to_catalog(self, filename):
-        &#34;&#34;&#34;adds the Controller to an existing catalog
-
-        Parameters
-        ----------
-            filename (str): path to the catalog file
-
-        &#34;&#34;&#34;
-        cf = CatalogFile()
-        cf.open_catalog(filename)
-        cf.add_to_catalog(self)
-        cf.dump()
-
     def add_shape(self, shape):
         &#34;&#34;&#34;adds a shape to the trajectory (only the same shape can be used)
 
@@ -2395,19 +2318,6 @@ class Trajectory(VersionBase):
         self.shapes = shape
         return self
 
-    def add_parameter(self, parameter):
-        &#34;&#34;&#34;adds a parameter to the Trajectory
-
-        Parameters
-        ----------
-            parameter (Parameter): the parameter to add
-
-        &#34;&#34;&#34;
-        if not isinstance(parameter, Parameter):
-            raise TypeError(&#34;input parameter is not of type Parameter&#34;)
-        self.parameters.add_parameter(parameter)
-        return self
-
     def get_attributes(self):
         &#34;&#34;&#34;returns the attributes of the Trajectory as a dict&#34;&#34;&#34;
         retdict = {}
@@ -2418,7 +2328,7 @@ class Trajectory(VersionBase):
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the Trajectory&#34;&#34;&#34;
         element = ET.Element(&#34;Trajectory&#34;, attrib=self.get_attributes())
-        element.append(self.parameters.get_element())
+        self.add_parameters_to_element(element)
         if self.shapes:
             element.append(self.shapes.get_element())
         else:
@@ -5730,7 +5640,7 @@ closed (boolean): if the waypoints forms a loop
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Route(VersionBase):
+<pre><code class="python">class Route(_BaseCatalog):
     &#34;&#34;&#34;the Route class creates a route, needs atleast two waypoints to be valid
 
     Parameters
@@ -5783,10 +5693,10 @@ closed (boolean): if the waypoints forms a loop
                 Default: False
 
         &#34;&#34;&#34;
+        super().__init__()
         self.name = name
         self.closed = convert_bool(closed)
         self.waypoints = []
-        self.parameters = ParameterDeclarations()
 
     def __eq__(self, other):
         if isinstance(other, Route):
@@ -5820,51 +5730,6 @@ closed (boolean): if the waypoints forms a loop
             route.waypoints.append(waypoint)
         return route
 
-    def dump_to_catalog(self, filename, catalogtype, description, author):
-        &#34;&#34;&#34;dump_to_catalog creates a new catalog and adds the Controller to it
-
-        Parameters
-        ----------
-            filename (str): path of the new catalog file
-
-            catalogtype (str): name of the catalog
-
-            description (str): description of the catalog
-
-            author (str): author of the catalog
-
-        &#34;&#34;&#34;
-        cf = CatalogFile()
-        cf.create_catalog(filename, catalogtype, description, author)
-        cf.add_to_catalog(self)
-        cf.dump()
-
-    def append_to_catalog(self, filename):
-        &#34;&#34;&#34;adds the Controller to an existing catalog
-
-        Parameters
-        ----------
-            filename (str): path to the catalog file
-
-        &#34;&#34;&#34;
-        cf = CatalogFile()
-        cf.open_catalog(filename)
-        cf.add_to_catalog(self)
-        cf.dump()
-
-    def add_parameter(self, parameter):
-        &#34;&#34;&#34;adds a parameter to the Route
-
-        Parameters
-        ----------
-            parameter (Parameter): the parameter to add
-
-        &#34;&#34;&#34;
-        if not isinstance(parameter, Parameter):
-            raise TypeError(&#34;parameter input is not of type Parameter&#34;)
-        self.parameters.add_parameter(parameter)
-        return self
-
     def add_waypoint(self, position, routestrategy):
         &#34;&#34;&#34;adds a waypoint to the Route
 
@@ -5891,13 +5756,14 @@ closed (boolean): if the waypoints forms a loop
         if len(self.waypoints) &lt; 2:
             ValueError(&#34;Too few waypoints&#34;)
         element = ET.Element(&#34;Route&#34;, attrib=self.get_attributes())
-        element.append(self.parameters.get_element())
+        self.add_parameters_to_element(element)
         for w in self.waypoints:
             element.append(w.get_element())
         return element</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
+<li>scenariogeneration.xosc.utils._BaseCatalog</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Static methods</h3>
@@ -5943,32 +5809,6 @@ def parse(element):
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="scenariogeneration.xosc.position.Route.add_parameter"><code class="name flex">
-<span>def <span class="ident">add_parameter</span></span>(<span>self, parameter)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>adds a parameter to the Route</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>parameter (Parameter): the parameter to add
-</code></pre></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def add_parameter(self, parameter):
-    &#34;&#34;&#34;adds a parameter to the Route
-
-    Parameters
-    ----------
-        parameter (Parameter): the parameter to add
-
-    &#34;&#34;&#34;
-    if not isinstance(parameter, Parameter):
-        raise TypeError(&#34;parameter input is not of type Parameter&#34;)
-    self.parameters.add_parameter(parameter)
-    return self</code></pre>
-</details>
-</dd>
 <dt id="scenariogeneration.xosc.position.Route.add_waypoint"><code class="name flex">
 <span>def <span class="ident">add_waypoint</span></span>(<span>self, position, routestrategy)</span>
 </code></dt>
@@ -5996,70 +5836,6 @@ routestrategy (RouteStrategy): routing strategy for this waypoint
     # note: the checks for types are done in Waypoint
     self.waypoints.append(Waypoint(position, routestrategy))
     return self</code></pre>
-</details>
-</dd>
-<dt id="scenariogeneration.xosc.position.Route.append_to_catalog"><code class="name flex">
-<span>def <span class="ident">append_to_catalog</span></span>(<span>self, filename)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>adds the Controller to an existing catalog</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>filename (str): path to the catalog file
-</code></pre></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def append_to_catalog(self, filename):
-    &#34;&#34;&#34;adds the Controller to an existing catalog
-
-    Parameters
-    ----------
-        filename (str): path to the catalog file
-
-    &#34;&#34;&#34;
-    cf = CatalogFile()
-    cf.open_catalog(filename)
-    cf.add_to_catalog(self)
-    cf.dump()</code></pre>
-</details>
-</dd>
-<dt id="scenariogeneration.xosc.position.Route.dump_to_catalog"><code class="name flex">
-<span>def <span class="ident">dump_to_catalog</span></span>(<span>self, filename, catalogtype, description, author)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>dump_to_catalog creates a new catalog and adds the Controller to it</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>filename (str): path of the new catalog file
-
-catalogtype (str): name of the catalog
-
-description (str): description of the catalog
-
-author (str): author of the catalog
-</code></pre></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def dump_to_catalog(self, filename, catalogtype, description, author):
-    &#34;&#34;&#34;dump_to_catalog creates a new catalog and adds the Controller to it
-
-    Parameters
-    ----------
-        filename (str): path of the new catalog file
-
-        catalogtype (str): name of the catalog
-
-        description (str): description of the catalog
-
-        author (str): author of the catalog
-
-    &#34;&#34;&#34;
-    cf = CatalogFile()
-    cf.create_catalog(filename, catalogtype, description, author)
-    cf.add_to_catalog(self)
-    cf.dump()</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xosc.position.Route.get_attributes"><code class="name flex">
@@ -6093,7 +5869,7 @@ author (str): author of the catalog
     if len(self.waypoints) &lt; 2:
         ValueError(&#34;Too few waypoints&#34;)
     element = ET.Element(&#34;Route&#34;, attrib=self.get_attributes())
-    element.append(self.parameters.get_element())
+    self.add_parameters_to_element(element)
     for w in self.waypoints:
         element.append(w.get_element())
     return element</code></pre>
@@ -6900,7 +6676,7 @@ get_attributes()
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Trajectory(VersionBase):
+<pre><code class="python">class Trajectory(_BaseCatalog):
     &#34;&#34;&#34;the Trajectory class creates a Trajectory,
 
     Parameters
@@ -6954,10 +6730,9 @@ get_attributes()
         closed (boolean): if the trajectory is closed at the end
 
         &#34;&#34;&#34;
-
+        super().__init__()
         self.name = name
         self.closed = convert_bool(closed)
-        self.parameters = ParameterDeclarations()
         self.shapes = None
 
     def __eq__(self, other):
@@ -6991,38 +6766,6 @@ get_attributes()
         trajectory.add_shape(shape)
         return trajectory
 
-    def dump_to_catalog(self, filename, catalogtype, description, author):
-        &#34;&#34;&#34;dump_to_catalog creates a new catalog and adds the Controller to it
-
-        Parameters
-        ----------
-            filename (str): path of the new catalog file
-
-            catalogtype (str): name of the catalog
-
-            description (str): description of the catalog
-
-            author (str): author of the catalog
-
-        &#34;&#34;&#34;
-        cf = CatalogFile()
-        cf.create_catalog(filename, catalogtype, description, author)
-        cf.add_to_catalog(self)
-        cf.dump()
-
-    def append_to_catalog(self, filename):
-        &#34;&#34;&#34;adds the Controller to an existing catalog
-
-        Parameters
-        ----------
-            filename (str): path to the catalog file
-
-        &#34;&#34;&#34;
-        cf = CatalogFile()
-        cf.open_catalog(filename)
-        cf.add_to_catalog(self)
-        cf.dump()
-
     def add_shape(self, shape):
         &#34;&#34;&#34;adds a shape to the trajectory (only the same shape can be used)
 
@@ -7040,19 +6783,6 @@ get_attributes()
         self.shapes = shape
         return self
 
-    def add_parameter(self, parameter):
-        &#34;&#34;&#34;adds a parameter to the Trajectory
-
-        Parameters
-        ----------
-            parameter (Parameter): the parameter to add
-
-        &#34;&#34;&#34;
-        if not isinstance(parameter, Parameter):
-            raise TypeError(&#34;input parameter is not of type Parameter&#34;)
-        self.parameters.add_parameter(parameter)
-        return self
-
     def get_attributes(self):
         &#34;&#34;&#34;returns the attributes of the Trajectory as a dict&#34;&#34;&#34;
         retdict = {}
@@ -7063,7 +6793,7 @@ get_attributes()
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the Trajectory&#34;&#34;&#34;
         element = ET.Element(&#34;Trajectory&#34;, attrib=self.get_attributes())
-        element.append(self.parameters.get_element())
+        self.add_parameters_to_element(element)
         if self.shapes:
             element.append(self.shapes.get_element())
         else:
@@ -7072,6 +6802,7 @@ get_attributes()
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
+<li>scenariogeneration.xosc.utils._BaseCatalog</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Static methods</h3>
@@ -7116,32 +6847,6 @@ def parse(element):
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="scenariogeneration.xosc.position.Trajectory.add_parameter"><code class="name flex">
-<span>def <span class="ident">add_parameter</span></span>(<span>self, parameter)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>adds a parameter to the Trajectory</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>parameter (Parameter): the parameter to add
-</code></pre></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def add_parameter(self, parameter):
-    &#34;&#34;&#34;adds a parameter to the Trajectory
-
-    Parameters
-    ----------
-        parameter (Parameter): the parameter to add
-
-    &#34;&#34;&#34;
-    if not isinstance(parameter, Parameter):
-        raise TypeError(&#34;input parameter is not of type Parameter&#34;)
-    self.parameters.add_parameter(parameter)
-    return self</code></pre>
-</details>
-</dd>
 <dt id="scenariogeneration.xosc.position.Trajectory.add_shape"><code class="name flex">
 <span>def <span class="ident">add_shape</span></span>(<span>self, shape)</span>
 </code></dt>
@@ -7169,70 +6874,6 @@ def parse(element):
         raise TypeError(&#34;shape input neither of type Polyline, Clothoid, or Nurbs&#34;)
     self.shapes = shape
     return self</code></pre>
-</details>
-</dd>
-<dt id="scenariogeneration.xosc.position.Trajectory.append_to_catalog"><code class="name flex">
-<span>def <span class="ident">append_to_catalog</span></span>(<span>self, filename)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>adds the Controller to an existing catalog</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>filename (str): path to the catalog file
-</code></pre></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def append_to_catalog(self, filename):
-    &#34;&#34;&#34;adds the Controller to an existing catalog
-
-    Parameters
-    ----------
-        filename (str): path to the catalog file
-
-    &#34;&#34;&#34;
-    cf = CatalogFile()
-    cf.open_catalog(filename)
-    cf.add_to_catalog(self)
-    cf.dump()</code></pre>
-</details>
-</dd>
-<dt id="scenariogeneration.xosc.position.Trajectory.dump_to_catalog"><code class="name flex">
-<span>def <span class="ident">dump_to_catalog</span></span>(<span>self, filename, catalogtype, description, author)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>dump_to_catalog creates a new catalog and adds the Controller to it</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>filename (str): path of the new catalog file
-
-catalogtype (str): name of the catalog
-
-description (str): description of the catalog
-
-author (str): author of the catalog
-</code></pre></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def dump_to_catalog(self, filename, catalogtype, description, author):
-    &#34;&#34;&#34;dump_to_catalog creates a new catalog and adds the Controller to it
-
-    Parameters
-    ----------
-        filename (str): path of the new catalog file
-
-        catalogtype (str): name of the catalog
-
-        description (str): description of the catalog
-
-        author (str): author of the catalog
-
-    &#34;&#34;&#34;
-    cf = CatalogFile()
-    cf.create_catalog(filename, catalogtype, description, author)
-    cf.add_to_catalog(self)
-    cf.dump()</code></pre>
 </details>
 </dd>
 <dt id="scenariogeneration.xosc.position.Trajectory.get_attributes"><code class="name flex">
@@ -7264,7 +6905,7 @@ author (str): author of the catalog
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the Trajectory&#34;&#34;&#34;
     element = ET.Element(&#34;Trajectory&#34;, attrib=self.get_attributes())
-    element.append(self.parameters.get_element())
+    self.add_parameters_to_element(element)
     if self.shapes:
         element.append(self.shapes.get_element())
     else:
@@ -8156,11 +7797,8 @@ def parse(element):
 </li>
 <li>
 <h4><code><a title="scenariogeneration.xosc.position.Route" href="#scenariogeneration.xosc.position.Route">Route</a></code></h4>
-<ul class="two-column">
-<li><code><a title="scenariogeneration.xosc.position.Route.add_parameter" href="#scenariogeneration.xosc.position.Route.add_parameter">add_parameter</a></code></li>
+<ul class="">
 <li><code><a title="scenariogeneration.xosc.position.Route.add_waypoint" href="#scenariogeneration.xosc.position.Route.add_waypoint">add_waypoint</a></code></li>
-<li><code><a title="scenariogeneration.xosc.position.Route.append_to_catalog" href="#scenariogeneration.xosc.position.Route.append_to_catalog">append_to_catalog</a></code></li>
-<li><code><a title="scenariogeneration.xosc.position.Route.dump_to_catalog" href="#scenariogeneration.xosc.position.Route.dump_to_catalog">dump_to_catalog</a></code></li>
 <li><code><a title="scenariogeneration.xosc.position.Route.get_attributes" href="#scenariogeneration.xosc.position.Route.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.position.Route.get_element" href="#scenariogeneration.xosc.position.Route.get_element">get_element</a></code></li>
 <li><code><a title="scenariogeneration.xosc.position.Route.parse" href="#scenariogeneration.xosc.position.Route.parse">parse</a></code></li>
@@ -8189,11 +7827,8 @@ def parse(element):
 </li>
 <li>
 <h4><code><a title="scenariogeneration.xosc.position.Trajectory" href="#scenariogeneration.xosc.position.Trajectory">Trajectory</a></code></h4>
-<ul class="two-column">
-<li><code><a title="scenariogeneration.xosc.position.Trajectory.add_parameter" href="#scenariogeneration.xosc.position.Trajectory.add_parameter">add_parameter</a></code></li>
+<ul class="">
 <li><code><a title="scenariogeneration.xosc.position.Trajectory.add_shape" href="#scenariogeneration.xosc.position.Trajectory.add_shape">add_shape</a></code></li>
-<li><code><a title="scenariogeneration.xosc.position.Trajectory.append_to_catalog" href="#scenariogeneration.xosc.position.Trajectory.append_to_catalog">append_to_catalog</a></code></li>
-<li><code><a title="scenariogeneration.xosc.position.Trajectory.dump_to_catalog" href="#scenariogeneration.xosc.position.Trajectory.dump_to_catalog">dump_to_catalog</a></code></li>
 <li><code><a title="scenariogeneration.xosc.position.Trajectory.get_attributes" href="#scenariogeneration.xosc.position.Trajectory.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.position.Trajectory.get_element" href="#scenariogeneration.xosc.position.Trajectory.get_element">get_element</a></code></li>
 <li><code><a title="scenariogeneration.xosc.position.Trajectory.parse" href="#scenariogeneration.xosc.position.Trajectory.parse">parse</a></code></li>

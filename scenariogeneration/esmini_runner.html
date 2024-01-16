@@ -165,7 +165,9 @@ def esmini(
             filetype = &#34; --odr &#34;
             additional_args += &#34; --density &#34; + str(car_density)
             additional_args += &#34; --window &#34; + window_size
-            filename = road_file
+            filename = os.path.join(
+                generation_path, &#34;xodr&#34;, os.path.split(road_file)[1]
+            )
         else:
             executable = &#34;esmini&#34;
             filetype = &#34; --osc &#34;
@@ -396,7 +398,9 @@ headless (boolean): run esmini in headless mode (no viewer)
             filetype = &#34; --odr &#34;
             additional_args += &#34; --density &#34; + str(car_density)
             additional_args += &#34; --window &#34; + window_size
-            filename = road_file
+            filename = os.path.join(
+                generation_path, &#34;xodr&#34;, os.path.split(road_file)[1]
+            )
         else:
             executable = &#34;esmini&#34;
             filetype = &#34; --osc &#34;

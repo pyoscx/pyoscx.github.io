@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>examples.xodr.road_link_unequal_number_of_lanes API documentation</title>
+<title>examples.xodr.clothoid_generation API documentation</title>
 <meta name="description" content="scenariogeneration
 https://github.com/pyoscx/scenariogeneration …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -20,7 +20,7 @@ https://github.com/pyoscx/scenariogeneration …" />
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>examples.xodr.road_link_unequal_number_of_lanes</code></h1>
+<h1 class="title">Module <code>examples.xodr.clothoid_generation</code></h1>
 </header>
 <section id="section-intro">
 <p>scenariogeneration
@@ -28,11 +28,17 @@ https://github.com/pyoscx/scenariogeneration …" />
 <p>This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
-<p>Copyright (c) 2022 The scenariogeneration Authors.</p>
-<p>Example for linking two roads with an unequal number of lanes.</p>
-<p>Note: This is possible and valid according to the OpenDRIVE standard. It is
-sometimes necessary to use this approach but it might often be prefered to begin
-a new lane section to change the number of lanes instead.</p>
+<p>Copyright (c) 2023 The scenariogeneration Authors.</p>
+<p>Example how to utilze pyclothoids to create a road to match two points</p>
+<p>Some features used:</p>
+<ul>
+<li>
+<p>create_road</p>
+</li>
+<li>
+<p>pyclothoids* (external package)</p>
+</li>
+</ul>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -45,16 +51,23 @@ a new lane section to change the number of lanes instead.</p>
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-  Copyright (c) 2022 The scenariogeneration Authors.
+  Copyright (c) 2023 The scenariogeneration Authors.
 
-    Example for linking two roads with an unequal number of lanes.
+    Example how to utilze pyclothoids to create a road to match two points
 
-    Note: This is possible and valid according to the OpenDRIVE standard. It is
-    sometimes necessary to use this approach but it might often be prefered to begin
-    a new lane section to change the number of lanes instead.
+
+    Some features used:
+
+    - create_road
+
+    - pyclothoids* (external package)
+
 &#34;&#34;&#34;
 
+
 from scenariogeneration import xodr, prettyprint, ScenarioGenerator
+
+import pyclothoids as pcloth
 import os
 
 
@@ -63,42 +76,40 @@ class Scenario(ScenarioGenerator):
         super().__init__()
 
     def road(self, **kwargs):
-        # Create roads
-        length_road = 100.0
-        road_first = xodr.create_road([xodr.Line(length_road)], 1, 2, 3)
-        road_first.planview.adjust_geometries()
+        start_x = 0  # x coordinate at the beginning of the curvature
+        start_y = 0  # y coordinate at the beginning of the curvature
+        start_h = 0  # heading at the beginning of the curvature
 
-        road_second = xodr.create_road([xodr.Line(length_road)], 2, 2, 4)
-        road_second.planview.set_start_point(100, 0, 0)
-        road_second.planview.adjust_geometries()
-        # Make a new lane open up/branch out
-        new_lane_width = 3.0
-        road_second.lanes.lanesections[0].rightlanes[2].a = 0.0
-        road_second.lanes.lanesections[0].rightlanes[2].b = 0.0
-        road_second.lanes.lanesections[0].rightlanes[2].c = (
-            3.0 / length_road**2 * new_lane_width
+        end_x = 150  # x coordinate at the end of the curvature
+        end_y = 20  # y coordinate at the end of the curvature
+        end_h = 0  # heading at the end of the curvature
+
+        clothoids = pcloth.SolveG2(
+            start_x,
+            start_y,
+            start_h,
+            xodr.STD_START_CLOTH,
+            end_x,
+            end_y,
+            end_h,
+            xodr.STD_START_CLOTH,
         )
-        road_second.lanes.lanesections[0].rightlanes[2].d = (
-            -2.0 / length_road**3 * new_lane_width
-        )
+        # create spirals from each responce
+        roadgeoms = [
+            xodr.Spiral(x.KappaStart, x.KappaEnd, length=x.length) for x in clothoids
+        ]
+
+        # create the road
+        road = xodr.create_road(roadgeoms, id=0, left_lanes=2, right_lanes=2)
 
         ## Create the OpenDrive class (Master class)
-        odr = xodr.OpenDrive(&#34;myroads&#34;)
+        odr = xodr.OpenDrive(&#34;myroad&#34;)
 
         ## Finally add roads to Opendrive
-        odr.add_road(road_first)
-        odr.add_road(road_second)
+        odr.add_road(road)
 
-        # Link roads
-        road_first.add_successor(xodr.ElementType.road, 2, xodr.ContactPoint.start)
-        road_second.add_predecessor(xodr.ElementType.road, 1, xodr.ContactPoint.end)
-
-        # Link lanes but do not link the newly beginning lane
-        link_lane_ids_first = [2, 1, -1, -2, -3]
-        link_lane_ids_second = [2, 1, -1, -2, -4]
-        xodr.create_lane_links_from_ids(
-            road_first, road_second, link_lane_ids_first, link_lane_ids_second
-        )
+        ## Adjust initial positions of the roads looking at succ-pred logic
+        odr.adjust_roads_and_lanes()
 
         return odr
 
@@ -125,7 +136,7 @@ if __name__ == &#34;__main__&#34;:
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="examples.xodr.road_link_unequal_number_of_lanes.Scenario"><code class="flex name class">
+<dt id="examples.xodr.clothoid_generation.Scenario"><code class="flex name class">
 <span>class <span class="ident">Scenario</span></span>
 </code></dt>
 <dd>
@@ -160,42 +171,40 @@ encoding (str): encoding of the outputs
         super().__init__()
 
     def road(self, **kwargs):
-        # Create roads
-        length_road = 100.0
-        road_first = xodr.create_road([xodr.Line(length_road)], 1, 2, 3)
-        road_first.planview.adjust_geometries()
+        start_x = 0  # x coordinate at the beginning of the curvature
+        start_y = 0  # y coordinate at the beginning of the curvature
+        start_h = 0  # heading at the beginning of the curvature
 
-        road_second = xodr.create_road([xodr.Line(length_road)], 2, 2, 4)
-        road_second.planview.set_start_point(100, 0, 0)
-        road_second.planview.adjust_geometries()
-        # Make a new lane open up/branch out
-        new_lane_width = 3.0
-        road_second.lanes.lanesections[0].rightlanes[2].a = 0.0
-        road_second.lanes.lanesections[0].rightlanes[2].b = 0.0
-        road_second.lanes.lanesections[0].rightlanes[2].c = (
-            3.0 / length_road**2 * new_lane_width
+        end_x = 150  # x coordinate at the end of the curvature
+        end_y = 20  # y coordinate at the end of the curvature
+        end_h = 0  # heading at the end of the curvature
+
+        clothoids = pcloth.SolveG2(
+            start_x,
+            start_y,
+            start_h,
+            xodr.STD_START_CLOTH,
+            end_x,
+            end_y,
+            end_h,
+            xodr.STD_START_CLOTH,
         )
-        road_second.lanes.lanesections[0].rightlanes[2].d = (
-            -2.0 / length_road**3 * new_lane_width
-        )
+        # create spirals from each responce
+        roadgeoms = [
+            xodr.Spiral(x.KappaStart, x.KappaEnd, length=x.length) for x in clothoids
+        ]
+
+        # create the road
+        road = xodr.create_road(roadgeoms, id=0, left_lanes=2, right_lanes=2)
 
         ## Create the OpenDrive class (Master class)
-        odr = xodr.OpenDrive(&#34;myroads&#34;)
+        odr = xodr.OpenDrive(&#34;myroad&#34;)
 
         ## Finally add roads to Opendrive
-        odr.add_road(road_first)
-        odr.add_road(road_second)
+        odr.add_road(road)
 
-        # Link roads
-        road_first.add_successor(xodr.ElementType.road, 2, xodr.ContactPoint.start)
-        road_second.add_predecessor(xodr.ElementType.road, 1, xodr.ContactPoint.end)
-
-        # Link lanes but do not link the newly beginning lane
-        link_lane_ids_first = [2, 1, -1, -2, -3]
-        link_lane_ids_second = [2, 1, -1, -2, -4]
-        xodr.create_lane_links_from_ids(
-            road_first, road_second, link_lane_ids_first, link_lane_ids_second
-        )
+        ## Adjust initial positions of the roads looking at succ-pred logic
+        odr.adjust_roads_and_lanes()
 
         return odr</code></pre>
 </details>
@@ -233,7 +242,7 @@ encoding (str): encoding of the outputs
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="examples.xodr.road_link_unequal_number_of_lanes.Scenario" href="#examples.xodr.road_link_unequal_number_of_lanes.Scenario">Scenario</a></code></h4>
+<h4><code><a title="examples.xodr.clothoid_generation.Scenario" href="#examples.xodr.clothoid_generation.Scenario">Scenario</a></code></h4>
 </li>
 </ul>
 </li>

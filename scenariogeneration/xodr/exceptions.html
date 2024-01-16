@@ -36,11 +36,11 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <pre><code class="python">&#34;&#34;&#34;
   scenariogeneration
   https://github.com/pyoscx/scenariogeneration
- 
+
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at https://mozilla.org/MPL/2.0/.
- 
+
   Copyright (c) 2022 The scenariogeneration Authors.
 
 &#34;&#34;&#34;
@@ -96,6 +96,12 @@ class IdAlreadyExists(Exception):
 
 class RemovedFunctionality(Exception):
     &#34;&#34;&#34;Raise when a function has been removed&#34;&#34;&#34;
+
+    pass
+
+
+class MixingDrivingDirection(Exception):
+    &#34;&#34;&#34;Raise when the driving directions are added&#34;&#34;&#34;
 
     pass</code></pre>
 </details>
@@ -163,6 +169,27 @@ class RemovedFunctionality(Exception):
 </summary>
 <pre><code class="python">class MixOfGeometryAddition(Exception):
     &#34;&#34;&#34;Raise when the wrong way of adding geometires are used for the planview&#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="scenariogeneration.xodr.exceptions.MixingDrivingDirection"><code class="flex name class">
+<span>class <span class="ident">MixingDrivingDirection</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Raise when the driving directions are added</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class MixingDrivingDirection(Exception):
+    &#34;&#34;&#34;Raise when the driving directions are added&#34;&#34;&#34;
 
     pass</code></pre>
 </details>
@@ -322,6 +349,9 @@ class RemovedFunctionality(Exception):
 </li>
 <li>
 <h4><code><a title="scenariogeneration.xodr.exceptions.MixOfGeometryAddition" href="#scenariogeneration.xodr.exceptions.MixOfGeometryAddition">MixOfGeometryAddition</a></code></h4>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xodr.exceptions.MixingDrivingDirection" href="#scenariogeneration.xodr.exceptions.MixingDrivingDirection">MixingDrivingDirection</a></code></h4>
 </li>
 <li>
 <h4><code><a title="scenariogeneration.xodr.exceptions.NotEnoughInputArguments" href="#scenariogeneration.xodr.exceptions.NotEnoughInputArguments">NotEnoughInputArguments</a></code></h4>

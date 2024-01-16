@@ -56,6 +56,7 @@ from .utils import (
     _TriggerType,
     _EntityTriggerType,
     _ValueTriggerType,
+    _BaseCatalog,
 )
 from .utils import (
     ParameterDeclarations,
@@ -408,7 +409,7 @@ class StoryBoard(VersionBase):
                 Default: EmptyTrigger(&#39;stop&#39;)
 
             parameters (ParameterDeclarations): the parameters of the story (optional)
-                Default: ParameterDeclarations()
+                Default: None
 
         &#34;&#34;&#34;
         if not (
@@ -559,7 +560,8 @@ class Story(VersionBase):
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the Story&#34;&#34;&#34;
         element = ET.Element(&#34;Story&#34;, attrib=self.get_attributes())
-        element.append(self.parameter.get_element())
+        if self.parameter.get_element():
+            element.append(self.parameter.get_element())
         if not self.acts:
             raise ValueError(&#34;no acts added to the story&#34;)
         for a in self.acts:
@@ -941,7 +943,7 @@ class _Actors(VersionBase):
         return element
 
 
-class Maneuver(VersionBase):
+class Maneuver(_BaseCatalog):
     &#34;&#34;&#34;The Maneuver class creates the Maneuver of OpenScenario
 
     Parameters
@@ -988,9 +990,11 @@ class Maneuver(VersionBase):
             name (str): name of the Maneuver
 
         &#34;&#34;&#34;
+        super().__init__()
         if parameters is not None and not isinstance(parameters, ParameterDeclarations):
             raise TypeError(&#34;parameters is not of type ParameterDeclarations&#34;)
-        self.parameters = parameters
+        if parameters is not None:
+            self.parameters = parameters
         self.name = name
         self.events = []
 
@@ -1029,38 +1033,6 @@ class Maneuver(VersionBase):
             man.add_event(Event.parse(e))
         return man
 
-    def dump_to_catalog(self, filename, catalogtype, description, author):
-        &#34;&#34;&#34;dump_to_catalog creates a new catalog and adds the Controller to it
-
-        Parameters
-        ----------
-            filename (str): path of the new catalog file
-
-            catalogtype (str): name of the catalog
-
-            description (str): description of the catalog
-
-            author (str): author of the catalog
-
-        &#34;&#34;&#34;
-        cf = CatalogFile()
-        cf.create_catalog(filename, catalogtype, description, author)
-        cf.add_to_catalog(self)
-        cf.dump()
-
-    def append_to_catalog(self, filename):
-        &#34;&#34;&#34;adds the Controller to an existing catalog
-
-        Parameters
-        ----------
-            filename (str): path to the catalog file
-
-        &#34;&#34;&#34;
-        cf = CatalogFile()
-        cf.open_catalog(filename)
-        cf.add_to_catalog(self)
-        cf.dump()
-
     def add_event(self, event):
         &#34;&#34;&#34;adds an event to the Maneuver
 
@@ -1084,8 +1056,7 @@ class Maneuver(VersionBase):
             raise ValueError(&#34;no events added to the maneuver&#34;)
 
         element = ET.Element(&#34;Maneuver&#34;, attrib=self.get_attributes())
-        if self.parameters:
-            element.append(self.parameters.get_element())
+        self.add_parameters_to_element(element)
         for event in self.events:
             element.append(event.get_element())
 
@@ -1192,11 +1163,11 @@ class Event(VersionBase):
         if not isinstance(trigger, _TriggerType):
             if isinstance(trigger, _ValueTriggerType):
                 raise TypeError(
-                    &#34;trigger input is a value trigger condition, please add to a ValueTrigger.&#34;
+                    &#34;trigger input is a value trigger condition, please add it to a ValueTrigger.&#34;
                 )
-            elif isinstance(_EntityTriggerType):
+            elif isinstance(trigger, _EntityTriggerType):
                 raise TypeError(
-                    &#34;trigger input is a entity trigger condition, please add to a EntityTrigger.&#34;
+                    &#34;trigger input is an entity trigger condition, please add it to an EntityTrigger.&#34;
                 )
             raise TypeError(&#34;trigger input is not a valid trigger&#34;)
         self.trigger = trigger
@@ -1694,11 +1665,11 @@ get_attributes()
         if not isinstance(trigger, _TriggerType):
             if isinstance(trigger, _ValueTriggerType):
                 raise TypeError(
-                    &#34;trigger input is a value trigger condition, please add to a ValueTrigger.&#34;
+                    &#34;trigger input is a value trigger condition, please add it to a ValueTrigger.&#34;
                 )
-            elif isinstance(_EntityTriggerType):
+            elif isinstance(trigger, _EntityTriggerType):
                 raise TypeError(
-                    &#34;trigger input is a entity trigger condition, please add to a EntityTrigger.&#34;
+                    &#34;trigger input is an entity trigger condition, please add it to an EntityTrigger.&#34;
                 )
             raise TypeError(&#34;trigger input is not a valid trigger&#34;)
         self.trigger = trigger
@@ -1841,11 +1812,11 @@ def parse(element):
     if not isinstance(trigger, _TriggerType):
         if isinstance(trigger, _ValueTriggerType):
             raise TypeError(
-                &#34;trigger input is a value trigger condition, please add to a ValueTrigger.&#34;
+                &#34;trigger input is a value trigger condition, please add it to a ValueTrigger.&#34;
             )
-        elif isinstance(_EntityTriggerType):
+        elif isinstance(trigger, _EntityTriggerType):
             raise TypeError(
-                &#34;trigger input is a entity trigger condition, please add to a EntityTrigger.&#34;
+                &#34;trigger input is an entity trigger condition, please add it to an EntityTrigger.&#34;
             )
         raise TypeError(&#34;trigger input is not a valid trigger&#34;)
     self.trigger = trigger
@@ -2295,7 +2266,7 @@ Parameters</p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Maneuver(VersionBase):
+<pre><code class="python">class Maneuver(_BaseCatalog):
     &#34;&#34;&#34;The Maneuver class creates the Maneuver of OpenScenario
 
     Parameters
@@ -2342,9 +2313,11 @@ Parameters</p>
             name (str): name of the Maneuver
 
         &#34;&#34;&#34;
+        super().__init__()
         if parameters is not None and not isinstance(parameters, ParameterDeclarations):
             raise TypeError(&#34;parameters is not of type ParameterDeclarations&#34;)
-        self.parameters = parameters
+        if parameters is not None:
+            self.parameters = parameters
         self.name = name
         self.events = []
 
@@ -2383,38 +2356,6 @@ Parameters</p>
             man.add_event(Event.parse(e))
         return man
 
-    def dump_to_catalog(self, filename, catalogtype, description, author):
-        &#34;&#34;&#34;dump_to_catalog creates a new catalog and adds the Controller to it
-
-        Parameters
-        ----------
-            filename (str): path of the new catalog file
-
-            catalogtype (str): name of the catalog
-
-            description (str): description of the catalog
-
-            author (str): author of the catalog
-
-        &#34;&#34;&#34;
-        cf = CatalogFile()
-        cf.create_catalog(filename, catalogtype, description, author)
-        cf.add_to_catalog(self)
-        cf.dump()
-
-    def append_to_catalog(self, filename):
-        &#34;&#34;&#34;adds the Controller to an existing catalog
-
-        Parameters
-        ----------
-            filename (str): path to the catalog file
-
-        &#34;&#34;&#34;
-        cf = CatalogFile()
-        cf.open_catalog(filename)
-        cf.add_to_catalog(self)
-        cf.dump()
-
     def add_event(self, event):
         &#34;&#34;&#34;adds an event to the Maneuver
 
@@ -2438,8 +2379,7 @@ Parameters</p>
             raise ValueError(&#34;no events added to the maneuver&#34;)
 
         element = ET.Element(&#34;Maneuver&#34;, attrib=self.get_attributes())
-        if self.parameters:
-            element.append(self.parameters.get_element())
+        self.add_parameters_to_element(element)
         for event in self.events:
             element.append(event.get_element())
 
@@ -2447,6 +2387,7 @@ Parameters</p>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
+<li>scenariogeneration.xosc.utils._BaseCatalog</li>
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
 </ul>
 <h3>Static methods</h3>
@@ -2521,70 +2462,6 @@ def parse(element):
     return self</code></pre>
 </details>
 </dd>
-<dt id="scenariogeneration.xosc.storyboard.Maneuver.append_to_catalog"><code class="name flex">
-<span>def <span class="ident">append_to_catalog</span></span>(<span>self, filename)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>adds the Controller to an existing catalog</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>filename (str): path to the catalog file
-</code></pre></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def append_to_catalog(self, filename):
-    &#34;&#34;&#34;adds the Controller to an existing catalog
-
-    Parameters
-    ----------
-        filename (str): path to the catalog file
-
-    &#34;&#34;&#34;
-    cf = CatalogFile()
-    cf.open_catalog(filename)
-    cf.add_to_catalog(self)
-    cf.dump()</code></pre>
-</details>
-</dd>
-<dt id="scenariogeneration.xosc.storyboard.Maneuver.dump_to_catalog"><code class="name flex">
-<span>def <span class="ident">dump_to_catalog</span></span>(<span>self, filename, catalogtype, description, author)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>dump_to_catalog creates a new catalog and adds the Controller to it</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>filename (str): path of the new catalog file
-
-catalogtype (str): name of the catalog
-
-description (str): description of the catalog
-
-author (str): author of the catalog
-</code></pre></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def dump_to_catalog(self, filename, catalogtype, description, author):
-    &#34;&#34;&#34;dump_to_catalog creates a new catalog and adds the Controller to it
-
-    Parameters
-    ----------
-        filename (str): path of the new catalog file
-
-        catalogtype (str): name of the catalog
-
-        description (str): description of the catalog
-
-        author (str): author of the catalog
-
-    &#34;&#34;&#34;
-    cf = CatalogFile()
-    cf.create_catalog(filename, catalogtype, description, author)
-    cf.add_to_catalog(self)
-    cf.dump()</code></pre>
-</details>
-</dd>
 <dt id="scenariogeneration.xosc.storyboard.Maneuver.get_attributes"><code class="name flex">
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
@@ -2614,8 +2491,7 @@ author (str): author of the catalog
         raise ValueError(&#34;no events added to the maneuver&#34;)
 
     element = ET.Element(&#34;Maneuver&#34;, attrib=self.get_attributes())
-    if self.parameters:
-        element.append(self.parameters.get_element())
+    self.add_parameters_to_element(element)
     for event in self.events:
         element.append(event.get_element())
 
@@ -3094,7 +2970,8 @@ parameters (ParameterDeclarations): the parameters of the Story
     def get_element(self):
         &#34;&#34;&#34;returns the elementTree of the Story&#34;&#34;&#34;
         element = ET.Element(&#34;Story&#34;, attrib=self.get_attributes())
-        element.append(self.parameter.get_element())
+        if self.parameter.get_element():
+            element.append(self.parameter.get_element())
         if not self.acts:
             raise ValueError(&#34;no acts added to the story&#34;)
         for a in self.acts:
@@ -3203,7 +3080,8 @@ def parse(element):
 <pre><code class="python">def get_element(self):
     &#34;&#34;&#34;returns the elementTree of the Story&#34;&#34;&#34;
     element = ET.Element(&#34;Story&#34;, attrib=self.get_attributes())
-    element.append(self.parameter.get_element())
+    if self.parameter.get_element():
+        element.append(self.parameter.get_element())
     if not self.acts:
         raise ValueError(&#34;no acts added to the story&#34;)
     for a in self.acts:
@@ -3451,7 +3329,7 @@ stoptrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigge
                 Default: EmptyTrigger(&#39;stop&#39;)
 
             parameters (ParameterDeclarations): the parameters of the story (optional)
-                Default: ParameterDeclarations()
+                Default: None
 
         &#34;&#34;&#34;
         if not (
@@ -3595,7 +3473,7 @@ stoptrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigge
     Default: EmptyTrigger('stop')
 
 parameters (ParameterDeclarations): the parameters of the story (optional)
-    Default: ParameterDeclarations()
+    Default: None
 </code></pre></div>
 <details class="source">
 <summary>
@@ -3626,7 +3504,7 @@ parameters (ParameterDeclarations): the parameters of the story (optional)
             Default: EmptyTrigger(&#39;stop&#39;)
 
         parameters (ParameterDeclarations): the parameters of the story (optional)
-            Default: ParameterDeclarations()
+            Default: None
 
     &#34;&#34;&#34;
     if not (
@@ -3825,10 +3703,8 @@ parameters (ParameterDeclarations): the parameters of the story (optional)
 </li>
 <li>
 <h4><code><a title="scenariogeneration.xosc.storyboard.Maneuver" href="#scenariogeneration.xosc.storyboard.Maneuver">Maneuver</a></code></h4>
-<ul class="two-column">
+<ul class="">
 <li><code><a title="scenariogeneration.xosc.storyboard.Maneuver.add_event" href="#scenariogeneration.xosc.storyboard.Maneuver.add_event">add_event</a></code></li>
-<li><code><a title="scenariogeneration.xosc.storyboard.Maneuver.append_to_catalog" href="#scenariogeneration.xosc.storyboard.Maneuver.append_to_catalog">append_to_catalog</a></code></li>
-<li><code><a title="scenariogeneration.xosc.storyboard.Maneuver.dump_to_catalog" href="#scenariogeneration.xosc.storyboard.Maneuver.dump_to_catalog">dump_to_catalog</a></code></li>
 <li><code><a title="scenariogeneration.xosc.storyboard.Maneuver.get_attributes" href="#scenariogeneration.xosc.storyboard.Maneuver.get_attributes">get_attributes</a></code></li>
 <li><code><a title="scenariogeneration.xosc.storyboard.Maneuver.get_element" href="#scenariogeneration.xosc.storyboard.Maneuver.get_element">get_element</a></code></li>
 <li><code><a title="scenariogeneration.xosc.storyboard.Maneuver.parse" href="#scenariogeneration.xosc.storyboard.Maneuver.parse">parse</a></code></li>
