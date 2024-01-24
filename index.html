@@ -90,6 +90,11 @@ scenario.write_xml(&quot;multiple_maneuvers_0.xosc&quot;)
 The <em>adjust_roadmark</em> method will adjust the first road added to the <em>OpenDrive</em> object first, then adjust all roads according to the lane markings based on that road.</p>
 <p>This is done by adding a new <em>soffset</em> to all roadmarks, and if a roadmark is cut between lanesections an explicit line will be added to fill the gap in the beginning of a lanesection making it complete.</p>
 <p><strong>NOTE:</strong> All roads has to be fixed (using <em>adjust_roads_and_lanes</em>) before the roadmarks can be adjusted.</p>
+<h3 id="automatic-creation-of-elevations">Automatic creation of elevations</h3>
+<p>If some roads has a defined elevation or superelevation profile, the rest can be automaically be calculated based on the ones that have an elevation. This is done by first calculating superelevation and after that elevations (since superelevations might give rise to elevations). This is enabled by the method <em>adjust_elevations</em>.</p>
+<p><strong>NOTE:</strong> This functionality tries to fit elevations if the neighboring roads have elevations, if only one has, it will copy it. This means that depending on the road network the solution is dependent on the order roads are added.</p>
+<p><strong>NOTE:</strong> For common junctions it will try to create elevations, however this will yeild very strange crossings, so please set the elevation in your crossings beforehand. (This is solved in OpenDRIVE 1.8 but not implemented in scenariogeneration)</p>
+<p>An example of elevation automation can be seen in <a href="exampels/xodr/super_elevation_automation_example.html">super_elevation_automation_example</a></p>
 <h3 id="generators">Generators</h3>
 <p>For most simple roads, the generators that are provided in the <strong>xodr</strong> module can be used. These most often will generate the roads that can build up the network and then the user can just "patch" them together with the "successor/predecessor" attributes (see <a href="examples/xodr/highway_example.html">highway_example</a>)</p>
 <h4 id="create_road">create_road</h4>
@@ -321,6 +326,7 @@ To connect the scenario and the generated road, create the RoadNetwork object in
 </ul>
 </li>
 <li><a href="#automatic-adjustment-of-roadmarks">Automatic adjustment of roadmarks</a></li>
+<li><a href="#automatic-creation-of-elevations">Automatic creation of elevations</a></li>
 <li><a href="#generators">Generators</a><ul>
 <li><a href="#create_road">create_road</a></li>
 <li><a href="#create_3cloths">create_3cloths</a></li>
