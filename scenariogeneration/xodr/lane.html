@@ -2,19 +2,33 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.10.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
 <title>scenariogeneration.xodr.lane API documentation</title>
 <meta name="description" content="scenariogeneration
-https://github.com/pyoscx/scenariogeneration …" />
-<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
-<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
-<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
-<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
-<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+https://github.com/pyoscx/scenariogeneration …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
-<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
 </head>
 <body>
 <main>
@@ -29,1618 +43,6 @@ https://github.com/pyoscx/scenariogeneration …" />
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
 <p>Copyright (c) 2022 The scenariogeneration Authors.</p>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">&#34;&#34;&#34;
-  scenariogeneration
-  https://github.com/pyoscx/scenariogeneration
-
-  This Source Code Form is subject to the terms of the Mozilla Public
-  License, v. 2.0. If a copy of the MPL was not distributed with this
-  file, You can obtain one at https://mozilla.org/MPL/2.0/.
-
-  Copyright (c) 2022 The scenariogeneration Authors.
-
-&#34;&#34;&#34;
-
-from operator import index
-import xml.etree.ElementTree as ET
-from ..helpers import enum2str
-from .enumerations import (
-    LaneType,
-    LaneChange,
-    RoadMarkWeight,
-    RoadMarkColor,
-    RoadMarkType,
-    MarkRule,
-    ContactPoint,
-)
-from .exceptions import ToManyOptionalArguments
-from .utils import XodrBase
-from .links import _Links, _Link
-import numpy as np
-
-
-class Lanes(XodrBase):
-    &#34;&#34;&#34;creates the Lanes element of opendrive
-
-
-    Attributes
-    ----------
-        lane_sections (list of LaneSection): a list of all lanesections
-
-    Methods
-    -------
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-        add_lanesection(lanesection)
-            adds a lane section to Lanes
-
-        add_laneoffset(laneoffset)
-            adds a lane offset to Lanes
-    &#34;&#34;&#34;
-
-    def __init__(self):
-        super().__init__()
-        &#34;&#34;&#34;initalize Lanes&#34;&#34;&#34;
-        self.lanesections = []
-        self.laneoffsets = []
-        self.roadmarks_adjusted = False
-
-    def __eq__(self, other):
-        if isinstance(other, Lanes) and super().__eq__(other):
-            if (
-                self.laneoffsets == other.laneoffsets
-                and self.lanesections == other.lanesections
-            ):
-                return True
-        return False
-
-    def add_lanesection(self, lanesection, lanelinks=None):
-        &#34;&#34;&#34;creates the Lanes element of opendrive
-
-        Parameters
-        ----------
-            lanesection (LaneSection): a LaneSection to add
-
-            lanelink (LaneLinker): (optional) a LaneLink to add
-
-        &#34;&#34;&#34;
-        # add links to the lanes
-        if lanelinks:
-            # loop over all links
-            if not isinstance(lanelinks, list):
-                lanelinks = [lanelinks]
-            for lanelink in lanelinks:
-                for link in lanelink.links:
-                    # check if link already added
-                    if not link.used:
-                        link.predecessor.add_link(&#34;successor&#34;, link.successor.lane_id)
-                        link.successor.add_link(&#34;predecessor&#34;, link.predecessor.lane_id)
-                        link.used = True
-
-        self.lanesections.append(lanesection)
-        return self
-
-    def add_laneoffset(self, laneoffset):
-        &#34;&#34;&#34;adds a lane offset to Lanes
-
-        Parameters
-        ----------
-            laneoffset (LaneOffset): a LaneOffset to add
-        &#34;&#34;&#34;
-        if not isinstance(laneoffset, LaneOffset):
-            raise TypeError(
-                &#34;add_laneoffset requires a LaneOffset as input, not &#34;
-                + str(type(laneoffset))
-            )
-        self.laneoffsets.append(laneoffset)
-        return self
-
-    def _check_valid_mark_type(self, lane):
-        &#34;&#34;&#34;simple checker if the lanemark can be adjusted
-
-        Parameters
-        ----------
-            lane (Lane): the lane which roadmark should be checked
-        &#34;&#34;&#34;
-        return (
-            lane.roadmark[0].marking_type == RoadMarkType.broken
-            or lane.roadmark[0].marking_type == RoadMarkType.broken_broken
-        )
-
-    def _adjust_for_missing_line_offset(self, roadmark):
-        &#34;&#34;&#34;adds an explicit line if soofset is less than 0 (for adjusting from start) or longer than the space between lines (for adjusting from end)
-
-        Parameters
-        ----------
-            roadmark (RoadMark): the roadmark to be adjusted
-        &#34;&#34;&#34;
-        for line in roadmark._line:
-            if line.soffset &lt; 0 or line.soffset &gt; line.length + line.soffset:
-                roadmark.add_explicit_road_line(
-                    ExplicitRoadLine(
-                        line.width,
-                        line.length + line.soffset,
-                        line.toffset,
-                        0,
-                        line.rule,
-                    )
-                )
-            elif line.soffset &gt; line.space:
-                roadmark.add_explicit_road_line(
-                    ExplicitRoadLine(
-                        line.width,
-                        line.soffset - line.space,
-                        line.toffset,
-                        0,
-                        line.rule,
-                    )
-                )
-            if line.soffset &lt; 0:
-                line.shift_soffset()
-
-    def _validity_check_for_roadmark_adjustment(self):
-        &#34;&#34;&#34;does some simple checks if the the different lanes can be adjusted&#34;&#34;&#34;
-        self._right_lanes_adjustable = len(self.lanesections[0].rightlanes) &gt; 0
-        self._left_lanes_adjustable = len(self.lanesections[0].leftlanes) &gt; 0
-        self._center_lane_adjustable = True
-        for ls in range(len(self.lanesections) - 1):
-            if len(self.lanesections[ls].centerlane.roadmark) != 1:
-                self.center_lane_adjustable = False
-            if (
-                self.lanesections[ls].centerlane.roadmark
-                != self.lanesections[ls + 1].centerlane.roadmark
-            ):
-                self.center_lane_adjustable = False
-            if (
-                self.lanesections[ls].centerlane.roadmark[0].marking_type
-                != RoadMarkType.broken
-                and self.lanesections[ls].centerlane.roadmark[0].marking_type
-                != RoadMarkType.broken_broken
-            ):
-                self.center_lane_adjustable = False
-
-            for rl in range(len(self.lanesections[ls].rightlanes)):
-                if self._right_lanes_adjustable:
-                    if len(self.lanesections[ls].rightlanes[rl].roadmark) != 1:
-                        self._right_lanes_adjustable = False
-            for ll in range(len(self.lanesections[ls].leftlanes)):
-                if self._left_lanes_adjustable:
-                    if len(self.lanesections[ls].leftlanes[ll].roadmark) != 1:
-                        self._left_lanes_adjustable = False
-
-    def _get_previous_remainder(
-        self,
-        connected_lane_section,
-        i_line,
-        lane_side,
-        contact_point,
-        lane_index,
-        lane_section_index,
-        start_or_end,
-    ):
-        &#34;&#34;&#34;_get_previous_remainder is a helper method to get the remainder of a lanemarking of a connecting lane section (for lenght adjustment)
-
-        Parameters
-        ----------
-            connected_lane_section (LaneSection): connected lane section (on another road)
-
-            i_line (int): index of the line (roadmark._line)
-
-            lane_side (str): &#34;left&#34;, &#34;right&#34;, or &#34;center&#34; describing what lane is of interest
-
-            contact_point (ContactPoint): contact point of the connected_lane_section
-
-            lane_index (int): the lane index of the wanted lane
-
-            lane_section_index (int): index of the lane section
-
-            start_or_end (str): if the adjustment is done from the end or from the start of the road
-
-        Return
-        ------
-            float: remainder of the previous lanesection
-
-        &#34;&#34;&#34;
-        active_lane_sec = self.lanesections[lane_section_index]
-        neighbor_lane_sec = None
-        if start_or_end == &#34;end&#34;:
-            on_edge = lane_section_index == len(self.lanesections) - 1
-            connection = &#34;successor&#34;
-            if not on_edge:
-                neighbor_lane_sec = self.lanesections[lane_section_index + 1]
-        else:
-            on_edge = lane_section_index == 0
-            connection = &#34;predecessor&#34;
-            if not on_edge:
-                neighbor_lane_sec = self.lanesections[lane_section_index - 1]
-
-        linked_lane_id = 0
-        found_linked_lane_id = None
-        if lane_side == &#34;right&#34;:
-            found_linked_lane_id = active_lane_sec.rightlanes[
-                lane_index
-            ].get_linked_lane_id(connection)
-            if neighbor_lane_sec:
-                neighboring_lane = neighbor_lane_sec.rightlanes[linked_lane_id]
-        elif lane_side == &#34;left&#34;:
-            found_linked_lane_id = active_lane_sec.leftlanes[
-                lane_index
-            ].get_linked_lane_id(connection)
-            if neighbor_lane_sec:
-                neighboring_lane = neighbor_lane_sec.leftlanes[linked_lane_id]
-        else:  # center
-            if neighbor_lane_sec:
-                neighboring_lane = neighbor_lane_sec.centerlane
-        if found_linked_lane_id:
-            linked_lane_id = abs(found_linked_lane_id) - 1
-
-        prev_remainder = 0
-        if on_edge:
-            if lane_side == &#34;right&#34;:
-                if (
-                    contact_point == ContactPoint.end
-                    and connected_lane_section.rightlanes[linked_lane_id]
-                    .roadmark[0]
-                    ._line
-                ):
-                    prev_remainder = (
-                        connected_lane_section.rightlanes[linked_lane_id]
-                        .roadmark[0]
-                        ._line[i_line]
-                        ._remainder
-                    )
-                elif (
-                    contact_point == ContactPoint.start
-                    and connected_lane_section.leftlanes[linked_lane_id]
-                    .roadmark[0]
-                    ._line
-                ):
-                    prev_remainder = (
-                        connected_lane_section.leftlanes[linked_lane_id]
-                        .roadmark[0]
-                        ._line[i_line]
-                        .soffset
-                    )
-
-            if lane_side == &#34;left&#34;:
-                if (
-                    contact_point == ContactPoint.end
-                    and connected_lane_section.leftlanes[linked_lane_id]
-                    .roadmark[0]
-                    ._line
-                ):
-                    prev_remainder = (
-                        connected_lane_section.leftlanes[linked_lane_id]
-                        .roadmark[0]
-                        ._line[i_line]
-                        ._remainder
-                    )
-                elif (
-                    contact_point == ContactPoint.start
-                    and connected_lane_section.rightlanes[linked_lane_id]
-                    .roadmark[0]
-                    ._line
-                ):
-                    prev_remainder = (
-                        connected_lane_section.rightlanes[linked_lane_id]
-                        .roadmark[0]
-                        ._line[i_line]
-                        .soffset
-                    )
-
-            if (
-                lane_side == &#34;center&#34;
-                and connected_lane_section.centerlane.roadmark[0]._line
-            ):
-                if contact_point == ContactPoint.end:
-                    prev_remainder = (
-                        connected_lane_section.centerlane.roadmark[0]
-                        ._line[i_line]
-                        ._remainder
-                    )
-                elif contact_point == ContactPoint.start:
-                    prev_remainder = (
-                        connected_lane_section.centerlane.roadmark[0]
-                        ._line[i_line]
-                        .soffset
-                    )
-
-        else:
-            if start_or_end == &#34;start&#34;:
-                prev_remainder = neighboring_lane.roadmark[0]._line[i_line]._remainder
-            else:
-                prev_remainder = neighboring_lane.roadmark[0]._line[i_line].soffset
-        return prev_remainder
-
-    def _get_seg_length(self, total_road_length, lane_section_index):
-        &#34;&#34;&#34;_get_seg_length is a helper method to figure out how long a lane section is
-
-        Parameters
-        ----------
-            total_road_length (float): total length of the road
-
-            lane_section_index (int): the index of the wanted lanesection
-
-        Returns
-        -------
-            float: length of the lanesection
-
-        &#34;&#34;&#34;
-        if len(self.lanesections) == 1:
-            seg_length = total_road_length
-        elif lane_section_index == 0:
-            seg_length = self.lanesections[1].s
-        elif lane_section_index == len(self.lanesections) - 1:
-            seg_length = total_road_length - self.lanesections[lane_section_index].s
-        else:
-            seg_length = (
-                self.lanesections[lane_section_index + 1].s
-                - self.lanesections[lane_section_index].s
-            )
-        return seg_length
-
-    def adjust_road_marks_from_start(
-        self,
-        total_road_length,
-        connected_lane_section=None,
-        contact_point=ContactPoint.end,
-    ):
-        &#34;&#34;&#34;Adjusts road marks from the start of the road, based on the connected lane section.
-        If connected_lane_section is not provided, the last roadmark will be placed with zero
-        distance to the start of the road
-
-        Parameters
-        ----------
-            total_road_length (float): total length of the road
-
-            connected_lane_section (LaneSection): the lane section connected to the road
-                Default: None
-
-            contact_point (ContactPoint)
-                Default: ContactPoint.end
-        &#34;&#34;&#34;
-        if not self.roadmarks_adjusted:
-            self._validity_check_for_roadmark_adjustment()
-            self.roadmarks_adjusted = True
-
-            def set_zero_offset_to_lines(lane, seg_length):
-                for i_line in range(len(lane.roadmark[0]._line)):
-                    lane.roadmark[0]._line[i_line].adjust_remainder(
-                        seg_length, soffset=0
-                    )
-
-            for ls in range(0, len(self.lanesections)):
-                seg_length = self._get_seg_length(total_road_length, ls)
-                if self._right_lanes_adjustable:
-                    for rl in range(len(self.lanesections[ls].rightlanes)):
-                        if self._check_valid_mark_type(
-                            self.lanesections[ls].rightlanes[rl]
-                        ):
-                            if ls == 0 and connected_lane_section is None:
-                                set_zero_offset_to_lines(
-                                    self.lanesections[ls].rightlanes[rl], seg_length
-                                )
-                            else:
-                                for i_line in range(
-                                    len(
-                                        self.lanesections[ls]
-                                        .rightlanes[rl]
-                                        .roadmark[0]
-                                        ._line
-                                    )
-                                ):
-                                    prev_remainder = self._get_previous_remainder(
-                                        connected_lane_section,
-                                        i_line,
-                                        &#34;right&#34;,
-                                        contact_point,
-                                        rl,
-                                        ls,
-                                        &#34;start&#34;,
-                                    )
-                                    self.lanesections[ls].rightlanes[rl].roadmark[
-                                        0
-                                    ]._line[i_line].adjust_remainder(
-                                        seg_length, previous_remainder=prev_remainder
-                                    )
-                                self._adjust_for_missing_line_offset(
-                                    self.lanesections[ls].rightlanes[rl].roadmark[0]
-                                )
-                if self._left_lanes_adjustable:
-                    for ll in range(len(self.lanesections[ls].leftlanes)):
-                        if self._check_valid_mark_type(
-                            self.lanesections[ls].leftlanes[ll]
-                        ):
-                            if ls == 0 and connected_lane_section is None:
-                                set_zero_offset_to_lines(
-                                    self.lanesections[ls].leftlanes[ll], seg_length
-                                )
-                            else:
-                                for i_line in range(
-                                    len(
-                                        self.lanesections[ls]
-                                        .leftlanes[ll]
-                                        .roadmark[0]
-                                        ._line
-                                    )
-                                ):
-                                    prev_remainder = self._get_previous_remainder(
-                                        connected_lane_section,
-                                        i_line,
-                                        &#34;left&#34;,
-                                        contact_point,
-                                        ll,
-                                        ls,
-                                        &#34;start&#34;,
-                                    )
-                                    self.lanesections[ls].leftlanes[ll].roadmark[
-                                        0
-                                    ]._line[i_line].adjust_remainder(
-                                        seg_length, previous_remainder=prev_remainder
-                                    )
-                                self._adjust_for_missing_line_offset(
-                                    self.lanesections[ls].leftlanes[ll].roadmark[0]
-                                )
-                if self._center_lane_adjustable:
-                    if self._check_valid_mark_type(self.lanesections[ls].centerlane):
-                        if ls == 0 and connected_lane_section is None:
-                            set_zero_offset_to_lines(
-                                self.lanesections[ls].centerlane, seg_length
-                            )
-                        else:
-                            for i_line in range(
-                                len(self.lanesections[ls].centerlane.roadmark[0]._line)
-                            ):
-                                prev_remainder = self._get_previous_remainder(
-                                    connected_lane_section,
-                                    i_line,
-                                    &#34;center&#34;,
-                                    contact_point,
-                                    None,
-                                    ls,
-                                    &#34;start&#34;,
-                                )
-                                self.lanesections[ls].centerlane.roadmark[0]._line[
-                                    i_line
-                                ].adjust_remainder(
-                                    seg_length, previous_remainder=prev_remainder
-                                )
-                            self._adjust_for_missing_line_offset(
-                                self.lanesections[ls].centerlane.roadmark[0]
-                            )
-
-    def adjust_road_marks_from_end(
-        self,
-        total_road_length,
-        connected_lane_section=None,
-        contact_point=ContactPoint.end,
-    ):
-        &#34;&#34;&#34;Adjusts road marks from the end of the road, based on the connected lane section.
-        If connected_lane_section is not provided, the last roadmark will be placed with zero
-        distance to the end of the road
-
-        Parameters
-        ----------
-            total_road_length (float): total length of the road
-
-            connected_lane_section (LaneSection): the lane section connected to the road
-                Default: None
-
-            contact_point (ContactPoint)
-                Default: ContactPoint.end
-        &#34;&#34;&#34;
-        if not self.roadmarks_adjusted:
-            self._validity_check_for_roadmark_adjustment()
-            self.roadmarks_adjusted = True
-
-            def set_zero_remainder_to_lines(lane, seg_length):
-                for i_line in range(len(lane.roadmark[0]._line)):
-                    lane.roadmark[0]._line[i_line].adjust_soffset(
-                        seg_length, remainder=0
-                    )
-
-            for ls in range(len(self.lanesections) - 1, -1, -1):
-                seg_length = self._get_seg_length(total_road_length, ls)
-                if self._right_lanes_adjustable:
-                    for rl in range(len(self.lanesections[ls].rightlanes)):
-                        if self._check_valid_mark_type(
-                            self.lanesections[ls].rightlanes[rl]
-                        ):
-                            if (
-                                ls == len(self.lanesections) - 1
-                                and connected_lane_section is None
-                            ):
-                                set_zero_remainder_to_lines(
-                                    self.lanesections[ls].rightlanes[rl], seg_length
-                                )
-                            else:
-                                for i_line in range(
-                                    len(
-                                        self.lanesections[ls]
-                                        .rightlanes[rl]
-                                        .roadmark[0]
-                                        ._line
-                                    )
-                                ):
-                                    prev_remainder = self._get_previous_remainder(
-                                        connected_lane_section,
-                                        i_line,
-                                        &#34;right&#34;,
-                                        contact_point,
-                                        rl,
-                                        ls,
-                                        &#34;end&#34;,
-                                    )
-                                    self.lanesections[ls].rightlanes[rl].roadmark[
-                                        0
-                                    ]._line[i_line].adjust_soffset(
-                                        seg_length, previous_offset=prev_remainder
-                                    )
-                                self._adjust_for_missing_line_offset(
-                                    self.lanesections[ls].rightlanes[rl].roadmark[0]
-                                )
-                if self._left_lanes_adjustable:
-                    for ll in range(len(self.lanesections[ls].leftlanes)):
-                        if self._check_valid_mark_type(
-                            self.lanesections[ls].leftlanes[ll]
-                        ):
-                            if (
-                                ls == len(self.lanesections) - 1
-                                and connected_lane_section is None
-                            ):
-                                set_zero_remainder_to_lines(
-                                    self.lanesections[ls].leftlanes[ll], seg_length
-                                )
-                            else:
-                                for i_line in range(
-                                    len(
-                                        self.lanesections[ls]
-                                        .leftlanes[ll]
-                                        .roadmark[0]
-                                        ._line
-                                    )
-                                ):
-                                    prev_remainder = self._get_previous_remainder(
-                                        connected_lane_section,
-                                        i_line,
-                                        &#34;left&#34;,
-                                        contact_point,
-                                        ll,
-                                        ls,
-                                        &#34;end&#34;,
-                                    )
-                                    self.lanesections[ls].leftlanes[ll].roadmark[
-                                        0
-                                    ]._line[i_line].adjust_soffset(
-                                        seg_length, previous_offset=prev_remainder
-                                    )
-                                self._adjust_for_missing_line_offset(
-                                    self.lanesections[ls].leftlanes[ll].roadmark[0]
-                                )
-
-                if self._center_lane_adjustable:
-                    if self._check_valid_mark_type(self.lanesections[ls].centerlane):
-                        if (
-                            ls == len(self.lanesections) - 1
-                            and connected_lane_section is None
-                        ):
-                            set_zero_remainder_to_lines(
-                                self.lanesections[ls].centerlane, seg_length
-                            )
-                        else:
-                            for i_line in range(
-                                len(self.lanesections[ls].centerlane.roadmark[0]._line)
-                            ):
-                                prev_remainder = self._get_previous_remainder(
-                                    connected_lane_section,
-                                    i_line,
-                                    &#34;center&#34;,
-                                    contact_point,
-                                    None,
-                                    ls,
-                                    &#34;end&#34;,
-                                )
-                                self.lanesections[ls].centerlane.roadmark[0]._line[
-                                    i_line
-                                ].adjust_soffset(
-                                    seg_length, previous_offset=prev_remainder
-                                )
-                            self._adjust_for_missing_line_offset(
-                                self.lanesections[ls].centerlane.roadmark[0]
-                            )
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of Lanes&#34;&#34;&#34;
-        element = ET.Element(&#34;lanes&#34;)
-        self._add_additional_data_to_element(element)
-        for l in self.laneoffsets:
-            element.append(l.get_element())
-        for l in self.lanesections:
-            element.append(l.get_element())
-        return element
-
-
-class LaneOffset(XodrBase):
-    &#34;&#34;&#34;the LaneOffset class defines an overall lateral offset along the road, described as a third degree polynomial
-
-    Parameters
-    ----------
-        s (float): s start coordinate of the elevation
-
-        a (float): a coefficient of the polynomial
-
-        b (float): b coefficient of the polynomial
-
-        c (float): c coefficient of the polynomial
-
-        d (float): d coefficient of the polynomial
-
-    Attributes
-    ----------
-        s (float): s start coordinate of the elevation
-
-        a (float): a coefficient of the polynomial
-
-        b (float): b coefficient of the polynomial
-
-        c (float): c coefficient of the polynomial
-
-        d (float): d coefficient of the polynomial
-
-    Methods
-    -------
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns the attributes of the class
-
-    &#34;&#34;&#34;
-
-    def __init__(self, s=0, a=0, b=0, c=0, d=0):
-        &#34;&#34;&#34;initalize the LaneOffset class
-
-        Parameters
-        ----------
-            s (float): s start coordinate of the LaneOffset
-
-            a (float): a coefficient of the polynomial
-
-            b (float): b coefficient of the polynomial
-
-            c (float): c coefficient of the polynomial
-
-            d (float): d coefficient of the polynomial
-
-        &#34;&#34;&#34;
-        super().__init__()
-        self.s = s
-        self.a = a
-        self.b = b
-        self.c = c
-        self.d = d
-
-    def __eq__(self, other):
-        if isinstance(other, LaneOffset) and super().__eq__(other):
-            if self.get_attributes() == other.get_attributes():
-                return True
-        return False
-
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes of the LaneOffset&#34;&#34;&#34;
-
-        retdict = {}
-        retdict[&#34;s&#34;] = str(self.s)
-        retdict[&#34;a&#34;] = str(self.a)
-        retdict[&#34;b&#34;] = str(self.b)
-        retdict[&#34;c&#34;] = str(self.c)
-        retdict[&#34;d&#34;] = str(self.d)
-        return retdict
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the LaneOffset&#34;&#34;&#34;
-        element = ET.Element(&#34;laneOffset&#34;, attrib=self.get_attributes())
-        self._add_additional_data_to_element(element)
-        return element
-
-
-class LaneSection(XodrBase):
-    &#34;&#34;&#34;Creates the LaneSection element of opendrive
-
-    Parameters
-    ----------
-        s (float): start of lanesection
-
-        centerlane (Lane): the centerline of the road
-
-    Attributes
-    ----------
-        s (float): start of lanesection
-
-        centerlane (Lane): the centerline of the road
-
-        leftlanes (list of Lane): the lanes left to the center
-
-        rightlanes (list of Lane): the lanes right to the center
-
-    Methods
-    -------
-        get_element()
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of class
-
-        add_left_lane(Lane)
-            adds a new lane to the left
-
-        add_right_lane(Lane)
-            adds a new lane to the right
-    &#34;&#34;&#34;
-
-    def __init__(self, s, centerlane):
-        &#34;&#34;&#34;initalize the LaneSection
-
-        Parameters
-        ----------
-            s (float): start of lanesection
-
-            centerlane (Lane): the centerline of the road
-        &#34;&#34;&#34;
-        super().__init__()
-        self.s = s
-        self.centerlane = centerlane
-        self.centerlane._set_lane_id(0)
-        self.leftlanes = []
-        self.rightlanes = []
-        self._left_id = 1
-        self._right_id = -1
-
-    def __eq__(self, other):
-        if isinstance(other, LaneSection) and super().__eq__(other):
-            if (
-                self.get_attributes() == other.get_attributes()
-                and self.centerlane == other.centerlane
-                and self.leftlanes == other.leftlanes
-                and self.rightlanes == other.rightlanes
-            ):
-                return True
-        return False
-
-    def add_left_lane(self, lane):
-        &#34;&#34;&#34;adds a lane to the left of the center, add from center outwards
-
-        Parameters
-        ----------
-            lane (Lane): the lane to add
-        &#34;&#34;&#34;
-        lane._set_lane_id(self._left_id)
-        self._left_id += 1
-        self.leftlanes.append(lane)
-        return self
-
-    def add_right_lane(self, lane):
-        &#34;&#34;&#34;adds a lane to the right of the center, add from center outwards
-
-        Parameters
-        ----------
-            lane (Lane): the lane to add
-        &#34;&#34;&#34;
-        lane._set_lane_id(self._right_id)
-        self._right_id -= 1
-        self.rightlanes.append(lane)
-        return self
-
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes of the Lane as a dict&#34;&#34;&#34;
-        retdict = {}
-        retdict[&#34;s&#34;] = str(self.s)
-        return retdict
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the WorldPostion&#34;&#34;&#34;
-        element = ET.Element(&#34;laneSection&#34;, attrib=self.get_attributes())
-        self._add_additional_data_to_element(element)
-        if self.leftlanes:
-            left = ET.SubElement(element, &#34;left&#34;)
-            for l in reversed(self.leftlanes):
-                left.append(l.get_element())
-
-        center = ET.SubElement(element, &#34;center&#34;)
-        center.append(self.centerlane.get_element())
-
-        if self.rightlanes:
-            right = ET.SubElement(element, &#34;right&#34;)
-            for l in self.rightlanes:
-                right.append(l.get_element())
-
-        return element
-
-
-class _poly3struct:
-    def __init__(self, a=0, b=0, c=0, d=0, soffset=0):
-        self.a = a
-        self.b = b
-        self.c = c
-        self.d = d
-        self.soffset = soffset
-
-    def __eq__(self, other):
-        if isinstance(other, _poly3struct):
-            if self.get_attributes() == other.get_attributes():
-                return True
-        return False
-
-    def get_width(self, s):
-        width = (
-            self.a
-            + self.b * (s - self.soffset)
-            + self.c * (s - self.soffset) ** 2
-            + self.d * (s - self.soffset) ** 3
-        )
-        return width
-
-    def get_attributes(self):
-        polynomialdict = {}
-        polynomialdict[&#34;a&#34;] = str(self.a)
-        polynomialdict[&#34;b&#34;] = str(self.b)
-        polynomialdict[&#34;c&#34;] = str(self.c)
-        polynomialdict[&#34;d&#34;] = str(self.d)
-        polynomialdict[&#34;sOffset&#34;] = str(self.soffset)
-        return polynomialdict
-
-
-class Lane(XodrBase):
-    &#34;&#34;&#34;creates a Lane of opendrive
-
-    the inputs are on the following format:
-        f(s) = a + b*s + c*s^2 + d*s^3
-
-    Parameters
-    ----------
-
-        lane_type (LaneType): type of lane
-            Default: LaneType.driving
-
-        a (float): a coefficient
-            Default: 0
-
-        b (float): b coefficient
-            Default: 0
-
-        c (float): c coefficient
-            Default: 0
-
-        d (float): d coefficient
-            Default: 0
-
-        soffset (float): soffset of lane
-            Default: 0
-
-
-    Attributes
-    ----------
-        lane_id (int): id of the lane (automatically assigned by LaneSection)
-
-        lane_type (LaneType): type of lane
-
-        a (float): a coefficient
-
-        b (float): b coefficient
-
-        c (float): c coefficient
-
-        d (float): d coefficient
-
-        soffset (float): soffset of lane
-
-        roadmark (RoadMark): roadmarks related to the lane
-
-        links (_Links): Lane links to the lane
-
-    Methods
-    -------
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of class
-
-        add_roadmark(roadmark)
-            adds a new roadmark to the lane
-
-        add_lane_width(a, b, c, d, soffset)
-            adds an additional width element to the lane
-    &#34;&#34;&#34;
-
-    def __init__(self, lane_type=LaneType.driving, a=0, b=0, c=0, d=0, soffset=0):
-        &#34;&#34;&#34;initalizes the Lane
-
-        Parameters
-        ----------
-
-            lane_type (LaneType): type of lane
-                Default: LaneType.driving
-
-            a (float): a polynomial coefficient for width (left/right) or laneoffset (center)
-                Default: 0
-
-            b (float): b polynomial coefficient for width (left/right) or laneoffset (center)
-                Default: 0
-
-            c (float): c polynomial coefficient for width (left/right) or laneoffset (center)
-                Default: 0
-
-            d (float): d polynomial coefficient for width (left/right) or laneoffset (center)
-                Default: 0
-
-            soffset (float): soffset of lane renamed to s in case of centerlane
-                Default: 0
-
-        &#34;&#34;&#34;
-        super().__init__()
-        self.lane_id = None
-        self.lane_type = lane_type
-        self.widths = []
-        self.add_lane_width(a, b, c, d, soffset)
-
-        self.soffset = soffset
-        # TODO: enable multiple widths records per lane (only then soffset really makes sense! ASAM requires one width record to have sOffset=0)
-        self.heights = (
-            []
-        )  # height entries to elevate the lane independent from the road elevation
-        self.roadmark = []
-        self.links = _Links()
-
-    def __eq__(self, other):
-        if isinstance(other, Lane) and super().__eq__(other):
-            if (
-                self.links == other.links
-                and self.get_attributes() == other.get_attributes()
-                and self.widths == other.widths
-                and self.heights == other.heights
-                and self.roadmark == other.roadmark
-            ):
-                return True
-        return False
-
-        # TODO: add more features to add for lane
-
-    def add_lane_width(self, a=0, b=0, c=0, d=0, soffset=0):
-        &#34;&#34;&#34;adds an additional width element to the lane
-
-        Parameters
-        ----------
-            a (float): a polynomial coefficient for width
-                Default: 0
-
-            b (float): b polynomial coefficient for width
-                Default: 0
-
-            c (float): c polynomial coefficient for width
-                Default: 0
-
-            d (float): d polynomial coefficient for width
-                Default: 0
-
-            soffset (float): soffset of lane renamed to s in case of centerlane
-                Default: 0
-
-        &#34;&#34;&#34;
-        self.widths.append(_poly3struct(a, b, c, d, soffset))
-
-    def get_width(self, s):
-        &#34;&#34;&#34;function that calculates the width of a lane at a point s
-
-        Note: no check that s is on the road can be made, that has to be taken care of by the user
-
-        Parameters
-        ----------
-            s (float): the point where the width is wished
-
-        Returns
-        -------
-            width (float): the width at point s
-        &#34;&#34;&#34;
-        index_to_calc = 0
-        for i in range(len(self.widths)):
-            if s &gt;= self.widths[i].soffset:
-                index_to_calc = i
-            else:
-                break
-        return self.widths[index_to_calc].get_width(s)
-
-    def add_link(self, link_type, id):
-        &#34;&#34;&#34;adds a link to the lane section
-
-        Parameters
-        ----------
-            link_type (str): type of link, successor or predecessor
-
-            id (str/id): id of the linked lane
-        &#34;&#34;&#34;
-        self.links.add_link(_Link(link_type, str(id)))
-        return self
-
-    def get_linked_lane_id(self, link_type):
-        &#34;&#34;&#34;adds a link to the lane section
-
-        Parameters
-        ----------
-            link_type (str): type of link, successor or predecessor
-        &#34;&#34;&#34;
-        for link in self.links.links:
-            if link.link_type == link_type:
-                return int(link.element_id)
-        return None
-
-    def _set_lane_id(self, lane_id):
-        &#34;&#34;&#34;set the lane id of the lane and set lane type to &#39;none&#39; in case of centerlane&#34;&#34;&#34;
-        self.lane_id = lane_id
-        if self.lane_id == 0:
-            self.lane_type = LaneType.none
-
-    def add_roadmark(self, roadmark):
-        &#34;&#34;&#34;add_roadmark adds a roadmark to the lane
-
-        Parameters
-        ----------
-            roadmark (RoadMark): roadmark of the lane
-
-        &#34;&#34;&#34;
-        if roadmark is not None:
-            self.roadmark.append(roadmark)
-        return self
-
-    def add_height(self, inner, outer=None, soffset=0):
-        &#34;&#34;&#34;add_height adds a height entry to the lane to elevate it independent from the road elevation
-
-        Parameters
-        ----------
-            inner (float): inner height
-
-            outer (float): outer height (if not provided, inner height is used)
-                Default: None
-
-            s_offset (float): s offset of the height record
-                Default: 0
-
-        &#34;&#34;&#34;
-        heightdict = {}
-        heightdict[&#34;inner&#34;] = str(inner)
-        if outer is not None:
-            heightdict[&#34;outer&#34;] = str(outer)
-        else:
-            heightdict[&#34;outer&#34;] = str(inner)
-        heightdict[&#34;sOffset&#34;] = str(soffset)
-
-        self.heights.append(heightdict)
-        return self
-
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes of the Lane as a dict&#34;&#34;&#34;
-        retdict = {}
-        if self.lane_id == None:
-            raise ValueError(&#34;lane id is not set correctly.&#34;)
-        retdict[&#34;id&#34;] = str(self.lane_id)
-        retdict[&#34;type&#34;] = enum2str(self.lane_type)
-        retdict[&#34;level&#34;] = &#34;false&#34;
-        return retdict
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the Lane&#34;&#34;&#34;
-        element = ET.Element(&#34;lane&#34;, attrib=self.get_attributes())
-        self._add_additional_data_to_element(element)
-        # according to standard if lane is centerlane it should
-        # not have a width record and omit the link record
-        if self.lane_id != 0:
-            element.append(self.links.get_element())
-            for w in sorted(self.widths, key=lambda x: x.soffset):
-                ET.SubElement(element, &#34;width&#34;, attrib=w.get_attributes())
-        # use polynomial dict for laneOffset in case of center lane (only if values provided)
-        # removed, should not be here..
-        # elif any([self.a,self.b,self.c,self.d]):
-        #     polynomialdict[&#39;s&#39;] = polynomialdict.pop(&#39;sOffset&#39;)
-        #     ET.SubElement(element,&#39;laneOffset&#39;,attrib=polynomialdict)
-
-        if self.roadmark:
-            for r in sorted(self.roadmark, key=lambda x: x.soffset):
-                element.append(r.get_element())
-
-        for height in self.heights:
-            ET.SubElement(element, &#34;height&#34;, attrib=height)
-
-        return element
-
-
-class RoadMark(XodrBase):
-    &#34;&#34;&#34;creates a RoadMark of opendrive
-
-    Parameters
-    ----------
-        marking_type (RoadMarkType): the type of marking
-
-        width (float): with of the line
-            Default: None
-        length (float): length of the line
-            Default: 0
-        toffset (float): offset in t
-            Default: 0
-        soffset (float): offset in s
-            Default: 0
-        rule (MarkRule): mark rule (optional)
-
-        color (RoadMarkColor): color of line (optional)
-
-    Attributes
-    ----------
-        marking_type (str): the type of marking
-
-        width (float): with of the line
-
-        length (float): length of the line
-            Default: 0
-        toffset (float): offset in t
-            Default: 0
-        soffset (float): offset in s
-            Default: 0
-        rule (MarkRule): mark rule (optional)
-
-        color (RoadMarkColor): color of line (optional)
-
-    Methods
-    -------
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of FileHeader
-
-        add_roadmark(roadmark)
-            adds a new roadmark to the lane
-
-    &#34;&#34;&#34;
-
-    def __init__(
-        self,
-        marking_type,
-        width=None,
-        length=None,
-        space=None,
-        toffset=None,
-        soffset=0,
-        rule=None,
-        color=RoadMarkColor.standard,
-        marking_weight=RoadMarkWeight.standard,
-        height=0.02,
-        laneChange=None,
-    ):
-        &#34;&#34;&#34;initializes the RoadMark
-
-        Parameters
-        ----------
-            marking_type (str): the type of marking
-
-            width (float): width of the marking / line
-                Default: None
-            length (float): length of the visible, marked part of the line (used for broken lines)
-                Default: None
-            space (float): length of the invisible, unmarked part of the line (used for broken lines)
-                Default: None
-            toffset (float): offset in t
-                Default: None
-            soffset (float): offset in s
-                Default: 0
-            rule (MarkRule): mark rule (optional)
-                Default: None
-            color (RoadMarkColor): color of marking
-                Default: &#39;standard&#39;
-            marking_weight (str): the weight of marking
-                Default: standard
-            height (float): thickness of marking
-                Default: 0.02
-            laneChange (LaneChange): indicates direction in which lane change is allowed
-                Default: none
-
-        &#34;&#34;&#34;
-        super().__init__()
-        # required arguments - must be provided by user
-        self.marking_type = marking_type
-
-        # required arguments - must be provided by user or taken from defaults
-        self.marking_weight = marking_weight
-        self.color = color
-        self.soffset = soffset
-        self.height = height
-        self.laneChange = laneChange
-
-        # optional arguments - roadmark is valid without them being defined
-        self.width = width
-        self.length = length
-        self.space = space
-        self.toffset = toffset
-        self.rule = rule
-
-        # TODO: there may be more line child elements per roadmark, which is currently unsupported
-        self._line = []
-        self._explicit_line = []
-        # check if arguments were passed that require line child element
-        if any([length, space, toffset, rule]):
-            # set defaults in case no values were provided
-            # values for broken lines
-            if marking_type == RoadMarkType.broken:
-                self.length = length or 3
-                self.space = space or 3
-            # values for solid lines
-            elif marking_type == RoadMarkType.solid:
-                self.length = length or 3
-                self.space = space or 0
-            # create empty line if arguments are missing
-            else:
-                self.length = length or 0
-                self.space = length or 0
-                print(
-                    &#34;No defaults for arguments &#39;space&#39; and &#39;length&#39; for roadmark type&#34;,
-                    enum2str(marking_type),
-                    &#34;available and no values were passed. Creating an empty roadmark.&#34;,
-                )
-            # set remaining defaults
-            self.width = width or 0.2
-            self.toffset = toffset or 0
-            self.rule = rule or MarkRule.none
-            self._line.append(
-                RoadLine(
-                    self.width,
-                    self.length,
-                    self.space,
-                    self.toffset,
-                    0,
-                    self.rule,
-                    self.color,
-                )
-            )
-
-    def add_specific_road_line(self, line):
-        &#34;&#34;&#34;function to add your own roadline to the RoadMark, to use for multi line type of roadmarks,
-
-        Parameters
-        ----------
-            line (RoadLine): the roadline to add
-
-        &#34;&#34;&#34;
-        self._line.append(line)
-        return self
-
-    def add_explicit_road_line(self, line):
-        &#34;&#34;&#34;function to add a explicit roadline to the RoadMark,
-
-        Parameters
-        ----------
-            line (RoadLine): the roadline to add
-
-        &#34;&#34;&#34;
-        self._explicit_line.append(line)
-        return self
-
-    def __eq__(self, other):
-        if isinstance(other, RoadMark) and super().__eq__(other):
-            if (
-                self._line == other._line
-                and self._explicit_line == other._explicit_line
-                and self.get_attributes() == other.get_attributes()
-                and self.marking_type == other.marking_type
-            ):
-                return True
-        return False
-
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes of the RoadMark as a dict&#34;&#34;&#34;
-        retdict = {}
-        retdict[&#34;sOffset&#34;] = str(self.soffset)
-        retdict[&#34;type&#34;] = enum2str(self.marking_type)
-        retdict[&#34;weight&#34;] = enum2str(self.marking_weight)
-        retdict[&#34;color&#34;] = enum2str(self.color)
-        retdict[&#34;height&#34;] = str(self.height)
-        if self.width is not None:
-            retdict[&#34;width&#34;] = str(self.width)
-        if self.laneChange is not None:
-            retdict[&#34;laneChange&#34;] = enum2str(self.laneChange)
-        return retdict
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the RoadMark&#34;&#34;&#34;
-        element = ET.Element(&#34;roadMark&#34;, attrib=self.get_attributes())
-        self._add_additional_data_to_element(element)
-        if self._line:
-            attribs = {&#34;name&#34;: enum2str(self.marking_type)}
-            if self.width is not None:
-                attribs[&#34;width&#34;] = str(self.width)
-            else:
-                offsets = [x.toffset for x in self._line]
-
-                attribs[&#34;width&#34;] = str(
-                    max(offsets)
-                    - min(offsets)
-                    + sum(
-                        [
-                            x.width
-                            for x in self._line
-                            if x.toffset in [max(offsets), min(offsets)]
-                        ]
-                    )
-                )
-            typeelement = ET.SubElement(
-                element,
-                &#34;type&#34;,
-                attrib=attribs,
-            )
-            for l in self._line:
-                typeelement.append(l.get_element())
-        if self._explicit_line:
-            typeelement = ET.SubElement(
-                element,
-                &#34;explicit&#34;,
-            )
-            for l in self._explicit_line:
-                typeelement.append(l.get_element())
-        return element
-
-
-class RoadLine(XodrBase):
-    &#34;&#34;&#34;creates a Line type of to be used in roadmark
-
-    Parameters
-    ----------
-        width (float): with of the line
-            Default: 0
-        length (float): length of the line
-            Default: 0
-        space (float): length of space between (broken) lines
-            Default: 0
-        toffset (float): offset in t
-            Default: 0
-        soffset (float): offset in s
-            Default: 0
-        rule (MarkRule): mark rule (optional)
-
-        color (RoadMarkColor): color of line (optional)
-
-    Attributes
-    ----------
-        length (float): length of the line
-
-        space (float): length of space between (broken) lines
-
-        toffset (float): offset in t
-
-        soffset (float): offset in s
-
-        rule (MarkRule): mark rule
-
-        width (float): with of the line
-
-        color (RoadMarkColor): color of line
-
-    Methods
-    -------
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of FileHeader
-
-    &#34;&#34;&#34;
-
-    # TODO: check this for 1.5
-    def __init__(
-        self, width=0, length=0, space=0, toffset=0, soffset=0, rule=None, color=None
-    ):
-        &#34;&#34;&#34;initalizes the RoadLine
-
-        Parameters
-        ----------
-            width (float): with of the line
-                Default: 0
-            length (float): length of the line
-                Default: 0
-            space (float): length of space between (broken) lines
-                Default: 0
-            toffset (float): offset in t
-                Default: 0
-            soffset (float): offset in s
-                Default: 0
-            rule (MarkRule): mark rule (optional)
-
-            color (RoadMarkColor): color of line (optional)
-
-
-        &#34;&#34;&#34;
-        super().__init__()
-        self.length = length
-        self.space = space
-        self.toffset = toffset
-        self.rule = rule
-        self.soffset = soffset
-        self.width = width
-        self.color = color
-        self._remainder = 0
-
-    def __eq__(self, other):
-        if isinstance(other, RoadLine) and super().__eq__(other):
-            if self.get_attributes() == other.get_attributes():
-                return True
-        return False
-
-    def adjust_remainder(self, total_length, soffset=None, previous_remainder=None):
-        &#34;&#34;&#34;adjust_remainder is used to calculated and set the remainer of a broken mark for offset adjustments
-
-        Parameters
-        ----------
-            total_length (float): the lenght of the lanesection where this line is valid
-
-            soffset (float): the wanted soffset (at beginning of line), use this or previous remainder
-                Default: use defined in class
-
-            previous_remainder (float): the remainder of the previous line, use this or soffset
-                Default: use defined in class
-        &#34;&#34;&#34;
-        if soffset and previous_remainder:
-            raise ToManyOptionalArguments(
-                &#34;for adjusting line lengths, use only soffset or previous_remainder.&#34;
-            )
-        if soffset is not None:
-            self.soffset = soffset
-        if previous_remainder is not None:
-            self.soffset = self.space - previous_remainder
-        self._remainder = self._calculate_remainder_of_line(self.soffset, total_length)
-
-    def shift_soffset(self):
-        &#34;&#34;&#34;shifts the soffset one period&#34;&#34;&#34;
-        self.soffset += self.space + self.length
-
-    def adjust_soffset(self, total_length, remainder=None, previous_offset=None):
-        &#34;&#34;&#34;adjust_soffset is used to calculated and set the soffset of a broken mark for offset adjustments
-
-        Parameters
-        ----------
-            total_length (float): the lenght of the lanesection where this line is valid
-
-            remainder (float): the wanted remainder (&#34;soffset&#34; at end of line), use this or previous_offset
-                Default: use defined in class
-
-            previous_offset (float): the soffset of the previous line, use this or remainder
-                Default: use defined in class
-        &#34;&#34;&#34;
-        if remainder and previous_offset:
-            raise ToManyOptionalArguments(
-                &#34;for adjusting line lengths, use only soffset or previous_remainder.&#34;
-            )
-        if remainder is not None:
-            self._remainder = remainder
-        if previous_offset is not None:
-            self._remainder = self.space - previous_offset
-        self.soffset = self._calculate_remainder_of_line(self._remainder, total_length)
-
-    def _calculate_remainder_of_line(self, soffset, total_length):
-        n = (total_length - soffset + self.space) / (self.space + self.length)
-        return (
-            total_length
-            - soffset
-            - np.floor(n) * (self.space + self.length)
-            + self.space
-        )
-
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes of the Lane as a dict&#34;&#34;&#34;
-        retdict = {}
-        retdict[&#34;length&#34;] = str(self.length)
-        retdict[&#34;space&#34;] = str(self.space)
-        retdict[&#34;tOffset&#34;] = str(self.toffset)
-        retdict[&#34;width&#34;] = str(self.width)
-        retdict[&#34;sOffset&#34;] = str(self.soffset)
-        # if self.color:
-        # retdict[&#39;color&#39;] = enum2str(self.color)
-        if self.rule:
-            retdict[&#34;rule&#34;] = enum2str(self.rule)
-        return retdict
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the RoadLine&#34;&#34;&#34;
-        element = ET.Element(&#34;line&#34;, attrib=self.get_attributes())
-        self._add_additional_data_to_element(element)
-        return element
-
-
-class ExplicitRoadLine(XodrBase):
-    &#34;&#34;&#34;creates a Explicit RoadLine type of to be used in roadmark
-
-    Parameters
-    ----------
-        width (float): with of the line
-            Default: 0
-        length (float): length of the line
-            Default: 0
-        toffset (float): offset in t
-            Default: 0
-        soffset (float): offset in s
-            Default: 0
-        rule (MarkRule): mark rule (optional)
-
-    Attributes
-    ----------
-        length (float): length of the line
-
-        toffset (float): offset in t
-
-        soffset (float): offset in s
-
-        rule (MarkRule): mark rule
-
-        width (float): with of the line
-
-    Methods
-    -------
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of FileHeader
-
-    &#34;&#34;&#34;
-
-    # TODO: check this for 1.5
-    def __init__(self, width=0, length=0, toffset=0, soffset=0, rule=None):
-        &#34;&#34;&#34;initalizes the RoadLine
-
-        Parameters
-        ----------
-            width (float): with of the line
-                Default: 0
-            length (float): length of the line
-                Default: 0
-            toffset (float): offset in t
-                Default: 0
-            soffset (float): offset in s
-                Default: 0
-            rule (MarkRule): mark rule (optional)
-
-        &#34;&#34;&#34;
-        super().__init__()
-        self.length = length
-        self.toffset = toffset
-        self.rule = rule
-        self.soffset = soffset
-        self.width = width
-        self._remainder = 0
-
-    def __eq__(self, other):
-        if isinstance(other, ExplicitRoadLine) and super().__eq__(other):
-            if self.get_attributes() == other.get_attributes():
-                return True
-        return False
-
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes of the Lane as a dict&#34;&#34;&#34;
-        retdict = {}
-        retdict[&#34;length&#34;] = str(self.length)
-        retdict[&#34;tOffset&#34;] = str(self.toffset)
-        retdict[&#34;width&#34;] = str(self.width)
-        retdict[&#34;sOffset&#34;] = str(self.soffset)
-        if self.rule:
-            retdict[&#34;rule&#34;] = enum2str(self.rule)
-        return retdict
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the WorldPostion&#34;&#34;&#34;
-        element = ET.Element(&#34;line&#34;, attrib=self.get_attributes())
-        self._add_additional_data_to_element(element)
-        return element</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -1656,48 +58,6 @@ class ExplicitRoadLine(XodrBase):
 <span>(</span><span>width=0, length=0, toffset=0, soffset=0, rule=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>creates a Explicit RoadLine type of to be used in roadmark</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>width (float): with of the line
-    Default: 0
-length (float): length of the line
-    Default: 0
-toffset (float): offset in t
-    Default: 0
-soffset (float): offset in s
-    Default: 0
-rule (MarkRule): mark rule (optional)
-</code></pre>
-<h2 id="attributes">Attributes</h2>
-<pre><code>length (float): length of the line
-
-toffset (float): offset in t
-
-soffset (float): offset in s
-
-rule (MarkRule): mark rule
-
-width (float): with of the line
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>get_element(elementname)
-    Returns the full ElementTree of the class
-
-get_attributes()
-    Returns a dictionary of all attributes of FileHeader
-</code></pre>
-<p>initalizes the RoadLine</p>
-<h2 id="parameters_1">Parameters</h2>
-<pre><code>width (float): with of the line
-    Default: 0
-length (float): length of the line
-    Default: 0
-toffset (float): offset in t
-    Default: 0
-soffset (float): offset in s
-    Default: 0
-rule (MarkRule): mark rule (optional)
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1759,7 +119,7 @@ rule (MarkRule): mark rule (optional)
         super().__init__()
         self.length = length
         self.toffset = toffset
-        self.rule = rule
+        self.rule = enumchecker(rule, MarkRule, True)
         self.soffset = soffset
         self.width = width
         self._remainder = 0
@@ -1787,6 +147,48 @@ rule (MarkRule): mark rule (optional)
         self._add_additional_data_to_element(element)
         return element</code></pre>
 </details>
+<div class="desc"><p>creates a Explicit RoadLine type of to be used in roadmark</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>width (float): with of the line
+    Default: 0
+length (float): length of the line
+    Default: 0
+toffset (float): offset in t
+    Default: 0
+soffset (float): offset in s
+    Default: 0
+rule (MarkRule): mark rule (optional)
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>length (float): length of the line
+
+toffset (float): offset in t
+
+soffset (float): offset in s
+
+rule (MarkRule): mark rule
+
+width (float): with of the line
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element(elementname)
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of FileHeader
+</code></pre>
+<p>initalizes the RoadLine</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>width (float): with of the line
+    Default: 0
+length (float): length of the line
+    Default: 0
+toffset (float): offset in t
+    Default: 0
+soffset (float): offset in s
+    Default: 0
+rule (MarkRule): mark rule (optional)
+</code></pre></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
@@ -1797,7 +199,6 @@ rule (MarkRule): mark rule (optional)
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes of the Lane as a dict</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1813,12 +214,12 @@ rule (MarkRule): mark rule (optional)
         retdict[&#34;rule&#34;] = enum2str(self.rule)
     return retdict</code></pre>
 </details>
+<div class="desc"><p>returns the attributes of the Lane as a dict</p></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane.ExplicitRoadLine.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the WorldPostion</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1829,6 +230,7 @@ rule (MarkRule): mark rule (optional)
     self._add_additional_data_to_element(element)
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the WorldPostion</p></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -1846,80 +248,6 @@ rule (MarkRule): mark rule (optional)
 <span>(</span><span>lane_type=LaneType.driving, a=0, b=0, c=0, d=0, soffset=0)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>creates a Lane of opendrive</p>
-<p>the inputs are on the following format:
-f(s) = a + b<em>s + c</em>s^2 + d*s^3</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>lane_type (LaneType): type of lane
-    Default: LaneType.driving
-
-a (float): a coefficient
-    Default: 0
-
-b (float): b coefficient
-    Default: 0
-
-c (float): c coefficient
-    Default: 0
-
-d (float): d coefficient
-    Default: 0
-
-soffset (float): soffset of lane
-    Default: 0
-</code></pre>
-<h2 id="attributes">Attributes</h2>
-<pre><code>lane_id (int): id of the lane (automatically assigned by LaneSection)
-
-lane_type (LaneType): type of lane
-
-a (float): a coefficient
-
-b (float): b coefficient
-
-c (float): c coefficient
-
-d (float): d coefficient
-
-soffset (float): soffset of lane
-
-roadmark (RoadMark): roadmarks related to the lane
-
-links (_Links): Lane links to the lane
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>get_element(elementname)
-    Returns the full ElementTree of the class
-
-get_attributes()
-    Returns a dictionary of all attributes of class
-
-add_roadmark(roadmark)
-    adds a new roadmark to the lane
-
-add_lane_width(a, b, c, d, soffset)
-    adds an additional width element to the lane
-</code></pre>
-<p>initalizes the Lane</p>
-<h2 id="parameters_1">Parameters</h2>
-<pre><code>lane_type (LaneType): type of lane
-    Default: LaneType.driving
-
-a (float): a polynomial coefficient for width (left/right) or laneoffset (center)
-    Default: 0
-
-b (float): b polynomial coefficient for width (left/right) or laneoffset (center)
-    Default: 0
-
-c (float): c polynomial coefficient for width (left/right) or laneoffset (center)
-    Default: 0
-
-d (float): d polynomial coefficient for width (left/right) or laneoffset (center)
-    Default: 0
-
-soffset (float): soffset of lane renamed to s in case of centerlane
-    Default: 0
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1985,6 +313,17 @@ soffset (float): soffset of lane renamed to s in case of centerlane
 
         add_lane_width(a, b, c, d, soffset)
             adds an additional width element to the lane
+
+        get_width(s)
+            returns the width of the lane at s
+
+        add_height(self, inner, outer=None, soffset=0)
+            add_height adds a height entry to the lane to elevate it independent from the road elevation
+
+        add_lane_material(self, friction, roughness=None, soffset=0, surface=None)
+            add_lane_material adds a material description entry to the lane
+
+
     &#34;&#34;&#34;
 
     def __init__(self, lane_type=LaneType.driving, a=0, b=0, c=0, d=0, soffset=0):
@@ -2014,7 +353,7 @@ soffset (float): soffset of lane renamed to s in case of centerlane
         &#34;&#34;&#34;
         super().__init__()
         self.lane_id = None
-        self.lane_type = lane_type
+        self.lane_type = enumchecker(lane_type, LaneType)
         self.widths = []
         self.add_lane_width(a, b, c, d, soffset)
 
@@ -2025,6 +364,7 @@ soffset (float): soffset of lane renamed to s in case of centerlane
         )  # height entries to elevate the lane independent from the road elevation
         self.roadmark = []
         self.links = _Links()
+        self.materials = []
 
     def __eq__(self, other):
         if isinstance(other, Lane) and super().__eq__(other):
@@ -2034,6 +374,7 @@ soffset (float): soffset of lane renamed to s in case of centerlane
                 and self.widths == other.widths
                 and self.heights == other.heights
                 and self.roadmark == other.roadmark
+                and self.materials == other.materials
             ):
                 return True
         return False
@@ -2122,8 +463,9 @@ soffset (float): soffset of lane renamed to s in case of centerlane
             roadmark (RoadMark): roadmark of the lane
 
         &#34;&#34;&#34;
-        if roadmark is not None:
-            self.roadmark.append(roadmark)
+        if not isinstance(roadmark, RoadMark):
+            raise TypeError(&#34;roadmark input is not of type RoadMark&#34;)
+        self.roadmark.append(roadmark)
         return self
 
     def add_height(self, inner, outer=None, soffset=0):
@@ -2149,6 +491,32 @@ soffset (float): soffset of lane renamed to s in case of centerlane
         heightdict[&#34;sOffset&#34;] = str(soffset)
 
         self.heights.append(heightdict)
+        return self
+
+    def add_lane_material(self, friction, roughness=None, soffset=0, surface=None):
+        &#34;&#34;&#34;add_lane_material adds a material description entry to the lane
+        Parameters
+        ----------
+            friction (float): friction coefficient
+
+            roughness (float): roughness, for example, for sound and motion systems
+                Default: None
+
+            sOffset (float): s offset of the material
+                Default: 0
+
+            surface (str): surface material code, depending on application
+                Default: None
+
+        &#34;&#34;&#34;
+        materialdict = {}
+        materialdict[&#34;friction&#34;] = str(friction)
+        if roughness is not None:
+            materialdict[&#34;roughness&#34;] = str(roughness)
+        materialdict[&#34;sOffset&#34;] = str(soffset)
+        if surface is not None:
+            materialdict[&#34;surface&#34;] = str(surface)
+        self.materials.append(materialdict)
         return self
 
     def get_attributes(self):
@@ -2184,8 +552,94 @@ soffset (float): soffset of lane renamed to s in case of centerlane
         for height in self.heights:
             ET.SubElement(element, &#34;height&#34;, attrib=height)
 
+        for material in sorted(self.materials, key=lambda x: x[&#34;sOffset&#34;]):
+            ET.SubElement(element, &#34;material&#34;, attrib=material)
+
         return element</code></pre>
 </details>
+<div class="desc"><p>creates a Lane of opendrive</p>
+<p>the inputs are on the following format:
+f(s) = a + b<em>s + c</em>s^2 + d*s^3</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>lane_type (LaneType): type of lane
+    Default: LaneType.driving
+
+a (float): a coefficient
+    Default: 0
+
+b (float): b coefficient
+    Default: 0
+
+c (float): c coefficient
+    Default: 0
+
+d (float): d coefficient
+    Default: 0
+
+soffset (float): soffset of lane
+    Default: 0
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>lane_id (int): id of the lane (automatically assigned by LaneSection)
+
+lane_type (LaneType): type of lane
+
+a (float): a coefficient
+
+b (float): b coefficient
+
+c (float): c coefficient
+
+d (float): d coefficient
+
+soffset (float): soffset of lane
+
+roadmark (RoadMark): roadmarks related to the lane
+
+links (_Links): Lane links to the lane
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element(elementname)
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of class
+
+add_roadmark(roadmark)
+    adds a new roadmark to the lane
+
+add_lane_width(a, b, c, d, soffset)
+    adds an additional width element to the lane
+
+get_width(s)
+    returns the width of the lane at s
+
+add_height(self, inner, outer=None, soffset=0)
+    add_height adds a height entry to the lane to elevate it independent from the road elevation
+
+add_lane_material(self, friction, roughness=None, soffset=0, surface=None)
+    add_lane_material adds a material description entry to the lane
+</code></pre>
+<p>initalizes the Lane</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>lane_type (LaneType): type of lane
+    Default: LaneType.driving
+
+a (float): a polynomial coefficient for width (left/right) or laneoffset (center)
+    Default: 0
+
+b (float): b polynomial coefficient for width (left/right) or laneoffset (center)
+    Default: 0
+
+c (float): c polynomial coefficient for width (left/right) or laneoffset (center)
+    Default: 0
+
+d (float): d polynomial coefficient for width (left/right) or laneoffset (center)
+    Default: 0
+
+soffset (float): soffset of lane renamed to s in case of centerlane
+    Default: 0
+</code></pre></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
@@ -2196,16 +650,6 @@ soffset (float): soffset of lane renamed to s in case of centerlane
 <span>def <span class="ident">add_height</span></span>(<span>self, inner, outer=None, soffset=0)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>add_height adds a height entry to the lane to elevate it independent from the road elevation</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>inner (float): inner height
-
-outer (float): outer height (if not provided, inner height is used)
-    Default: None
-
-s_offset (float): s offset of the height record
-    Default: 0
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2235,28 +679,70 @@ s_offset (float): s offset of the height record
     self.heights.append(heightdict)
     return self</code></pre>
 </details>
+<div class="desc"><p>add_height adds a height entry to the lane to elevate it independent from the road elevation</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>inner (float): inner height
+
+outer (float): outer height (if not provided, inner height is used)
+    Default: None
+
+s_offset (float): s offset of the height record
+    Default: 0
+</code></pre></div>
+</dd>
+<dt id="scenariogeneration.xodr.lane.Lane.add_lane_material"><code class="name flex">
+<span>def <span class="ident">add_lane_material</span></span>(<span>self, friction, roughness=None, soffset=0, surface=None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_lane_material(self, friction, roughness=None, soffset=0, surface=None):
+    &#34;&#34;&#34;add_lane_material adds a material description entry to the lane
+    Parameters
+    ----------
+        friction (float): friction coefficient
+
+        roughness (float): roughness, for example, for sound and motion systems
+            Default: None
+
+        sOffset (float): s offset of the material
+            Default: 0
+
+        surface (str): surface material code, depending on application
+            Default: None
+
+    &#34;&#34;&#34;
+    materialdict = {}
+    materialdict[&#34;friction&#34;] = str(friction)
+    if roughness is not None:
+        materialdict[&#34;roughness&#34;] = str(roughness)
+    materialdict[&#34;sOffset&#34;] = str(soffset)
+    if surface is not None:
+        materialdict[&#34;surface&#34;] = str(surface)
+    self.materials.append(materialdict)
+    return self</code></pre>
+</details>
+<div class="desc"><p>add_lane_material adds a material description entry to the lane
+Parameters</p>
+<hr>
+<pre><code>friction (float): friction coefficient
+
+roughness (float): roughness, for example, for sound and motion systems
+    Default: None
+
+sOffset (float): s offset of the material
+    Default: 0
+
+surface (str): surface material code, depending on application
+    Default: None
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane.Lane.add_lane_width"><code class="name flex">
 <span>def <span class="ident">add_lane_width</span></span>(<span>self, a=0, b=0, c=0, d=0, soffset=0)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adds an additional width element to the lane</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>a (float): a polynomial coefficient for width
-    Default: 0
-
-b (float): b polynomial coefficient for width
-    Default: 0
-
-c (float): c polynomial coefficient for width
-    Default: 0
-
-d (float): d polynomial coefficient for width
-    Default: 0
-
-soffset (float): soffset of lane renamed to s in case of centerlane
-    Default: 0
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2284,17 +770,28 @@ soffset (float): soffset of lane renamed to s in case of centerlane
     &#34;&#34;&#34;
     self.widths.append(_poly3struct(a, b, c, d, soffset))</code></pre>
 </details>
+<div class="desc"><p>adds an additional width element to the lane</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>a (float): a polynomial coefficient for width
+    Default: 0
+
+b (float): b polynomial coefficient for width
+    Default: 0
+
+c (float): c polynomial coefficient for width
+    Default: 0
+
+d (float): d polynomial coefficient for width
+    Default: 0
+
+soffset (float): soffset of lane renamed to s in case of centerlane
+    Default: 0
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane.Lane.add_link"><code class="name flex">
 <span>def <span class="ident">add_link</span></span>(<span>self, link_type, id)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adds a link to the lane section</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>link_type (str): type of link, successor or predecessor
-
-id (str/id): id of the linked lane
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2311,15 +808,17 @@ id (str/id): id of the linked lane
     self.links.add_link(_Link(link_type, str(id)))
     return self</code></pre>
 </details>
+<div class="desc"><p>adds a link to the lane section</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>link_type (str): type of link, successor or predecessor
+
+id (str/id): id of the linked lane
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane.Lane.add_roadmark"><code class="name flex">
 <span>def <span class="ident">add_roadmark</span></span>(<span>self, roadmark)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>add_roadmark adds a roadmark to the lane</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>roadmark (RoadMark): roadmark of the lane
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2332,16 +831,20 @@ id (str/id): id of the linked lane
         roadmark (RoadMark): roadmark of the lane
 
     &#34;&#34;&#34;
-    if roadmark is not None:
-        self.roadmark.append(roadmark)
+    if not isinstance(roadmark, RoadMark):
+        raise TypeError(&#34;roadmark input is not of type RoadMark&#34;)
+    self.roadmark.append(roadmark)
     return self</code></pre>
 </details>
+<div class="desc"><p>add_roadmark adds a roadmark to the lane</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>roadmark (RoadMark): roadmark of the lane
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane.Lane.get_attributes"><code class="name flex">
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes of the Lane as a dict</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2356,12 +859,12 @@ id (str/id): id of the linked lane
     retdict[&#34;level&#34;] = &#34;false&#34;
     return retdict</code></pre>
 </details>
+<div class="desc"><p>returns the attributes of the Lane as a dict</p></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane.Lane.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the Lane</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2389,17 +892,17 @@ id (str/id): id of the linked lane
     for height in self.heights:
         ET.SubElement(element, &#34;height&#34;, attrib=height)
 
+    for material in sorted(self.materials, key=lambda x: x[&#34;sOffset&#34;]):
+        ET.SubElement(element, &#34;material&#34;, attrib=material)
+
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the Lane</p></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane.Lane.get_linked_lane_id"><code class="name flex">
 <span>def <span class="ident">get_linked_lane_id</span></span>(<span>self, link_type)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adds a link to the lane section</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>link_type (str): type of link, successor or predecessor
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2416,19 +919,15 @@ id (str/id): id of the linked lane
             return int(link.element_id)
     return None</code></pre>
 </details>
+<div class="desc"><p>adds a link to the lane section</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>link_type (str): type of link, successor or predecessor
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane.Lane.get_width"><code class="name flex">
 <span>def <span class="ident">get_width</span></span>(<span>self, s)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>function that calculates the width of a lane at a point s</p>
-<p>Note: no check that s is on the road can be made, that has to be taken care of by the user</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>s (float): the point where the width is wished
-</code></pre>
-<h2 id="returns">Returns</h2>
-<pre><code>width (float): the width at point s
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2454,6 +953,14 @@ id (str/id): id of the linked lane
             break
     return self.widths[index_to_calc].get_width(s)</code></pre>
 </details>
+<div class="desc"><p>function that calculates the width of a lane at a point s</p>
+<p>Note: no check that s is on the road can be made, that has to be taken care of by the user</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>s (float): the point where the width is wished
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>width (float): the width at point s
+</code></pre></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -2471,48 +978,6 @@ id (str/id): id of the linked lane
 <span>(</span><span>s=0, a=0, b=0, c=0, d=0)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>the LaneOffset class defines an overall lateral offset along the road, described as a third degree polynomial</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>s (float): s start coordinate of the elevation
-
-a (float): a coefficient of the polynomial
-
-b (float): b coefficient of the polynomial
-
-c (float): c coefficient of the polynomial
-
-d (float): d coefficient of the polynomial
-</code></pre>
-<h2 id="attributes">Attributes</h2>
-<pre><code>s (float): s start coordinate of the elevation
-
-a (float): a coefficient of the polynomial
-
-b (float): b coefficient of the polynomial
-
-c (float): c coefficient of the polynomial
-
-d (float): d coefficient of the polynomial
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>get_element(elementname)
-    Returns the full ElementTree of the class
-
-get_attributes()
-    Returns the attributes of the class
-</code></pre>
-<p>initalize the LaneOffset class</p>
-<h2 id="parameters_1">Parameters</h2>
-<pre><code>s (float): s start coordinate of the LaneOffset
-
-a (float): a coefficient of the polynomial
-
-b (float): b coefficient of the polynomial
-
-c (float): c coefficient of the polynomial
-
-d (float): d coefficient of the polynomial
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2600,6 +1065,48 @@ d (float): d coefficient of the polynomial
         self._add_additional_data_to_element(element)
         return element</code></pre>
 </details>
+<div class="desc"><p>the LaneOffset class defines an overall lateral offset along the road, described as a third degree polynomial</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>s (float): s start coordinate of the elevation
+
+a (float): a coefficient of the polynomial
+
+b (float): b coefficient of the polynomial
+
+c (float): c coefficient of the polynomial
+
+d (float): d coefficient of the polynomial
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>s (float): s start coordinate of the elevation
+
+a (float): a coefficient of the polynomial
+
+b (float): b coefficient of the polynomial
+
+c (float): c coefficient of the polynomial
+
+d (float): d coefficient of the polynomial
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element(elementname)
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns the attributes of the class
+</code></pre>
+<p>initalize the LaneOffset class</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>s (float): s start coordinate of the LaneOffset
+
+a (float): a coefficient of the polynomial
+
+b (float): b coefficient of the polynomial
+
+c (float): c coefficient of the polynomial
+
+d (float): d coefficient of the polynomial
+</code></pre></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
@@ -2610,7 +1117,6 @@ d (float): d coefficient of the polynomial
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes of the LaneOffset</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2626,12 +1132,12 @@ d (float): d coefficient of the polynomial
     retdict[&#34;d&#34;] = str(self.d)
     return retdict</code></pre>
 </details>
+<div class="desc"><p>returns the attributes of the LaneOffset</p></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane.LaneOffset.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the LaneOffset</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2642,6 +1148,7 @@ d (float): d coefficient of the polynomial
     self._add_additional_data_to_element(element)
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the LaneOffset</p></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -2659,40 +1166,6 @@ d (float): d coefficient of the polynomial
 <span>(</span><span>s, centerlane)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Creates the LaneSection element of opendrive</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>s (float): start of lanesection
-
-centerlane (Lane): the centerline of the road
-</code></pre>
-<h2 id="attributes">Attributes</h2>
-<pre><code>s (float): start of lanesection
-
-centerlane (Lane): the centerline of the road
-
-leftlanes (list of Lane): the lanes left to the center
-
-rightlanes (list of Lane): the lanes right to the center
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>get_element()
-    Returns the full ElementTree of the class
-
-get_attributes()
-    Returns a dictionary of all attributes of class
-
-add_left_lane(Lane)
-    adds a new lane to the left
-
-add_right_lane(Lane)
-    adds a new lane to the right
-</code></pre>
-<p>initalize the LaneSection</p>
-<h2 id="parameters_1">Parameters</h2>
-<pre><code>s (float): start of lanesection
-
-centerlane (Lane): the centerline of the road
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2742,6 +1215,8 @@ centerlane (Lane): the centerline of the road
         &#34;&#34;&#34;
         super().__init__()
         self.s = s
+        if not isinstance(centerlane, Lane):
+            raise TypeError(&#34;centerlane input is not of type Lane&#34;)
         self.centerlane = centerlane
         self.centerlane._set_lane_id(0)
         self.leftlanes = []
@@ -2767,6 +1242,8 @@ centerlane (Lane): the centerline of the road
         ----------
             lane (Lane): the lane to add
         &#34;&#34;&#34;
+        if not isinstance(lane, Lane):
+            raise TypeError(&#34;lane input is not of type Lane&#34;)
         lane._set_lane_id(self._left_id)
         self._left_id += 1
         self.leftlanes.append(lane)
@@ -2779,6 +1256,8 @@ centerlane (Lane): the centerline of the road
         ----------
             lane (Lane): the lane to add
         &#34;&#34;&#34;
+        if not isinstance(lane, Lane):
+            raise TypeError(&#34;lane input is not of type Lane&#34;)
         lane._set_lane_id(self._right_id)
         self._right_id -= 1
         self.rightlanes.append(lane)
@@ -2809,6 +1288,40 @@ centerlane (Lane): the centerline of the road
 
         return element</code></pre>
 </details>
+<div class="desc"><p>Creates the LaneSection element of opendrive</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>s (float): start of lanesection
+
+centerlane (Lane): the centerline of the road
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>s (float): start of lanesection
+
+centerlane (Lane): the centerline of the road
+
+leftlanes (list of Lane): the lanes left to the center
+
+rightlanes (list of Lane): the lanes right to the center
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element()
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of class
+
+add_left_lane(Lane)
+    adds a new lane to the left
+
+add_right_lane(Lane)
+    adds a new lane to the right
+</code></pre>
+<p>initalize the LaneSection</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>s (float): start of lanesection
+
+centerlane (Lane): the centerline of the road
+</code></pre></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
@@ -2819,10 +1332,6 @@ centerlane (Lane): the centerline of the road
 <span>def <span class="ident">add_left_lane</span></span>(<span>self, lane)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adds a lane to the left of the center, add from center outwards</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>lane (Lane): the lane to add
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2834,20 +1343,22 @@ centerlane (Lane): the centerline of the road
     ----------
         lane (Lane): the lane to add
     &#34;&#34;&#34;
+    if not isinstance(lane, Lane):
+        raise TypeError(&#34;lane input is not of type Lane&#34;)
     lane._set_lane_id(self._left_id)
     self._left_id += 1
     self.leftlanes.append(lane)
     return self</code></pre>
 </details>
+<div class="desc"><p>adds a lane to the left of the center, add from center outwards</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>lane (Lane): the lane to add
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane.LaneSection.add_right_lane"><code class="name flex">
 <span>def <span class="ident">add_right_lane</span></span>(<span>self, lane)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adds a lane to the right of the center, add from center outwards</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>lane (Lane): the lane to add
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2859,17 +1370,22 @@ centerlane (Lane): the centerline of the road
     ----------
         lane (Lane): the lane to add
     &#34;&#34;&#34;
+    if not isinstance(lane, Lane):
+        raise TypeError(&#34;lane input is not of type Lane&#34;)
     lane._set_lane_id(self._right_id)
     self._right_id -= 1
     self.rightlanes.append(lane)
     return self</code></pre>
 </details>
+<div class="desc"><p>adds a lane to the right of the center, add from center outwards</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>lane (Lane): the lane to add
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane.LaneSection.get_attributes"><code class="name flex">
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes of the Lane as a dict</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2880,12 +1396,12 @@ centerlane (Lane): the centerline of the road
     retdict[&#34;s&#34;] = str(self.s)
     return retdict</code></pre>
 </details>
+<div class="desc"><p>returns the attributes of the Lane as a dict</p></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane.LaneSection.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the WorldPostion</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2909,6 +1425,7 @@ centerlane (Lane): the centerline of the road
 
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the WorldPostion</p></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -2925,21 +1442,6 @@ centerlane (Lane): the centerline of the road
 <span>class <span class="ident">Lanes</span></span>
 </code></dt>
 <dd>
-<div class="desc"><p>creates the Lanes element of opendrive</p>
-<h2 id="attributes">Attributes</h2>
-<pre><code>lane_sections (list of LaneSection): a list of all lanesections
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>get_element(elementname)
-    Returns the full ElementTree of the class
-
-add_lanesection(lanesection)
-    adds a lane section to Lanes
-
-add_laneoffset(laneoffset)
-    adds a lane offset to Lanes
-</code></pre>
-<p>initalize the UserData</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2990,11 +1492,15 @@ add_laneoffset(laneoffset)
             lanelink (LaneLinker): (optional) a LaneLink to add
 
         &#34;&#34;&#34;
+        if not isinstance(lanesection, LaneSection):
+            raise TypeError(&#34;input lanesection is not of type LaneSection&#34;)
         # add links to the lanes
         if lanelinks:
             # loop over all links
             if not isinstance(lanelinks, list):
                 lanelinks = [lanelinks]
+            if any([not isinstance(x, LaneLinker) for x in lanelinks]):
+                raise TypeError(&#34;lanelinks contains a none LaneLinker type&#34;)
             for lanelink in lanelinks:
                 for link in lanelink.links:
                     # check if link already added
@@ -3285,6 +1791,11 @@ add_laneoffset(laneoffset)
             contact_point (ContactPoint)
                 Default: ContactPoint.end
         &#34;&#34;&#34;
+        contact_point = enumchecker(contact_point, ContactPoint)
+        if connected_lane_section and not isinstance(
+            connected_lane_section, LaneSection
+        ):
+            raise TypeError(&#34;connected_lane_section is not of type LaneSection&#34;)
         if not self.roadmarks_adjusted:
             self._validity_check_for_roadmark_adjustment()
             self.roadmarks_adjusted = True
@@ -3415,6 +1926,11 @@ add_laneoffset(laneoffset)
             contact_point (ContactPoint)
                 Default: ContactPoint.end
         &#34;&#34;&#34;
+        contact_point = enumchecker(contact_point, ContactPoint)
+        if connected_lane_section and not isinstance(
+            connected_lane_section, LaneSection
+        ):
+            raise TypeError(&#34;connected_lane_section is not of type LaneSection&#34;)
         if not self.roadmarks_adjusted:
             self._validity_check_for_roadmark_adjustment()
             self.roadmarks_adjusted = True
@@ -3545,6 +2061,21 @@ add_laneoffset(laneoffset)
             element.append(l.get_element())
         return element</code></pre>
 </details>
+<div class="desc"><p>creates the Lanes element of opendrive</p>
+<h2 id="attributes">Attributes</h2>
+<pre><code>lane_sections (list of LaneSection): a list of all lanesections
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element(elementname)
+    Returns the full ElementTree of the class
+
+add_lanesection(lanesection)
+    adds a lane section to Lanes
+
+add_laneoffset(laneoffset)
+    adds a lane offset to Lanes
+</code></pre>
+<p>initalize the UserData</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
@@ -3555,10 +2086,6 @@ add_laneoffset(laneoffset)
 <span>def <span class="ident">add_laneoffset</span></span>(<span>self, laneoffset)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adds a lane offset to Lanes</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>laneoffset (LaneOffset): a LaneOffset to add
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3578,17 +2105,15 @@ add_laneoffset(laneoffset)
     self.laneoffsets.append(laneoffset)
     return self</code></pre>
 </details>
+<div class="desc"><p>adds a lane offset to Lanes</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>laneoffset (LaneOffset): a LaneOffset to add
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane.Lanes.add_lanesection"><code class="name flex">
 <span>def <span class="ident">add_lanesection</span></span>(<span>self, lanesection, lanelinks=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>creates the Lanes element of opendrive</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>lanesection (LaneSection): a LaneSection to add
-
-lanelink (LaneLinker): (optional) a LaneLink to add
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3603,11 +2128,15 @@ lanelink (LaneLinker): (optional) a LaneLink to add
         lanelink (LaneLinker): (optional) a LaneLink to add
 
     &#34;&#34;&#34;
+    if not isinstance(lanesection, LaneSection):
+        raise TypeError(&#34;input lanesection is not of type LaneSection&#34;)
     # add links to the lanes
     if lanelinks:
         # loop over all links
         if not isinstance(lanelinks, list):
             lanelinks = [lanelinks]
+        if any([not isinstance(x, LaneLinker) for x in lanelinks]):
+            raise TypeError(&#34;lanelinks contains a none LaneLinker type&#34;)
         for lanelink in lanelinks:
             for link in lanelink.links:
                 # check if link already added
@@ -3619,23 +2148,17 @@ lanelink (LaneLinker): (optional) a LaneLink to add
     self.lanesections.append(lanesection)
     return self</code></pre>
 </details>
+<div class="desc"><p>creates the Lanes element of opendrive</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>lanesection (LaneSection): a LaneSection to add
+
+lanelink (LaneLinker): (optional) a LaneLink to add
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane.Lanes.adjust_road_marks_from_end"><code class="name flex">
-<span>def <span class="ident">adjust_road_marks_from_end</span></span>(<span>self, total_road_length, connected_lane_section=None, contact_point=ContactPoint.end)</span>
+<span>def <span class="ident">adjust_road_marks_from_end</span></span>(<span>self,<br>total_road_length,<br>connected_lane_section=None,<br>contact_point=ContactPoint.end)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Adjusts road marks from the end of the road, based on the connected lane section.
-If connected_lane_section is not provided, the last roadmark will be placed with zero
-distance to the end of the road</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>total_road_length (float): total length of the road
-
-connected_lane_section (LaneSection): the lane section connected to the road
-    Default: None
-
-contact_point (ContactPoint)
-    Default: ContactPoint.end
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3660,6 +2183,11 @@ contact_point (ContactPoint)
         contact_point (ContactPoint)
             Default: ContactPoint.end
     &#34;&#34;&#34;
+    contact_point = enumchecker(contact_point, ContactPoint)
+    if connected_lane_section and not isinstance(
+        connected_lane_section, LaneSection
+    ):
+        raise TypeError(&#34;connected_lane_section is not of type LaneSection&#34;)
     if not self.roadmarks_adjusted:
         self._validity_check_for_roadmark_adjustment()
         self.roadmarks_adjusted = True
@@ -3780,14 +2308,9 @@ contact_point (ContactPoint)
                             self.lanesections[ls].centerlane.roadmark[0]
                         )</code></pre>
 </details>
-</dd>
-<dt id="scenariogeneration.xodr.lane.Lanes.adjust_road_marks_from_start"><code class="name flex">
-<span>def <span class="ident">adjust_road_marks_from_start</span></span>(<span>self, total_road_length, connected_lane_section=None, contact_point=ContactPoint.end)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Adjusts road marks from the start of the road, based on the connected lane section.
+<div class="desc"><p>Adjusts road marks from the end of the road, based on the connected lane section.
 If connected_lane_section is not provided, the last roadmark will be placed with zero
-distance to the start of the road</p>
+distance to the end of the road</p>
 <h2 id="parameters">Parameters</h2>
 <pre><code>total_road_length (float): total length of the road
 
@@ -3797,6 +2320,11 @@ connected_lane_section (LaneSection): the lane section connected to the road
 contact_point (ContactPoint)
     Default: ContactPoint.end
 </code></pre></div>
+</dd>
+<dt id="scenariogeneration.xodr.lane.Lanes.adjust_road_marks_from_start"><code class="name flex">
+<span>def <span class="ident">adjust_road_marks_from_start</span></span>(<span>self,<br>total_road_length,<br>connected_lane_section=None,<br>contact_point=ContactPoint.end)</span>
+</code></dt>
+<dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3821,6 +2349,11 @@ contact_point (ContactPoint)
         contact_point (ContactPoint)
             Default: ContactPoint.end
     &#34;&#34;&#34;
+    contact_point = enumchecker(contact_point, ContactPoint)
+    if connected_lane_section and not isinstance(
+        connected_lane_section, LaneSection
+    ):
+        raise TypeError(&#34;connected_lane_section is not of type LaneSection&#34;)
     if not self.roadmarks_adjusted:
         self._validity_check_for_roadmark_adjustment()
         self.roadmarks_adjusted = True
@@ -3931,12 +2464,23 @@ contact_point (ContactPoint)
                             self.lanesections[ls].centerlane.roadmark[0]
                         )</code></pre>
 </details>
+<div class="desc"><p>Adjusts road marks from the start of the road, based on the connected lane section.
+If connected_lane_section is not provided, the last roadmark will be placed with zero
+distance to the start of the road</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>total_road_length (float): total length of the road
+
+connected_lane_section (LaneSection): the lane section connected to the road
+    Default: None
+
+contact_point (ContactPoint)
+    Default: ContactPoint.end
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane.Lanes.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of Lanes</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3951,6 +2495,7 @@ contact_point (ContactPoint)
         element.append(l.get_element())
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of Lanes</p></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -3968,60 +2513,6 @@ contact_point (ContactPoint)
 <span>(</span><span>width=0, length=0, space=0, toffset=0, soffset=0, rule=None, color=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>creates a Line type of to be used in roadmark</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>width (float): with of the line
-    Default: 0
-length (float): length of the line
-    Default: 0
-space (float): length of space between (broken) lines
-    Default: 0
-toffset (float): offset in t
-    Default: 0
-soffset (float): offset in s
-    Default: 0
-rule (MarkRule): mark rule (optional)
-
-color (RoadMarkColor): color of line (optional)
-</code></pre>
-<h2 id="attributes">Attributes</h2>
-<pre><code>length (float): length of the line
-
-space (float): length of space between (broken) lines
-
-toffset (float): offset in t
-
-soffset (float): offset in s
-
-rule (MarkRule): mark rule
-
-width (float): with of the line
-
-color (RoadMarkColor): color of line
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>get_element(elementname)
-    Returns the full ElementTree of the class
-
-get_attributes()
-    Returns a dictionary of all attributes of FileHeader
-</code></pre>
-<p>initalizes the RoadLine</p>
-<h2 id="parameters_1">Parameters</h2>
-<pre><code>width (float): with of the line
-    Default: 0
-length (float): length of the line
-    Default: 0
-space (float): length of space between (broken) lines
-    Default: 0
-toffset (float): offset in t
-    Default: 0
-soffset (float): offset in s
-    Default: 0
-rule (MarkRule): mark rule (optional)
-
-color (RoadMarkColor): color of line (optional)
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4099,10 +2590,10 @@ color (RoadMarkColor): color of line (optional)
         self.length = length
         self.space = space
         self.toffset = toffset
-        self.rule = rule
+        self.rule = enumchecker(rule, MarkRule, True)
         self.soffset = soffset
         self.width = width
-        self.color = color
+        self.color = enumchecker(color, RoadMarkColor, True)
         self._remainder = 0
 
     def __eq__(self, other):
@@ -4190,6 +2681,60 @@ color (RoadMarkColor): color of line (optional)
         self._add_additional_data_to_element(element)
         return element</code></pre>
 </details>
+<div class="desc"><p>creates a Line type of to be used in roadmark</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>width (float): with of the line
+    Default: 0
+length (float): length of the line
+    Default: 0
+space (float): length of space between (broken) lines
+    Default: 0
+toffset (float): offset in t
+    Default: 0
+soffset (float): offset in s
+    Default: 0
+rule (MarkRule): mark rule (optional)
+
+color (RoadMarkColor): color of line (optional)
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>length (float): length of the line
+
+space (float): length of space between (broken) lines
+
+toffset (float): offset in t
+
+soffset (float): offset in s
+
+rule (MarkRule): mark rule
+
+width (float): with of the line
+
+color (RoadMarkColor): color of line
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element(elementname)
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of FileHeader
+</code></pre>
+<p>initalizes the RoadLine</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>width (float): with of the line
+    Default: 0
+length (float): length of the line
+    Default: 0
+space (float): length of space between (broken) lines
+    Default: 0
+toffset (float): offset in t
+    Default: 0
+soffset (float): offset in s
+    Default: 0
+rule (MarkRule): mark rule (optional)
+
+color (RoadMarkColor): color of line (optional)
+</code></pre></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
@@ -4200,16 +2745,6 @@ color (RoadMarkColor): color of line (optional)
 <span>def <span class="ident">adjust_remainder</span></span>(<span>self, total_length, soffset=None, previous_remainder=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adjust_remainder is used to calculated and set the remainer of a broken mark for offset adjustments</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>total_length (float): the lenght of the lanesection where this line is valid
-
-soffset (float): the wanted soffset (at beginning of line), use this or previous remainder
-    Default: use defined in class
-
-previous_remainder (float): the remainder of the previous line, use this or soffset
-    Default: use defined in class
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4237,21 +2772,21 @@ previous_remainder (float): the remainder of the previous line, use this or soff
         self.soffset = self.space - previous_remainder
     self._remainder = self._calculate_remainder_of_line(self.soffset, total_length)</code></pre>
 </details>
+<div class="desc"><p>adjust_remainder is used to calculated and set the remainer of a broken mark for offset adjustments</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>total_length (float): the lenght of the lanesection where this line is valid
+
+soffset (float): the wanted soffset (at beginning of line), use this or previous remainder
+    Default: use defined in class
+
+previous_remainder (float): the remainder of the previous line, use this or soffset
+    Default: use defined in class
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane.RoadLine.adjust_soffset"><code class="name flex">
 <span>def <span class="ident">adjust_soffset</span></span>(<span>self, total_length, remainder=None, previous_offset=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adjust_soffset is used to calculated and set the soffset of a broken mark for offset adjustments</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>total_length (float): the lenght of the lanesection where this line is valid
-
-remainder (float): the wanted remainder ("soffset" at end of line), use this or previous_offset
-    Default: use defined in class
-
-previous_offset (float): the soffset of the previous line, use this or remainder
-    Default: use defined in class
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4279,12 +2814,21 @@ previous_offset (float): the soffset of the previous line, use this or remainder
         self._remainder = self.space - previous_offset
     self.soffset = self._calculate_remainder_of_line(self._remainder, total_length)</code></pre>
 </details>
+<div class="desc"><p>adjust_soffset is used to calculated and set the soffset of a broken mark for offset adjustments</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>total_length (float): the lenght of the lanesection where this line is valid
+
+remainder (float): the wanted remainder ("soffset" at end of line), use this or previous_offset
+    Default: use defined in class
+
+previous_offset (float): the soffset of the previous line, use this or remainder
+    Default: use defined in class
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane.RoadLine.get_attributes"><code class="name flex">
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes of the Lane as a dict</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4303,12 +2847,12 @@ previous_offset (float): the soffset of the previous line, use this or remainder
         retdict[&#34;rule&#34;] = enum2str(self.rule)
     return retdict</code></pre>
 </details>
+<div class="desc"><p>returns the attributes of the Lane as a dict</p></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane.RoadLine.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the RoadLine</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4319,12 +2863,12 @@ previous_offset (float): the soffset of the previous line, use this or remainder
     self._add_additional_data_to_element(element)
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the RoadLine</p></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane.RoadLine.shift_soffset"><code class="name flex">
 <span>def <span class="ident">shift_soffset</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>shifts the soffset one period</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4333,6 +2877,7 @@ previous_offset (float): the soffset of the previous line, use this or remainder
     &#34;&#34;&#34;shifts the soffset one period&#34;&#34;&#34;
     self.soffset += self.space + self.length</code></pre>
 </details>
+<div class="desc"><p>shifts the soffset one period</p></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -4347,75 +2892,9 @@ previous_offset (float): the soffset of the previous line, use this or remainder
 </dd>
 <dt id="scenariogeneration.xodr.lane.RoadMark"><code class="flex name class">
 <span>class <span class="ident">RoadMark</span></span>
-<span>(</span><span>marking_type, width=None, length=None, space=None, toffset=None, soffset=0, rule=None, color=RoadMarkColor.standard, marking_weight=RoadMarkWeight.standard, height=0.02, laneChange=None)</span>
+<span>(</span><span>marking_type,<br>width=None,<br>length=None,<br>space=None,<br>toffset=None,<br>soffset=0,<br>rule=None,<br>color=RoadMarkColor.standard,<br>marking_weight=RoadMarkWeight.standard,<br>height=0.02,<br>laneChange=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>creates a RoadMark of opendrive</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>marking_type (RoadMarkType): the type of marking
-
-width (float): with of the line
-    Default: None
-length (float): length of the line
-    Default: 0
-toffset (float): offset in t
-    Default: 0
-soffset (float): offset in s
-    Default: 0
-rule (MarkRule): mark rule (optional)
-
-color (RoadMarkColor): color of line (optional)
-</code></pre>
-<h2 id="attributes">Attributes</h2>
-<pre><code>marking_type (str): the type of marking
-
-width (float): with of the line
-
-length (float): length of the line
-    Default: 0
-toffset (float): offset in t
-    Default: 0
-soffset (float): offset in s
-    Default: 0
-rule (MarkRule): mark rule (optional)
-
-color (RoadMarkColor): color of line (optional)
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>get_element(elementname)
-    Returns the full ElementTree of the class
-
-get_attributes()
-    Returns a dictionary of all attributes of FileHeader
-
-add_roadmark(roadmark)
-    adds a new roadmark to the lane
-</code></pre>
-<p>initializes the RoadMark</p>
-<h2 id="parameters_1">Parameters</h2>
-<pre><code>marking_type (str): the type of marking
-
-width (float): width of the marking / line
-    Default: None
-length (float): length of the visible, marked part of the line (used for broken lines)
-    Default: None
-space (float): length of the invisible, unmarked part of the line (used for broken lines)
-    Default: None
-toffset (float): offset in t
-    Default: None
-soffset (float): offset in s
-    Default: 0
-rule (MarkRule): mark rule (optional)
-    Default: None
-color (RoadMarkColor): color of marking
-    Default: 'standard'
-marking_weight (str): the weight of marking
-    Default: standard
-height (float): thickness of marking
-    Default: 0.02
-laneChange (LaneChange): indicates direction in which lane change is allowed
-    Default: none
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4512,14 +2991,14 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
         &#34;&#34;&#34;
         super().__init__()
         # required arguments - must be provided by user
-        self.marking_type = marking_type
+        self.marking_type = enumchecker(marking_type, RoadMarkType)
 
         # required arguments - must be provided by user or taken from defaults
-        self.marking_weight = marking_weight
-        self.color = color
+        self.marking_weight = enumchecker(marking_weight, RoadMarkWeight)
+        self.color = enumchecker(color, RoadMarkColor, True)
         self.soffset = soffset
         self.height = height
-        self.laneChange = laneChange
+        self.laneChange = enumchecker(laneChange, LaneChange, True)
 
         # optional arguments - roadmark is valid without them being defined
         self.width = width
@@ -4567,28 +3046,6 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
                 )
             )
 
-    def add_specific_road_line(self, line):
-        &#34;&#34;&#34;function to add your own roadline to the RoadMark, to use for multi line type of roadmarks,
-
-        Parameters
-        ----------
-            line (RoadLine): the roadline to add
-
-        &#34;&#34;&#34;
-        self._line.append(line)
-        return self
-
-    def add_explicit_road_line(self, line):
-        &#34;&#34;&#34;function to add a explicit roadline to the RoadMark,
-
-        Parameters
-        ----------
-            line (RoadLine): the roadline to add
-
-        &#34;&#34;&#34;
-        self._explicit_line.append(line)
-        return self
-
     def __eq__(self, other):
         if isinstance(other, RoadMark) and super().__eq__(other):
             if (
@@ -4599,6 +3056,32 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
             ):
                 return True
         return False
+
+    def add_specific_road_line(self, line):
+        &#34;&#34;&#34;function to add your own roadline to the RoadMark, to use for multi line type of roadmarks,
+
+        Parameters
+        ----------
+            line (RoadLine): the roadline to add
+
+        &#34;&#34;&#34;
+        if not isinstance(line, RoadLine):
+            raise TypeError(&#34;line input is not of type RoadLine&#34;)
+        self._line.append(line)
+        return self
+
+    def add_explicit_road_line(self, line):
+        &#34;&#34;&#34;function to add a explicit roadline to the RoadMark,
+
+        Parameters
+        ----------
+            line (ExplicitRoadLine): the roadline to add
+
+        &#34;&#34;&#34;
+        if not isinstance(line, ExplicitRoadLine):
+            raise TypeError(&#34;line input is not of type RoadLine&#34;)
+        self._explicit_line.append(line)
+        return self
 
     def get_attributes(self):
         &#34;&#34;&#34;returns the attributes of the RoadMark as a dict&#34;&#34;&#34;
@@ -4652,6 +3135,72 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
                 typeelement.append(l.get_element())
         return element</code></pre>
 </details>
+<div class="desc"><p>creates a RoadMark of opendrive</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>marking_type (RoadMarkType): the type of marking
+
+width (float): with of the line
+    Default: None
+length (float): length of the line
+    Default: 0
+toffset (float): offset in t
+    Default: 0
+soffset (float): offset in s
+    Default: 0
+rule (MarkRule): mark rule (optional)
+
+color (RoadMarkColor): color of line (optional)
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>marking_type (str): the type of marking
+
+width (float): with of the line
+
+length (float): length of the line
+    Default: 0
+toffset (float): offset in t
+    Default: 0
+soffset (float): offset in s
+    Default: 0
+rule (MarkRule): mark rule (optional)
+
+color (RoadMarkColor): color of line (optional)
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element(elementname)
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of FileHeader
+
+add_roadmark(roadmark)
+    adds a new roadmark to the lane
+</code></pre>
+<p>initializes the RoadMark</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>marking_type (str): the type of marking
+
+width (float): width of the marking / line
+    Default: None
+length (float): length of the visible, marked part of the line (used for broken lines)
+    Default: None
+space (float): length of the invisible, unmarked part of the line (used for broken lines)
+    Default: None
+toffset (float): offset in t
+    Default: None
+soffset (float): offset in s
+    Default: 0
+rule (MarkRule): mark rule (optional)
+    Default: None
+color (RoadMarkColor): color of marking
+    Default: 'standard'
+marking_weight (str): the weight of marking
+    Default: standard
+height (float): thickness of marking
+    Default: 0.02
+laneChange (LaneChange): indicates direction in which lane change is allowed
+    Default: none
+</code></pre></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
@@ -4662,10 +3211,6 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
 <span>def <span class="ident">add_explicit_road_line</span></span>(<span>self, line)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>function to add a explicit roadline to the RoadMark,</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>line (RoadLine): the roadline to add
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4675,21 +3220,23 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
 
     Parameters
     ----------
-        line (RoadLine): the roadline to add
+        line (ExplicitRoadLine): the roadline to add
 
     &#34;&#34;&#34;
+    if not isinstance(line, ExplicitRoadLine):
+        raise TypeError(&#34;line input is not of type RoadLine&#34;)
     self._explicit_line.append(line)
     return self</code></pre>
 </details>
+<div class="desc"><p>function to add a explicit roadline to the RoadMark,</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>line (ExplicitRoadLine): the roadline to add
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane.RoadMark.add_specific_road_line"><code class="name flex">
 <span>def <span class="ident">add_specific_road_line</span></span>(<span>self, line)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>function to add your own roadline to the RoadMark, to use for multi line type of roadmarks,</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>line (RoadLine): the roadline to add
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4702,15 +3249,20 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
         line (RoadLine): the roadline to add
 
     &#34;&#34;&#34;
+    if not isinstance(line, RoadLine):
+        raise TypeError(&#34;line input is not of type RoadLine&#34;)
     self._line.append(line)
     return self</code></pre>
 </details>
+<div class="desc"><p>function to add your own roadline to the RoadMark, to use for multi line type of roadmarks,</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>line (RoadLine): the roadline to add
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane.RoadMark.get_attributes"><code class="name flex">
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes of the RoadMark as a dict</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4729,12 +3281,12 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
         retdict[&#34;laneChange&#34;] = enum2str(self.laneChange)
     return retdict</code></pre>
 </details>
+<div class="desc"><p>returns the attributes of the RoadMark as a dict</p></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane.RoadMark.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the RoadMark</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4777,6 +3329,7 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
             typeelement.append(l.get_element())
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the RoadMark</p></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -4793,7 +3346,6 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
 </section>
 </article>
 <nav id="sidebar">
-<h1>Index</h1>
 <div class="toc">
 <ul></ul>
 </div>
@@ -4816,6 +3368,7 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
 <h4><code><a title="scenariogeneration.xodr.lane.Lane" href="#scenariogeneration.xodr.lane.Lane">Lane</a></code></h4>
 <ul class="two-column">
 <li><code><a title="scenariogeneration.xodr.lane.Lane.add_height" href="#scenariogeneration.xodr.lane.Lane.add_height">add_height</a></code></li>
+<li><code><a title="scenariogeneration.xodr.lane.Lane.add_lane_material" href="#scenariogeneration.xodr.lane.Lane.add_lane_material">add_lane_material</a></code></li>
 <li><code><a title="scenariogeneration.xodr.lane.Lane.add_lane_width" href="#scenariogeneration.xodr.lane.Lane.add_lane_width">add_lane_width</a></code></li>
 <li><code><a title="scenariogeneration.xodr.lane.Lane.add_link" href="#scenariogeneration.xodr.lane.Lane.add_link">add_link</a></code></li>
 <li><code><a title="scenariogeneration.xodr.lane.Lane.add_roadmark" href="#scenariogeneration.xodr.lane.Lane.add_roadmark">add_roadmark</a></code></li>
@@ -4876,7 +3429,7 @@ laneChange (LaneChange): indicates direction in which lane change is allowed
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
 </footer>
 </body>
 </html>

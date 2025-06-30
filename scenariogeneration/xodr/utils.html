@@ -2,19 +2,33 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.10.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
 <title>scenariogeneration.xodr.utils API documentation</title>
 <meta name="description" content="scenariogeneration
-https://github.com/pyoscx/scenariogeneration …" />
-<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
-<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
-<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
-<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
-<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+https://github.com/pyoscx/scenariogeneration …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
-<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
 </head>
 <body>
 <main>
@@ -29,413 +43,6 @@ https://github.com/pyoscx/scenariogeneration …" />
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
 <p>Copyright (c) 2022 The scenariogeneration Authors.</p>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">&#34;&#34;&#34;
-  scenariogeneration
-  https://github.com/pyoscx/scenariogeneration
-
-  This Source Code Form is subject to the terms of the Mozilla Public
-  License, v. 2.0. If a copy of the MPL was not distributed with this
-  file, You can obtain one at https://mozilla.org/MPL/2.0/.
-
-  Copyright (c) 2022 The scenariogeneration Authors.
-
-&#34;&#34;&#34;
-import xml.etree.ElementTree as ET
-import numpy as np
-
-from .enumerations import ContactPoint
-from ..helpers import enum2str
-
-
-def get_lane_sec_and_s_for_lane_calc(road, contact_point):
-    &#34;&#34;&#34;Helping function to get a lane_section and s coordinate for calculations, at either the end or start of a road
-
-    Parameters
-    ----------
-        road (Road): the road to be used
-
-        contact_point (ContactPoint): start or end of the road
-
-    Returns
-    -------
-        lanesection (int): 0 or -1
-
-        s (float): the s coordinate at start or end of the road
-    &#34;&#34;&#34;
-
-    relevant_s = 0
-    if contact_point == ContactPoint.start:
-        relevant_lanesection = 0  # since we are at the start the first lane section is relevant for determining widths for lane offset
-    elif contact_point == ContactPoint.end:
-        relevant_lanesection = (
-            -1
-        )  # since we are at the end the last lane section is relevant for determining widths for lane offset
-
-        for geom in road.planview._raw_geometries:
-            relevant_s += geom.length
-
-    return relevant_lanesection, relevant_s
-
-
-def get_coeffs_for_poly3(length, lane_offset, zero_start, lane_width_end=None):
-    &#34;&#34;&#34;get_coeffs_for_poly3 creates the coefficients for a third degree polynomial, can be used for all kinds of descriptions in xodr.
-
-    Assuming that the derivative is 0 at the start and end of the segment.
-
-    Parameters
-    ----------
-        length (float): length of the segment in the s direction
-
-        lane_offset (float): the lane offset (width) of the lane
-
-        zero_start (bool): True; start with zero and ends with lane_offset width,
-                           False; start with lane_offset and ends with zero width
-
-        lane_width_end (float): specify the ending lane width for lanes that may start
-                                and end with different widths
-
-    Return
-    ------
-        coefficients (float,float,float,float): polynomial coefficients corresponding to &#34;a, b, c, d&#34; in the OpenDrive polynomials
-    &#34;&#34;&#34;
-    # might be expanded for other cases, not now if needed yet though
-    start_heading = 0
-    end_heading = 0
-    s0 = 0
-    s1 = length
-
-    # create the linear system
-    A = np.array(
-        [
-            [0, 1, 2 * s0, 3 * s0**2],
-            [0, 1, 2 * s1, 3 * s1**2],
-            [1, s0, s0**2, s0**3],
-            [1, s1, s1**2, s1**3],
-        ]
-    )
-    if zero_start:
-        B = [start_heading, end_heading, 0, lane_offset]
-    else:
-        B = [start_heading, end_heading, lane_offset, 0]
-
-    if lane_width_end is not None:
-        B = [start_heading, end_heading, lane_offset, lane_width_end]
-
-    # calculate and return the coefficients
-    return np.linalg.solve(A, B)
-
-
-class XodrBase:
-    &#34;&#34;&#34;Sets up common functionality for xodr generating classes by enabling userdata inputs
-
-    Parameters
-    ----------
-
-    Attributes
-    ----------
-        user_data (list of UserData): all userdata added
-
-        includes (list of str): all includes (filenames)
-
-        data_quality (DataQuality): All
-
-    Methods
-    -------
-
-        add_userdata(userdata)
-            adds a userdata to the xodr entry
-
-        add_dataquality(dataquality)
-            adds dataquality to the xodr entry
-
-    &#34;&#34;&#34;
-
-    def __init__(self):
-        &#34;&#34;&#34;initalize the UserData&#34;&#34;&#34;
-        self.user_data = []
-        self.data_quality = None
-
-    def __eq__(self, other):
-        if (
-            self.user_data == other.user_data
-            and self.data_quality == other.data_quality
-        ):
-            return True
-
-        return False
-
-    def add_userdata(self, userdata):
-        &#34;&#34;&#34;Adds a userdata entry to the xodr entry
-
-        Parameters
-        ----------
-            userdata (Userdata): the data to be added
-        &#34;&#34;&#34;
-        if not isinstance(userdata, UserData):
-            raise TypeError(&#34;userdata is not of type UserData.&#34;)
-        self.user_data.append(userdata)
-
-    def add_dataquality(self, dataquality):
-        &#34;&#34;&#34;Adds a dataquality entry to the xodr entry
-
-        Parameters
-        ----------
-            dataquality (DataQuality): the data to be added
-        &#34;&#34;&#34;
-        if not isinstance(dataquality, DataQuality):
-            raise TypeError(&#34;dataquality is not of type DataQuality.&#34;)
-        self.data_quality = dataquality
-
-    def _add_additional_data_to_element(self, element):
-        &#34;&#34;&#34;returns the elementTree of the Junction&#34;&#34;&#34;
-        for ud in self.user_data:
-            element.append(ud.get_element())
-        if self.data_quality:
-            element.append(self.data_quality.get_element())
-        return element
-
-
-class UserData:
-    &#34;&#34;&#34;Sets up addtional data for any entry of OpenDRIVE
-
-    Parameters
-    ----------
-        code (str): code of the userdata
-
-        value (str): value of the userdata
-            Default: None
-
-    Attributes
-    ----------
-        code (str): code of the userdata
-
-        value (str): value of the userdata
-
-        user_data_content (list of ET.element): list of all extra elements added
-
-    Methods
-    -------
-        get_element()
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
-        add_userdata_content(ET.element)
-            adds extra elements to the userdata
-
-    &#34;&#34;&#34;
-
-    def __init__(self, code, value=None):
-        &#34;&#34;&#34;initalize the UserData&#34;&#34;&#34;
-        self.code = code
-        self.value = value
-        self.userdata_content = []
-
-    def add_userdata_content(self, content):
-        &#34;&#34;&#34;add_userdata_content adds extra elements to userdata
-
-        Parameters
-        ----------
-            content (ET.element): the element to be added
-        &#34;&#34;&#34;
-        self.userdata_content.append(content)
-
-    def _element_equals(self, e1, e2):
-        if e1.tag != e2.tag:
-            return False
-        if e1.text != e2.text:
-            return False
-        if e1.tail != e2.tail:
-            return False
-        if e1.attrib != e2.attrib:
-            return False
-        if len(e1) != len(e2):
-            return False
-        return all(self._elements_equal(c1, c2) for c1, c2 in zip(e1, e2))
-
-    def __eq__(self, other):
-        if isinstance(other, UserData):
-            if self.get_attributes() == other.get_attributes() and len(
-                self.userdata_content
-            ) == len(other.userdata_content):
-                for i in range(len(self.userdata_content)):
-                    if not self._element_equals(
-                        self.userdata_content[i], other.userdata_content[i]
-                    ):
-                        return False
-                return True
-        return False
-
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes as a dict of the JunctionGroup&#34;&#34;&#34;
-        retdict = {}
-        retdict[&#34;code&#34;] = str(self.code)
-        if self.value is not None:
-            retdict[&#34;value&#34;] = str(self.value)
-        return retdict
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the Junction&#34;&#34;&#34;
-        element = ET.Element(&#34;userData&#34;, attrib=self.get_attributes())
-        for i in self.userdata_content:
-            element.append(i)
-        return element
-
-
-class DataQuality:
-    &#34;&#34;&#34;Sets up DataQuality for any entry of OpenDRIVE
-
-
-    Attributes
-    ----------
-        date (str): code of the userdata
-
-        post_processing (RawDataPostProcessing): postprocessing definition
-
-        source (RawDataSource): source of the data
-
-        post_processing_comment (str): comment of the postprocessing
-
-        source_comment (str): comment of the soure
-
-        xy_abs (float): absolute xy error
-
-        xy_rel (float): relative xy error
-
-        z_abs (float): absolute z error
-
-        z_rel (float): relative z error
-
-    Methods
-    -------
-        get_element()
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
-        add_raw_data_info(date, post_processing, source, post_processing_comment, source_comment)
-            adds raw data info
-
-        add_error(xy_abs, xy_rel, z_abs,z_rel)
-            adds error info
-    &#34;&#34;&#34;
-
-    def __init__(self):
-        &#34;&#34;&#34;initalize the UserData&#34;&#34;&#34;
-        self.date = None
-        self.post_processing = None
-        self.source = None
-        self.post_processing_comment = None
-        self.source_comment = None
-        self.xy_abs = None
-        self.xy_rel = None
-        self.z_abs = None
-        self.z_rel = None
-        self._error_added = False
-        self._raw_data_added = False
-
-    def add_raw_data_info(
-        self,
-        date,
-        post_processing,
-        source,
-        post_processing_comment=None,
-        source_comment=None,
-    ):
-        &#34;&#34;&#34;add_raw_data_info adds data for the RawData entry
-
-        Parameters
-        ----------
-            date (str): code of the userdata
-
-            post_processing (RawDataPostProcessing): postprocessing definition
-
-            source (RawDataSource): source of the data
-
-            post_processing_comment (str): comment of the postprocessing
-                Default: None
-
-            source_comment (str): comment of the soure
-                Default: None
-        &#34;&#34;&#34;
-
-        self.date = date
-        self.post_processing = post_processing
-        self.source = source
-        self.post_processing_comment = post_processing_comment
-        self.source_comment = source_comment
-        self._raw_data_added = True
-
-    def add_error(self, xy_abs, xy_rel, z_abs, z_rel):
-        &#34;&#34;&#34;add_error adds data to the error element
-
-        Parameters
-        ----------
-            xy_abs (float): absolute xy error
-
-            xy_rel (float): relative xy error
-
-            z_abs (float): absolute z error
-
-            z_rel (float): relative z error
-        &#34;&#34;&#34;
-        self.xy_abs = xy_abs
-        self.xy_rel = xy_rel
-        self.z_abs = z_abs
-        self.z_rel = z_rel
-        self._error_added = True
-
-    def __eq__(self, other):
-        if isinstance(other, DataQuality):
-            if (
-                self.date == other.date
-                and self.post_processing == other.post_processing
-                and self.source == other.source
-                and self.post_processing_comment == other.post_processing_comment
-                and self.source_comment == other.source_comment
-                and self.xy_abs == other.xy_abs
-                and self.xy_rel == other.xy_rel
-                and self.z_abs == other.z_abs
-                and self.z_rel == other.z_rel
-            ):
-                return True
-        return False
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the Junction&#34;&#34;&#34;
-        element = ET.Element(&#34;dataQuality&#34;)
-        if self._raw_data_added:
-            raw_data_attrib = {
-                &#34;date&#34;: self.date,
-                &#34;postProcessing&#34;: enum2str(self.post_processing),
-                &#34;source&#34;: enum2str(self.source),
-            }
-            if self.post_processing_comment is not None:
-                raw_data_attrib[&#34;postProcessingComment&#34;] = self.post_processing_comment
-            if self.source_comment is not None:
-                raw_data_attrib[&#34;sourceComment&#34;] = self.source_comment
-
-            ET.SubElement(element, &#34;rawData&#34;, attrib=raw_data_attrib)
-
-        if self._error_added:
-            ET.SubElement(
-                element,
-                &#34;error&#34;,
-                attrib={
-                    &#34;xyAbsolute&#34;: str(self.xy_abs),
-                    &#34;xyRelative&#34;: str(self.xy_rel),
-                    &#34;zAbsolute&#34;: str(self.z_rel),
-                    &#34;zRelative&#34;: str(self.z_rel),
-                },
-            )
-        return element</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -448,22 +55,6 @@ class DataQuality:
 <span>def <span class="ident">get_coeffs_for_poly3</span></span>(<span>length, lane_offset, zero_start, lane_width_end=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>get_coeffs_for_poly3 creates the coefficients for a third degree polynomial, can be used for all kinds of descriptions in xodr.</p>
-<p>Assuming that the derivative is 0 at the start and end of the segment.</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>length (float): length of the segment in the s direction
-
-lane_offset (float): the lane offset (width) of the lane
-
-zero_start (bool): True; start with zero and ends with lane_offset width,
-                   False; start with lane_offset and ends with zero width
-
-lane_width_end (float): specify the ending lane width for lanes that may start
-                        and end with different widths
-</code></pre>
-<h2 id="return">Return</h2>
-<pre><code>coefficients (float,float,float,float): polynomial coefficients corresponding to "a, b, c, d" in the OpenDrive polynomials
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -515,22 +106,27 @@ lane_width_end (float): specify the ending lane width for lanes that may start
     # calculate and return the coefficients
     return np.linalg.solve(A, B)</code></pre>
 </details>
+<div class="desc"><p>get_coeffs_for_poly3 creates the coefficients for a third degree polynomial, can be used for all kinds of descriptions in xodr.</p>
+<p>Assuming that the derivative is 0 at the start and end of the segment.</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>length (float): length of the segment in the s direction
+
+lane_offset (float): the lane offset (width) of the lane
+
+zero_start (bool): True; start with zero and ends with lane_offset width,
+                   False; start with lane_offset and ends with zero width
+
+lane_width_end (float): specify the ending lane width for lanes that may start
+                        and end with different widths
+</code></pre>
+<h2 id="return">Return</h2>
+<pre><code>coefficients (float,float,float,float): polynomial coefficients corresponding to "a, b, c, d" in the OpenDrive polynomials
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xodr.utils.get_lane_sec_and_s_for_lane_calc"><code class="name flex">
 <span>def <span class="ident">get_lane_sec_and_s_for_lane_calc</span></span>(<span>road, contact_point)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Helping function to get a lane_section and s coordinate for calculations, at either the end or start of a road</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>road (Road): the road to be used
-
-contact_point (ContactPoint): start or end of the road
-</code></pre>
-<h2 id="returns">Returns</h2>
-<pre><code>lanesection (int): 0 or -1
-
-s (float): the s coordinate at start or end of the road
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -564,6 +160,17 @@ s (float): the s coordinate at start or end of the road
 
     return relevant_lanesection, relevant_s</code></pre>
 </details>
+<div class="desc"><p>Helping function to get a lane_section and s coordinate for calculations, at either the end or start of a road</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>road (Road): the road to be used
+
+contact_point (ContactPoint): start or end of the road
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>lanesection (int): 0 or -1
+
+s (float): the s coordinate at start or end of the road
+</code></pre></div>
 </dd>
 </dl>
 </section>
@@ -574,40 +181,6 @@ s (float): the s coordinate at start or end of the road
 <span>class <span class="ident">DataQuality</span></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Sets up DataQuality for any entry of OpenDRIVE</p>
-<h2 id="attributes">Attributes</h2>
-<pre><code>date (str): code of the userdata
-
-post_processing (RawDataPostProcessing): postprocessing definition
-
-source (RawDataSource): source of the data
-
-post_processing_comment (str): comment of the postprocessing
-
-source_comment (str): comment of the soure
-
-xy_abs (float): absolute xy error
-
-xy_rel (float): relative xy error
-
-z_abs (float): absolute z error
-
-z_rel (float): relative z error
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>get_element()
-    Returns the full ElementTree of the class
-
-get_attributes()
-    Returns a dictionary of all attributes of the class
-
-add_raw_data_info(date, post_processing, source, post_processing_comment, source_comment)
-    adds raw data info
-
-add_error(xy_abs, xy_rel, z_abs,z_rel)
-    adds error info
-</code></pre>
-<p>initalize the UserData</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -761,22 +334,46 @@ add_error(xy_abs, xy_rel, z_abs,z_rel)
             )
         return element</code></pre>
 </details>
-<h3>Methods</h3>
-<dl>
-<dt id="scenariogeneration.xodr.utils.DataQuality.add_error"><code class="name flex">
-<span>def <span class="ident">add_error</span></span>(<span>self, xy_abs, xy_rel, z_abs, z_rel)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>add_error adds data to the error element</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>xy_abs (float): absolute xy error
+<div class="desc"><p>Sets up DataQuality for any entry of OpenDRIVE</p>
+<h2 id="attributes">Attributes</h2>
+<pre><code>date (str): code of the userdata
+
+post_processing (RawDataPostProcessing): postprocessing definition
+
+source (RawDataSource): source of the data
+
+post_processing_comment (str): comment of the postprocessing
+
+source_comment (str): comment of the soure
+
+xy_abs (float): absolute xy error
 
 xy_rel (float): relative xy error
 
 z_abs (float): absolute z error
 
 z_rel (float): relative z error
-</code></pre></div>
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element()
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of the class
+
+add_raw_data_info(date, post_processing, source, post_processing_comment, source_comment)
+    adds raw data info
+
+add_error(xy_abs, xy_rel, z_abs,z_rel)
+    adds error info
+</code></pre>
+<p>initalize the UserData</p></div>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xodr.utils.DataQuality.add_error"><code class="name flex">
+<span>def <span class="ident">add_error</span></span>(<span>self, xy_abs, xy_rel, z_abs, z_rel)</span>
+</code></dt>
+<dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -800,25 +397,21 @@ z_rel (float): relative z error
     self.z_rel = z_rel
     self._error_added = True</code></pre>
 </details>
+<div class="desc"><p>add_error adds data to the error element</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>xy_abs (float): absolute xy error
+
+xy_rel (float): relative xy error
+
+z_abs (float): absolute z error
+
+z_rel (float): relative z error
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xodr.utils.DataQuality.add_raw_data_info"><code class="name flex">
-<span>def <span class="ident">add_raw_data_info</span></span>(<span>self, date, post_processing, source, post_processing_comment=None, source_comment=None)</span>
+<span>def <span class="ident">add_raw_data_info</span></span>(<span>self,<br>date,<br>post_processing,<br>source,<br>post_processing_comment=None,<br>source_comment=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>add_raw_data_info adds data for the RawData entry</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>date (str): code of the userdata
-
-post_processing (RawDataPostProcessing): postprocessing definition
-
-source (RawDataSource): source of the data
-
-post_processing_comment (str): comment of the postprocessing
-    Default: None
-
-source_comment (str): comment of the soure
-    Default: None
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -855,12 +448,25 @@ source_comment (str): comment of the soure
     self.source_comment = source_comment
     self._raw_data_added = True</code></pre>
 </details>
+<div class="desc"><p>add_raw_data_info adds data for the RawData entry</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>date (str): code of the userdata
+
+post_processing (RawDataPostProcessing): postprocessing definition
+
+source (RawDataSource): source of the data
+
+post_processing_comment (str): comment of the postprocessing
+    Default: None
+
+source_comment (str): comment of the soure
+    Default: None
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xodr.utils.DataQuality.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the Junction</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -894,6 +500,7 @@ source_comment (str): comment of the soure
         )
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the Junction</p></div>
 </dd>
 </dl>
 </dd>
@@ -902,31 +509,6 @@ source_comment (str): comment of the soure
 <span>(</span><span>code, value=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Sets up addtional data for any entry of OpenDRIVE</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>code (str): code of the userdata
-
-value (str): value of the userdata
-    Default: None
-</code></pre>
-<h2 id="attributes">Attributes</h2>
-<pre><code>code (str): code of the userdata
-
-value (str): value of the userdata
-
-user_data_content (list of ET.element): list of all extra elements added
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>get_element()
-    Returns the full ElementTree of the class
-
-get_attributes()
-    Returns a dictionary of all attributes of the class
-
-add_userdata_content(ET.element)
-    adds extra elements to the userdata
-</code></pre>
-<p>initalize the UserData</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1018,16 +600,37 @@ add_userdata_content(ET.element)
             element.append(i)
         return element</code></pre>
 </details>
+<div class="desc"><p>Sets up addtional data for any entry of OpenDRIVE</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>code (str): code of the userdata
+
+value (str): value of the userdata
+    Default: None
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>code (str): code of the userdata
+
+value (str): value of the userdata
+
+user_data_content (list of ET.element): list of all extra elements added
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>get_element()
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of the class
+
+add_userdata_content(ET.element)
+    adds extra elements to the userdata
+</code></pre>
+<p>initalize the UserData</p></div>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.utils.UserData.add_userdata_content"><code class="name flex">
 <span>def <span class="ident">add_userdata_content</span></span>(<span>self, content)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>add_userdata_content adds extra elements to userdata</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>content (ET.element): the element to be added
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1041,12 +644,15 @@ add_userdata_content(ET.element)
     &#34;&#34;&#34;
     self.userdata_content.append(content)</code></pre>
 </details>
+<div class="desc"><p>add_userdata_content adds extra elements to userdata</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>content (ET.element): the element to be added
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xodr.utils.UserData.get_attributes"><code class="name flex">
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes as a dict of the JunctionGroup</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1059,12 +665,12 @@ add_userdata_content(ET.element)
         retdict[&#34;value&#34;] = str(self.value)
     return retdict</code></pre>
 </details>
+<div class="desc"><p>returns the attributes as a dict of the JunctionGroup</p></div>
 </dd>
 <dt id="scenariogeneration.xodr.utils.UserData.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the Junction</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1076,6 +682,7 @@ add_userdata_content(ET.element)
         element.append(i)
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the Junction</p></div>
 </dd>
 </dl>
 </dd>
@@ -1083,23 +690,6 @@ add_userdata_content(ET.element)
 <span>class <span class="ident">XodrBase</span></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Sets up common functionality for xodr generating classes by enabling userdata inputs</p>
-<h2 id="parameters">Parameters</h2>
-<h2 id="attributes">Attributes</h2>
-<pre><code>user_data (list of UserData): all userdata added
-
-includes (list of str): all includes (filenames)
-
-data_quality (DataQuality): All
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>add_userdata(userdata)
-    adds a userdata to the xodr entry
-
-add_dataquality(dataquality)
-    adds dataquality to the xodr entry
-</code></pre>
-<p>initalize the UserData</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1173,15 +763,29 @@ add_dataquality(dataquality)
             element.append(self.data_quality.get_element())
         return element</code></pre>
 </details>
+<div class="desc"><p>Sets up common functionality for xodr generating classes by enabling userdata inputs</p>
+<h2 id="parameters">Parameters</h2>
+<h2 id="attributes">Attributes</h2>
+<pre><code>user_data (list of UserData): all userdata added
+
+includes (list of str): all includes (filenames)
+
+data_quality (DataQuality): All
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>add_userdata(userdata)
+    adds a userdata to the xodr entry
+
+add_dataquality(dataquality)
+    adds dataquality to the xodr entry
+</code></pre>
+<p>initalize the UserData</p></div>
 <h3>Subclasses</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xodr.elevation.ElevationProfile" href="elevation.html#scenariogeneration.xodr.elevation.ElevationProfile">ElevationProfile</a></li>
 <li><a title="scenariogeneration.xodr.elevation.LateralProfile" href="elevation.html#scenariogeneration.xodr.elevation.LateralProfile">LateralProfile</a></li>
-<li><a title="scenariogeneration.xodr.geometry.Arc" href="geometry.html#scenariogeneration.xodr.geometry.Arc">Arc</a></li>
-<li><a title="scenariogeneration.xodr.geometry.Line" href="geometry.html#scenariogeneration.xodr.geometry.Line">Line</a></li>
-<li><a title="scenariogeneration.xodr.geometry.ParamPoly3" href="geometry.html#scenariogeneration.xodr.geometry.ParamPoly3">ParamPoly3</a></li>
 <li><a title="scenariogeneration.xodr.geometry.PlanView" href="geometry.html#scenariogeneration.xodr.geometry.PlanView">PlanView</a></li>
-<li><a title="scenariogeneration.xodr.geometry.Spiral" href="geometry.html#scenariogeneration.xodr.geometry.Spiral">Spiral</a></li>
+<li>scenariogeneration.xodr.geometry._BaseGeometry</li>
 <li>scenariogeneration.xodr.geometry._Geometry</li>
 <li><a title="scenariogeneration.xodr.lane.ExplicitRoadLine" href="lane.html#scenariogeneration.xodr.lane.ExplicitRoadLine">ExplicitRoadLine</a></li>
 <li><a title="scenariogeneration.xodr.lane.Lane" href="lane.html#scenariogeneration.xodr.lane.Lane">Lane</a></li>
@@ -1214,10 +818,6 @@ add_dataquality(dataquality)
 <span>def <span class="ident">add_dataquality</span></span>(<span>self, dataquality)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Adds a dataquality entry to the xodr entry</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>dataquality (DataQuality): the data to be added
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1233,15 +833,15 @@ add_dataquality(dataquality)
         raise TypeError(&#34;dataquality is not of type DataQuality.&#34;)
     self.data_quality = dataquality</code></pre>
 </details>
+<div class="desc"><p>Adds a dataquality entry to the xodr entry</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>dataquality (DataQuality): the data to be added
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xodr.utils.XodrBase.add_userdata"><code class="name flex">
 <span>def <span class="ident">add_userdata</span></span>(<span>self, userdata)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Adds a userdata entry to the xodr entry</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>userdata (Userdata): the data to be added
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1257,6 +857,10 @@ add_dataquality(dataquality)
         raise TypeError(&#34;userdata is not of type UserData.&#34;)
     self.user_data.append(userdata)</code></pre>
 </details>
+<div class="desc"><p>Adds a userdata entry to the xodr entry</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>userdata (Userdata): the data to be added
+</code></pre></div>
 </dd>
 </dl>
 </dd>
@@ -1264,7 +868,6 @@ add_dataquality(dataquality)
 </section>
 </article>
 <nav id="sidebar">
-<h1>Index</h1>
 <div class="toc">
 <ul></ul>
 </div>
@@ -1311,7 +914,7 @@ add_dataquality(dataquality)
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
 </footer>
 </body>
 </html>

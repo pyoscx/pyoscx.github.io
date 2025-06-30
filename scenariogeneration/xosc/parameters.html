@@ -2,19 +2,33 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.10.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
 <title>scenariogeneration.xosc.parameters API documentation</title>
 <meta name="description" content="scenariogeneration
-https://github.com/pyoscx/scenariogeneration …" />
-<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
-<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
-<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
-<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
-<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+https://github.com/pyoscx/scenariogeneration …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
-<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
 </head>
 <body>
 <main>
@@ -29,1447 +43,6 @@ https://github.com/pyoscx/scenariogeneration …" />
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
 <p>Copyright (c) 2022 The scenariogeneration Authors.</p>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">&#34;&#34;&#34;
-  scenariogeneration
-  https://github.com/pyoscx/scenariogeneration
-
-  This Source Code Form is subject to the terms of the Mozilla Public
-  License, v. 2.0. If a copy of the MPL was not distributed with this
-  file, You can obtain one at https://mozilla.org/MPL/2.0/.
-
-  Copyright (c) 2022 The scenariogeneration Authors.
-
-&#34;&#34;&#34;
-import xml.etree.ElementTree as ET
-
-from .enumerations import VersionBase, XMLNS, XSI, _MINOR_VERSION
-from .utils import (
-    _StochasticDistributionType,
-    FileHeader,
-    VersionBase,
-    ParameterAssignment,
-    Rule,
-    convert_float,
-)
-from .exceptions import (
-    NotEnoughInputArguments,
-    OpenSCENARIOVersionError,
-    NotAValidElement,
-)
-from ..helpers import prettyprint, printToFile
-
-
-class _StochasticFactory:
-    @staticmethod
-    def parse_distribution(element):
-        if element.find(&#34;NormalDistribution&#34;) is not None:
-            return NormalDistribution.parse(element.find(&#34;NormalDistribution&#34;))
-        elif element.find(&#34;UniformDistribution&#34;) is not None:
-            return UniformDistribution.parse(element.find(&#34;UniformDistribution&#34;))
-        elif element.find(&#34;PoissonDistribution&#34;) is not None:
-            return PoissonDistribution.parse(element.find(&#34;PoissonDistribution&#34;))
-        elif element.find(&#34;Histogram&#34;) is not None:
-            return Histogram.parse(element.find(&#34;Histogram&#34;))
-        elif element.find(&#34;ProbabilityDistributionSet&#34;) is not None:
-            return ProbabilityDistributionSet.parse(
-                element.find(&#34;ProbabilityDistributionSet&#34;)
-            )
-        elif element.find(&#34;UserDefinedDistribution&#34;) is not None:
-            return NotImplementedError(
-                &#34;UserDefinedDistribution is not implemented yet.&#34;
-            )
-        else:
-            raise NotAValidElement(
-                &#34;element &#34;, element, &#34;is not a valid Stochastic distribution&#34;
-            )
-
-
-class _DeterministicFactory:
-    @staticmethod
-    def parse_distribution(element):
-        if element.find(&#34;DistributionSet&#34;) is not None:
-            return DistributionSet.parse(element.find(&#34;DistributionSet&#34;))
-        elif element.find(&#34;DistributionRange&#34;) is not None:
-            return DistributionRange.parse(element.find(&#34;DistributionRange&#34;))
-        elif element.find(&#34;UserDefinedDistribution&#34;) is not None:
-            return NotImplementedError(
-                &#34;UserDefinedDistribution is not implemented yet.&#34;
-            )
-        else:
-            raise NotAValidElement(
-                &#34;element &#34;, element, &#34;is not a valid deterministic distribution&#34;
-            )
-
-
-class _HistogramBin(VersionBase):
-    &#34;&#34;&#34;the _HistogramBin is used by Histogram to define the bins
-
-    Parameters
-    ----------
-        weight (float): the weight of the bin
-
-        range (Range): the range of the bin
-
-    Attributes
-    ----------
-        weight (float): the weight of the bin
-
-        range (Range): the range of the bin
-
-    Methods
-    -------
-        parse(element)
-            parses a ElementTree created by the class and returns an instance of the class
-
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
-    &#34;&#34;&#34;
-
-    def __init__(self, weight, range=None):
-        &#34;&#34;&#34;initalizes the Histogram
-
-        Parameters
-        ----------
-            weight (float): the weight of the bin
-
-            range (Range): the range of the bin
-
-        &#34;&#34;&#34;
-        if range and not isinstance(range, Range):
-            raise TypeError(&#34;range input is not of type Histogram&#34;)
-        self.weight = convert_float(weight)
-        self.range = range
-
-    def __eq__(self, other):
-        if isinstance(other, _HistogramBin):
-            if (
-                self.get_attributes() == other.get_attributes()
-                and self.range == other.range
-            ):
-                return True
-        return False
-
-    @staticmethod
-    def parse(element):
-        &#34;&#34;&#34;Parses the xml element of _HistogramBin
-
-        Parameters
-        ----------
-            element (xml.etree.ElementTree.Element): A _HistogramBin element (same as generated by the class itself)
-
-        Returns
-        -------
-            histogram (_HistogramBin): a _HistogramBin object
-
-        &#34;&#34;&#34;
-        range_element = element.find(&#34;Range&#34;)
-        if range_element is not None:
-            range = Range.parse(range_element)
-        else:
-            range = None
-
-        return _HistogramBin(convert_float(element.attrib[&#34;weight&#34;]), range)
-
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes of the HistogramBin as a dict&#34;&#34;&#34;
-        retdict = {&#34;weight&#34;: str(self.weight)}
-        return retdict
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the HistogramBin&#34;&#34;&#34;
-        element = ET.Element(&#34;Bin&#34;, self.get_attributes())
-        element.append(self.range.get_element())
-        return element
-
-
-class _ProbabilityDistributionSetElement(VersionBase):
-    &#34;&#34;&#34;the _ProbabilityDistributionSetElement is used by ProbabilityDistributionSet to define the elements
-
-    Parameters
-    ----------
-        value (string): possible value
-
-        weight (float): weight of the value
-
-    Attributes
-    ----------
-        value (string): possible value
-
-        weight (float): weight of the value
-
-    Methods
-    -------
-        parse(element)
-            parses a ElementTree created by the class and returns an instance of the class
-
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
-    &#34;&#34;&#34;
-
-    def __init__(self, value, weight):
-        &#34;&#34;&#34;initalizes the Histogram
-
-        Parameters
-        ----------
-            value (string): possible value
-
-            weight (float): weight of the value
-
-        &#34;&#34;&#34;
-        self.value = value
-        self.weight = convert_float(weight)
-
-    def __eq__(self, other):
-        if isinstance(other, _ProbabilityDistributionSetElement):
-            if self.get_attributes() == other.get_attributes():
-                return True
-        return False
-
-    @staticmethod
-    def parse(element):
-        &#34;&#34;&#34;Parses the xml element of _ProbabilityDistributionSetElement
-
-        Parameters
-        ----------
-            element (xml.etree.ElementTree.Element): A _ProbabilityDistributionSetElement element (same as generated by the class itself)
-
-        Returns
-        -------
-            pds (_ProbabilityDistributionSetElement): a _ProbabilityDistributionSetElement object
-
-        &#34;&#34;&#34;
-
-        return _ProbabilityDistributionSetElement(
-            element.attrib[&#34;value&#34;], convert_float(element.attrib[&#34;weight&#34;])
-        )
-
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes of the _ProbabilityDistributionSetElement as a dict&#34;&#34;&#34;
-        retdict = {&#34;value&#34;: self.value, &#34;weight&#34;: str(self.weight)}
-        return retdict
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the _ProbabilityDistributionSetElement&#34;&#34;&#34;
-        element = ET.Element(&#34;Element&#34;, self.get_attributes())
-        return element
-
-
-class Range(VersionBase):
-    &#34;&#34;&#34;the Range creates a Range used by parameter distributions
-
-    Parameters
-    ----------
-        lower (float): lower limit of the range
-
-        upper (float): upper limit of the range
-
-    Attributes
-    ----------
-        lower (float): lower limit of the range
-
-        upper (float): upper limit of the range
-
-    Methods
-    -------
-        parse(element)
-            parses a ElementTree created by the class and returns an instance of the class
-
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
-    &#34;&#34;&#34;
-
-    def __init__(self, lower, upper):
-        &#34;&#34;&#34;initalizes the Range
-
-        Parameters
-        ----------
-            lower (float): lower limit of the range
-
-            upper (float): upper limit of the range
-
-        &#34;&#34;&#34;
-        self.lower = convert_float(lower)
-        self.upper = convert_float(upper)
-
-    def __eq__(self, other):
-        if isinstance(other, Range):
-            if self.get_attributes() == other.get_attributes():
-                return True
-        return False
-
-    @staticmethod
-    def parse(element):
-        &#34;&#34;&#34;Parses the xml element of Range
-
-        Parameters
-        ----------
-            element (xml.etree.ElementTree.Element): A Range element (same as generated by the class itself)
-
-        Returns
-        -------
-            range (Range): a Range object
-
-        &#34;&#34;&#34;
-
-        return Range(
-            convert_float(element.attrib[&#34;lowerLimit&#34;]),
-            convert_float(element.attrib[&#34;upperLimit&#34;]),
-        )
-
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes of the Range as a dict&#34;&#34;&#34;
-        retdict = {&#34;lowerLimit&#34;: str(self.lower), &#34;upperLimit&#34;: str(self.upper)}
-        return retdict
-
-    def get_element(self, elementname=&#34;Range&#34;):
-        &#34;&#34;&#34;returns the elementTree of the Range&#34;&#34;&#34;
-        element = ET.Element(elementname, self.get_attributes())
-        return element
-
-
-## Stochastic distributions
-class Stochastic(VersionBase):
-    &#34;&#34;&#34;Creates the Stochastic type of parameter distributions
-
-    Parameters
-    ----------
-        number_of_tests (int): number of tests to run
-
-        random_seed (float): the seed for the run
-            Default: None
-
-    Attributes
-    ----------
-        number_of_tests (int): number of tests to run
-
-        random_seed (float): the seed for the run
-
-        distributions (dict of *StochasticDistribution): the distributions for the parameters
-
-    Methods
-    -------
-        parse(element)
-            parses a ElementTree created by the class and returns an instance of the class
-
-        add_distribution(parametername, distribution)
-            Adds a parameter/distribution pair
-
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
-    &#34;&#34;&#34;
-
-    def __init__(self, number_of_tests, random_seed=None):
-        &#34;&#34;&#34;initalizes the Stochastic
-
-        Parameters
-        ----------
-            number_of_tests (int): number of tests to run
-
-            random_seed (float): the seed for the run
-                Default: None
-
-        &#34;&#34;&#34;
-        self.number_of_tests = number_of_tests
-        self.random_seed = random_seed
-        self.distributions = {}
-
-    def __eq__(self, other):
-        if isinstance(other, Stochastic):
-            if (
-                self.get_attributes() == other.get_attributes()
-                and self.distributions == other.distributions
-            ):
-                return True
-        return False
-
-    @staticmethod
-    def parse(element):
-        &#34;&#34;&#34;Parses the xml element of Stochastic
-
-        Parameters
-        ----------
-            element (xml.etree.ElementTree.Element): A Stochastic element (same as generated by the class itself)
-
-        Returns
-        -------
-            Stochastic (Stochastic): a Stochastic object
-
-        &#34;&#34;&#34;
-
-        if &#34;randomSeed&#34; in element.attrib:
-            seed = element.attrib[&#34;randomSeed&#34;]
-        else:
-            seed = None
-        stoc = Stochastic(element.attrib[&#34;numberOfTestRuns&#34;], seed)
-        for dist_element in element.findall(&#34;StochasticDistribution&#34;):
-            name = dist_element.attrib[&#34;parameterName&#34;]
-            dist = _StochasticFactory.parse_distribution(dist_element)
-            stoc.add_distribution(name, dist)
-        return stoc
-
-    def add_distribution(self, parametername, distribution):
-        &#34;&#34;&#34;adds a parameter and a related distribution to it
-
-        Parameters
-        ----------
-            parametername (str): name of the parameter
-
-            distribution (StochasticDistribution): the distribution of that parameter
-
-        &#34;&#34;&#34;
-        if not isinstance(distribution, _StochasticDistributionType):
-            raise TypeError(&#34;distribution input is not a valid StochasticDistribution&#34;)
-        self.distributions[parametername] = distribution
-        return self
-
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes of the Stochastic as a dict&#34;&#34;&#34;
-        retdict = {}
-        retdict[&#34;numberOfTestRuns&#34;] = str(self.number_of_tests)
-        if self.random_seed is not None:
-            retdict[&#34;randomSeed&#34;] = str(self.random_seed)
-
-        return retdict
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the Stochastic&#34;&#34;&#34;
-        element = ET.Element(&#34;Stochastic&#34;, self.get_attributes())
-        if not self.distributions:
-            raise NotEnoughInputArguments(&#34;No distribution has been added&#34;)
-        for d in self.distributions:
-            # dist = ET.SubElement(element,&#39;stochasticDistribution&#39;,)
-            dist = ET.SubElement(
-                element, &#34;StochasticDistribution&#34;, attrib={&#34;parameterName&#34;: d}
-            )
-            dist.append(self.distributions[d].get_element())
-
-        return element
-
-
-class NormalDistribution(_StochasticDistributionType):
-    &#34;&#34;&#34;the NormalDistribution is a Stochastic distribution
-
-    Parameters
-    ----------
-        expected_value (float): the expected value (mean) of the distribution
-
-        variance (float): variance of the distribution
-
-        range (Range): limit of the values (optional)
-            Default: None
-
-    Attributes
-    ----------
-        expected_value (float): the expected value (mean) of the distribution
-
-        variance (float): variance of the distribution
-
-        range (Range): limit of the values (optional)
-
-    Methods
-    -------
-        parse(element)
-            parses a ElementTree created by the class and returns an instance of the class
-
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
-    &#34;&#34;&#34;
-
-    def __init__(self, expected_value, variance, range=None):
-        &#34;&#34;&#34;initalizes the NormalDistribution
-
-        Parameters
-        ----------
-            expected_value (float): the expected value (mean) of the distribution
-
-            variance (float): variance of the distribution
-
-            range (Range): limit of the values (optional)
-                Default: None
-
-        &#34;&#34;&#34;
-        if range and not isinstance(range, Range):
-            raise TypeError(&#34;range input is not of type Range&#34;)
-        self.expected_value = expected_value
-        self.variance = variance
-        self.range = range
-
-    def __eq__(self, other):
-        if isinstance(other, NormalDistribution):
-            if (
-                self.get_attributes() == other.get_attributes()
-                and self.range == other.range
-            ):
-                return True
-        return False
-
-    @staticmethod
-    def parse(element):
-        &#34;&#34;&#34;Parses the xml element of NormalDistribution
-
-        Parameters
-        ----------
-            element (xml.etree.ElementTree.Element): A NormalDistribution element (same as generated by the class itself)
-
-        Returns
-        -------
-            nd (NormalDistribution): a NormalDistribution object
-
-        &#34;&#34;&#34;
-        if element.find(&#34;Range&#34;) is not None:
-            range = Range.parse(element.find(&#34;Range&#34;))
-        else:
-            range = None
-        nd = NormalDistribution(
-            element.attrib[&#34;expectedValue&#34;], element.attrib[&#34;variance&#34;], range
-        )
-        return nd
-
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes of the NormalDistribution as a dict&#34;&#34;&#34;
-        retdict = {
-            &#34;expectedValue&#34;: str(self.expected_value),
-            &#34;variance&#34;: str(self.variance),
-        }
-        return retdict
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the NormalDistribution&#34;&#34;&#34;
-        element = ET.Element(&#34;NormalDistribution&#34;, self.get_attributes())
-        if self.range:
-            element.append(self.range.get_element())
-        return element
-
-
-class UniformDistribution(_StochasticDistributionType):
-    &#34;&#34;&#34;the UniformDistribution is a Stochastic distribution
-
-    Parameters
-    ----------
-        range (Range): limit of the values
-
-    Attributes
-    ----------
-        range (Range): limit of the values
-
-    Methods
-    -------
-        parse(element)
-            parses a ElementTree created by the class and returns an instance of the class
-
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-    &#34;&#34;&#34;
-
-    def __init__(self, range):
-        &#34;&#34;&#34;initalizes the UniformDistribution
-
-        Parameters
-        ----------
-            range (Range): limit of the values (optional)
-
-
-        &#34;&#34;&#34;
-        if not isinstance(range, Range):
-            raise TypeError(&#34;range input is not of type Range&#34;)
-        self.range = range
-
-    def __eq__(self, other):
-        if isinstance(other, UniformDistribution):
-            if self.range == other.range:
-                return True
-        return False
-
-    @staticmethod
-    def parse(element):
-        &#34;&#34;&#34;Parses the xml element of UniformDistribution
-
-        Parameters
-        ----------
-            element (xml.etree.ElementTree.Element): A UniformDistribution element (same as generated by the class itself)
-
-        Returns
-        -------
-            ud (UniformDistribution): a UniformDistribution object
-
-        &#34;&#34;&#34;
-
-        return UniformDistribution(Range.parse(element.find(&#34;Range&#34;)))
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the UniformDistribution&#34;&#34;&#34;
-        element = ET.Element(&#34;UniformDistribution&#34;)
-        element.append(self.range.get_element())
-        return element
-
-
-class PoissonDistribution(_StochasticDistributionType):
-    &#34;&#34;&#34;the PoissonDistribution is a Stochastic distribution
-
-    Parameters
-    ----------
-        expected_value (float): the expected value of the distribution
-
-        range (Range): limit of the values (optional)
-            Default: None
-
-    Attributes
-    ----------
-        expected_value (float): the expected value of the distribution
-
-        range (Range): limit of the values (optional)
-
-    Methods
-    -------
-        parse(element)
-            parses a ElementTree created by the class and returns an instance of the class
-
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
-    &#34;&#34;&#34;
-
-    def __init__(self, expected_value, range=None):
-        &#34;&#34;&#34;initalizes the PoissonDistribution
-
-        Parameters
-        ----------
-            expected_value (float): the expected value of the distribution
-
-            range (Range): limit of the values (optional)
-                Default: None
-
-        &#34;&#34;&#34;
-        if range and not isinstance(range, Range):
-            raise TypeError(&#34;range input is not of type Range&#34;)
-        self.expected_value = expected_value
-        self.range = range
-
-    def __eq__(self, other):
-        if isinstance(other, PoissonDistribution):
-            if (
-                self.get_attributes() == other.get_attributes()
-                and self.range == other.range
-            ):
-                return True
-        return False
-
-    @staticmethod
-    def parse(element):
-        &#34;&#34;&#34;Parses the xml element of PoissonDistribution
-
-        Parameters
-        ----------
-            element (xml.etree.ElementTree.Element): A PoissonDistribution element (same as generated by the class itself)
-
-        Returns
-        -------
-            pd (PoissonDistribution): a PoissonDistribution object
-
-        &#34;&#34;&#34;
-        if element.find(&#34;Range&#34;) is not None:
-            range = Range.parse(element.find(&#34;Range&#34;))
-        else:
-            range = None
-        pd = PoissonDistribution(element.attrib[&#34;expectedValue&#34;], range)
-        return pd
-
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes of the PoissonDistribution as a dict&#34;&#34;&#34;
-        retdict = {&#34;expectedValue&#34;: str(self.expected_value)}
-        return retdict
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the PoissonDistribution&#34;&#34;&#34;
-        element = ET.Element(&#34;PoissonDistribution&#34;, self.get_attributes())
-        if self.range:
-            element.append(self.range.get_element())
-        return element
-
-
-class Histogram(_StochasticDistributionType):
-    &#34;&#34;&#34;the Histogram is a Stochastic distribution
-
-    Parameters
-    ----------
-
-    Attributes
-    ----------
-        bins (list of _HistogramBin): the bins defining the histogram
-
-    Methods
-    -------
-        parse(element)
-            parses a ElementTree created by the class and returns an instance of the class
-
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-        add_bin(weight,range)
-            adds a weight and a range to a bin
-
-    &#34;&#34;&#34;
-
-    def __init__(self):
-        &#34;&#34;&#34;initalizes the Histogram&#34;&#34;&#34;
-        self.bins = []
-
-    def __eq__(self, other):
-        if isinstance(other, Histogram):
-            if self.bins == other.bins:
-                return True
-        return False
-
-    @staticmethod
-    def parse(element):
-        &#34;&#34;&#34;Parses the xml element of Histogram
-
-        Parameters
-        ----------
-            element (xml.etree.ElementTree.Element): A Histogram element (same as generated by the class itself)
-
-        Returns
-        -------
-            histogram (Histogram): a Histogram object
-
-        &#34;&#34;&#34;
-        hist = Histogram()
-        for h_element in element.findall(&#34;Bin&#34;):
-            hist.bins.append(_HistogramBin.parse(h_element))
-        return hist
-
-    def add_bin(self, weight, range):
-        &#34;&#34;&#34;returns the attributes of the Histogram as a dict
-
-        Parameters
-        ----------
-            weight (float): the weight of the bin
-
-            range (Range): the range of the bin
-
-        &#34;&#34;&#34;
-        self.bins.append(_HistogramBin(weight, range))
-        return self
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the Histogram&#34;&#34;&#34;
-        element = ET.Element(&#34;Histogram&#34;)
-        if not self.bins:
-            raise NotEnoughInputArguments(
-                &#34;The Histogram has no bins, please use add_bin to add atleast one.&#34;
-            )
-        for bin in self.bins:
-            element.append(bin.get_element())
-        return element
-
-
-class ProbabilityDistributionSet(_StochasticDistributionType):
-    &#34;&#34;&#34;the ProbabilityDistributionSet is a Stochastic distribution
-
-    Parameters
-    ----------
-
-    Attributes
-    ----------
-        sets (list of _ProbabilityDistributionSetElement): the sets defining the ProbabilityDistributionSet
-
-    Methods
-    -------
-        parse(element)
-            parses a ElementTree created by the class and returns an instance of the class
-
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-        add_set(value, weight)
-            adds a weight and a range to a bin
-
-    &#34;&#34;&#34;
-
-    def __init__(self):
-        &#34;&#34;&#34;initalizes the ProbabilityDistributionSet&#34;&#34;&#34;
-        self.sets = []
-
-    def __eq__(self, other):
-        if isinstance(other, ProbabilityDistributionSet):
-            if self.sets == other.sets:
-                return True
-        return False
-
-    @staticmethod
-    def parse(element):
-        &#34;&#34;&#34;Parses the xml element of ProbabilityDistributionSet
-
-        Parameters
-        ----------
-            element (xml.etree.ElementTree.Element): A ProbabilityDistributionSet element (same as generated by the class itself)
-
-        Returns
-        -------
-            pds (ProbabilityDistributionSet): a ProbabilityDistributionSet object
-
-        &#34;&#34;&#34;
-        pds = ProbabilityDistributionSet()
-        for e in element.findall(&#34;Element&#34;):
-            pds.sets.append(_ProbabilityDistributionSetElement.parse(e))
-        return pds
-
-    def add_set(self, value, weight):
-        &#34;&#34;&#34;adds a set element to the ProbabilityDistributionSet
-
-        Parameters
-        ----------
-            value (string): possible value
-
-            weight (float): weight of the value
-
-        &#34;&#34;&#34;
-        self.sets.append(_ProbabilityDistributionSetElement(value, weight))
-        return self
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the ProbabilityDistributionSet&#34;&#34;&#34;
-        element = ET.Element(&#34;ProbabilityDistributionSet&#34;)
-        if not self.sets:
-            raise NotEnoughInputArguments(
-                &#34;No sets were added to the ProbabilityDistributionSet, please use add_set&#34;
-            )
-        for bin in self.sets:
-            element.append(bin.get_element())
-        return element
-
-
-### Deterministic
-
-
-class ParameterValueSet(VersionBase):
-    &#34;&#34;&#34;Creates the ParameterValueSet used by the DeterministicMultiParameterDistribution
-
-    Parameters
-    ----------
-
-
-    Attributes
-    ----------
-
-        assignments (list of ParameterAssignment): the the assignments for the ValueSet
-
-    Methods
-    -------
-        parse(element)
-            parses a ElementTree created by the class and returns an instance of the class
-
-        add_parameter(parameterref, value)
-            Adds a parameter value pair
-
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-    &#34;&#34;&#34;
-
-    def __init__(self):
-        &#34;&#34;&#34;initalizes the ParameterValueSet&#34;&#34;&#34;
-
-        self.sets = []
-
-    def __eq__(self, other):
-        if isinstance(other, ParameterValueSet):
-            if self.sets == other.sets:
-                return True
-        return False
-
-    @staticmethod
-    def parse(element):
-        &#34;&#34;&#34;Parses the xml element of ParameterValueSet
-
-        Parameters
-        ----------
-            element (xml.etree.ElementTree.Element): A ParameterValueSet element (same as generated by the class itself)
-
-        Returns
-        -------
-            parameter_value_set (ParameterValueSet): a ParameterValueSet object
-
-        &#34;&#34;&#34;
-        parameter_value_set = ParameterValueSet()
-        for pa in element.findall(&#34;ParameterAssignment&#34;):
-            parameter_value_set.sets.append(ParameterAssignment.parse(pa))
-
-        return parameter_value_set
-
-    def add_parameter(self, parameterref, value):
-        &#34;&#34;&#34;adds a parameter and a value
-
-        Parameters
-        ----------
-            parameterref (str): name of the parameters
-
-            value (str): value of the parameters
-
-        &#34;&#34;&#34;
-
-        self.sets.append(ParameterAssignment(parameterref, value))
-        return self
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the ParameterValueSet&#34;&#34;&#34;
-        element = ET.Element(&#34;ParameterValueSet&#34;)
-
-        if not self.sets:
-            raise NotEnoughInputArguments(&#34;No sets has been added&#34;)
-        for s in self.sets:
-            element.append(s.get_element())
-
-        return element
-
-
-class DeterministicMultiParameterDistribution(VersionBase):
-    &#34;&#34;&#34;Creates the DeterministicMultiParameterDistribution type of parameter distributions
-
-    Parameters
-    ----------
-
-
-    Attributes
-    ----------
-
-        distributions (list of ParameterValueSet): the distributions for the parameters
-
-    Methods
-    -------
-        parse(element)
-            parses a ElementTree created by the class and returns an instance of the class
-
-        add_value_set(parameter_value_set)
-            Adds a parameter value set
-
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-    &#34;&#34;&#34;
-
-    def __init__(self):
-        &#34;&#34;&#34;initalizes the DeterministicMultiParameterDistribution&#34;&#34;&#34;
-
-        self.sets = []
-
-    def __eq__(self, other):
-        if isinstance(other, DeterministicMultiParameterDistribution):
-            if self.sets == other.sets:
-                return True
-        return False
-
-    @staticmethod
-    def parse(element):
-        &#34;&#34;&#34;Parses the xml element of DeterministicMultiParameterDistribution
-
-        Parameters
-        ----------
-            element (xml.etree.ElementTree.Element): A DeterministicMultiParameterDistribution element (same as generated by the class itself)
-
-        Returns
-        -------
-            distribution (DeterministicMultiParameterDistribution): a DeterministicMultiParameterDistribution object
-
-        &#34;&#34;&#34;
-        dist = DeterministicMultiParameterDistribution()
-        for h_element in element.findall(&#34;ValueSetDistribution/ParameterValueSet&#34;):
-            dist.sets.append(ParameterValueSet.parse(h_element))
-        return dist
-
-    def add_value_set(self, parameter_value_set):
-        &#34;&#34;&#34;adds a parameter and a related distribution to it
-
-        Parameters
-        ----------
-            parameter_value_set (ParameterValueSet): a set of parameters
-
-        &#34;&#34;&#34;
-        if not isinstance(parameter_value_set, ParameterValueSet):
-            raise TypeError(&#34;distribution input is not of type ParameterValueSet&#34;)
-        self.sets.append(parameter_value_set)
-        return self
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the DeterministicMultiParameterDistribution&#34;&#34;&#34;
-        element = ET.Element(&#34;DeterministicMultiParameterDistribution&#34;)
-        value_set_element = ET.SubElement(element, &#34;ValueSetDistribution&#34;)
-        if not self.sets:
-            raise NotEnoughInputArguments(&#34;No sets has been added&#34;)
-        for d in self.sets:
-            value_set_element.append(d.get_element())
-
-        return element
-
-
-class DistributionRange(VersionBase):
-    &#34;&#34;&#34;Creates the DistributionRange used to define a Single parameter distribution
-
-    Parameters
-    ----------
-        step_width (float): step size of the distribution
-
-        range (Range): the range of the parameter
-
-    Attributes
-    ----------
-
-        step_width (float): step size of the distribution
-
-        range (Range): the range of the parameter
-
-
-    Methods
-    -------
-        parse(element)
-            parses a ElementTree created by the class and returns an instance of the class
-
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
-    &#34;&#34;&#34;
-
-    def __init__(self, step_width, range):
-        &#34;&#34;&#34;initalizes the DistributionRange
-
-        Parameters
-        ----------
-            step_width (float): step size of the distribution
-
-            range (Range): the range of the parameter
-
-        &#34;&#34;&#34;
-
-        self.step_width = step_width
-        if not isinstance(range, Range):
-            raise TypeError(&#34;range is not of type Range.&#34;)
-        self.range = range
-
-    def __eq__(self, other):
-        if isinstance(other, DistributionRange):
-            if (
-                self.get_attributes() == other.get_attributes()
-                and self.range == other.range
-            ):
-                return True
-        return False
-
-    @staticmethod
-    def parse(element):
-        &#34;&#34;&#34;Parses the xml element of DistributionRange
-
-        Parameters
-        ----------
-            element (xml.etree.ElementTree.Element): A DistributionRange element (same as generated by the class itself)
-
-        Returns
-        -------
-            distribution_range (DistributionRange): a DistributionRange object
-
-        &#34;&#34;&#34;
-
-        distribution_range = DistributionRange(
-            element.attrib[&#34;stepWidth&#34;], Range.parse(element.find(&#34;Range&#34;))
-        )
-        return distribution_range
-
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes of the DistributionRange as a dict&#34;&#34;&#34;
-        retdict = {&#34;stepWidth&#34;: str(self.step_width)}
-        return retdict
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the DistributionRange&#34;&#34;&#34;
-        element = ET.Element(&#34;DistributionRange&#34;, attrib=self.get_attributes())
-        element.append(self.range.get_element())
-
-        return element
-
-
-class DistributionSet(VersionBase):
-    &#34;&#34;&#34;Creates the DistributionSet used to define a Single parameter distribution
-
-    Parameters
-    ----------
-
-    Attributes
-    ----------
-
-        value_elements (list of str double): a list of all values
-
-    Methods
-    -------
-        parse(element)
-            parses a ElementTree created by the class and returns an instance of the class
-
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-    &#34;&#34;&#34;
-
-    def __init__(self):
-        &#34;&#34;&#34;initalizes the DistributionSet&#34;&#34;&#34;
-        self.value_elements = []
-
-    def __eq__(self, other):
-        if isinstance(other, DistributionSet):
-            if self.value_elements == other.value_elements:
-                return True
-        return False
-
-    @staticmethod
-    def parse(element):
-        &#34;&#34;&#34;Parses the xml element of DistributionSet
-
-        Parameters
-        ----------
-            element (xml.etree.ElementTree.Element): A DistributionSet element (same as generated by the class itself)
-
-        Returns
-        -------
-            dist (DistributionSet): a DistributionSet object
-
-        &#34;&#34;&#34;
-        dist = DistributionSet()
-        for v in element.findall(&#34;Element&#34;):
-            dist.add_value(v.attrib[&#34;value&#34;])
-        return dist
-
-    def add_value(self, value):
-        &#34;&#34;&#34;adds a value to the DistirbutionSet
-
-        Parameters
-        ----------
-            value (str): the value to be added to the distribution
-        &#34;&#34;&#34;
-        self.value_elements.append(value)
-        return self
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the DistributionSet&#34;&#34;&#34;
-        element = ET.Element(&#34;DistributionSet&#34;)
-        if not self.value_elements:
-            raise NotEnoughInputArguments(
-                &#34;No values has been added to the DistributionSet&#34;
-            )
-        for value in self.value_elements:
-            ET.SubElement(element, &#34;Element&#34;, attrib={&#34;value&#34;: value})
-
-        return element
-
-
-class Deterministic(VersionBase):
-    &#34;&#34;&#34;Creates the Deterministic type of parameter distributions
-
-    Parameters
-    ----------
-
-
-    Attributes
-    ----------
-
-        multi_distributions (list of DeterministicMultiParameterDistribution): multi parameter distributions
-
-        single_distributions (dict of DistributionSet/DistributionRange): single parameter distribution
-
-    Methods
-    -------
-        parse(element)
-            parses a ElementTree created by the class and returns an instance of the class
-
-        add_multi_distribution(distribution)
-            Adds a DeterministicMultiParameterDistribution
-
-        add_single_distribution(parametername,distribution)
-            adds a DeterministicSingleParameterDistribution
-
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-    &#34;&#34;&#34;
-
-    def __init__(self):
-        &#34;&#34;&#34;initalizes the Deterministic&#34;&#34;&#34;
-
-        self.multi_distributions = []
-        self.single_distributions = {}
-
-    def __eq__(self, other):
-        if isinstance(other, Deterministic):
-            if (
-                self.multi_distributions == other.multi_distributions
-                and self.single_distributions == other.single_distributions
-            ):
-                return True
-        return False
-
-    @staticmethod
-    def parse(element):
-        &#34;&#34;&#34;Parses the xml element of Deterministic
-
-        Parameters
-        ----------
-            element (xml.etree.ElementTree.Element): A Deterministic element (same as generated by the class itself)
-
-        Returns
-        -------
-            deterministic (Deterministic): a Deterministic object
-
-        &#34;&#34;&#34;
-        deterministic = Deterministic()
-        for single_dist in element.findall(&#34;DeterministicSingleParameterDistribution&#34;):
-            param_name = single_dist.attrib[&#34;parameterName&#34;]
-            dist = _DeterministicFactory.parse_distribution(single_dist)
-            deterministic.add_single_distribution(param_name, dist)
-        for multi_dist in element.findall(&#34;DeterministicMultiParameterDistribution&#34;):
-            deterministic.add_multi_distribution(
-                DeterministicMultiParameterDistribution.parse(multi_dist)
-            )
-
-        return deterministic
-
-    def add_multi_distribution(self, distribution):
-        &#34;&#34;&#34;adds a DeterministicMultiParameterDistribution
-
-        Parameters
-        ----------
-            distribution (DeterministicMultiParameterDistribution): the distribution of that parameter
-
-        &#34;&#34;&#34;
-        if not isinstance(distribution, DeterministicMultiParameterDistribution):
-            raise TypeError(
-                &#34;distribution input is not of type DeterministicMultiParameterDistribution&#34;
-            )
-        self.multi_distributions.append(distribution)
-        return self
-
-    def add_single_distribution(self, parametername, distribution):
-        &#34;&#34;&#34;adds a parameter and a related distribution to it
-
-        Parameters
-        ----------
-            parametername (str): reference to the parameter
-
-            distribution (DistributionSet or DistributionRange): the distribution of that parameter
-
-        &#34;&#34;&#34;
-        if not (
-            isinstance(distribution, DistributionSet)
-            or isinstance(distribution, DistributionRange)
-        ):
-            raise TypeError(
-                &#34;distribution input is not of type DeterministicMultiParameterDistribution&#34;
-            )
-        self.single_distributions[parametername] = distribution
-        return self
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the Deterministic&#34;&#34;&#34;
-
-        element = ET.Element(&#34;Deterministic&#34;)
-        for md in self.multi_distributions:
-            element.append(md.get_element())
-        for d in self.single_distributions:
-            dist = ET.SubElement(
-                element,
-                &#34;DeterministicSingleParameterDistribution&#34;,
-                attrib={&#34;parameterName&#34;: d},
-            )
-            dist.append(self.single_distributions[d].get_element())
-
-        return element
-
-
-## wrapper
-
-
-class ParameterValueDistribution(VersionBase):
-    &#34;&#34;&#34;Creates the the ParameterValueDistribution file for open scenario
-
-    Parameters
-    ----------
-        number_of_tests (int): number of tests to run
-
-        random_seed (float): the seed for the run
-            Default: None
-
-    Attributes
-    ----------
-        number_of_tests (int): number of tests to run
-
-        random_seed (float): the seed for the run
-
-        distributions (dict of *StochasticDistribution): the distributions for the parameters
-
-    Methods
-    -------
-        parse(element)
-            parses a ElementTree created by the class and returns an instance of the class
-
-        write_xml(filename)
-            write a open scenario xml
-
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-    &#34;&#34;&#34;
-
-    _XMLNS = XMLNS
-    _XSI = XSI
-
-    def __init__(
-        self,
-        description,
-        author,
-        scenario_file,
-        parameter_distribution,
-        osc_minor_version=_MINOR_VERSION,
-        header_properties=None,
-        license=None,
-    ):
-        &#34;&#34;&#34;initalizes the ParameterValueDistribution
-
-        Parameters
-        ----------
-            description (str): a description of the parameter set
-
-            author (str): the author of the file
-
-            scenario_file (str): path to the scenario that the parameter distribution should set
-
-            parameter_distribution (Stochastic or Deterministic): the parameter distribution
-
-            osc_minor_version (int): the osi version wanted (Note: only available from OpenSCENARIO V1.1.0)
-
-            header_properties (Properties): properties that can be added to the header
-                Default: None
-
-            licence (License): optional license to the file header
-                Default: None
-        &#34;&#34;&#34;
-        self.header = FileHeader(
-            author,
-            description,
-            revMinor=osc_minor_version,
-            properties=header_properties,
-        )
-        if not isinstance(parameter_distribution, Stochastic) and not isinstance(
-            parameter_distribution, Deterministic
-        ):
-            raise TypeError(
-                type(parameter_distribution)
-                + &#34;is not of type Stochastic or Deterministic&#34;
-            )
-        self.scenario_file = scenario_file
-        self.parameter_distribution = parameter_distribution
-
-    def __eq__(self, other):
-        if isinstance(other, ParameterValueDistribution):
-            if (
-                self.header == other.header
-                and self.scenario_file == other.scenario_file
-                and self.parameter_distribution == other.parameter_distribution
-            ):
-                return True
-        return False
-
-    @staticmethod
-    def parse(element):
-        &#34;&#34;&#34;Parses the xml element of ParameterValueDistribution
-
-        Parameters
-        ----------
-            element (xml.etree.ElementTree.Element): A ParameterValueDistribution element (same as generated by the class itself)
-
-        Returns
-        -------
-            paramvaluedist (ParameterValueDistribution): a ParameterValueDistribution object
-
-        &#34;&#34;&#34;
-
-        pvd_element = element.find(&#34;ParameterValueDistribution&#34;)
-        if pvd_element.find(&#34;Stochastic&#34;) is not None:
-            dist = Stochastic.parse(pvd_element.find(&#34;Stochastic&#34;))
-        elif pvd_element.find(&#34;Deterministic&#34;) is not None:
-            dist = Deterministic.parse(pvd_element.find(&#34;Deterministic&#34;))
-        else:
-            raise NotAValidElement(
-                &#34;ParameterValueDistribution is missing a distribution&#34;
-            )
-
-        pvd = ParameterValueDistribution(
-            &#34;&#34;, &#34;&#34;, pvd_element.find(&#34;ScenarioFile&#34;).attrib[&#34;filepath&#34;], dist
-        )
-        pvd.header = FileHeader.parse(element.find(&#34;FileHeader&#34;))
-        return pvd
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the ParameterValueDistribution&#34;&#34;&#34;
-        if self.isVersion(minor=0):
-            raise OpenSCENARIOVersionError(
-                &#34;Everything related to ParameterValueDistribution was introduced in OpenSCENARIO V1.1&#34;
-            )
-        element = ET.Element(
-            &#34;OpenSCENARIO&#34;,
-            attrib={
-                &#34;xmlns:xsi&#34;: self._XMLNS,
-                &#34;xsi:noNamespaceSchemaLocation&#34;: self._XSI,
-            },
-        )
-        element.append(self.header.get_element())
-        parameterdist = ET.SubElement(element, &#34;ParameterValueDistribution&#34;)
-        ET.SubElement(
-            parameterdist, &#34;ScenarioFile&#34;, attrib={&#34;filepath&#34;: self.scenario_file}
-        )
-
-        parameterdist.append(self.parameter_distribution.get_element())
-
-        return element
-
-    def write_xml(self, filename, prettyprint=True, encoding=&#34;utf-8&#34;):
-        &#34;&#34;&#34;write_xml writes the parametervaluedistribution xml file
-
-        Parameters
-        ----------
-            filename (str): path and filename of the wanted xml file
-
-            prettyprint (bool): pretty print or ugly print?
-                Default: True
-
-        &#34;&#34;&#34;
-        printToFile(self.get_element(), filename, prettyprint, encoding)</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -1484,27 +57,6 @@ class ParameterValueDistribution(VersionBase):
 <span>class <span class="ident">Deterministic</span></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Creates the Deterministic type of parameter distributions</p>
-<h2 id="parameters">Parameters</h2>
-<h2 id="attributes">Attributes</h2>
-<pre><code>multi_distributions (list of DeterministicMultiParameterDistribution): multi parameter distributions
-
-single_distributions (dict of DistributionSet/DistributionRange): single parameter distribution
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>parse(element)
-    parses a ElementTree created by the class and returns an instance of the class
-
-add_multi_distribution(distribution)
-    Adds a DeterministicMultiParameterDistribution
-
-add_single_distribution(parametername,distribution)
-    adds a DeterministicSingleParameterDistribution
-
-get_element(elementname)
-    Returns the full ElementTree of the class
-</code></pre>
-<p>initalizes the Deterministic</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1630,6 +182,27 @@ get_element(elementname)
 
         return element</code></pre>
 </details>
+<div class="desc"><p>Creates the Deterministic type of parameter distributions</p>
+<h2 id="parameters">Parameters</h2>
+<h2 id="attributes">Attributes</h2>
+<pre><code>multi_distributions (list of DeterministicMultiParameterDistribution): multi parameter distributions
+
+single_distributions (dict of DistributionSet/DistributionRange): single parameter distribution
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+add_multi_distribution(distribution)
+    Adds a DeterministicMultiParameterDistribution
+
+add_single_distribution(parametername,distribution)
+    adds a DeterministicSingleParameterDistribution
+
+get_element(elementname)
+    Returns the full ElementTree of the class
+</code></pre>
+<p>initalizes the Deterministic</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
@@ -1640,13 +213,6 @@ get_element(elementname)
 <span>def <span class="ident">parse</span></span>(<span>element)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Parses the xml element of Deterministic</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>element (xml.etree.ElementTree.Element): A Deterministic element (same as generated by the class itself)
-</code></pre>
-<h2 id="returns">Returns</h2>
-<pre><code>deterministic (Deterministic): a Deterministic object
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1676,6 +242,13 @@ def parse(element):
 
     return deterministic</code></pre>
 </details>
+<div class="desc"><p>Parses the xml element of Deterministic</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A Deterministic element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>deterministic (Deterministic): a Deterministic object
+</code></pre></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -1684,10 +257,6 @@ def parse(element):
 <span>def <span class="ident">add_multi_distribution</span></span>(<span>self, distribution)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adds a DeterministicMultiParameterDistribution</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>distribution (DeterministicMultiParameterDistribution): the distribution of that parameter
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1707,17 +276,15 @@ def parse(element):
     self.multi_distributions.append(distribution)
     return self</code></pre>
 </details>
+<div class="desc"><p>adds a DeterministicMultiParameterDistribution</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>distribution (DeterministicMultiParameterDistribution): the distribution of that parameter
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xosc.parameters.Deterministic.add_single_distribution"><code class="name flex">
 <span>def <span class="ident">add_single_distribution</span></span>(<span>self, parametername, distribution)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adds a parameter and a related distribution to it</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>parametername (str): reference to the parameter
-
-distribution (DistributionSet or DistributionRange): the distribution of that parameter
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1742,12 +309,17 @@ distribution (DistributionSet or DistributionRange): the distribution of that pa
     self.single_distributions[parametername] = distribution
     return self</code></pre>
 </details>
+<div class="desc"><p>adds a parameter and a related distribution to it</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>parametername (str): reference to the parameter
+
+distribution (DistributionSet or DistributionRange): the distribution of that parameter
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xosc.parameters.Deterministic.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the Deterministic</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1768,6 +340,7 @@ distribution (DistributionSet or DistributionRange): the distribution of that pa
 
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the Deterministic</p></div>
 </dd>
 </dl>
 </dd>
@@ -1775,22 +348,6 @@ distribution (DistributionSet or DistributionRange): the distribution of that pa
 <span>class <span class="ident">DeterministicMultiParameterDistribution</span></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Creates the DeterministicMultiParameterDistribution type of parameter distributions</p>
-<h2 id="parameters">Parameters</h2>
-<h2 id="attributes">Attributes</h2>
-<pre><code>distributions (list of ParameterValueSet): the distributions for the parameters
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>parse(element)
-    parses a ElementTree created by the class and returns an instance of the class
-
-add_value_set(parameter_value_set)
-    Adds a parameter value set
-
-get_element(elementname)
-    Returns the full ElementTree of the class
-</code></pre>
-<p>initalizes the DeterministicMultiParameterDistribution</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1873,6 +430,22 @@ get_element(elementname)
 
         return element</code></pre>
 </details>
+<div class="desc"><p>Creates the DeterministicMultiParameterDistribution type of parameter distributions</p>
+<h2 id="parameters">Parameters</h2>
+<h2 id="attributes">Attributes</h2>
+<pre><code>distributions (list of ParameterValueSet): the distributions for the parameters
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+add_value_set(parameter_value_set)
+    Adds a parameter value set
+
+get_element(elementname)
+    Returns the full ElementTree of the class
+</code></pre>
+<p>initalizes the DeterministicMultiParameterDistribution</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
@@ -1883,13 +456,6 @@ get_element(elementname)
 <span>def <span class="ident">parse</span></span>(<span>element)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Parses the xml element of DeterministicMultiParameterDistribution</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>element (xml.etree.ElementTree.Element): A DeterministicMultiParameterDistribution element (same as generated by the class itself)
-</code></pre>
-<h2 id="returns">Returns</h2>
-<pre><code>distribution (DeterministicMultiParameterDistribution): a DeterministicMultiParameterDistribution object
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1912,6 +478,13 @@ def parse(element):
         dist.sets.append(ParameterValueSet.parse(h_element))
     return dist</code></pre>
 </details>
+<div class="desc"><p>Parses the xml element of DeterministicMultiParameterDistribution</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A DeterministicMultiParameterDistribution element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>distribution (DeterministicMultiParameterDistribution): a DeterministicMultiParameterDistribution object
+</code></pre></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -1920,10 +493,6 @@ def parse(element):
 <span>def <span class="ident">add_value_set</span></span>(<span>self, parameter_value_set)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adds a parameter and a related distribution to it</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>parameter_value_set (ParameterValueSet): a set of parameters
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1941,12 +510,15 @@ def parse(element):
     self.sets.append(parameter_value_set)
     return self</code></pre>
 </details>
+<div class="desc"><p>adds a parameter and a related distribution to it</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>parameter_value_set (ParameterValueSet): a set of parameters
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xosc.parameters.DeterministicMultiParameterDistribution.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the DeterministicMultiParameterDistribution</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1962,6 +534,7 @@ def parse(element):
 
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the DeterministicMultiParameterDistribution</p></div>
 </dd>
 </dl>
 </dd>
@@ -1970,33 +543,6 @@ def parse(element):
 <span>(</span><span>step_width, range)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Creates the DistributionRange used to define a Single parameter distribution</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>step_width (float): step size of the distribution
-
-range (Range): the range of the parameter
-</code></pre>
-<h2 id="attributes">Attributes</h2>
-<pre><code>step_width (float): step size of the distribution
-
-range (Range): the range of the parameter
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>parse(element)
-    parses a ElementTree created by the class and returns an instance of the class
-
-get_element(elementname)
-    Returns the full ElementTree of the class
-
-get_attributes()
-    Returns a dictionary of all attributes of the class
-</code></pre>
-<p>initalizes the DistributionRange</p>
-<h2 id="parameters_1">Parameters</h2>
-<pre><code>step_width (float): step size of the distribution
-
-range (Range): the range of the parameter
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2087,6 +633,33 @@ range (Range): the range of the parameter
 
         return element</code></pre>
 </details>
+<div class="desc"><p>Creates the DistributionRange used to define a Single parameter distribution</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>step_width (float): step size of the distribution
+
+range (Range): the range of the parameter
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>step_width (float): step size of the distribution
+
+range (Range): the range of the parameter
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element(elementname)
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of the class
+</code></pre>
+<p>initalizes the DistributionRange</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>step_width (float): step size of the distribution
+
+range (Range): the range of the parameter
+</code></pre></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
@@ -2097,13 +670,6 @@ range (Range): the range of the parameter
 <span>def <span class="ident">parse</span></span>(<span>element)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Parses the xml element of DistributionRange</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>element (xml.etree.ElementTree.Element): A DistributionRange element (same as generated by the class itself)
-</code></pre>
-<h2 id="returns">Returns</h2>
-<pre><code>distribution_range (DistributionRange): a DistributionRange object
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2127,6 +693,13 @@ def parse(element):
     )
     return distribution_range</code></pre>
 </details>
+<div class="desc"><p>Parses the xml element of DistributionRange</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A DistributionRange element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>distribution_range (DistributionRange): a DistributionRange object
+</code></pre></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -2135,7 +708,6 @@ def parse(element):
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes of the DistributionRange as a dict</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2145,12 +717,12 @@ def parse(element):
     retdict = {&#34;stepWidth&#34;: str(self.step_width)}
     return retdict</code></pre>
 </details>
+<div class="desc"><p>returns the attributes of the DistributionRange as a dict</p></div>
 </dd>
 <dt id="scenariogeneration.xosc.parameters.DistributionRange.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the DistributionRange</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2162,6 +734,7 @@ def parse(element):
 
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the DistributionRange</p></div>
 </dd>
 </dl>
 </dd>
@@ -2169,19 +742,6 @@ def parse(element):
 <span>class <span class="ident">DistributionSet</span></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Creates the DistributionSet used to define a Single parameter distribution</p>
-<h2 id="parameters">Parameters</h2>
-<h2 id="attributes">Attributes</h2>
-<pre><code>value_elements (list of str double): a list of all values
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>parse(element)
-    parses a ElementTree created by the class and returns an instance of the class
-
-get_element(elementname)
-    Returns the full ElementTree of the class
-</code></pre>
-<p>initalizes the DistributionSet</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2257,6 +817,19 @@ get_element(elementname)
 
         return element</code></pre>
 </details>
+<div class="desc"><p>Creates the DistributionSet used to define a Single parameter distribution</p>
+<h2 id="parameters">Parameters</h2>
+<h2 id="attributes">Attributes</h2>
+<pre><code>value_elements (list of str double): a list of all values
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element(elementname)
+    Returns the full ElementTree of the class
+</code></pre>
+<p>initalizes the DistributionSet</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
@@ -2267,13 +840,6 @@ get_element(elementname)
 <span>def <span class="ident">parse</span></span>(<span>element)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Parses the xml element of DistributionSet</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>element (xml.etree.ElementTree.Element): A DistributionSet element (same as generated by the class itself)
-</code></pre>
-<h2 id="returns">Returns</h2>
-<pre><code>dist (DistributionSet): a DistributionSet object
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2296,6 +862,13 @@ def parse(element):
         dist.add_value(v.attrib[&#34;value&#34;])
     return dist</code></pre>
 </details>
+<div class="desc"><p>Parses the xml element of DistributionSet</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A DistributionSet element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>dist (DistributionSet): a DistributionSet object
+</code></pre></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -2304,10 +877,6 @@ def parse(element):
 <span>def <span class="ident">add_value</span></span>(<span>self, value)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adds a value to the DistirbutionSet</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>value (str): the value to be added to the distribution
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2322,12 +891,15 @@ def parse(element):
     self.value_elements.append(value)
     return self</code></pre>
 </details>
+<div class="desc"><p>adds a value to the DistirbutionSet</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>value (str): the value to be added to the distribution
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xosc.parameters.DistributionSet.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the DistributionSet</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2344,6 +916,7 @@ def parse(element):
 
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the DistributionSet</p></div>
 </dd>
 </dl>
 </dd>
@@ -2351,22 +924,6 @@ def parse(element):
 <span>class <span class="ident">Histogram</span></span>
 </code></dt>
 <dd>
-<div class="desc"><p>the Histogram is a Stochastic distribution</p>
-<h2 id="parameters">Parameters</h2>
-<h2 id="attributes">Attributes</h2>
-<pre><code>bins (list of _HistogramBin): the bins defining the histogram
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>parse(element)
-    parses a ElementTree created by the class and returns an instance of the class
-
-get_element(elementname)
-    Returns the full ElementTree of the class
-
-add_bin(weight,range)
-    adds a weight and a range to a bin
-</code></pre>
-<p>initalizes the Histogram</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2446,6 +1003,22 @@ add_bin(weight,range)
             element.append(bin.get_element())
         return element</code></pre>
 </details>
+<div class="desc"><p>the Histogram is a Stochastic distribution</p>
+<h2 id="parameters">Parameters</h2>
+<h2 id="attributes">Attributes</h2>
+<pre><code>bins (list of _HistogramBin): the bins defining the histogram
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element(elementname)
+    Returns the full ElementTree of the class
+
+add_bin(weight,range)
+    adds a weight and a range to a bin
+</code></pre>
+<p>initalizes the Histogram</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._StochasticDistributionType</li>
@@ -2457,13 +1030,6 @@ add_bin(weight,range)
 <span>def <span class="ident">parse</span></span>(<span>element)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Parses the xml element of Histogram</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>element (xml.etree.ElementTree.Element): A Histogram element (same as generated by the class itself)
-</code></pre>
-<h2 id="returns">Returns</h2>
-<pre><code>histogram (Histogram): a Histogram object
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2486,6 +1052,13 @@ def parse(element):
         hist.bins.append(_HistogramBin.parse(h_element))
     return hist</code></pre>
 </details>
+<div class="desc"><p>Parses the xml element of Histogram</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A Histogram element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>histogram (Histogram): a Histogram object
+</code></pre></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -2494,12 +1067,6 @@ def parse(element):
 <span>def <span class="ident">add_bin</span></span>(<span>self, weight, range)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes of the Histogram as a dict</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>weight (float): the weight of the bin
-
-range (Range): the range of the bin
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2517,12 +1084,17 @@ range (Range): the range of the bin
     self.bins.append(_HistogramBin(weight, range))
     return self</code></pre>
 </details>
+<div class="desc"><p>returns the attributes of the Histogram as a dict</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>weight (float): the weight of the bin
+
+range (Range): the range of the bin
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xosc.parameters.Histogram.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the Histogram</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2538,6 +1110,7 @@ range (Range): the range of the bin
         element.append(bin.get_element())
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the Histogram</p></div>
 </dd>
 </dl>
 </dd>
@@ -2546,41 +1119,6 @@ range (Range): the range of the bin
 <span>(</span><span>expected_value, variance, range=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>the NormalDistribution is a Stochastic distribution</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>expected_value (float): the expected value (mean) of the distribution
-
-variance (float): variance of the distribution
-
-range (Range): limit of the values (optional)
-    Default: None
-</code></pre>
-<h2 id="attributes">Attributes</h2>
-<pre><code>expected_value (float): the expected value (mean) of the distribution
-
-variance (float): variance of the distribution
-
-range (Range): limit of the values (optional)
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>parse(element)
-    parses a ElementTree created by the class and returns an instance of the class
-
-get_element(elementname)
-    Returns the full ElementTree of the class
-
-get_attributes()
-    Returns a dictionary of all attributes of the class
-</code></pre>
-<p>initalizes the NormalDistribution</p>
-<h2 id="parameters_1">Parameters</h2>
-<pre><code>expected_value (float): the expected value (mean) of the distribution
-
-variance (float): variance of the distribution
-
-range (Range): limit of the values (optional)
-    Default: None
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2683,6 +1221,41 @@ range (Range): limit of the values (optional)
             element.append(self.range.get_element())
         return element</code></pre>
 </details>
+<div class="desc"><p>the NormalDistribution is a Stochastic distribution</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>expected_value (float): the expected value (mean) of the distribution
+
+variance (float): variance of the distribution
+
+range (Range): limit of the values (optional)
+    Default: None
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>expected_value (float): the expected value (mean) of the distribution
+
+variance (float): variance of the distribution
+
+range (Range): limit of the values (optional)
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element(elementname)
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of the class
+</code></pre>
+<p>initalizes the NormalDistribution</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>expected_value (float): the expected value (mean) of the distribution
+
+variance (float): variance of the distribution
+
+range (Range): limit of the values (optional)
+    Default: None
+</code></pre></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._StochasticDistributionType</li>
@@ -2694,13 +1267,6 @@ range (Range): limit of the values (optional)
 <span>def <span class="ident">parse</span></span>(<span>element)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Parses the xml element of NormalDistribution</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>element (xml.etree.ElementTree.Element): A NormalDistribution element (same as generated by the class itself)
-</code></pre>
-<h2 id="returns">Returns</h2>
-<pre><code>nd (NormalDistribution): a NormalDistribution object
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2727,6 +1293,13 @@ def parse(element):
     )
     return nd</code></pre>
 </details>
+<div class="desc"><p>Parses the xml element of NormalDistribution</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A NormalDistribution element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>nd (NormalDistribution): a NormalDistribution object
+</code></pre></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -2735,7 +1308,6 @@ def parse(element):
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes of the NormalDistribution as a dict</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2748,12 +1320,12 @@ def parse(element):
     }
     return retdict</code></pre>
 </details>
+<div class="desc"><p>returns the attributes of the NormalDistribution as a dict</p></div>
 </dd>
 <dt id="scenariogeneration.xosc.parameters.NormalDistribution.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the NormalDistribution</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2765,56 +1337,15 @@ def parse(element):
         element.append(self.range.get_element())
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the NormalDistribution</p></div>
 </dd>
 </dl>
 </dd>
 <dt id="scenariogeneration.xosc.parameters.ParameterValueDistribution"><code class="flex name class">
 <span>class <span class="ident">ParameterValueDistribution</span></span>
-<span>(</span><span>description, author, scenario_file, parameter_distribution, osc_minor_version=2, header_properties=None, license=None)</span>
+<span>(</span><span>description,<br>author,<br>scenario_file,<br>parameter_distribution,<br>osc_minor_version=2,<br>header_properties=None,<br>license=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Creates the the ParameterValueDistribution file for open scenario</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>number_of_tests (int): number of tests to run
-
-random_seed (float): the seed for the run
-    Default: None
-</code></pre>
-<h2 id="attributes">Attributes</h2>
-<pre><code>number_of_tests (int): number of tests to run
-
-random_seed (float): the seed for the run
-
-distributions (dict of *StochasticDistribution): the distributions for the parameters
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>parse(element)
-    parses a ElementTree created by the class and returns an instance of the class
-
-write_xml(filename)
-    write a open scenario xml
-
-get_element(elementname)
-    Returns the full ElementTree of the class
-</code></pre>
-<p>initalizes the ParameterValueDistribution</p>
-<h2 id="parameters_1">Parameters</h2>
-<pre><code>description (str): a description of the parameter set
-
-author (str): the author of the file
-
-scenario_file (str): path to the scenario that the parameter distribution should set
-
-parameter_distribution (Stochastic or Deterministic): the parameter distribution
-
-osc_minor_version (int): the osi version wanted (Note: only available from OpenSCENARIO V1.1.0)
-
-header_properties (Properties): properties that can be added to the header
-    Default: None
-
-licence (License): optional license to the file header
-    Default: None
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2975,6 +1506,48 @@ licence (License): optional license to the file header
         &#34;&#34;&#34;
         printToFile(self.get_element(), filename, prettyprint, encoding)</code></pre>
 </details>
+<div class="desc"><p>Creates the the ParameterValueDistribution file for open scenario</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>number_of_tests (int): number of tests to run
+
+random_seed (float): the seed for the run
+    Default: None
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>number_of_tests (int): number of tests to run
+
+random_seed (float): the seed for the run
+
+distributions (dict of *StochasticDistribution): the distributions for the parameters
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+write_xml(filename)
+    write a open scenario xml
+
+get_element(elementname)
+    Returns the full ElementTree of the class
+</code></pre>
+<p>initalizes the ParameterValueDistribution</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>description (str): a description of the parameter set
+
+author (str): the author of the file
+
+scenario_file (str): path to the scenario that the parameter distribution should set
+
+parameter_distribution (Stochastic or Deterministic): the parameter distribution
+
+osc_minor_version (int): the osi version wanted (Note: only available from OpenSCENARIO V1.1.0)
+
+header_properties (Properties): properties that can be added to the header
+    Default: None
+
+licence (License): optional license to the file header
+    Default: None
+</code></pre></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
@@ -2985,13 +1558,6 @@ licence (License): optional license to the file header
 <span>def <span class="ident">parse</span></span>(<span>element)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Parses the xml element of ParameterValueDistribution</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>element (xml.etree.ElementTree.Element): A ParameterValueDistribution element (same as generated by the class itself)
-</code></pre>
-<h2 id="returns">Returns</h2>
-<pre><code>paramvaluedist (ParameterValueDistribution): a ParameterValueDistribution object
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3026,6 +1592,13 @@ def parse(element):
     pvd.header = FileHeader.parse(element.find(&#34;FileHeader&#34;))
     return pvd</code></pre>
 </details>
+<div class="desc"><p>Parses the xml element of ParameterValueDistribution</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A ParameterValueDistribution element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>paramvaluedist (ParameterValueDistribution): a ParameterValueDistribution object
+</code></pre></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -3034,7 +1607,6 @@ def parse(element):
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the ParameterValueDistribution</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3062,18 +1634,12 @@ def parse(element):
 
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the ParameterValueDistribution</p></div>
 </dd>
 <dt id="scenariogeneration.xosc.parameters.ParameterValueDistribution.write_xml"><code class="name flex">
 <span>def <span class="ident">write_xml</span></span>(<span>self, filename, prettyprint=True, encoding='utf-8')</span>
 </code></dt>
 <dd>
-<div class="desc"><p>write_xml writes the parametervaluedistribution xml file</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>filename (str): path and filename of the wanted xml file
-
-prettyprint (bool): pretty print or ugly print?
-    Default: True
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3091,6 +1657,13 @@ prettyprint (bool): pretty print or ugly print?
     &#34;&#34;&#34;
     printToFile(self.get_element(), filename, prettyprint, encoding)</code></pre>
 </details>
+<div class="desc"><p>write_xml writes the parametervaluedistribution xml file</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>filename (str): path and filename of the wanted xml file
+
+prettyprint (bool): pretty print or ugly print?
+    Default: True
+</code></pre></div>
 </dd>
 </dl>
 </dd>
@@ -3098,22 +1671,6 @@ prettyprint (bool): pretty print or ugly print?
 <span>class <span class="ident">ParameterValueSet</span></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Creates the ParameterValueSet used by the DeterministicMultiParameterDistribution</p>
-<h2 id="parameters">Parameters</h2>
-<h2 id="attributes">Attributes</h2>
-<pre><code>assignments (list of ParameterAssignment): the the assignments for the ValueSet
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>parse(element)
-    parses a ElementTree created by the class and returns an instance of the class
-
-add_parameter(parameterref, value)
-    Adds a parameter value pair
-
-get_element(elementname)
-    Returns the full ElementTree of the class
-</code></pre>
-<p>initalizes the ParameterValueSet</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3198,6 +1755,22 @@ get_element(elementname)
 
         return element</code></pre>
 </details>
+<div class="desc"><p>Creates the ParameterValueSet used by the DeterministicMultiParameterDistribution</p>
+<h2 id="parameters">Parameters</h2>
+<h2 id="attributes">Attributes</h2>
+<pre><code>assignments (list of ParameterAssignment): the the assignments for the ValueSet
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+add_parameter(parameterref, value)
+    Adds a parameter value pair
+
+get_element(elementname)
+    Returns the full ElementTree of the class
+</code></pre>
+<p>initalizes the ParameterValueSet</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
@@ -3208,13 +1781,6 @@ get_element(elementname)
 <span>def <span class="ident">parse</span></span>(<span>element)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Parses the xml element of ParameterValueSet</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>element (xml.etree.ElementTree.Element): A ParameterValueSet element (same as generated by the class itself)
-</code></pre>
-<h2 id="returns">Returns</h2>
-<pre><code>parameter_value_set (ParameterValueSet): a ParameterValueSet object
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3238,6 +1804,13 @@ def parse(element):
 
     return parameter_value_set</code></pre>
 </details>
+<div class="desc"><p>Parses the xml element of ParameterValueSet</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A ParameterValueSet element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>parameter_value_set (ParameterValueSet): a ParameterValueSet object
+</code></pre></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -3246,12 +1819,6 @@ def parse(element):
 <span>def <span class="ident">add_parameter</span></span>(<span>self, parameterref, value)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adds a parameter and a value</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>parameterref (str): name of the parameters
-
-value (str): value of the parameters
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3270,12 +1837,17 @@ value (str): value of the parameters
     self.sets.append(ParameterAssignment(parameterref, value))
     return self</code></pre>
 </details>
+<div class="desc"><p>adds a parameter and a value</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>parameterref (str): name of the parameters
+
+value (str): value of the parameters
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xosc.parameters.ParameterValueSet.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the ParameterValueSet</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3291,6 +1863,7 @@ value (str): value of the parameters
 
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the ParameterValueSet</p></div>
 </dd>
 </dl>
 </dd>
@@ -3299,35 +1872,6 @@ value (str): value of the parameters
 <span>(</span><span>expected_value, range=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>the PoissonDistribution is a Stochastic distribution</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>expected_value (float): the expected value of the distribution
-
-range (Range): limit of the values (optional)
-    Default: None
-</code></pre>
-<h2 id="attributes">Attributes</h2>
-<pre><code>expected_value (float): the expected value of the distribution
-
-range (Range): limit of the values (optional)
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>parse(element)
-    parses a ElementTree created by the class and returns an instance of the class
-
-get_element(elementname)
-    Returns the full ElementTree of the class
-
-get_attributes()
-    Returns a dictionary of all attributes of the class
-</code></pre>
-<p>initalizes the PoissonDistribution</p>
-<h2 id="parameters_1">Parameters</h2>
-<pre><code>expected_value (float): the expected value of the distribution
-
-range (Range): limit of the values (optional)
-    Default: None
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3418,6 +1962,35 @@ range (Range): limit of the values (optional)
             element.append(self.range.get_element())
         return element</code></pre>
 </details>
+<div class="desc"><p>the PoissonDistribution is a Stochastic distribution</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>expected_value (float): the expected value of the distribution
+
+range (Range): limit of the values (optional)
+    Default: None
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>expected_value (float): the expected value of the distribution
+
+range (Range): limit of the values (optional)
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element(elementname)
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of the class
+</code></pre>
+<p>initalizes the PoissonDistribution</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>expected_value (float): the expected value of the distribution
+
+range (Range): limit of the values (optional)
+    Default: None
+</code></pre></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._StochasticDistributionType</li>
@@ -3429,13 +2002,6 @@ range (Range): limit of the values (optional)
 <span>def <span class="ident">parse</span></span>(<span>element)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Parses the xml element of PoissonDistribution</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>element (xml.etree.ElementTree.Element): A PoissonDistribution element (same as generated by the class itself)
-</code></pre>
-<h2 id="returns">Returns</h2>
-<pre><code>pd (PoissonDistribution): a PoissonDistribution object
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3460,6 +2026,13 @@ def parse(element):
     pd = PoissonDistribution(element.attrib[&#34;expectedValue&#34;], range)
     return pd</code></pre>
 </details>
+<div class="desc"><p>Parses the xml element of PoissonDistribution</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A PoissonDistribution element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>pd (PoissonDistribution): a PoissonDistribution object
+</code></pre></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -3468,7 +2041,6 @@ def parse(element):
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes of the PoissonDistribution as a dict</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3478,12 +2050,12 @@ def parse(element):
     retdict = {&#34;expectedValue&#34;: str(self.expected_value)}
     return retdict</code></pre>
 </details>
+<div class="desc"><p>returns the attributes of the PoissonDistribution as a dict</p></div>
 </dd>
 <dt id="scenariogeneration.xosc.parameters.PoissonDistribution.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the PoissonDistribution</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3495,6 +2067,7 @@ def parse(element):
         element.append(self.range.get_element())
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the PoissonDistribution</p></div>
 </dd>
 </dl>
 </dd>
@@ -3502,22 +2075,6 @@ def parse(element):
 <span>class <span class="ident">ProbabilityDistributionSet</span></span>
 </code></dt>
 <dd>
-<div class="desc"><p>the ProbabilityDistributionSet is a Stochastic distribution</p>
-<h2 id="parameters">Parameters</h2>
-<h2 id="attributes">Attributes</h2>
-<pre><code>sets (list of _ProbabilityDistributionSetElement): the sets defining the ProbabilityDistributionSet
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>parse(element)
-    parses a ElementTree created by the class and returns an instance of the class
-
-get_element(elementname)
-    Returns the full ElementTree of the class
-
-add_set(value, weight)
-    adds a weight and a range to a bin
-</code></pre>
-<p>initalizes the ProbabilityDistributionSet</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3597,6 +2154,22 @@ add_set(value, weight)
             element.append(bin.get_element())
         return element</code></pre>
 </details>
+<div class="desc"><p>the ProbabilityDistributionSet is a Stochastic distribution</p>
+<h2 id="parameters">Parameters</h2>
+<h2 id="attributes">Attributes</h2>
+<pre><code>sets (list of _ProbabilityDistributionSetElement): the sets defining the ProbabilityDistributionSet
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element(elementname)
+    Returns the full ElementTree of the class
+
+add_set(value, weight)
+    adds a weight and a range to a bin
+</code></pre>
+<p>initalizes the ProbabilityDistributionSet</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._StochasticDistributionType</li>
@@ -3608,13 +2181,6 @@ add_set(value, weight)
 <span>def <span class="ident">parse</span></span>(<span>element)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Parses the xml element of ProbabilityDistributionSet</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>element (xml.etree.ElementTree.Element): A ProbabilityDistributionSet element (same as generated by the class itself)
-</code></pre>
-<h2 id="returns">Returns</h2>
-<pre><code>pds (ProbabilityDistributionSet): a ProbabilityDistributionSet object
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3637,6 +2203,13 @@ def parse(element):
         pds.sets.append(_ProbabilityDistributionSetElement.parse(e))
     return pds</code></pre>
 </details>
+<div class="desc"><p>Parses the xml element of ProbabilityDistributionSet</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A ProbabilityDistributionSet element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>pds (ProbabilityDistributionSet): a ProbabilityDistributionSet object
+</code></pre></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -3645,12 +2218,6 @@ def parse(element):
 <span>def <span class="ident">add_set</span></span>(<span>self, value, weight)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adds a set element to the ProbabilityDistributionSet</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>value (string): possible value
-
-weight (float): weight of the value
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3668,12 +2235,17 @@ weight (float): weight of the value
     self.sets.append(_ProbabilityDistributionSetElement(value, weight))
     return self</code></pre>
 </details>
+<div class="desc"><p>adds a set element to the ProbabilityDistributionSet</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>value (string): possible value
+
+weight (float): weight of the value
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xosc.parameters.ProbabilityDistributionSet.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the ProbabilityDistributionSet</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3689,6 +2261,7 @@ weight (float): weight of the value
         element.append(bin.get_element())
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the ProbabilityDistributionSet</p></div>
 </dd>
 </dl>
 </dd>
@@ -3697,33 +2270,6 @@ weight (float): weight of the value
 <span>(</span><span>lower, upper)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>the Range creates a Range used by parameter distributions</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>lower (float): lower limit of the range
-
-upper (float): upper limit of the range
-</code></pre>
-<h2 id="attributes">Attributes</h2>
-<pre><code>lower (float): lower limit of the range
-
-upper (float): upper limit of the range
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>parse(element)
-    parses a ElementTree created by the class and returns an instance of the class
-
-get_element(elementname)
-    Returns the full ElementTree of the class
-
-get_attributes()
-    Returns a dictionary of all attributes of the class
-</code></pre>
-<p>initalizes the Range</p>
-<h2 id="parameters_1">Parameters</h2>
-<pre><code>lower (float): lower limit of the range
-
-upper (float): upper limit of the range
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3804,6 +2350,33 @@ upper (float): upper limit of the range
         element = ET.Element(elementname, self.get_attributes())
         return element</code></pre>
 </details>
+<div class="desc"><p>the Range creates a Range used by parameter distributions</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>lower (float): lower limit of the range
+
+upper (float): upper limit of the range
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>lower (float): lower limit of the range
+
+upper (float): upper limit of the range
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element(elementname)
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of the class
+</code></pre>
+<p>initalizes the Range</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>lower (float): lower limit of the range
+
+upper (float): upper limit of the range
+</code></pre></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
@@ -3814,13 +2387,6 @@ upper (float): upper limit of the range
 <span>def <span class="ident">parse</span></span>(<span>element)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Parses the xml element of Range</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>element (xml.etree.ElementTree.Element): A Range element (same as generated by the class itself)
-</code></pre>
-<h2 id="returns">Returns</h2>
-<pre><code>range (Range): a Range object
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3844,6 +2410,13 @@ def parse(element):
         convert_float(element.attrib[&#34;upperLimit&#34;]),
     )</code></pre>
 </details>
+<div class="desc"><p>Parses the xml element of Range</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A Range element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>range (Range): a Range object
+</code></pre></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -3852,7 +2425,6 @@ def parse(element):
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes of the Range as a dict</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3862,12 +2434,12 @@ def parse(element):
     retdict = {&#34;lowerLimit&#34;: str(self.lower), &#34;upperLimit&#34;: str(self.upper)}
     return retdict</code></pre>
 </details>
+<div class="desc"><p>returns the attributes of the Range as a dict</p></div>
 </dd>
 <dt id="scenariogeneration.xosc.parameters.Range.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self, elementname='Range')</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the Range</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3877,6 +2449,7 @@ def parse(element):
     element = ET.Element(elementname, self.get_attributes())
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the Range</p></div>
 </dd>
 </dl>
 </dd>
@@ -3885,40 +2458,6 @@ def parse(element):
 <span>(</span><span>number_of_tests, random_seed=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Creates the Stochastic type of parameter distributions</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>number_of_tests (int): number of tests to run
-
-random_seed (float): the seed for the run
-    Default: None
-</code></pre>
-<h2 id="attributes">Attributes</h2>
-<pre><code>number_of_tests (int): number of tests to run
-
-random_seed (float): the seed for the run
-
-distributions (dict of *StochasticDistribution): the distributions for the parameters
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>parse(element)
-    parses a ElementTree created by the class and returns an instance of the class
-
-add_distribution(parametername, distribution)
-    Adds a parameter/distribution pair
-
-get_element(elementname)
-    Returns the full ElementTree of the class
-
-get_attributes()
-    Returns a dictionary of all attributes of the class
-</code></pre>
-<p>initalizes the Stochastic</p>
-<h2 id="parameters_1">Parameters</h2>
-<pre><code>number_of_tests (int): number of tests to run
-
-random_seed (float): the seed for the run
-    Default: None
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4044,6 +2583,40 @@ random_seed (float): the seed for the run
 
         return element</code></pre>
 </details>
+<div class="desc"><p>Creates the Stochastic type of parameter distributions</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>number_of_tests (int): number of tests to run
+
+random_seed (float): the seed for the run
+    Default: None
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>number_of_tests (int): number of tests to run
+
+random_seed (float): the seed for the run
+
+distributions (dict of *StochasticDistribution): the distributions for the parameters
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+add_distribution(parametername, distribution)
+    Adds a parameter/distribution pair
+
+get_element(elementname)
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of the class
+</code></pre>
+<p>initalizes the Stochastic</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>number_of_tests (int): number of tests to run
+
+random_seed (float): the seed for the run
+    Default: None
+</code></pre></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
@@ -4054,13 +2627,6 @@ random_seed (float): the seed for the run
 <span>def <span class="ident">parse</span></span>(<span>element)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Parses the xml element of Stochastic</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>element (xml.etree.ElementTree.Element): A Stochastic element (same as generated by the class itself)
-</code></pre>
-<h2 id="returns">Returns</h2>
-<pre><code>Stochastic (Stochastic): a Stochastic object
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4090,6 +2656,13 @@ def parse(element):
         stoc.add_distribution(name, dist)
     return stoc</code></pre>
 </details>
+<div class="desc"><p>Parses the xml element of Stochastic</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A Stochastic element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>Stochastic (Stochastic): a Stochastic object
+</code></pre></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -4098,12 +2671,6 @@ def parse(element):
 <span>def <span class="ident">add_distribution</span></span>(<span>self, parametername, distribution)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adds a parameter and a related distribution to it</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>parametername (str): name of the parameter
-
-distribution (StochasticDistribution): the distribution of that parameter
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4123,12 +2690,17 @@ distribution (StochasticDistribution): the distribution of that parameter
     self.distributions[parametername] = distribution
     return self</code></pre>
 </details>
+<div class="desc"><p>adds a parameter and a related distribution to it</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>parametername (str): name of the parameter
+
+distribution (StochasticDistribution): the distribution of that parameter
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xosc.parameters.Stochastic.get_attributes"><code class="name flex">
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes of the Stochastic as a dict</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4142,12 +2714,12 @@ distribution (StochasticDistribution): the distribution of that parameter
 
     return retdict</code></pre>
 </details>
+<div class="desc"><p>returns the attributes of the Stochastic as a dict</p></div>
 </dd>
 <dt id="scenariogeneration.xosc.parameters.Stochastic.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the Stochastic</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4166,6 +2738,7 @@ distribution (StochasticDistribution): the distribution of that parameter
 
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the Stochastic</p></div>
 </dd>
 </dl>
 </dd>
@@ -4174,24 +2747,6 @@ distribution (StochasticDistribution): the distribution of that parameter
 <span>(</span><span>range)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>the UniformDistribution is a Stochastic distribution</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>range (Range): limit of the values
-</code></pre>
-<h2 id="attributes">Attributes</h2>
-<pre><code>range (Range): limit of the values
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>parse(element)
-    parses a ElementTree created by the class and returns an instance of the class
-
-get_element(elementname)
-    Returns the full ElementTree of the class
-</code></pre>
-<p>initalizes the UniformDistribution</p>
-<h2 id="parameters_1">Parameters</h2>
-<pre><code>range (Range): limit of the values (optional)
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4258,6 +2813,24 @@ get_element(elementname)
         element.append(self.range.get_element())
         return element</code></pre>
 </details>
+<div class="desc"><p>the UniformDistribution is a Stochastic distribution</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>range (Range): limit of the values
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>range (Range): limit of the values
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element(elementname)
+    Returns the full ElementTree of the class
+</code></pre>
+<p>initalizes the UniformDistribution</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>range (Range): limit of the values (optional)
+</code></pre></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._StochasticDistributionType</li>
@@ -4269,13 +2842,6 @@ get_element(elementname)
 <span>def <span class="ident">parse</span></span>(<span>element)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Parses the xml element of UniformDistribution</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>element (xml.etree.ElementTree.Element): A UniformDistribution element (same as generated by the class itself)
-</code></pre>
-<h2 id="returns">Returns</h2>
-<pre><code>ud (UniformDistribution): a UniformDistribution object
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4296,6 +2862,13 @@ def parse(element):
 
     return UniformDistribution(Range.parse(element.find(&#34;Range&#34;)))</code></pre>
 </details>
+<div class="desc"><p>Parses the xml element of UniformDistribution</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A UniformDistribution element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>ud (UniformDistribution): a UniformDistribution object
+</code></pre></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -4304,7 +2877,6 @@ def parse(element):
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the UniformDistribution</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4315,6 +2887,7 @@ def parse(element):
     element.append(self.range.get_element())
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the UniformDistribution</p></div>
 </dd>
 </dl>
 </dd>
@@ -4322,7 +2895,6 @@ def parse(element):
 </section>
 </article>
 <nav id="sidebar">
-<h1>Index</h1>
 <div class="toc">
 <ul></ul>
 </div>
@@ -4445,7 +3017,7 @@ def parse(element):
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
 </footer>
 </body>
 </html>

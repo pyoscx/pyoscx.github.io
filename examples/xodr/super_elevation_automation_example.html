@@ -4,9 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.6">
-<title>examples.generator.generate_from_main API documentation</title>
-<meta name="description" content="scenariogeneration
-https://github.com/pyoscx/scenariogeneration …">
+<title>examples.xodr.super_elevation_automation_example API documentation</title>
+<meta name="description" content="">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
@@ -34,18 +33,9 @@ el.replaceWith(d);
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>examples.generator.generate_from_main</code></h1>
+<h1 class="title">Module <code>examples.xodr.super_elevation_automation_example</code></h1>
 </header>
 <section id="section-intro">
-<p>scenariogeneration
-<a href="https://github.com/pyoscx/scenariogeneration">https://github.com/pyoscx/scenariogeneration</a></p>
-<p>This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
-<p>Copyright (c) 2022 The scenariogeneration Authors.</p>
-<p>example of creating OpenSCENARIO and OpenDRIVE file, with the parameters defined outside the class structure</p>
-<p>Example usage: when a itterative procedure is defined and the parameters to the Scenario will change</p>
-<p>Will generate 9 scenarios</p>
 </section>
 <section>
 </section>
@@ -56,7 +46,7 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="examples.generator.generate_from_main.Scenario"><code class="flex name class">
+<dt id="examples.xodr.super_elevation_automation_example.Scenario"><code class="flex name class">
 <span>class <span class="ident">Scenario</span></span>
 </code></dt>
 <dd>
@@ -66,98 +56,101 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 </summary>
 <pre><code class="python">class Scenario(ScenarioGenerator):
     def __init__(self):
-        ScenarioGenerator.__init__(self)
-        self.naming = &#34;numerical&#34;
+        super().__init__()
 
     def road(self, **kwargs):
-        road = xodr.create_road(
-            [
-                xodr.Spiral(0.0000000001, kwargs[&#34;road_curvature&#34;], 100),
-                xodr.Arc(kwargs[&#34;road_curvature&#34;], 50),
-                xodr.Spiral(kwargs[&#34;road_curvature&#34;], 0.0000000001, 100),
-                xodr.Line(100),
-            ],
-            id=0,
-            left_lanes=2,
-            right_lanes=2,
+        ## create some roads
+        start_road = xodr.create_road(
+            xodr.Line(50), 0, left_lanes=3, right_lanes=3, lane_width=3
         )
-        odr = xodr.OpenDrive(&#34;myroad&#34;)
-        odr.add_road(road)
+        main_road = xodr.create_road(
+            xodr.Spiral(0.00001, 0.01, 50),
+            1,
+            left_lanes=3,
+            right_lanes=3,
+            lane_width=3,
+        )
+        suc_road = xodr.create_road(
+            xodr.Line(50), 2, left_lanes=2, right_lanes=2, lane_width=3
+        )
+        offramp1 = xodr.create_road(
+            xodr.Arc(-0.01, 50), 3, left_lanes=0, right_lanes=1, lane_width=3
+        )
+        offramp2 = xodr.create_road(
+            xodr.Arc(0.01, 50), 4, left_lanes=1, right_lanes=0, lane_width=3
+        )
+        continuation1 = xodr.create_road(
+            xodr.Line(50), 5, left_lanes=0, right_lanes=1, lane_width=3
+        )
+        continuation2 = xodr.create_road(
+            xodr.Line(50), 6, left_lanes=1, right_lanes=0, lane_width=3
+        )
+
+        ## add some known elevations
+        suc_road.add_superelevation(0, 0, 0.002, 0, 0)
+        suc_road.add_elevation(0, 10, 0, 0, 0)
+
+        start_road.add_elevation(0, 0, 0.01, 0, 0)
+        start_road.add_superelevation(0, 0, 0.0, 0, 0)
+
+        continuation1.add_superelevation(0, 0, 0, 0, 0)
+        continuation1.add_elevation(0, 8, 0, 0, 0)
+
+        continuation2.add_superelevation(0, 0, 0, 0, 0)
+        continuation2.add_elevation(0, 6, 0, 0, 0)
+
+        ## add successors and predecessors
+        start_road.add_successor(
+            xodr.ElementType.road, 1, xodr.ContactPoint.start
+        )
+        main_road.add_predecessor(
+            xodr.ElementType.road, 0, xodr.ContactPoint.end
+        )
+        main_road.add_successor(xodr.ElementType.junction, 100)
+        suc_road.add_successor(xodr.ElementType.junction, 100)
+        offramp1.add_predecessor(xodr.ElementType.junction, 100)
+        offramp2.add_predecessor(xodr.ElementType.junction, 100)
+        offramp1.add_successor(
+            xodr.ElementType.road, 5, xodr.ContactPoint.start
+        )
+        offramp2.add_successor(
+            xodr.ElementType.road, 6, xodr.ContactPoint.start
+        )
+        continuation1.add_predecessor(
+            xodr.ElementType.road, 3, xodr.ContactPoint.end
+        )
+        continuation2.add_predecessor(
+            xodr.ElementType.road, 4, xodr.ContactPoint.end
+        )
+
+        ## create the direct junction
+        jc = xodr.DirectJunctionCreator(100, &#34;my junc&#34;)
+        jc.add_connection(main_road, suc_road)
+        jc.add_connection(main_road, offramp1, -3, -1)
+        jc.add_connection(main_road, offramp2, 3, 1)
+
+        ## add all roads to the OpenDrive
+        odr = xodr.OpenDrive(&#34;my_road&#34;)
+        odr.add_road(start_road)
+        odr.add_road(main_road)
+        odr.add_road(suc_road)
+        odr.add_road(offramp1)
+        odr.add_road(offramp2)
+        odr.add_road(continuation1)
+        odr.add_road(continuation2)
+
+        odr.add_junction_creator(jc)
+
+        # adjust roads and lanes
         odr.adjust_roads_and_lanes()
-        return odr
 
-    def scenario(self, **kwargs):
-        road = xosc.RoadNetwork(self.road_file)
-        egoname = &#34;Ego&#34;
-        entities = xosc.Entities()
-        entities.add_scenario_object(
-            egoname, xosc.CatalogReference(&#34;VehicleCatalog&#34;, &#34;car_white&#34;)
-        )
+        # adjust the remaining elevations
+        odr.adjust_elevations()
 
-        catalog = xosc.Catalog()
-        catalog.add_catalog(&#34;VehicleCatalog&#34;, &#34;../xosc/Catalogs/Vehicles&#34;)
+        # adjust the roadmarks
+        odr.adjust_roadmarks()
 
-        init = xosc.Init()
-
-        init.add_init_action(
-            egoname, xosc.TeleportAction(xosc.LanePosition(50, 0, -2, 0))
-        )
-        init.add_init_action(
-            egoname,
-            xosc.AbsoluteSpeedAction(
-                kwargs[&#34;speed&#34;],
-                xosc.TransitionDynamics(
-                    xosc.DynamicsShapes.step, xosc.DynamicsDimension.time, 1
-                ),
-            ),
-        )
-
-        event = xosc.Event(&#34;my event&#34;, xosc.Priority.overwrite)
-        event.add_action(
-            &#34;lane change&#34;,
-            xosc.AbsoluteLaneChangeAction(
-                -1,
-                xosc.TransitionDynamics(
-                    xosc.DynamicsShapes.sinusoidal,
-                    xosc.DynamicsDimension.time,
-                    4,
-                ),
-            ),
-        )
-        event.add_trigger(
-            xosc.ValueTrigger(
-                &#34;start_trigger &#34;,
-                0,
-                xosc.ConditionEdge.none,
-                xosc.SimulationTimeCondition(4, xosc.Rule.greaterThan),
-            )
-        )
-
-        man = xosc.Maneuver(&#34;maneuver&#34;)
-        man.add_event(event)
-
-        sb = xosc.StoryBoard(
-            init,
-            stoptrigger=xosc.ValueTrigger(
-                &#34;start_trigger &#34;,
-                0,
-                xosc.ConditionEdge.none,
-                xosc.SimulationTimeCondition(13, xosc.Rule.greaterThan),
-                &#34;stop&#34;,
-            ),
-        )
-        sb.add_maneuver(man, egoname)
-        sce = xosc.Scenario(
-            &#34;my scenario&#34;,
-            &#34;Mandolin&#34;,
-            xosc.ParameterDeclarations(),
-            entities,
-            sb,
-            road,
-            catalog,
-        )
-
-        return sce</code></pre>
+        return odr</code></pre>
 </details>
 <div class="desc"><p>ScenarioTemplate is a class that should be inherited by a
 Scenario class in order to generate xodr and xosc files based on
@@ -212,13 +205,13 @@ the list is one scenario</p>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="examples.generator" href="index.html">examples.generator</a></code></li>
+<li><code><a title="examples.xodr" href="index.html">examples.xodr</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="examples.generator.generate_from_main.Scenario" href="#examples.generator.generate_from_main.Scenario">Scenario</a></code></h4>
+<h4><code><a title="examples.xodr.super_elevation_automation_example.Scenario" href="#examples.xodr.super_elevation_automation_example.Scenario">Scenario</a></code></h4>
 </li>
 </ul>
 </li>

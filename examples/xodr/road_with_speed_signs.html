@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.6">
-<title>examples.generator.generate_from_main API documentation</title>
+<title>examples.xodr.road_with_speed_signs API documentation</title>
 <meta name="description" content="scenariogeneration
 https://github.com/pyoscx/scenariogeneration …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
@@ -34,7 +34,7 @@ el.replaceWith(d);
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>examples.generator.generate_from_main</code></h1>
+<h1 class="title">Module <code>examples.xodr.road_with_speed_signs</code></h1>
 </header>
 <section id="section-intro">
 <p>scenariogeneration
@@ -43,9 +43,17 @@ el.replaceWith(d);
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
 <p>Copyright (c) 2022 The scenariogeneration Authors.</p>
-<p>example of creating OpenSCENARIO and OpenDRIVE file, with the parameters defined outside the class structure</p>
-<p>Example usage: when a itterative procedure is defined and the parameters to the Scenario will change</p>
-<p>Will generate 9 scenarios</p>
+<p>Example how to create a more customized a junction with different widths of lanes,
+using generators and LaneDef with different lane widths</p>
+<p>Some features used</p>
+<ul>
+<li>
+<p>create_road</p>
+</li>
+<li>
+<p>Signal</p>
+</li>
+</ul>
 </section>
 <section>
 </section>
@@ -56,7 +64,7 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="examples.generator.generate_from_main.Scenario"><code class="flex name class">
+<dt id="examples.xodr.road_with_speed_signs.Scenario"><code class="flex name class">
 <span>class <span class="ident">Scenario</span></span>
 </code></dt>
 <dd>
@@ -66,98 +74,119 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 </summary>
 <pre><code class="python">class Scenario(ScenarioGenerator):
     def __init__(self):
-        ScenarioGenerator.__init__(self)
-        self.naming = &#34;numerical&#34;
+        super().__init__()
 
     def road(self, **kwargs):
-        road = xodr.create_road(
-            [
-                xodr.Spiral(0.0000000001, kwargs[&#34;road_curvature&#34;], 100),
-                xodr.Arc(kwargs[&#34;road_curvature&#34;], 50),
-                xodr.Spiral(kwargs[&#34;road_curvature&#34;], 0.0000000001, 100),
-                xodr.Line(100),
-            ],
-            id=0,
-            left_lanes=2,
-            right_lanes=2,
-        )
-        odr = xodr.OpenDrive(&#34;myroad&#34;)
-        odr.add_road(road)
-        odr.adjust_roads_and_lanes()
-        return odr
+        # create a road with some strange lane sections
+        road1 = xodr.create_road(xodr.Line(200), 1, 3, 3, lane_width=4)
 
-    def scenario(self, **kwargs):
-        road = xosc.RoadNetwork(self.road_file)
-        egoname = &#34;Ego&#34;
-        entities = xosc.Entities()
-        entities.add_scenario_object(
-            egoname, xosc.CatalogReference(&#34;VehicleCatalog&#34;, &#34;car_white&#34;)
+        # create 3 poles
+        road1.add_object(
+            xodr.Object(
+                s=100,
+                t=-12,
+                id=1,
+                length=0.05,
+                width=0.05,
+                radius=0.5,
+                height=2.3,
+            )
         )
-
-        catalog = xosc.Catalog()
-        catalog.add_catalog(&#34;VehicleCatalog&#34;, &#34;../xosc/Catalogs/Vehicles&#34;)
-
-        init = xosc.Init()
-
-        init.add_init_action(
-            egoname, xosc.TeleportAction(xosc.LanePosition(50, 0, -2, 0))
+        road1.add_object(
+            xodr.Object(
+                s=100,
+                t=0,
+                id=1,
+                length=0.05,
+                width=0.05,
+                radius=0.5,
+                height=2.3,
+            )
         )
-        init.add_init_action(
-            egoname,
-            xosc.AbsoluteSpeedAction(
-                kwargs[&#34;speed&#34;],
-                xosc.TransitionDynamics(
-                    xosc.DynamicsShapes.step, xosc.DynamicsDimension.time, 1
-                ),
-            ),
-        )
-
-        event = xosc.Event(&#34;my event&#34;, xosc.Priority.overwrite)
-        event.add_action(
-            &#34;lane change&#34;,
-            xosc.AbsoluteLaneChangeAction(
-                -1,
-                xosc.TransitionDynamics(
-                    xosc.DynamicsShapes.sinusoidal,
-                    xosc.DynamicsDimension.time,
-                    4,
-                ),
-            ),
-        )
-        event.add_trigger(
-            xosc.ValueTrigger(
-                &#34;start_trigger &#34;,
-                0,
-                xosc.ConditionEdge.none,
-                xosc.SimulationTimeCondition(4, xosc.Rule.greaterThan),
+        road1.add_object(
+            xodr.Object(
+                s=100,
+                t=12,
+                id=1,
+                length=0.05,
+                width=0.05,
+                radius=0.5,
+                height=2.3,
             )
         )
 
-        man = xosc.Maneuver(&#34;maneuver&#34;)
-        man.add_event(event)
-
-        sb = xosc.StoryBoard(
-            init,
-            stoptrigger=xosc.ValueTrigger(
-                &#34;start_trigger &#34;,
-                0,
-                xosc.ConditionEdge.none,
-                xosc.SimulationTimeCondition(13, xosc.Rule.greaterThan),
-                &#34;stop&#34;,
-            ),
+        # create some signs (signals)
+        road1.add_signal(
+            xodr.Signal(
+                s=100,
+                t=-12,
+                zOffset=2.3,
+                orientation=xodr.Orientation.positive,
+                country=&#34;se&#34;,
+                Type=&#34;c&#34;,
+                subtype=&#34;31&#34;,
+                value=10,
+                name=&#34;right_100_sign&#34;,
+                id=1,
+                unit=&#34;km/h&#34;,
+            )
         )
-        sb.add_maneuver(man, egoname)
-        sce = xosc.Scenario(
-            &#34;my scenario&#34;,
-            &#34;Mandolin&#34;,
-            xosc.ParameterDeclarations(),
-            entities,
-            sb,
-            road,
-            catalog,
+        road1.add_signal(
+            xodr.Signal(
+                s=100,
+                t=0,
+                zOffset=2.3,
+                orientation=xodr.Orientation.positive,
+                country=&#34;se&#34;,
+                Type=&#34;c&#34;,
+                subtype=&#34;31&#34;,
+                value=10,
+                name=&#34;right_100_sign&#34;,
+                id=1,
+                unit=&#34;km/h&#34;,
+            )
+        )
+        road1.add_signal(
+            xodr.Signal(
+                s=100,
+                t=0,
+                zOffset=2.3,
+                orientation=xodr.Orientation.negative,
+                country=&#34;se&#34;,
+                Type=&#34;c&#34;,
+                subtype=&#34;31&#34;,
+                value=9,
+                name=&#34;right_100_sign&#34;,
+                id=1,
+                unit=&#34;km/h&#34;,
+            )
+        )
+        road1.add_signal(
+            xodr.Signal(
+                s=100,
+                t=12,
+                zOffset=2.3,
+                orientation=xodr.Orientation.negative,
+                country=&#34;se&#34;,
+                Type=&#34;c&#34;,
+                subtype=&#34;31&#34;,
+                value=9,
+                name=&#34;right_100_sign&#34;,
+                id=1,
+                unit=&#34;km/h&#34;,
+            )
         )
 
-        return sce</code></pre>
+        # add everything to the OpenDRIVE object
+        odr = xodr.OpenDrive(&#34;my adjusted road&#34;)
+        odr.add_road(road1)
+
+        # adjust roads and lanes
+        odr.adjust_roads_and_lanes()
+
+        # adjust roadmarks (comment out to see difference)
+        odr.adjust_roadmarks()
+        return odr</code></pre>
 </details>
 <div class="desc"><p>ScenarioTemplate is a class that should be inherited by a
 Scenario class in order to generate xodr and xosc files based on
@@ -212,13 +241,13 @@ the list is one scenario</p>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="examples.generator" href="index.html">examples.generator</a></code></li>
+<li><code><a title="examples.xodr" href="index.html">examples.xodr</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="examples.generator.generate_from_main.Scenario" href="#examples.generator.generate_from_main.Scenario">Scenario</a></code></h4>
+<h4><code><a title="examples.xodr.road_with_speed_signs.Scenario" href="#examples.xodr.road_with_speed_signs.Scenario">Scenario</a></code></h4>
 </li>
 </ul>
 </li>

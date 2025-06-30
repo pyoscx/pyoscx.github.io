@@ -2,19 +2,33 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.10.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
 <title>scenariogeneration.scenario_generator API documentation</title>
 <meta name="description" content="scenariogeneration
-https://github.com/pyoscx/scenariogeneration …" />
-<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
-<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
-<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
-<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
-<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+https://github.com/pyoscx/scenariogeneration …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
-<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
 </head>
 <body>
 <main>
@@ -29,399 +43,6 @@ https://github.com/pyoscx/scenariogeneration …" />
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
 <p>Copyright (c) 2022 The scenariogeneration Authors.</p>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">&#34;&#34;&#34;
-  scenariogeneration
-  https://github.com/pyoscx/scenariogeneration
-
-  This Source Code Form is subject to the terms of the Mozilla Public
-  License, v. 2.0. If a copy of the MPL was not distributed with this
-  file, You can obtain one at https://mozilla.org/MPL/2.0/.
-
-  Copyright (c) 2022 The scenariogeneration Authors.
-
-&#34;&#34;&#34;
-import itertools
-import os
-import numpy as np
-import sys
-from multiprocessing import Pool
-from .helpers import printToFile
-
-
-class _generation_struct:
-    def __init__(self, data, filename, prettyprint, encoding=&#34;utf-8&#34;):
-        self.data = data
-        self.filename = filename
-        self.prettyprint = prettyprint
-        self.encoding = encoding
-
-
-def _write_xml_file(data_struct):
-    printToFile(
-        data_struct.data,
-        data_struct.filename,
-        data_struct.prettyprint,
-        data_struct.encoding,
-    )
-
-
-class ScenarioGenerator:
-    &#34;&#34;&#34;ScenarioTemplate is a class that should be inherited by a Scenario class in order to generate xodr and xosc files based on pyoscx and pyodrx
-
-    Two main uses, in your generation class define self.parameters as either as
-     - a dict of lists, where the lists are the values you want to sweep over, all permutations of these sets will be generated
-     - a list of dicts, where the dicts are identical and each element in the list is one scenario
-
-    Attributes
-    ----------
-        road_file (str): name of the roadfile
-
-        parameters (dict of lists, or list of dicts): parameter sets to be used
-
-        naming (str): two options &#34;numerical&#34; or &#34;parameter&#34;
-
-        generate_all_roads (bool): will only generate unique roads
-
-        number_of_parallel_writings (int): parallelize the writing of the xml files
-            Default: 1 (no parallelization)
-
-        basename (str): basename of the scenariofiles,
-            Default: name of file
-
-        encoding (str): encoding of the outputs
-            Default:
-    &#34;&#34;&#34;
-
-    def __init__(self):
-        self.road_file = &#34;&#34;
-        self.parameters = {}
-        self.naming = &#34;numerical&#34;  # can be &#39;numerical&#39;, &#39;parameter&#39;
-        self._it = 0
-        self._generation_folder = &#34;&#34;
-
-        self.generate_all_roads = True
-        self._created_roads = {}
-        self._name_separator = &#34;_&#34;
-        self.number_of_parallel_writings = 1
-        self._prettyprint = True
-        self.basename = os.path.basename(
-            sys.modules[self.__class__.__module__].__file__
-        ).split(&#34;.&#34;)[0]
-        self.encoding = &#34;utf-8&#34;
-
-    def road(self, **kwargs):
-        &#34;&#34;&#34;Dummy method for generating an OpenDRIVE road
-
-        Should be overwritten by the user, and return a pyodrx.OpenDrive object
-
-        Return
-        ------
-            sce (pyodrx.OpenDrive): a road on pyodrx format
-        &#34;&#34;&#34;
-        return []
-
-    def scenario(self, **kwargs):
-        &#34;&#34;&#34;Dummy method for generating a OpenScenario file
-
-        Should be overwritten by the user, and return a pyoscx.Scenario object
-
-        Return
-        ------
-            sce (pyoscx.Scenario): a scenario on pyoscx format
-        &#34;&#34;&#34;
-        return []
-
-    def _reset_name_counter(self):
-        &#34;&#34;&#34;method to reset the counter if numerical naming is used.&#34;&#34;&#34;
-        self._it = 0
-
-    def _create_folder_structure(self, generation_folder):
-        &#34;&#34;&#34;method to create a folder structure (if needed) to generate the scenarios and roads in
-
-        Parameters
-        ----------
-            generation_folder (str): the path to a folder where the files should be generated
-
-        &#34;&#34;&#34;
-        xosc_folder = os.path.join(generation_folder, &#34;xosc&#34;)
-        xodr_folder = os.path.join(generation_folder, &#34;xodr&#34;)
-
-        if not os.path.exists(generation_folder):
-            os.mkdir(generation_folder)
-        if not os.path.exists(xosc_folder):
-            os.mkdir(xosc_folder)
-        if not os.path.exists(xodr_folder):
-            os.mkdir(xodr_folder)
-
-        self._generation_folder = generation_folder
-
-    def print_permutations(self, override_parameters=None):
-        &#34;&#34;&#34;print_permutations will create a printout to view all permutations created
-
-        Parameters
-        ----------
-            override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute
-
-        &#34;&#34;&#34;
-        if override_parameters:
-            self.parameters = override_parameters
-        self._handle_input_parameters()
-        it = 0
-        for p in self.all_permutations:
-            print(&#34;Permutation: &#34; + str(it))
-            printstr = &#34;&#34;
-            for key, value in p.items():
-                printstr += key + &#34;: &#34; + str(value) + &#34;, &#34;
-            print(printstr)
-            it += 1
-
-    def _handle_input_parameters(self):
-        &#34;&#34;&#34;_handle_input_parameters takes care of different types of parameters inputs, such as list of dicts or a dict of lists&#34;&#34;&#34;
-
-        if isinstance(self.parameters, dict):
-            self._create_permutations()
-
-        elif isinstance(self.parameters, list):
-            self.all_permutations = self.parameters
-
-    def _generate_road_and_scenario(self, permutation):
-        &#34;&#34;&#34;_generate_road_and_scenario takes a permutation and generates the road/scenario (if specified)
-
-        Parameters
-        ----------
-            permutation (dict): the parameter dict of the wanted scenario
-
-        Returns
-        -------
-            open_scenario_file (str), open_drive_file (str)
-        &#34;&#34;&#34;
-        scenario_name = self._get_scenario_name(permutation)
-        self.road_file = &#34;&#34;
-        scenario_file = &#34;&#34;
-        files_to_write = []
-        road = self.road(**permutation)
-        if road:
-            new_unique_road = True
-            if not self.generate_all_roads:
-                for previous_road in self._created_roads:
-                    if self._created_roads[previous_road] == road:
-                        self.road_file = previous_road
-                        new_unique_road = False
-
-            if new_unique_road:
-                self.road_file = os.path.abspath(
-                    os.path.join(
-                        self._generation_folder, &#34;xodr&#34;, scenario_name + &#34;.xodr&#34;
-                    )
-                )
-                if self.number_of_parallel_writings == 1:
-                    road.write_xml(self.road_file, prettyprint=self._prettyprint)
-                else:
-                    files_to_write.append(
-                        _generation_struct(
-                            road.get_element(),
-                            self.road_file,
-                            self._prettyprint,
-                            self.encoding,
-                        )
-                    )
-
-                if self.write_relative_road_path:
-                    self.road_file = self.road_file.replace(
-                        os.path.abspath(self._generation_folder), os.path.pardir
-                    )
-
-                self._created_roads[self.road_file] = road
-
-        sce = self.scenario(**permutation)
-        if sce:
-            scenario_file = os.path.join(
-                self._generation_folder, &#34;xosc&#34;, scenario_name + &#34;.xosc&#34;
-            )
-            if self.number_of_parallel_writings == 1:
-                sce.write_xml(scenario_file, prettyprint=self._prettyprint)
-            else:
-                files_to_write.append(
-                    _generation_struct(
-                        sce.get_element(),
-                        scenario_file,
-                        self._prettyprint,
-                        self.encoding,
-                    )
-                )
-        return scenario_file, self.road_file, files_to_write
-
-    def _get_scenario_name(self, permutation):
-        &#34;&#34;&#34;_get_scenario_name generates the name of the wanted file, based on the permutation
-
-        Parameters
-        ----------
-            permutation (dict): a permutation to create name from (used for the parameter naming option)
-
-        Returns
-        -------
-            scenario_name (str)
-        &#34;&#34;&#34;
-        name_prefix = &#34;&#34;
-
-        if self.naming == &#34;numerical&#34;:
-            name_prefix = str(self._it)
-            self._it += 1
-        elif self.naming == &#34;parameter&#34; or self.naming == &#34;parameter_no_lists&#34;:
-            for key, value in permutation.items():
-                if isinstance(value, list) and self.naming == &#34;parameter_no_lists&#34;:
-                    value_str = str(self._it)
-                    self._it += 1
-                else:
-                    value_str = str(value).replace(&#34;\\&#34;, &#34;-&#34;).replace(&#34;/&#34;, &#34;-&#34;)
-                name_prefix += (
-                    self._name_separator
-                    + key.replace(&#34;\\&#34;, &#34;-&#34;).replace(&#34;/&#34;, &#34;-&#34;)
-                    + &#34;-&#34;
-                    + value_str
-                )
-
-        else:
-            raise NameError(
-                &#39;Attribute naming, can only be &#34;numerical&#34; or &#34;parameter&#34;, not &#39;
-                + self.naming
-            )
-
-        return self.basename + name_prefix
-
-    def generate_single(
-        self,
-        generation_folder,
-        order=&#34;first&#34;,
-        override_parameters=None,
-        write_relative_road_path=True,
-        name_separator=None,
-        prettyprint=True,
-    ):
-        &#34;&#34;&#34;generate_single will generate only one scenario
-
-        Parameters
-        ----------
-            generation_folder (str): the path to a folder where the files should be generated
-
-            order (str, or int): if multiple permutations are defined, this enables the picking of different permutations
-                                 int - the number of that permutation
-                                 str - first: first permutation
-                                       middle: the permutation in the middle
-                                       random: a random permutation
-                Default: &#39;first&#39;
-
-            override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute (optional)
-
-            write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true),
-                                             or the absolute path to the xodr (false)
-                Default: True
-
-            name_separator (str): for generation with multiple parameters, this will change the separator between the variables
-                Default: &#39;_&#39;
-
-            prettyprint (bool): determins if the prettify funciton should be used while writing to xml (will take longer time)
-                Default: True
-        &#34;&#34;&#34;
-        self._prettyprint = prettyprint
-        if name_separator:
-            self._name_separator = name_separator
-        self.write_relative_road_path = write_relative_road_path
-        self._create_folder_structure(generation_folder)
-        if override_parameters:
-            self.parameters = override_parameters
-        self._handle_input_parameters()
-
-        if isinstance(order, str):
-            if order == &#34;first&#34;:
-                it = 0
-            elif order == &#34;middle&#34;:
-                it = int(np.floor(len(self.all_permutations) / 2))
-            elif order == &#34;random&#34;:
-                it = int(np.floor(np.random.rand() * len(self.all_permutations)))
-        else:
-            it = order
-            self._it = it
-        self.number_of_parallel_writings = 1
-        osc, odr, _ = self._generate_road_and_scenario(self.all_permutations[it])
-        self._reset_name_counter()
-        return osc, odr
-
-    def generate(
-        self,
-        generation_folder,
-        override_parameters=None,
-        write_relative_road_path=True,
-        name_separator=None,
-        prettyprint=True,
-    ):
-        &#34;&#34;&#34;generate uses the xosc.Scenario defined in the method scenario and the xodr.OpenDrive (optional) in the road method
-        together with the parameters attribute to generate scenarios and roads for all permutations defined and save those files
-        in the generation_folder.
-
-        Parameters
-        ----------
-            generation_folder (str): the path to a folder where the files should be generated
-
-            override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute (optional)
-
-            write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true), or the absolute path to the xodr (false)
-                Default: True
-
-            name_separator (str): for generation with multiple parameters, this will change the separator between the variables
-                Default: &#39;_&#39;
-
-            prettyprint (bool): determins if the prettify funciton should be used while writing to xml (will take longer time)
-                Default: True
-        &#34;&#34;&#34;
-        self._prettyprint = prettyprint
-        if name_separator:
-            self._name_separator = name_separator
-
-        self.write_relative_road_path = write_relative_road_path
-        scenario_files = []
-        road_files = []
-        self._create_folder_structure(generation_folder)
-        if override_parameters:
-            self.parameters = override_parameters
-        self._handle_input_parameters()
-        files_to_write = []
-        for p in self.all_permutations:
-            scenario_file, road_file, writables = self._generate_road_and_scenario(p)
-            scenario_files.append(scenario_file)
-            road_files.append(road_file)
-            files_to_write.extend(writables)
-
-        if self.number_of_parallel_writings != 1:
-            with Pool(self.number_of_parallel_writings) as p:
-                p.map(_write_xml_file, files_to_write)
-        self._reset_name_counter()
-        return scenario_files, road_files
-
-    def _create_permutations(self):
-        &#34;&#34;&#34;generates all permutations of the defined parameters.
-
-        Returns
-        -------
-            scenario_files (list of str): all scenenario files generated
-        &#34;&#34;&#34;
-        parameterlist = []
-        for key in self.parameters:
-            parameterlist.append(self.parameters[key])
-
-        available_permutations = list(itertools.product(*parameterlist))
-        self.all_permutations = []
-        keys = list(self.parameters.keys())
-        for p in available_permutations:
-            inputdict = {}
-            for i in range(len(self.parameters)):
-                inputdict[keys[i]] = p[i]
-            self.all_permutations.append(inputdict)</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -436,57 +57,44 @@ class ScenarioGenerator:
 <span>class <span class="ident">ScenarioGenerator</span></span>
 </code></dt>
 <dd>
-<div class="desc"><p>ScenarioTemplate is a class that should be inherited by a Scenario class in order to generate xodr and xosc files based on pyoscx and pyodrx</p>
-<p>Two main uses, in your generation class define self.parameters as either as
-- a dict of lists, where the lists are the values you want to sweep over, all permutations of these sets will be generated
-- a list of dicts, where the dicts are identical and each element in the list is one scenario</p>
-<h2 id="attributes">Attributes</h2>
-<pre><code>road_file (str): name of the roadfile
-
-parameters (dict of lists, or list of dicts): parameter sets to be used
-
-naming (str): two options "numerical" or "parameter"
-
-generate_all_roads (bool): will only generate unique roads
-
-number_of_parallel_writings (int): parallelize the writing of the xml files
-    Default: 1 (no parallelization)
-
-basename (str): basename of the scenariofiles,
-    Default: name of file
-
-encoding (str): encoding of the outputs
-    Default:
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ScenarioGenerator:
-    &#34;&#34;&#34;ScenarioTemplate is a class that should be inherited by a Scenario class in order to generate xodr and xosc files based on pyoscx and pyodrx
+    &#34;&#34;&#34;ScenarioTemplate is a class that should be inherited by a
+    Scenario class in order to generate xodr and xosc files based on
+    the submodules xodr and xosc
 
-    Two main uses, in your generation class define self.parameters as either as
-     - a dict of lists, where the lists are the values you want to sweep over, all permutations of these sets will be generated
-     - a list of dicts, where the dicts are identical and each element in the list is one scenario
+    Two main uses, in your generation class define self.parameters as
+    either as:
+    - a dict of lists, where the lists are the values you want to sweep
+    over, all permutations of these sets will be generated
+    - a list of dicts, where the dicts are identical and each element in
+    the list is one scenario
 
     Attributes
     ----------
-        road_file (str): name of the roadfile
+    road_file : str
+        name of the roadfile
 
-        parameters (dict of lists, or list of dicts): parameter sets to be used
+    parameters : dict[list], list[dicts]
+        parameter sets to be used
 
-        naming (str): two options &#34;numerical&#34; or &#34;parameter&#34;
+    naming : str
+        two options &#34;numerical&#34; or &#34;parameter&#34;
 
-        generate_all_roads (bool): will only generate unique roads
+    generate_all_roads : bool
+        will only generate unique roads
 
-        number_of_parallel_writings (int): parallelize the writing of the xml files
-            Default: 1 (no parallelization)
+    number_of_parallel_writings : int
+        parallelize the writing of the xml files, default: 1
 
-        basename (str): basename of the scenariofiles,
-            Default: name of file
+    basename : str
+        basename of the scenariofiles, default: name of file
 
-        encoding (str): encoding of the outputs
-            Default:
+    encoding : str
+        encoding of the outputs, default: utf-8
     &#34;&#34;&#34;
 
     def __init__(self):
@@ -505,39 +113,47 @@ encoding (str): encoding of the outputs
             sys.modules[self.__class__.__module__].__file__
         ).split(&#34;.&#34;)[0]
         self.encoding = &#34;utf-8&#34;
+        self.all_permutations = None
+        self.write_relative_road_path = None
 
-    def road(self, **kwargs):
+    def road(self, **kwargs) -&gt; Optional[Road]:
         &#34;&#34;&#34;Dummy method for generating an OpenDRIVE road
 
-        Should be overwritten by the user, and return a pyodrx.OpenDrive object
+        Should be overwritten by the user, and return a pyodrx.OpenDrive
+        object
 
         Return
         ------
-            sce (pyodrx.OpenDrive): a road on pyodrx format
+        Optional[OpenDrive]
+            a road on xodr.OpenDrive format
         &#34;&#34;&#34;
-        return []
+        return None
 
-    def scenario(self, **kwargs):
+    def scenario(self, **kwargs) -&gt; Optional[Scenario]:
         &#34;&#34;&#34;Dummy method for generating a OpenScenario file
 
-        Should be overwritten by the user, and return a pyoscx.Scenario object
+        Should be overwritten by the user, and return a pyoscx.Scenario
+        object
 
         Return
         ------
-            sce (pyoscx.Scenario): a scenario on pyoscx format
+        Optional[Scenario]
+            a scenario on pyoscx format
         &#34;&#34;&#34;
-        return []
+        return None
 
     def _reset_name_counter(self):
         &#34;&#34;&#34;method to reset the counter if numerical naming is used.&#34;&#34;&#34;
         self._it = 0
 
-    def _create_folder_structure(self, generation_folder):
-        &#34;&#34;&#34;method to create a folder structure (if needed) to generate the scenarios and roads in
+    def _create_folder_structure(self, generation_folder: str):
+        &#34;&#34;&#34;method to create a folder structure (if needed) to generate
+        the scenarios and roads in
 
         Parameters
         ----------
-            generation_folder (str): the path to a folder where the files should be generated
+        generation_folder : str
+            the path to a folder where the files should be generated
 
         &#34;&#34;&#34;
         xosc_folder = os.path.join(generation_folder, &#34;xosc&#34;)
@@ -552,12 +168,16 @@ encoding (str): encoding of the outputs
 
         self._generation_folder = generation_folder
 
-    def print_permutations(self, override_parameters=None):
-        &#34;&#34;&#34;print_permutations will create a printout to view all permutations created
+    def print_permutations(
+        self, override_parameters: Optional[list] | Optional[dict] = None
+    ):
+        &#34;&#34;&#34;print_permutations will create a printout to view all
+        permutations created
 
         Parameters
         ----------
-            override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute
+        override_parameters :Optional[list] | Optional[dict]
+            overrides the self.parameters attribute
 
         &#34;&#34;&#34;
         if override_parameters:
@@ -573,7 +193,10 @@ encoding (str): encoding of the outputs
             it += 1
 
     def _handle_input_parameters(self):
-        &#34;&#34;&#34;_handle_input_parameters takes care of different types of parameters inputs, such as list of dicts or a dict of lists&#34;&#34;&#34;
+        &#34;&#34;&#34;_handle_input_parameters takes care of different types of
+        parameters inputs,
+        such as list of dicts or a dict of lists
+        &#34;&#34;&#34;
 
         if isinstance(self.parameters, dict):
             self._create_permutations()
@@ -581,16 +204,21 @@ encoding (str): encoding of the outputs
         elif isinstance(self.parameters, list):
             self.all_permutations = self.parameters
 
-    def _generate_road_and_scenario(self, permutation):
-        &#34;&#34;&#34;_generate_road_and_scenario takes a permutation and generates the road/scenario (if specified)
+    def _generate_road_and_scenario(
+        self, permutation: dict
+    ) -&gt; tuple[str, str]:
+        &#34;&#34;&#34;_generate_road_and_scenario takes a permutation and generates
+        the road/scenario (if specified)
 
         Parameters
         ----------
-            permutation (dict): the parameter dict of the wanted scenario
+        permutation : dict
+            the parameter dict of the wanted scenario
 
         Returns
         -------
-            open_scenario_file (str), open_drive_file (str)
+        tuple[str,str]
+            open_scenario_file, open_drive_file
         &#34;&#34;&#34;
         scenario_name = self._get_scenario_name(permutation)
         self.road_file = &#34;&#34;
@@ -608,14 +236,18 @@ encoding (str): encoding of the outputs
             if new_unique_road:
                 self.road_file = os.path.abspath(
                     os.path.join(
-                        self._generation_folder, &#34;xodr&#34;, scenario_name + &#34;.xodr&#34;
+                        self._generation_folder,
+                        &#34;xodr&#34;,
+                        scenario_name + &#34;.xodr&#34;,
                     )
                 )
                 if self.number_of_parallel_writings == 1:
-                    road.write_xml(self.road_file, prettyprint=self._prettyprint)
+                    road.write_xml(
+                        self.road_file, prettyprint=self._prettyprint
+                    )
                 else:
                     files_to_write.append(
-                        _generation_struct(
+                        _GenerationStruct(
                             road.get_element(),
                             self.road_file,
                             self._prettyprint,
@@ -625,7 +257,8 @@ encoding (str): encoding of the outputs
 
                 if self.write_relative_road_path:
                     self.road_file = self.road_file.replace(
-                        os.path.abspath(self._generation_folder), os.path.pardir
+                        os.path.abspath(self._generation_folder),
+                        os.path.pardir,
                     )
 
                 self._created_roads[self.road_file] = road
@@ -639,7 +272,7 @@ encoding (str): encoding of the outputs
                 sce.write_xml(scenario_file, prettyprint=self._prettyprint)
             else:
                 files_to_write.append(
-                    _generation_struct(
+                    _GenerationStruct(
                         sce.get_element(),
                         scenario_file,
                         self._prettyprint,
@@ -648,25 +281,32 @@ encoding (str): encoding of the outputs
                 )
         return scenario_file, self.road_file, files_to_write
 
-    def _get_scenario_name(self, permutation):
-        &#34;&#34;&#34;_get_scenario_name generates the name of the wanted file, based on the permutation
+    def _get_scenario_name(self, permutation: dict) -&gt; str:
+        &#34;&#34;&#34;_get_scenario_name generates the name of the wanted file,
+        based on the permutation
 
         Parameters
         ----------
-            permutation (dict): a permutation to create name from (used for the parameter naming option)
+        permutation : dict
+            a permutation to create name from
+            (used for the parameter naming option)
 
         Returns
         -------
-            scenario_name (str)
+        str
+            scenario_name
         &#34;&#34;&#34;
         name_prefix = &#34;&#34;
 
         if self.naming == &#34;numerical&#34;:
             name_prefix = str(self._it)
             self._it += 1
-        elif self.naming == &#34;parameter&#34; or self.naming == &#34;parameter_no_lists&#34;:
+        elif self.naming in [&#34;parameter&#34;, &#34;parameter_no_lists&#34;]:
             for key, value in permutation.items():
-                if isinstance(value, list) and self.naming == &#34;parameter_no_lists&#34;:
+                if (
+                    isinstance(value, list)
+                    and self.naming == &#34;parameter_no_lists&#34;
+                ):
                     value_str = str(self._it)
                     self._it += 1
                 else:
@@ -688,37 +328,45 @@ encoding (str): encoding of the outputs
 
     def generate_single(
         self,
-        generation_folder,
-        order=&#34;first&#34;,
-        override_parameters=None,
-        write_relative_road_path=True,
-        name_separator=None,
-        prettyprint=True,
+        generation_folder: str,
+        order: str | int = &#34;first&#34;,
+        override_parameters: Optional[list] | Optional[dict] = None,
+        write_relative_road_path: bool = True,
+        name_separator: Optional[str] = None,
+        prettyprint: bool = True,
     ):
         &#34;&#34;&#34;generate_single will generate only one scenario
 
         Parameters
         ----------
-            generation_folder (str): the path to a folder where the files should be generated
+        generation_folder : str
+            the path to a folder where the files should be generated
 
-            order (str, or int): if multiple permutations are defined, this enables the picking of different permutations
-                                 int - the number of that permutation
-                                 str - first: first permutation
-                                       middle: the permutation in the middle
-                                       random: a random permutation
-                Default: &#39;first&#39;
+        order : str | int
+            if multiple permutations are defined, this enables the
+            picking of different permutations
+                int - the number of that permutation
+                str - first: first permutation
+                        middle: the permutation in the middle
+                        random: a random permutation
+            Default: &#39;first&#39;
 
-            override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute (optional)
+        override_parameters : Optional[list] | Optional[dict]
+            overrides the self.parameters attribute (optional)
 
-            write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true),
-                                             or the absolute path to the xodr (false)
-                Default: True
+        write_relative_road_path : bool
+            if the generator will write the path to a generated xodr
+            file relative to the xosc (true), or the absolute path
+            to the xodr (false)
+            Default: True
 
-            name_separator (str): for generation with multiple parameters, this will change the separator between the variables
-                Default: &#39;_&#39;
+        name_separator : str
+            for generation with multiple parameters, this will change
+            the separator between the variables. Default: &#39;_&#39;
 
-            prettyprint (bool): determins if the prettify funciton should be used while writing to xml (will take longer time)
-                Default: True
+        prettyprint:bool
+            determins if the prettify funciton should be used while
+            writing to xml (will take longer time). Default: True
         &#34;&#34;&#34;
         self._prettyprint = prettyprint
         if name_separator:
@@ -735,41 +383,53 @@ encoding (str): encoding of the outputs
             elif order == &#34;middle&#34;:
                 it = int(np.floor(len(self.all_permutations) / 2))
             elif order == &#34;random&#34;:
-                it = int(np.floor(np.random.rand() * len(self.all_permutations)))
+                it = int(
+                    np.floor(np.random.rand() * len(self.all_permutations))
+                )
         else:
             it = order
             self._it = it
         self.number_of_parallel_writings = 1
-        osc, odr, _ = self._generate_road_and_scenario(self.all_permutations[it])
+        osc, odr, _ = self._generate_road_and_scenario(
+            self.all_permutations[it]
+        )
         self._reset_name_counter()
         return osc, odr
 
     def generate(
         self,
-        generation_folder,
-        override_parameters=None,
-        write_relative_road_path=True,
-        name_separator=None,
-        prettyprint=True,
+        generation_folder: str,
+        override_parameters: Optional[list] | Optional[dict] = None,
+        write_relative_road_path: bool = True,
+        name_separator: Optional[str] = None,
+        prettyprint: bool = True,
     ):
-        &#34;&#34;&#34;generate uses the xosc.Scenario defined in the method scenario and the xodr.OpenDrive (optional) in the road method
-        together with the parameters attribute to generate scenarios and roads for all permutations defined and save those files
-        in the generation_folder.
+        &#34;&#34;&#34;generate uses the xosc.Scenario defined in the method
+        scenario and the xodr.OpenDrive (optional) in the road method
+        together with the parameters attribute to generate scenarios and
+        roads for all permutations defined and save those files in the
+        generation_folder.
 
         Parameters
         ----------
-            generation_folder (str): the path to a folder where the files should be generated
+        generation_folder : str
+            the path to a folder where the files should be generated
 
-            override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute (optional)
+        override_parameters : Optional[list] | Optional[dict]
+            overrides the self.parameters attribute (optional)
 
-            write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true), or the absolute path to the xodr (false)
-                Default: True
+        write_relative_road_path : bool
+            if the generator will write the path to a generated xodr
+            file relative to the xosc (true), or the absolute path to
+            the xodr (false). Default: True
 
-            name_separator (str): for generation with multiple parameters, this will change the separator between the variables
-                Default: &#39;_&#39;
+        name_separator : str
+            for generation with multiple parameters, this will change
+            the separator between the variables. Default: &#39;_&#39;
 
-            prettyprint (bool): determins if the prettify funciton should be used while writing to xml (will take longer time)
-                Default: True
+        prettyprint : bool
+            determins if the prettify funciton should be used while
+            writing to xml (will take longer time). Default: True
         &#34;&#34;&#34;
         self._prettyprint = prettyprint
         if name_separator:
@@ -784,7 +444,9 @@ encoding (str): encoding of the outputs
         self._handle_input_parameters()
         files_to_write = []
         for p in self.all_permutations:
-            scenario_file, road_file, writables = self._generate_road_and_scenario(p)
+            scenario_file, road_file, writables = (
+                self._generate_road_and_scenario(p)
+            )
             scenario_files.append(scenario_file)
             road_files.append(road_file)
             files_to_write.extend(writables)
@@ -796,12 +458,7 @@ encoding (str): encoding of the outputs
         return scenario_files, road_files
 
     def _create_permutations(self):
-        &#34;&#34;&#34;generates all permutations of the defined parameters.
-
-        Returns
-        -------
-            scenario_files (list of str): all scenenario files generated
-        &#34;&#34;&#34;
+        &#34;&#34;&#34;generates all permutations of the defined parameters.&#34;&#34;&#34;
         parameterlist = []
         for key in self.parameters:
             parameterlist.append(self.parameters[key])
@@ -815,6 +472,32 @@ encoding (str): encoding of the outputs
                 inputdict[keys[i]] = p[i]
             self.all_permutations.append(inputdict)</code></pre>
 </details>
+<div class="desc"><p>ScenarioTemplate is a class that should be inherited by a
+Scenario class in order to generate xodr and xosc files based on
+the submodules xodr and xosc</p>
+<p>Two main uses, in your generation class define self.parameters as
+either as:
+- a dict of lists, where the lists are the values you want to sweep
+over, all permutations of these sets will be generated
+- a list of dicts, where the dicts are identical and each element in
+the list is one scenario</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>road_file</code></strong> :&ensp;<code>str</code></dt>
+<dd>name of the roadfile</dd>
+<dt><strong><code>parameters</code></strong> :&ensp;<code>dict[list], list[dicts]</code></dt>
+<dd>parameter sets to be used</dd>
+<dt><strong><code>naming</code></strong> :&ensp;<code>str</code></dt>
+<dd>two options "numerical" or "parameter"</dd>
+<dt><strong><code>generate_all_roads</code></strong> :&ensp;<code>bool</code></dt>
+<dd>will only generate unique roads</dd>
+<dt><strong><code>number_of_parallel_writings</code></strong> :&ensp;<code>int</code></dt>
+<dd>parallelize the writing of the xml files, default: 1</dd>
+<dt><strong><code>basename</code></strong> :&ensp;<code>str</code></dt>
+<dd>basename of the scenariofiles, default: name of file</dd>
+<dt><strong><code>encoding</code></strong> :&ensp;<code>str</code></dt>
+<dd>encoding of the outputs, default: utf-8</dd>
+</dl></div>
 <h3>Subclasses</h3>
 <ul class="hlist">
 <li><a title="examples.generator.CCRb.Scenario" href="../examples/generator/CCRb.html#examples.generator.CCRb.Scenario">Scenario</a></li>
@@ -850,6 +533,7 @@ encoding (str): encoding of the outputs
 <li><a title="examples.xodr.road_with_custom_roadmarkers.Scenario" href="../examples/xodr/road_with_custom_roadmarkers.html#examples.xodr.road_with_custom_roadmarkers.Scenario">Scenario</a></li>
 <li><a title="examples.xodr.road_with_lane_adjustment.Scenario" href="../examples/xodr/road_with_lane_adjustment.html#examples.xodr.road_with_lane_adjustment.Scenario">Scenario</a></li>
 <li><a title="examples.xodr.road_with_multiple_lane_widths.Scenario" href="../examples/xodr/road_with_multiple_lane_widths.html#examples.xodr.road_with_multiple_lane_widths.Scenario">Scenario</a></li>
+<li><a title="examples.xodr.road_with_speed_signs.Scenario" href="../examples/xodr/road_with_speed_signs.html#examples.xodr.road_with_speed_signs.Scenario">Scenario</a></li>
 <li><a title="examples.xodr.simple_road_with_objects.Scenario" href="../examples/xodr/simple_road_with_objects.html#examples.xodr.simple_road_with_objects.Scenario">Scenario</a></li>
 <li><a title="examples.xodr.super_elevation_automation_example.Scenario" href="../examples/xodr/super_elevation_automation_example.html#examples.xodr.super_elevation_automation_example.Scenario">Scenario</a></li>
 <li><a title="examples.xodr.two_roads.Scenario" href="../examples/xodr/two_roads.html#examples.xodr.two_roads.Scenario">Scenario</a></li>
@@ -867,61 +551,53 @@ encoding (str): encoding of the outputs
 <li><a title="examples.xosc.speed_profile.Scenario" href="../examples/xosc/speed_profile.html#examples.xosc.speed_profile.Scenario">Scenario</a></li>
 <li><a title="examples.xosc.syncronize_straight_example.Scenario" href="../examples/xosc/syncronize_straight_example.html#examples.xosc.syncronize_straight_example.Scenario">Scenario</a></li>
 <li><a title="examples.xosc.trajectory_example.Scenario" href="../examples/xosc/trajectory_example.html#examples.xosc.trajectory_example.Scenario">Scenario</a></li>
+<li><a title="examples.xosc.variable_usage.Scenario" href="../examples/xosc/variable_usage.html#examples.xosc.variable_usage.Scenario">Scenario</a></li>
 <li><a title="examples.xosc.withcontroller.Scenario" href="../examples/xosc/withcontroller.html#examples.xosc.withcontroller.Scenario">Scenario</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.scenario_generator.ScenarioGenerator.generate"><code class="name flex">
-<span>def <span class="ident">generate</span></span>(<span>self, generation_folder, override_parameters=None, write_relative_road_path=True, name_separator=None, prettyprint=True)</span>
+<span>def <span class="ident">generate</span></span>(<span>self,<br>generation_folder: str,<br>override_parameters: list | dict | None = None,<br>write_relative_road_path: bool = True,<br>name_separator: str | None = None,<br>prettyprint: bool = True)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>generate uses the xosc.Scenario defined in the method scenario and the xodr.OpenDrive (optional) in the road method
-together with the parameters attribute to generate scenarios and roads for all permutations defined and save those files
-in the generation_folder.</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>generation_folder (str): the path to a folder where the files should be generated
-
-override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute (optional)
-
-write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true), or the absolute path to the xodr (false)
-    Default: True
-
-name_separator (str): for generation with multiple parameters, this will change the separator between the variables
-    Default: '_'
-
-prettyprint (bool): determins if the prettify funciton should be used while writing to xml (will take longer time)
-    Default: True
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def generate(
     self,
-    generation_folder,
-    override_parameters=None,
-    write_relative_road_path=True,
-    name_separator=None,
-    prettyprint=True,
+    generation_folder: str,
+    override_parameters: Optional[list] | Optional[dict] = None,
+    write_relative_road_path: bool = True,
+    name_separator: Optional[str] = None,
+    prettyprint: bool = True,
 ):
-    &#34;&#34;&#34;generate uses the xosc.Scenario defined in the method scenario and the xodr.OpenDrive (optional) in the road method
-    together with the parameters attribute to generate scenarios and roads for all permutations defined and save those files
-    in the generation_folder.
+    &#34;&#34;&#34;generate uses the xosc.Scenario defined in the method
+    scenario and the xodr.OpenDrive (optional) in the road method
+    together with the parameters attribute to generate scenarios and
+    roads for all permutations defined and save those files in the
+    generation_folder.
 
     Parameters
     ----------
-        generation_folder (str): the path to a folder where the files should be generated
+    generation_folder : str
+        the path to a folder where the files should be generated
 
-        override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute (optional)
+    override_parameters : Optional[list] | Optional[dict]
+        overrides the self.parameters attribute (optional)
 
-        write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true), or the absolute path to the xodr (false)
-            Default: True
+    write_relative_road_path : bool
+        if the generator will write the path to a generated xodr
+        file relative to the xosc (true), or the absolute path to
+        the xodr (false). Default: True
 
-        name_separator (str): for generation with multiple parameters, this will change the separator between the variables
-            Default: &#39;_&#39;
+    name_separator : str
+        for generation with multiple parameters, this will change
+        the separator between the variables. Default: &#39;_&#39;
 
-        prettyprint (bool): determins if the prettify funciton should be used while writing to xml (will take longer time)
-            Default: True
+    prettyprint : bool
+        determins if the prettify funciton should be used while
+        writing to xml (will take longer time). Default: True
     &#34;&#34;&#34;
     self._prettyprint = prettyprint
     if name_separator:
@@ -936,7 +612,9 @@ prettyprint (bool): determins if the prettify funciton should be used while writ
     self._handle_input_parameters()
     files_to_write = []
     for p in self.all_permutations:
-        scenario_file, road_file, writables = self._generate_road_and_scenario(p)
+        scenario_file, road_file, writables = (
+            self._generate_road_and_scenario(p)
+        )
         scenario_files.append(scenario_file)
         road_files.append(road_file)
         files_to_write.extend(writables)
@@ -947,71 +625,78 @@ prettyprint (bool): determins if the prettify funciton should be used while writ
     self._reset_name_counter()
     return scenario_files, road_files</code></pre>
 </details>
+<div class="desc"><p>generate uses the xosc.Scenario defined in the method
+scenario and the xodr.OpenDrive (optional) in the road method
+together with the parameters attribute to generate scenarios and
+roads for all permutations defined and save those files in the
+generation_folder.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>generation_folder</code></strong> :&ensp;<code>str</code></dt>
+<dd>the path to a folder where the files should be generated</dd>
+<dt><strong><code>override_parameters</code></strong> :&ensp;<code>Optional[list] | Optional[dict]</code></dt>
+<dd>overrides the self.parameters attribute (optional)</dd>
+<dt><strong><code>write_relative_road_path</code></strong> :&ensp;<code>bool</code></dt>
+<dd>if the generator will write the path to a generated xodr
+file relative to the xosc (true), or the absolute path to
+the xodr (false). Default: True</dd>
+<dt><strong><code>name_separator</code></strong> :&ensp;<code>str</code></dt>
+<dd>for generation with multiple parameters, this will change
+the separator between the variables. Default: '_'</dd>
+<dt><strong><code>prettyprint</code></strong> :&ensp;<code>bool</code></dt>
+<dd>determins if the prettify funciton should be used while
+writing to xml (will take longer time). Default: True</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.scenario_generator.ScenarioGenerator.generate_single"><code class="name flex">
-<span>def <span class="ident">generate_single</span></span>(<span>self, generation_folder, order='first', override_parameters=None, write_relative_road_path=True, name_separator=None, prettyprint=True)</span>
+<span>def <span class="ident">generate_single</span></span>(<span>self,<br>generation_folder: str,<br>order: str | int = 'first',<br>override_parameters: list | dict | None = None,<br>write_relative_road_path: bool = True,<br>name_separator: str | None = None,<br>prettyprint: bool = True)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>generate_single will generate only one scenario</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>generation_folder (str): the path to a folder where the files should be generated
-
-order (str, or int): if multiple permutations are defined, this enables the picking of different permutations
-                     int - the number of that permutation
-                     str - first: first permutation
-                           middle: the permutation in the middle
-                           random: a random permutation
-    Default: 'first'
-
-override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute (optional)
-
-write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true),
-                                 or the absolute path to the xodr (false)
-    Default: True
-
-name_separator (str): for generation with multiple parameters, this will change the separator between the variables
-    Default: '_'
-
-prettyprint (bool): determins if the prettify funciton should be used while writing to xml (will take longer time)
-    Default: True
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def generate_single(
     self,
-    generation_folder,
-    order=&#34;first&#34;,
-    override_parameters=None,
-    write_relative_road_path=True,
-    name_separator=None,
-    prettyprint=True,
+    generation_folder: str,
+    order: str | int = &#34;first&#34;,
+    override_parameters: Optional[list] | Optional[dict] = None,
+    write_relative_road_path: bool = True,
+    name_separator: Optional[str] = None,
+    prettyprint: bool = True,
 ):
     &#34;&#34;&#34;generate_single will generate only one scenario
 
     Parameters
     ----------
-        generation_folder (str): the path to a folder where the files should be generated
+    generation_folder : str
+        the path to a folder where the files should be generated
 
-        order (str, or int): if multiple permutations are defined, this enables the picking of different permutations
-                             int - the number of that permutation
-                             str - first: first permutation
-                                   middle: the permutation in the middle
-                                   random: a random permutation
-            Default: &#39;first&#39;
+    order : str | int
+        if multiple permutations are defined, this enables the
+        picking of different permutations
+            int - the number of that permutation
+            str - first: first permutation
+                    middle: the permutation in the middle
+                    random: a random permutation
+        Default: &#39;first&#39;
 
-        override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute (optional)
+    override_parameters : Optional[list] | Optional[dict]
+        overrides the self.parameters attribute (optional)
 
-        write_relative_road_path (bool): if the generator will write the path to a generated xodr file relative to the xosc (true),
-                                         or the absolute path to the xodr (false)
-            Default: True
+    write_relative_road_path : bool
+        if the generator will write the path to a generated xodr
+        file relative to the xosc (true), or the absolute path
+        to the xodr (false)
+        Default: True
 
-        name_separator (str): for generation with multiple parameters, this will change the separator between the variables
-            Default: &#39;_&#39;
+    name_separator : str
+        for generation with multiple parameters, this will change
+        the separator between the variables. Default: &#39;_&#39;
 
-        prettyprint (bool): determins if the prettify funciton should be used while writing to xml (will take longer time)
-            Default: True
+    prettyprint:bool
+        determins if the prettify funciton should be used while
+        writing to xml (will take longer time). Default: True
     &#34;&#34;&#34;
     self._prettyprint = prettyprint
     if name_separator:
@@ -1028,34 +713,65 @@ prettyprint (bool): determins if the prettify funciton should be used while writ
         elif order == &#34;middle&#34;:
             it = int(np.floor(len(self.all_permutations) / 2))
         elif order == &#34;random&#34;:
-            it = int(np.floor(np.random.rand() * len(self.all_permutations)))
+            it = int(
+                np.floor(np.random.rand() * len(self.all_permutations))
+            )
     else:
         it = order
         self._it = it
     self.number_of_parallel_writings = 1
-    osc, odr, _ = self._generate_road_and_scenario(self.all_permutations[it])
+    osc, odr, _ = self._generate_road_and_scenario(
+        self.all_permutations[it]
+    )
     self._reset_name_counter()
     return osc, odr</code></pre>
 </details>
+<div class="desc"><p>generate_single will generate only one scenario</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>generation_folder</code></strong> :&ensp;<code>str</code></dt>
+<dd>the path to a folder where the files should be generated</dd>
+<dt><strong><code>order</code></strong> :&ensp;<code>str | int</code></dt>
+<dd>if multiple permutations are defined, this enables the
+picking of different permutations
+int - the number of that permutation
+str - first: first permutation
+middle: the permutation in the middle
+random: a random permutation
+Default: 'first'</dd>
+<dt><strong><code>override_parameters</code></strong> :&ensp;<code>Optional[list] | Optional[dict]</code></dt>
+<dd>overrides the self.parameters attribute (optional)</dd>
+<dt><strong><code>write_relative_road_path</code></strong> :&ensp;<code>bool</code></dt>
+<dd>if the generator will write the path to a generated xodr
+file relative to the xosc (true), or the absolute path
+to the xodr (false)
+Default: True</dd>
+<dt><strong><code>name_separator</code></strong> :&ensp;<code>str</code></dt>
+<dd>for generation with multiple parameters, this will change
+the separator between the variables. Default: '_'</dd>
+</dl>
+<p>prettyprint:bool
+determins if the prettify funciton should be used while
+writing to xml (will take longer time). Default: True</p></div>
 </dd>
 <dt id="scenariogeneration.scenario_generator.ScenarioGenerator.print_permutations"><code class="name flex">
-<span>def <span class="ident">print_permutations</span></span>(<span>self, override_parameters=None)</span>
+<span>def <span class="ident">print_permutations</span></span>(<span>self, override_parameters: list | dict | None = None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>print_permutations will create a printout to view all permutations created</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def print_permutations(self, override_parameters=None):
-    &#34;&#34;&#34;print_permutations will create a printout to view all permutations created
+<pre><code class="python">def print_permutations(
+    self, override_parameters: Optional[list] | Optional[dict] = None
+):
+    &#34;&#34;&#34;print_permutations will create a printout to view all
+    permutations created
 
     Parameters
     ----------
-        override_parameters (list of dicts, or dict of lists): overrides the self.parameters attribute
+    override_parameters :Optional[list] | Optional[dict]
+        overrides the self.parameters attribute
 
     &#34;&#34;&#34;
     if override_parameters:
@@ -1070,56 +786,67 @@ prettyprint (bool): determins if the prettify funciton should be used while writ
         print(printstr)
         it += 1</code></pre>
 </details>
+<div class="desc"><p>print_permutations will create a printout to view all
+permutations created</p>
+<h2 id="parameters">Parameters</h2>
+<p>override_parameters :Optional[list] | Optional[dict]
+overrides the self.parameters attribute</p></div>
 </dd>
 <dt id="scenariogeneration.scenario_generator.ScenarioGenerator.road"><code class="name flex">
-<span>def <span class="ident">road</span></span>(<span>self, **kwargs)</span>
+<span>def <span class="ident">road</span></span>(<span>self, **kwargs) ‑> <a title="scenariogeneration.xodr.opendrive.Road" href="xodr/opendrive.html#scenariogeneration.xodr.opendrive.Road">Road</a> | None</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Dummy method for generating an OpenDRIVE road</p>
-<p>Should be overwritten by the user, and return a pyodrx.OpenDrive object</p>
-<h2 id="return">Return</h2>
-<pre><code>sce (pyodrx.OpenDrive): a road on pyodrx format
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def road(self, **kwargs):
+<pre><code class="python">def road(self, **kwargs) -&gt; Optional[Road]:
     &#34;&#34;&#34;Dummy method for generating an OpenDRIVE road
 
-    Should be overwritten by the user, and return a pyodrx.OpenDrive object
+    Should be overwritten by the user, and return a pyodrx.OpenDrive
+    object
 
     Return
     ------
-        sce (pyodrx.OpenDrive): a road on pyodrx format
+    Optional[OpenDrive]
+        a road on xodr.OpenDrive format
     &#34;&#34;&#34;
-    return []</code></pre>
+    return None</code></pre>
 </details>
+<div class="desc"><p>Dummy method for generating an OpenDRIVE road</p>
+<p>Should be overwritten by the user, and return a pyodrx.OpenDrive
+object</p>
+<h2 id="return">Return</h2>
+<p>Optional[OpenDrive]
+a road on xodr.OpenDrive format</p></div>
 </dd>
 <dt id="scenariogeneration.scenario_generator.ScenarioGenerator.scenario"><code class="name flex">
-<span>def <span class="ident">scenario</span></span>(<span>self, **kwargs)</span>
+<span>def <span class="ident">scenario</span></span>(<span>self, **kwargs) ‑> <a title="scenariogeneration.xosc.scenario.Scenario" href="xosc/scenario.html#scenariogeneration.xosc.scenario.Scenario">Scenario</a> | None</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Dummy method for generating a OpenScenario file</p>
-<p>Should be overwritten by the user, and return a pyoscx.Scenario object</p>
-<h2 id="return">Return</h2>
-<pre><code>sce (pyoscx.Scenario): a scenario on pyoscx format
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def scenario(self, **kwargs):
+<pre><code class="python">def scenario(self, **kwargs) -&gt; Optional[Scenario]:
     &#34;&#34;&#34;Dummy method for generating a OpenScenario file
 
-    Should be overwritten by the user, and return a pyoscx.Scenario object
+    Should be overwritten by the user, and return a pyoscx.Scenario
+    object
 
     Return
     ------
-        sce (pyoscx.Scenario): a scenario on pyoscx format
+    Optional[Scenario]
+        a scenario on pyoscx format
     &#34;&#34;&#34;
-    return []</code></pre>
+    return None</code></pre>
 </details>
+<div class="desc"><p>Dummy method for generating a OpenScenario file</p>
+<p>Should be overwritten by the user, and return a pyoscx.Scenario
+object</p>
+<h2 id="return">Return</h2>
+<p>Optional[Scenario]
+a scenario on pyoscx format</p></div>
 </dd>
 </dl>
 </dd>
@@ -1127,7 +854,6 @@ prettyprint (bool): determins if the prettify funciton should be used while writ
 </section>
 </article>
 <nav id="sidebar">
-<h1>Index</h1>
 <div class="toc">
 <ul></ul>
 </div>
@@ -1155,7 +881,7 @@ prettyprint (bool): determins if the prettify funciton should be used while writ
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
 </footer>
 </body>
 </html>

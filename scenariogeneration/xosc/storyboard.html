@@ -2,19 +2,33 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.10.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
 <title>scenariogeneration.xosc.storyboard API documentation</title>
 <meta name="description" content="scenariogeneration
-https://github.com/pyoscx/scenariogeneration …" />
-<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
-<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
-<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
-<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
-<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+https://github.com/pyoscx/scenariogeneration …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
-<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
 </head>
 <body>
 <main>
@@ -29,1184 +43,6 @@ https://github.com/pyoscx/scenariogeneration …" />
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
 <p>Copyright (c) 2022 The scenariogeneration Authors.</p>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">&#34;&#34;&#34;
-  scenariogeneration
-  https://github.com/pyoscx/scenariogeneration
-
-  This Source Code Form is subject to the terms of the Mozilla Public
-  License, v. 2.0. If a copy of the MPL was not distributed with this
-  file, You can obtain one at https://mozilla.org/MPL/2.0/.
-
-  Copyright (c) 2022 The scenariogeneration Authors.
-
-&#34;&#34;&#34;
-import xml.etree.ElementTree as ET
-
-
-from .actions import _Action, _ActionType, _PrivateActionType
-
-from .triggers import EmptyTrigger, ValueTrigger, SimulationTimeCondition, Trigger
-from .utils import (
-    CatalogReference,
-    EntityRef,
-    _TriggerType,
-    _EntityTriggerType,
-    _ValueTriggerType,
-    _BaseCatalog,
-)
-from .utils import (
-    ParameterDeclarations,
-    CatalogFile,
-    convert_bool,
-    convert_int,
-    get_bool_string,
-    convert_enum,
-)
-from .enumerations import Priority, Rule, ConditionEdge, VersionBase
-from .actions import _GlobalActionFactory, _PrivateActionFactory
-
-
-class Init(VersionBase):
-    &#34;&#34;&#34;the Init class, creates the init part of the storyboard
-
-    Attributes
-    ----------
-        initactions (dir: {entityname: Action}): a directory
-            containing all init actions of the scenario
-
-    Methods
-    -------
-        parse(element)
-            parses a ElementTree created by the class and returns an instance of the class
-
-        get_element()
-            Returns the full ElementTree of the class
-
-        add_init_action(entityname, action):
-            adds a private action to the init
-
-        add_global_action(action):
-            adds a global action to the init
-
-        add_user_defined_action(action):
-            adds a user defined action to the init
-
-    &#34;&#34;&#34;
-
-    def __init__(self):
-        &#34;&#34;&#34;initalize the Init class&#34;&#34;&#34;
-        self.initactions = {}
-        self.global_actions = []
-        self.user_defined_actions = []
-
-    def __eq__(self, other):
-        if isinstance(other, Init):
-            if (
-                self.initactions == other.initactions
-                and self.global_actions == other.global_actions
-                and self.user_defined_actions == other.user_defined_actions
-            ):
-                return True
-        return False
-
-    @staticmethod
-    def parse(element):
-        &#34;&#34;&#34;Parses the xml element of Init
-        NOTE: no UserDefinedActions are parsed.
-
-        Parameters
-        ----------
-            element (xml.etree.ElementTree.Element): A Init element (same as generated by the class itself)
-
-        Returns
-        -------
-            init (Init): a Init object
-
-        &#34;&#34;&#34;
-        init = Init()
-        action_element = element.find(&#34;Actions&#34;)
-        global_elements = action_element.findall(&#34;GlobalAction&#34;)
-        for ga in global_elements:
-            globalaction = _GlobalActionFactory.parse_globalaction(ga)
-            init.add_global_action(globalaction)
-
-        private_elements = action_element.findall(&#34;Private&#34;)
-        for pe in private_elements:
-            actor = pe.attrib[&#34;entityRef&#34;]
-            all_private_actions = pe.findall(&#34;PrivateAction&#34;)
-            for pa in all_private_actions:
-                privateaction = _PrivateActionFactory.parse_privateaction(pa)
-                init.add_init_action(actor, privateaction)
-
-        return init
-
-    def add_init_action(self, entityname, action):
-        &#34;&#34;&#34;add_init_action adds an Private Action to the init.
-
-        Parameters
-        ----------
-            entityname (str): name of the entity to add the action to
-            action (*Action): Any private action to be added (like TeleportAction)
-
-        &#34;&#34;&#34;
-        if not isinstance(action, _PrivateActionType):
-            if isinstance(action, _ActionType):
-                raise TypeError(
-                    &#34;the action provided is a global action, please use add_global_action instead&#34;
-                )
-            raise TypeError(&#34;action input is not a valid action&#34;)
-        if entityname not in self.initactions:
-            self.initactions[entityname] = []
-
-        self.initactions[entityname].append(action)
-
-    def add_global_action(self, action):
-        &#34;&#34;&#34;add_global_action adds a global action to the init
-
-        Parameters
-        ----------
-            action (*Action): any global action to add to the init
-
-        &#34;&#34;&#34;
-        if isinstance(action, _PrivateActionType):
-            raise TypeError(
-                &#34;action input is a Private action, please use add_init_action instead&#34;
-            )
-        if not isinstance(action, _ActionType):
-            raise TypeError(&#34;action input is not a valid action&#34;)
-        self.global_actions.append(action)
-        return self
-
-    def add_user_defined_action(self, action):
-        &#34;&#34;&#34;add_user_defined_action adds a userDefined action to the init
-
-        Parameters
-        ----------
-            action (CustomCommandAction): a custom command action (NOTE: a very crude implementation see actions.py)
-
-        &#34;&#34;&#34;
-        # NOTE: since this is not really implemented no checkes are done here.
-        self.user_defined_actions.append(action)
-        return self
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the Init&#34;&#34;&#34;
-        element = ET.Element(&#34;Init&#34;)
-        actions = ET.SubElement(element, &#34;Actions&#34;)
-
-        # add global actions
-        for i in self.global_actions:
-            actions.append(i.get_element())
-
-        # add user defined actions
-        for i in self.user_defined_actions:
-            actions.append(i.get_element())
-
-        # add private actions
-        for i in self.initactions:
-            private = ET.SubElement(actions, &#34;Private&#34;, attrib={&#34;entityRef&#34;: i})
-            for j in self.initactions[i]:
-                private.append(j.get_element())
-
-        return element
-
-
-class StoryBoard(VersionBase):
-    &#34;&#34;&#34;The StoryBoard class creates the storyboard of OpenScenario
-
-    Parameters
-    ----------
-        init (Init): the init part of the storyboard
-
-        stoptrigger (Valuetrigger, Entitytrigger or EmptyTrigger):
-            the stoptrigger of the storyboard (optional)
-            Default (EmptyTrigger)
-
-    Attributes
-    ----------
-        init (Init): the init of the storyboard
-
-        stoptrigger (Valuetrigger, Entitytrigger or EmptyTrigger):
-            the stoptrigger
-
-        stories (list of Story): all stories of the scenario
-
-    Methods
-    -------
-        parse(element)
-            parses a ElementTree created by the class and returns an instance of the class
-
-        add_story (story)
-            adds a story to the storyboard
-
-        get_element()
-            Returns the full ElementTree of the class
-
-
-    &#34;&#34;&#34;
-
-    def __init__(self, init=Init(), stoptrigger=EmptyTrigger(&#34;stop&#34;)):
-        &#34;&#34;&#34;initalizes the storyboard
-
-        Parameters
-        ----------
-            init (Init): the init part of the storyboard
-                Default: Init()
-
-            stoptrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigger):
-                the stoptrigger of the storyboard (optional)
-                Default: (EmptyTrigger)
-
-        &#34;&#34;&#34;
-        if not isinstance(init, Init):
-            raise TypeError(&#34;init is not of type Init&#34;)
-        if not isinstance(stoptrigger, _TriggerType):
-            raise TypeError(&#34;stoptrigger is not a valid Trigger&#34;)
-        # check that the stoptrigger has a triggeringpoint that is &#39;stop&#39;
-        if stoptrigger._triggerpoint == &#34;StartTrigger&#34;:
-            raise ValueError(
-                &#34;the stoptrigger provided does not have stop as the triggeringpoint&#34;
-            )
-        self.init = init
-        self.stoptrigger = stoptrigger
-        self.stories = []
-
-    def __eq__(self, other):
-        if isinstance(other, StoryBoard):
-            if (
-                self.init == other.init
-                and self.stoptrigger == other.stoptrigger
-                and self.stories == other.stories
-            ):
-                return True
-        return False
-
-    @staticmethod
-    def parse(element):
-        &#34;&#34;&#34;Parses the xml element of StoryBoard
-
-        Parameters
-        ----------
-            element (xml.etree.ElementTree.Element): A StoryBoard element (same as generated by the class itself)
-
-        Returns
-        -------
-            storyboard (StoryBoard): a StoryBoard object
-
-        &#34;&#34;&#34;
-        init = Init.parse(element.find(&#34;Init&#34;))
-        stoptrigger = Trigger.parse(element.find(&#34;StopTrigger&#34;))
-
-        storyboard = StoryBoard(init, stoptrigger)
-        for s in element.findall(&#34;Story&#34;):
-            storyboard.add_story(Story.parse(s))
-        return storyboard
-
-    def add_story(self, story):
-        &#34;&#34;&#34;adds a story to the storyboard
-
-        Parameters
-        ----------
-            story (Story): the story to be added
-
-        &#34;&#34;&#34;
-        if not isinstance(story, Story):
-            raise TypeError(&#34;story input is not of type Story&#34;)
-        self.stories.append(story)
-        return self
-
-    def add_act(self, act, parameters=ParameterDeclarations()):
-        &#34;&#34;&#34;add_act is a quick way to add a single act to one story, for multi act type of scenarios, use Story instead.
-
-        NOTE: if used multiple times multiple stories will be created
-
-        Parameters
-        ----------
-            act (Act): the Act to add
-
-            parameters (ParameterDeclarations): the parameters of the story (optional)
-                Default: ParameterDeclarations()
-        &#34;&#34;&#34;
-        if not isinstance(act, Act):
-            raise TypeError(&#34;act input is not of type Act&#34;)
-        newstory = Story(&#34;story_&#34; + act.name, parameters)
-        newstory.add_act(act)
-        self.stories.append(newstory)
-        return self
-
-    def add_maneuver_group(
-        self,
-        maneuvergroup,
-        starttrigger=None,
-        stoptrigger=EmptyTrigger(&#34;stop&#34;),
-        parameters=ParameterDeclarations(),
-    ):
-        &#34;&#34;&#34;add_maneuver_group is a quick way to add a single maneuver_group to one story, for multi maneuver_group type of scenarios, use Act instead.
-
-        NOTE: if used multiple times multiple stories will be created
-
-        Parameters
-        ----------
-            maneuvergroup (ManeuverGroup): the ManeuverGroup to add
-
-            starttrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigger): starttrigger for the act
-                Default: at simulationtime 0
-
-            stoptrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigger): stoptrigger for the act
-                Default: EmptyTrigger(&#39;stop&#39;)
-
-            parameters (ParameterDeclarations): the parameters of the story (optional)
-                Default: ParameterDeclarations()
-
-        &#34;&#34;&#34;
-        if not isinstance(maneuvergroup, ManeuverGroup):
-            raise TypeError(&#34;maneuvergroup input is not of type ManeuverGroup&#34;)
-        if starttrigger == None:
-            starttrigger = ValueTrigger(
-                &#34;act_start&#34;,
-                0,
-                ConditionEdge.rising,
-                SimulationTimeCondition(0, Rule.greaterThan),
-            )
-        elif starttrigger._triggerpoint == &#34;StopTrigger&#34;:
-            raise ValueError(
-                &#34;the starttrigger provided does not have start as the triggeringpoint&#34;
-            )
-
-        if stoptrigger._triggerpoint == &#34;StartTrigger&#34;:
-            raise ValueError(&#34;the stoptrigger provided is not of type StopTrigger&#34;)
-        newact = Act(&#34;act_&#34; + maneuvergroup.name, starttrigger, stoptrigger)
-        newact.add_maneuver_group(maneuvergroup)
-        self.add_act(newact, parameters)
-        return self
-
-    def add_maneuver(
-        self,
-        maneuver,
-        actors=None,
-        starttrigger=None,
-        stoptrigger=EmptyTrigger(&#34;stop&#34;),
-        parameters=ParameterDeclarations(),
-    ):
-        &#34;&#34;&#34;add_maneuver is a quick way to add a single maneuver to one story, for multi maneuver type of scenarios, use ManeuverGroup instead.
-
-        NOTE: if used multiple times multiple stories will be created
-
-        Parameters
-        ----------
-            maneuver (Maneuver or CatalogReference): the Maneuver to add
-
-            actors (list of &#39;str&#39;, or &#39;str&#39;): list of all actors in the maneuver or just a name of the actor
-
-            starttrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigger): starttrigger for the act
-                Default: at simulationtime 0
-
-            stoptrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigger): stoptrigger for the act
-                Default: EmptyTrigger(&#39;stop&#39;)
-
-            parameters (ParameterDeclarations): the parameters of the story (optional)
-                Default: None
-
-        &#34;&#34;&#34;
-        if not (
-            isinstance(maneuver, Maneuver) or isinstance(maneuver, CatalogReference)
-        ):
-            raise TypeError(&#34;maneuver input is not of type Maneuver&#34;)
-        if isinstance(maneuver, Maneuver):
-            mangr = ManeuverGroup(&#34;maneuvuergroup_&#34; + maneuver.name)
-        else:
-            mangr = ManeuverGroup(&#34;maneuvuergroup_from_catalog&#34;)
-
-        if actors is not None:
-            if isinstance(actors, list):
-                for a in actors:
-                    mangr.add_actor(a)
-            else:
-                mangr.add_actor(actors)
-        mangr.add_maneuver(maneuver)
-        self.add_maneuver_group(
-            mangr,
-            starttrigger=starttrigger,
-            stoptrigger=stoptrigger,
-            parameters=parameters,
-        )
-        return self
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the Storyboard&#34;&#34;&#34;
-        element = ET.Element(&#34;Storyboard&#34;)
-        element.append(self.init.get_element())
-
-        # if not self.stories:
-        #     raise ValueError(&#39;no stories available for storyboard&#39;)
-
-        if not self.stories:
-            self.add_maneuver_group(ManeuverGroup(&#34;empty&#34;), EmptyTrigger())
-        for story in self.stories:
-            element.append(story.get_element())
-
-        element.append(self.stoptrigger.get_element())
-
-        return element
-
-
-class Story(VersionBase):
-    &#34;&#34;&#34;The Story class creates a story of the OpenScenario
-
-    Parameters
-    ----------
-        name (str): name of the story
-
-        parameters (ParameterDeclarations): the parameters of the Story
-            Default: ParameterDeclarations()
-
-    Attributes
-    ----------
-        name (str): name of the story
-
-        parameters (ParameterDeclarations): the parameters of the story (optional)
-
-        acts (list of Act): all acts belonging to the story
-
-    Methods
-    -------
-        parse(element)
-            parses a ElementTree created by the class and returns an instance of the class
-
-        add_act(act)
-            adds an act to the story
-
-        get_element()
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
-    &#34;&#34;&#34;
-
-    def __init__(self, name, parameters=ParameterDeclarations()):
-        &#34;&#34;&#34;initalizes the Story class
-
-        Parameters
-        ----------
-            name (str): name of the story
-
-            parameters (ParameterDeclarations): the parameters of the Story
-        &#34;&#34;&#34;
-        self.name = name
-
-        self.acts = []
-        if not isinstance(parameters, ParameterDeclarations):
-            raise TypeError(&#34;parameters input is not of type ParameterDeclarations&#34;)
-
-        self.parameter = parameters
-
-    def __eq__(self, other):
-        if isinstance(other, Story):
-            if (
-                self.get_attributes() == other.get_attributes()
-                and self.parameter == other.parameter
-                and self.acts == other.acts
-            ):
-                return True
-        return False
-
-    @staticmethod
-    def parse(element):
-        &#34;&#34;&#34;Parses the xml element of Story
-
-        Parameters
-        ----------
-            element (xml.etree.ElementTree.Element): A Story element (same as generated by the class itself)
-
-        Returns
-        -------
-            story (Story): a Story object
-
-        &#34;&#34;&#34;
-        name = element.attrib[&#34;name&#34;]
-        if element.find(&#34;ParameterDeclarations&#34;) != None:
-            parameters = ParameterDeclarations.parse(
-                element.find(&#34;ParameterDeclarations&#34;)
-            )
-        else:
-            parameters = ParameterDeclarations()
-        story = Story(name, parameters)
-        for a in element.findall(&#34;Act&#34;):
-            story.add_act(Act.parse(a))
-        return story
-
-    def add_act(self, act):
-        &#34;&#34;&#34;adds an act to the story
-
-        Parameters
-        ----------
-            act (Act): act to add to the story
-
-        &#34;&#34;&#34;
-        if not isinstance(act, Act):
-            raise TypeError(&#34;act input is not of type Act&#34;)
-        self.acts.append(act)
-        return self
-
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes as a dict of the Story&#34;&#34;&#34;
-        return {&#34;name&#34;: self.name}
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the Story&#34;&#34;&#34;
-        element = ET.Element(&#34;Story&#34;, attrib=self.get_attributes())
-        if self.parameter.get_element():
-            element.append(self.parameter.get_element())
-        if not self.acts:
-            raise ValueError(&#34;no acts added to the story&#34;)
-        for a in self.acts:
-            element.append(a.get_element())
-        return element
-
-
-class Act(VersionBase):
-    &#34;&#34;&#34;the Act class creates the Act of the OpenScenario
-
-    Parameters
-    ----------
-        name (str): name of the act
-
-        starttrigger (*Trigger): starttrigger of the act
-            Default: ValueTrigger(&#39;act_start&#39;,0,ConditionEdge.none,SimulationTimeCondition(0,Rule.greaterThan))
-
-        stoptrigger (*Trigger): stoptrigger of the act (optional)
-
-    Attributes
-    ----------
-        name (str): name of the act
-
-        starttrigger (*Trigger): starttrigger of the act
-
-        stoptrigger (*Trigger): stoptrigger of the act (optional)
-
-        maneuvergroup (list of ManeuverGroup): list of ManeuverGroups belonging to the act
-
-    Methods
-    -------
-        parse(element)
-            parses a ElementTree created by the class and returns an instance of the class
-
-        add_maneuver_group(maneuvergroup)
-            adds a maneuvuergroup to the act
-
-        get_element()
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
-    &#34;&#34;&#34;
-
-    def __init__(self, name, starttrigger=None, stoptrigger=None):
-        &#34;&#34;&#34;Initalize the Act
-
-        Parameters
-        ----------
-            name (str): name of the act
-
-            starttrigger (*Trigger): starttrigger of the act
-                Default: ValueTrigger(&#39;act_start&#39;,0,ConditionEdge.none,SimulationTimeCondition(0,Rule.greaterThan))
-
-            stoptrigger (*Trigger): stoptrigger of the act (optional)
-                Default: Emptytrigger
-
-        &#34;&#34;&#34;
-
-        self.name = name
-        if starttrigger == None:
-            self.starttrigger = starttrigger = ValueTrigger(
-                &#34;act_start&#34;,
-                0,
-                ConditionEdge.none,
-                SimulationTimeCondition(0, Rule.greaterThan),
-            )
-        elif starttrigger._triggerpoint == &#34;StopTrigger&#34;:
-            raise ValueError(
-                &#34;the starttrigger provided does not have start as the triggeringpoint&#34;
-            )
-        else:
-            self.starttrigger = starttrigger
-
-        if stoptrigger == None:
-            self.stoptrigger = EmptyTrigger(&#34;stop&#34;)
-        elif stoptrigger._triggerpoint == &#34;StartTrigger&#34;:
-            raise ValueError(&#34;the stoptrigger provided is not of type StopTrigger&#34;)
-        else:
-            self.stoptrigger = stoptrigger
-
-        self.maneuvergroup = []
-
-    def __eq__(self, other):
-        if isinstance(other, Act):
-            if (
-                self.starttrigger == other.starttrigger
-                and self.stoptrigger == other.stoptrigger
-                and self.maneuvergroup == other.maneuvergroup
-            ):
-                return True
-        return False
-
-    @staticmethod
-    def parse(element):
-        &#34;&#34;&#34;Parses the xml element of Act
-
-        Parameters
-        ----------
-            element (xml.etree.ElementTree.Element): A Act element (same as generated by the class itself)
-
-        Returns
-        -------
-            act (Act): a Act object
-
-        &#34;&#34;&#34;
-        name = element.attrib[&#34;name&#34;]
-        stoptrigger = None
-        if element.find(&#34;StopTrigger&#34;) is not None:
-            stoptrigger = Trigger.parse(element.find(&#34;StopTrigger&#34;))
-        starttrigger = Trigger.parse(element.find(&#34;StartTrigger&#34;))
-
-        act = Act(name, starttrigger, stoptrigger)
-        for m in element.findall(&#34;ManeuverGroup&#34;):
-            act.add_maneuver_group(ManeuverGroup.parse(m))
-        return act
-
-    def add_maneuver_group(self, maneuvergroup):
-        &#34;&#34;&#34;adds a maneuvuergroup to the act
-
-        Parameters
-        ----------
-            maneuvergroup (ManeuverGroup): the maneuvergroup to add
-
-        &#34;&#34;&#34;
-        if not isinstance(maneuvergroup, ManeuverGroup):
-            raise TypeError(&#34;maneuvergroup is not of type ManeuverGroup&#34;)
-        self.maneuvergroup.append(maneuvergroup)
-        return self
-
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes as a dict of the Act&#34;&#34;&#34;
-        return {&#34;name&#34;: self.name}
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the Act&#34;&#34;&#34;
-        element = ET.Element(&#34;Act&#34;, attrib=self.get_attributes())
-        if not self.maneuvergroup:
-            raise ValueError(&#34;no maneuver group added to the act&#34;)
-        for mangr in self.maneuvergroup:
-            element.append(mangr.get_element())
-
-        element.append(self.starttrigger.get_element())
-        element.append(self.stoptrigger.get_element())
-        return element
-
-
-class ManeuverGroup(VersionBase):
-    &#34;&#34;&#34;the ManeuverGroup creates the ManeuverGroup of the OpenScenario
-
-    Parameters
-    ----------
-        name (str): name of the ManeuverGroup
-
-        maxexecution (int): maximum number of iterations
-
-        selecttriggeringentities (bool): Have no idea what this does ??? TODO: check
-
-    Attributes
-    ----------
-        name (str): name of the ManeuverGroup
-
-        maxexecution (int): maximum number of iterations
-
-        selecttriggeringentities (bool): Have no idea what this does ??? TODO: check
-
-        maneuvers (list of Maneuver): the maneuvers in the ManeuverGroup
-
-        actors (_Actors): all actors of the ManeuverGroup
-
-    Methods
-    -------
-        parse(element)
-            parses a ElementTree created by the class and returns an instance of the class
-
-        add_maneuver(Maneuver)
-            adds a maneuver to the ManeuverGroup
-
-        add_actor(entity)
-            adds an actor to the ManeuverGroup
-
-        get_element()
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
-    &#34;&#34;&#34;
-
-    def __init__(self, name, maxexecution=1, selecttriggeringentities=False):
-        &#34;&#34;&#34;initalize the ManeuverGroup
-
-        Parameters
-        ----------
-            name (str): name of the ManeuverGroup
-
-            maxexecution (int): maximum number of iterations
-
-            selecttriggeringentities (bool): Have no idea what this does ??? TODO: check
-
-        &#34;&#34;&#34;
-        self.name = name
-        self.maxexecution = convert_int(maxexecution)
-        self.actors = _Actors(selecttriggeringentities)
-        self.maneuvers = []
-
-    def __eq__(self, other):
-        if isinstance(other, ManeuverGroup):
-            if (
-                self.get_attributes() == other.get_attributes()
-                and self.actors == other.actors
-                and self.maneuvers == other.maneuvers
-            ):
-                return True
-        return False
-
-    @staticmethod
-    def parse(element):
-        &#34;&#34;&#34;Parses the xml element of ManeuverGroup
-
-        Parameters
-        ----------
-            element (xml.etree.ElementTree.Element): A ManeuverGroup element (same as generated by the class itself)
-
-        Returns
-        -------
-            maneuver_group (ManeuverGroup): a ManeuverGroup object
-
-        &#34;&#34;&#34;
-
-        name = element.attrib[&#34;name&#34;]
-        maxexec = convert_int(element.attrib[&#34;maximumExecutionCount&#34;])
-        actors = _Actors.parse(element.find(&#34;Actors&#34;))
-        maneuver_group = ManeuverGroup(name, maxexec)
-        maneuver_group.actors = actors
-        for m in element.findall(&#34;Maneuver&#34;):
-            maneuver_group.add_maneuver(Maneuver.parse(m))
-        for cr in element.findall(&#34;CatalogReference&#34;):
-            maneuver_group.add_maneuver(CatalogReference.parse(cr))
-
-        return maneuver_group
-
-    def add_maneuver(self, maneuver):
-        &#34;&#34;&#34;adds a maneuver to the ManeuverGroup
-
-        Parameters
-        ----------
-            maneuver (Maneuver, or CatalogReference): maneuver to add
-
-        &#34;&#34;&#34;
-        if not (
-            isinstance(maneuver, Maneuver) or isinstance(maneuver, CatalogReference)
-        ):
-            raise TypeError(&#34;maneuver input is not of type Maneuver&#34;)
-        self.maneuvers.append(maneuver)
-        return self
-
-    def add_actor(self, entity):
-        &#34;&#34;&#34;adds an actor to the ManeuverGroup
-
-        Parameters
-        ----------
-            entity (str): name of the entity to add as an actor
-
-        &#34;&#34;&#34;
-        self.actors.add_actor(entity)
-        return self
-
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes as a dict of the ManeuverGroup&#34;&#34;&#34;
-        return {&#34;name&#34;: self.name, &#34;maximumExecutionCount&#34;: str(self.maxexecution)}
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the ManeuverGroup&#34;&#34;&#34;
-        element = ET.Element(&#34;ManeuverGroup&#34;, attrib=self.get_attributes())
-        element.append(self.actors.get_element())
-        for man in self.maneuvers:
-            element.append(man.get_element())
-        return element
-
-
-class _Actors(VersionBase):
-    &#34;&#34;&#34;_Actors is used to create the actors of a ManeuverGroup
-
-    Parameters
-    ----------
-        selectTriggeringEntities (bool): ???
-            Default: False
-
-    Attributes
-    ----------
-        selectTriggeringEntities (bool): ???
-
-        actors (list or EntityRef): all actors to add to the element
-
-    Methods
-    -------
-        parse(element)
-            parses a ElementTree created by the class and returns an instance of the class
-
-        add_actor(actor)
-            adds an actor
-
-        get_element()
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
-    &#34;&#34;&#34;
-
-    def __init__(self, selectTriggeringEntities=False):
-        &#34;&#34;&#34;initalize the _Actors
-
-        Parameters
-        ----------
-            selectTriggeringEntities (bool): ???
-                Default: False
-
-        &#34;&#34;&#34;
-        self.actors = []
-        self.select = convert_bool(selectTriggeringEntities)
-
-    def __eq__(self, other):
-        if isinstance(other, _Actors):
-            if (
-                self.get_attributes() == other.get_attributes()
-                and self.actors == other.actors
-            ):
-                return True
-        return False
-
-    @staticmethod
-    def parse(element):
-        &#34;&#34;&#34;Parses the xml element of _Actors
-
-        Parameters
-        ----------
-            element (xml.etree.ElementTree.Element): A _Actors element (same as generated by the class itself)
-
-        Returns
-        -------
-            actors (_Actors): a _Actors object
-
-        &#34;&#34;&#34;
-        trigent = convert_bool(element.attrib[&#34;selectTriggeringEntities&#34;])
-        actors = _Actors(trigent)
-        entrefs = element.findall(&#34;EntityRef&#34;)
-        for ent in entrefs:
-            entityref = EntityRef.parse(ent)
-            actors.add_actor(entityref.entity)
-        return actors
-
-    def add_actor(self, entity):
-        &#34;&#34;&#34;adds an actor to the list of actors
-
-        Parameters
-        ----------
-            entity (str): name of the entity
-
-        &#34;&#34;&#34;
-        self.actors.append(EntityRef(entity))
-        return self
-
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes of the _Actors as a dict&#34;&#34;&#34;
-        return {&#34;selectTriggeringEntities&#34;: get_bool_string(self.select)}
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the _Actors&#34;&#34;&#34;
-        # if not self.actors:
-        #     raise ValueError(&#39;no actors are set&#39;)
-        if len(self.actors) == 0:
-            Warning(&#34;No Actors are defined&#34;)
-        element = ET.Element(&#34;Actors&#34;, attrib=self.get_attributes())
-        for ent in self.actors:
-            element.append(ent.get_element())
-        return element
-
-
-class Maneuver(_BaseCatalog):
-    &#34;&#34;&#34;The Maneuver class creates the Maneuver of OpenScenario
-
-    Parameters
-    ----------
-        name (str): name of the Maneuver
-
-        parameters (ParameterDeclaration): Parameter declarations for the maneuver
-            Default: None
-
-    Attributes
-    ----------
-        name (str): name of the Maneuver
-
-        events (list of Event): all events belonging to the Maneuver
-
-        parameters (ParameterDeclaration): Parameter declarations for the maneuver
-
-    Methods
-    -------
-        parse(element)
-            parses a ElementTree created by the class and returns an instance of the class
-
-        add_event (event)
-            adds an event to the Maneuver
-
-        append_to_catalog(filename)
-            adds the vehicle to an existing catalog
-
-        dump_to_catalog(filename,name,description,author)
-            crates a new catalog with the vehicle
-
-        get_element()
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
-    &#34;&#34;&#34;
-
-    def __init__(self, name, parameters=None):
-        &#34;&#34;&#34;initalizes the Maneuver
-        Parameters
-        ----------
-            name (str): name of the Maneuver
-
-        &#34;&#34;&#34;
-        super().__init__()
-        if parameters is not None and not isinstance(parameters, ParameterDeclarations):
-            raise TypeError(&#34;parameters is not of type ParameterDeclarations&#34;)
-        if parameters is not None:
-            self.parameters = parameters
-        self.name = name
-        self.events = []
-
-    def __eq__(self, other):
-        if isinstance(other, Maneuver):
-            if (
-                self.get_attributes() == other.get_attributes()
-                and self.parameters == other.parameters
-                and self.events == other.events
-            ):
-                return True
-        return False
-
-    @staticmethod
-    def parse(element):
-        &#34;&#34;&#34;Parses the xml element of Maneuver
-
-        Parameters
-        ----------
-            element (xml.etree.ElementTree.Element): A Maneuver element (same as generated by the class itself)
-
-        Returns
-        -------
-            maneuver (Maneuver): a Maneuver object
-
-        &#34;&#34;&#34;
-        parameters = None
-        if element.find(&#34;ParameterDeclarations&#34;) is not None:
-            parameters = ParameterDeclarations.parse(
-                element.find(&#34;ParameterDeclarations&#34;)
-            )
-        name = element.attrib[&#34;name&#34;]
-        man = Maneuver(name, parameters)
-
-        for e in element.findall(&#34;Event&#34;):
-            man.add_event(Event.parse(e))
-        return man
-
-    def add_event(self, event):
-        &#34;&#34;&#34;adds an event to the Maneuver
-
-        Parameters
-        ----------
-            name (Event): the event to add to the Maneuver
-
-        &#34;&#34;&#34;
-        if not isinstance(event, Event):
-            raise TypeError(&#34;event input is not of type Event&#34;)
-        self.events.append(event)
-        return self
-
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes as a dict of the Maneuver&#34;&#34;&#34;
-        return {&#34;name&#34;: self.name}
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the Maneuver&#34;&#34;&#34;
-        if not self.events:
-            raise ValueError(&#34;no events added to the maneuver&#34;)
-
-        element = ET.Element(&#34;Maneuver&#34;, attrib=self.get_attributes())
-        self.add_parameters_to_element(element)
-        for event in self.events:
-            element.append(event.get_element())
-
-        return element
-
-
-class Event(VersionBase):
-    &#34;&#34;&#34;the Event class creates the event of OpenScenario
-
-    Parameters
-    ----------
-        name (str): name of the event
-
-        priority (Priority): what priority the event has
-
-        maxexecution (int): the maximum allowed executions of the event
-            Default: 1
-
-    Attributes
-    ----------
-        name (str): name of the event
-
-        priority (Priority): what priority the event has TODO: add definition
-
-        maxexecution (int): the maximum allowed executions of the event
-
-        action (list of actions): all actions belonging to the event
-
-        trigger (*Trigger): a start trigger to the event
-
-    Methods
-    -------
-        parse(element)
-            parses a ElementTree created by the class and returns an instance of the class
-
-        add_trigger()
-            adds an trigger to the event
-
-        add_action()
-            adds an action to the event (can be called multiple times)
-
-        get_element()
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
-    &#34;&#34;&#34;
-
-    def __init__(self, name, priority, maxexecution=1):
-        self.name = name
-        self.priority = convert_enum(priority, Priority)
-        self.action = []
-        self.trigger = None
-        self.maxexecution = convert_int(maxexecution)
-
-    def __eq__(self, other):
-        if isinstance(other, Event):
-            if (
-                self.get_attributes() == other.get_attributes()
-                and self.trigger == other.trigger
-                and self.action == other.action
-            ):
-                return True
-        return False
-
-    @staticmethod
-    def parse(element):
-        &#34;&#34;&#34;Parses the xml element of Event
-
-        Parameters
-        ----------
-            element (xml.etree.ElementTree.Element): A Event element (same as generated by the class itself)
-
-        Returns
-        -------
-            event (Event): a Event object
-
-        &#34;&#34;&#34;
-        name = element.attrib[&#34;name&#34;]
-        maxexec = None
-        if &#34;maximumExecutionCount&#34; in element.attrib:
-            maxexec = convert_int(element.attrib[&#34;maximumExecutionCount&#34;])
-        prio = getattr(Priority, element.attrib[&#34;priority&#34;])
-
-        event = Event(name, prio, maxexec)
-
-        event.add_trigger(Trigger.parse(element.find(&#34;StartTrigger&#34;)))
-
-        all_actions = []
-        for a in element.findall(&#34;Action&#34;):
-            event.action.append(_Action.parse(a))
-
-        return event
-
-    def add_trigger(self, trigger):
-        &#34;&#34;&#34;adds a starging trigger to the event
-
-        Parameters
-        ----------
-            trigger (*Trigger): Adds a trigger to start the event (not EmptyTrigger)
-
-        &#34;&#34;&#34;
-        if not isinstance(trigger, _TriggerType):
-            if isinstance(trigger, _ValueTriggerType):
-                raise TypeError(
-                    &#34;trigger input is a value trigger condition, please add to a ValueTrigger.&#34;
-                )
-            elif isinstance(_EntityTriggerType):
-                raise TypeError(
-                    &#34;trigger input is a entity trigger condition, please add to a EntityTrigger.&#34;
-                )
-            raise TypeError(&#34;trigger input is not a valid trigger&#34;)
-        self.trigger = trigger
-        return self
-
-    def add_action(self, actionname, action):
-        &#34;&#34;&#34;adds an action to the Event, multiple actions can be added and will be ordered as added.
-
-        Parameters
-        ----------
-            action (*Action): any action to be added to the event
-
-        &#34;&#34;&#34;
-        if not isinstance(action, _ActionType):
-            raise TypeError(&#34;action input is not a valid Action&#34;)
-        self.action.append(_Action(actionname, action))
-        return self
-
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes as a dict of the Event&#34;&#34;&#34;
-        retdict = {&#34;name&#34;: self.name, &#34;priority&#34;: self.priority.get_name()}
-        if self.maxexecution is not None:
-            retdict[&#34;maximumExecutionCount&#34;] = str(self.maxexecution)
-        return retdict
-
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the Event&#34;&#34;&#34;
-        if not self.action:
-            raise ValueError(&#34;no action(s) set&#34;)
-        if self.isVersion(minor=0) and not self.trigger:
-            raise ValueError(&#34;no trigger set&#34;)
-
-        element = ET.Element(&#34;Event&#34;, attrib=self.get_attributes())
-        for action in self.action:
-            element.append(action.get_element())
-        if self.trigger:
-            element.append(self.trigger.get_element())
-        return element</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -1222,47 +58,6 @@ class Event(VersionBase):
 <span>(</span><span>name, starttrigger=None, stoptrigger=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>the Act class creates the Act of the OpenScenario</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>name (str): name of the act
-
-starttrigger (*Trigger): starttrigger of the act
-    Default: ValueTrigger('act_start',0,ConditionEdge.none,SimulationTimeCondition(0,Rule.greaterThan))
-
-stoptrigger (*Trigger): stoptrigger of the act (optional)
-</code></pre>
-<h2 id="attributes">Attributes</h2>
-<pre><code>name (str): name of the act
-
-starttrigger (*Trigger): starttrigger of the act
-
-stoptrigger (*Trigger): stoptrigger of the act (optional)
-
-maneuvergroup (list of ManeuverGroup): list of ManeuverGroups belonging to the act
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>parse(element)
-    parses a ElementTree created by the class and returns an instance of the class
-
-add_maneuver_group(maneuvergroup)
-    adds a maneuvuergroup to the act
-
-get_element()
-    Returns the full ElementTree of the class
-
-get_attributes()
-    Returns a dictionary of all attributes of the class
-</code></pre>
-<p>Initalize the Act</p>
-<h2 id="parameters_1">Parameters</h2>
-<pre><code>name (str): name of the act
-
-starttrigger (*Trigger): starttrigger of the act
-    Default: ValueTrigger('act_start',0,ConditionEdge.none,SimulationTimeCondition(0,Rule.greaterThan))
-
-stoptrigger (*Trigger): stoptrigger of the act (optional)
-    Default: Emptytrigger
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1328,6 +123,8 @@ stoptrigger (*Trigger): stoptrigger of the act (optional)
                 ConditionEdge.none,
                 SimulationTimeCondition(0, Rule.greaterThan),
             )
+        elif not isinstance(starttrigger, _TriggerType):
+            raise TypeError(&#34;starttrigger is not a valid TriggerType&#34;)
         elif starttrigger._triggerpoint == &#34;StopTrigger&#34;:
             raise ValueError(
                 &#34;the starttrigger provided does not have start as the triggeringpoint&#34;
@@ -1337,6 +134,8 @@ stoptrigger (*Trigger): stoptrigger of the act (optional)
 
         if stoptrigger == None:
             self.stoptrigger = EmptyTrigger(&#34;stop&#34;)
+        elif not isinstance(stoptrigger, _TriggerType):
+            raise TypeError(&#34;stoptrigger is not a valid TriggerType&#34;)
         elif stoptrigger._triggerpoint == &#34;StartTrigger&#34;:
             raise ValueError(&#34;the stoptrigger provided is not of type StopTrigger&#34;)
         else:
@@ -1407,6 +206,47 @@ stoptrigger (*Trigger): stoptrigger of the act (optional)
         element.append(self.stoptrigger.get_element())
         return element</code></pre>
 </details>
+<div class="desc"><p>the Act class creates the Act of the OpenScenario</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>name (str): name of the act
+
+starttrigger (*Trigger): starttrigger of the act
+    Default: ValueTrigger('act_start',0,ConditionEdge.none,SimulationTimeCondition(0,Rule.greaterThan))
+
+stoptrigger (*Trigger): stoptrigger of the act (optional)
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>name (str): name of the act
+
+starttrigger (*Trigger): starttrigger of the act
+
+stoptrigger (*Trigger): stoptrigger of the act (optional)
+
+maneuvergroup (list of ManeuverGroup): list of ManeuverGroups belonging to the act
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+add_maneuver_group(maneuvergroup)
+    adds a maneuvuergroup to the act
+
+get_element()
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of the class
+</code></pre>
+<p>Initalize the Act</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>name (str): name of the act
+
+starttrigger (*Trigger): starttrigger of the act
+    Default: ValueTrigger('act_start',0,ConditionEdge.none,SimulationTimeCondition(0,Rule.greaterThan))
+
+stoptrigger (*Trigger): stoptrigger of the act (optional)
+    Default: Emptytrigger
+</code></pre></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
@@ -1417,13 +257,6 @@ stoptrigger (*Trigger): stoptrigger of the act (optional)
 <span>def <span class="ident">parse</span></span>(<span>element)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Parses the xml element of Act</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>element (xml.etree.ElementTree.Element): A Act element (same as generated by the class itself)
-</code></pre>
-<h2 id="returns">Returns</h2>
-<pre><code>act (Act): a Act object
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1452,6 +285,13 @@ def parse(element):
         act.add_maneuver_group(ManeuverGroup.parse(m))
     return act</code></pre>
 </details>
+<div class="desc"><p>Parses the xml element of Act</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A Act element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>act (Act): a Act object
+</code></pre></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -1460,10 +300,6 @@ def parse(element):
 <span>def <span class="ident">add_maneuver_group</span></span>(<span>self, maneuvergroup)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adds a maneuvuergroup to the act</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>maneuvergroup (ManeuverGroup): the maneuvergroup to add
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1481,12 +317,15 @@ def parse(element):
     self.maneuvergroup.append(maneuvergroup)
     return self</code></pre>
 </details>
+<div class="desc"><p>adds a maneuvuergroup to the act</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>maneuvergroup (ManeuverGroup): the maneuvergroup to add
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xosc.storyboard.Act.get_attributes"><code class="name flex">
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes as a dict of the Act</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1495,12 +334,12 @@ def parse(element):
     &#34;&#34;&#34;returns the attributes as a dict of the Act&#34;&#34;&#34;
     return {&#34;name&#34;: self.name}</code></pre>
 </details>
+<div class="desc"><p>returns the attributes as a dict of the Act</p></div>
 </dd>
 <dt id="scenariogeneration.xosc.storyboard.Act.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the Act</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1517,6 +356,7 @@ def parse(element):
     element.append(self.stoptrigger.get_element())
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the Act</p></div>
 </dd>
 </dl>
 </dd>
@@ -1525,42 +365,6 @@ def parse(element):
 <span>(</span><span>name, priority, maxexecution=1)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>the Event class creates the event of OpenScenario</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>name (str): name of the event
-
-priority (Priority): what priority the event has
-
-maxexecution (int): the maximum allowed executions of the event
-    Default: 1
-</code></pre>
-<h2 id="attributes">Attributes</h2>
-<pre><code>name (str): name of the event
-
-priority (Priority): what priority the event has TODO: add definition
-
-maxexecution (int): the maximum allowed executions of the event
-
-action (list of actions): all actions belonging to the event
-
-trigger (*Trigger): a start trigger to the event
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>parse(element)
-    parses a ElementTree created by the class and returns an instance of the class
-
-add_trigger()
-    adds an trigger to the event
-
-add_action()
-    adds an action to the event (can be called multiple times)
-
-get_element()
-    Returns the full ElementTree of the class
-
-get_attributes()
-    Returns a dictionary of all attributes of the class
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1665,11 +469,11 @@ get_attributes()
         if not isinstance(trigger, _TriggerType):
             if isinstance(trigger, _ValueTriggerType):
                 raise TypeError(
-                    &#34;trigger input is a value trigger condition, please add to a ValueTrigger.&#34;
+                    &#34;trigger input is a value trigger condition, please add it to a ValueTrigger.&#34;
                 )
-            elif isinstance(_EntityTriggerType):
+            elif isinstance(trigger, _EntityTriggerType):
                 raise TypeError(
-                    &#34;trigger input is a entity trigger condition, please add to a EntityTrigger.&#34;
+                    &#34;trigger input is an entity trigger condition, please add it to an EntityTrigger.&#34;
                 )
             raise TypeError(&#34;trigger input is not a valid trigger&#34;)
         self.trigger = trigger
@@ -1709,6 +513,42 @@ get_attributes()
             element.append(self.trigger.get_element())
         return element</code></pre>
 </details>
+<div class="desc"><p>the Event class creates the event of OpenScenario</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>name (str): name of the event
+
+priority (Priority): what priority the event has
+
+maxexecution (int): the maximum allowed executions of the event
+    Default: 1
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>name (str): name of the event
+
+priority (Priority): what priority the event has TODO: add definition
+
+maxexecution (int): the maximum allowed executions of the event
+
+action (list of actions): all actions belonging to the event
+
+trigger (*Trigger): a start trigger to the event
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+add_trigger()
+    adds an trigger to the event
+
+add_action()
+    adds an action to the event (can be called multiple times)
+
+get_element()
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of the class
+</code></pre></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
@@ -1719,13 +559,6 @@ get_attributes()
 <span>def <span class="ident">parse</span></span>(<span>element)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Parses the xml element of Event</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>element (xml.etree.ElementTree.Element): A Event element (same as generated by the class itself)
-</code></pre>
-<h2 id="returns">Returns</h2>
-<pre><code>event (Event): a Event object
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1759,6 +592,13 @@ def parse(element):
 
     return event</code></pre>
 </details>
+<div class="desc"><p>Parses the xml element of Event</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A Event element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>event (Event): a Event object
+</code></pre></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -1767,10 +607,6 @@ def parse(element):
 <span>def <span class="ident">add_action</span></span>(<span>self, actionname, action)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adds an action to the Event, multiple actions can be added and will be ordered as added.</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>action (*Action): any action to be added to the event
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1788,15 +624,15 @@ def parse(element):
     self.action.append(_Action(actionname, action))
     return self</code></pre>
 </details>
+<div class="desc"><p>adds an action to the Event, multiple actions can be added and will be ordered as added.</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>action (*Action): any action to be added to the event
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xosc.storyboard.Event.add_trigger"><code class="name flex">
 <span>def <span class="ident">add_trigger</span></span>(<span>self, trigger)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adds a starging trigger to the event</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>trigger (*Trigger): Adds a trigger to start the event (not EmptyTrigger)
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1812,22 +648,25 @@ def parse(element):
     if not isinstance(trigger, _TriggerType):
         if isinstance(trigger, _ValueTriggerType):
             raise TypeError(
-                &#34;trigger input is a value trigger condition, please add to a ValueTrigger.&#34;
+                &#34;trigger input is a value trigger condition, please add it to a ValueTrigger.&#34;
             )
-        elif isinstance(_EntityTriggerType):
+        elif isinstance(trigger, _EntityTriggerType):
             raise TypeError(
-                &#34;trigger input is a entity trigger condition, please add to a EntityTrigger.&#34;
+                &#34;trigger input is an entity trigger condition, please add it to an EntityTrigger.&#34;
             )
         raise TypeError(&#34;trigger input is not a valid trigger&#34;)
     self.trigger = trigger
     return self</code></pre>
 </details>
+<div class="desc"><p>adds a starging trigger to the event</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>trigger (*Trigger): Adds a trigger to start the event (not EmptyTrigger)
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xosc.storyboard.Event.get_attributes"><code class="name flex">
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes as a dict of the Event</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1839,12 +678,12 @@ def parse(element):
         retdict[&#34;maximumExecutionCount&#34;] = str(self.maxexecution)
     return retdict</code></pre>
 </details>
+<div class="desc"><p>returns the attributes as a dict of the Event</p></div>
 </dd>
 <dt id="scenariogeneration.xosc.storyboard.Event.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the Event</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1863,6 +702,7 @@ def parse(element):
         element.append(self.trigger.get_element())
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the Event</p></div>
 </dd>
 </dl>
 </dd>
@@ -1870,28 +710,6 @@ def parse(element):
 <span>class <span class="ident">Init</span></span>
 </code></dt>
 <dd>
-<div class="desc"><p>the Init class, creates the init part of the storyboard</p>
-<h2 id="attributes">Attributes</h2>
-<pre><code>initactions (dir: {entityname: Action}): a directory
-    containing all init actions of the scenario
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>parse(element)
-    parses a ElementTree created by the class and returns an instance of the class
-
-get_element()
-    Returns the full ElementTree of the class
-
-add_init_action(entityname, action):
-    adds a private action to the init
-
-add_global_action(action):
-    adds a global action to the init
-
-add_user_defined_action(action):
-    adds a user defined action to the init
-</code></pre>
-<p>initalize the Init class</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2015,7 +833,8 @@ add_user_defined_action(action):
             action (CustomCommandAction): a custom command action (NOTE: a very crude implementation see actions.py)
 
         &#34;&#34;&#34;
-        # NOTE: since this is not really implemented no checkes are done here.
+        if not isinstance(action, CustomCommandAction):
+            raise TypeError(&#34;action is not of type CustomCommandAction&#34;)
         self.user_defined_actions.append(action)
         return self
 
@@ -2040,6 +859,28 @@ add_user_defined_action(action):
 
         return element</code></pre>
 </details>
+<div class="desc"><p>the Init class, creates the init part of the storyboard</p>
+<h2 id="attributes">Attributes</h2>
+<pre><code>initactions (dir: {entityname: Action}): a directory
+    containing all init actions of the scenario
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+get_element()
+    Returns the full ElementTree of the class
+
+add_init_action(entityname, action):
+    adds a private action to the init
+
+add_global_action(action):
+    adds a global action to the init
+
+add_user_defined_action(action):
+    adds a user defined action to the init
+</code></pre>
+<p>initalize the Init class</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
@@ -2050,14 +891,6 @@ add_user_defined_action(action):
 <span>def <span class="ident">parse</span></span>(<span>element)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Parses the xml element of Init
-NOTE: no UserDefinedActions are parsed.</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>element (xml.etree.ElementTree.Element): A Init element (same as generated by the class itself)
-</code></pre>
-<h2 id="returns">Returns</h2>
-<pre><code>init (Init): a Init object
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2093,6 +926,14 @@ def parse(element):
 
     return init</code></pre>
 </details>
+<div class="desc"><p>Parses the xml element of Init
+NOTE: no UserDefinedActions are parsed.</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A Init element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>init (Init): a Init object
+</code></pre></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -2101,10 +942,6 @@ def parse(element):
 <span>def <span class="ident">add_global_action</span></span>(<span>self, action)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>add_global_action adds a global action to the init</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>action (*Action): any global action to add to the init
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2126,16 +963,15 @@ def parse(element):
     self.global_actions.append(action)
     return self</code></pre>
 </details>
+<div class="desc"><p>add_global_action adds a global action to the init</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>action (*Action): any global action to add to the init
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xosc.storyboard.Init.add_init_action"><code class="name flex">
 <span>def <span class="ident">add_init_action</span></span>(<span>self, entityname, action)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>add_init_action adds an Private Action to the init.</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>entityname (str): name of the entity to add the action to
-action (*Action): Any private action to be added (like TeleportAction)
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2160,15 +996,16 @@ action (*Action): Any private action to be added (like TeleportAction)
 
     self.initactions[entityname].append(action)</code></pre>
 </details>
+<div class="desc"><p>add_init_action adds an Private Action to the init.</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>entityname (str): name of the entity to add the action to
+action (*Action): Any private action to be added (like TeleportAction)
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xosc.storyboard.Init.add_user_defined_action"><code class="name flex">
 <span>def <span class="ident">add_user_defined_action</span></span>(<span>self, action)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>add_user_defined_action adds a userDefined action to the init</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>action (CustomCommandAction): a custom command action (NOTE: a very crude implementation see actions.py)
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2181,16 +1018,20 @@ action (*Action): Any private action to be added (like TeleportAction)
         action (CustomCommandAction): a custom command action (NOTE: a very crude implementation see actions.py)
 
     &#34;&#34;&#34;
-    # NOTE: since this is not really implemented no checkes are done here.
+    if not isinstance(action, CustomCommandAction):
+        raise TypeError(&#34;action is not of type CustomCommandAction&#34;)
     self.user_defined_actions.append(action)
     return self</code></pre>
 </details>
+<div class="desc"><p>add_user_defined_action adds a userDefined action to the init</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>action (CustomCommandAction): a custom command action (NOTE: a very crude implementation see actions.py)
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xosc.storyboard.Init.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the Init</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2216,6 +1057,7 @@ action (*Action): Any private action to be added (like TeleportAction)
 
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the Init</p></div>
 </dd>
 </dl>
 </dd>
@@ -2224,44 +1066,6 @@ action (*Action): Any private action to be added (like TeleportAction)
 <span>(</span><span>name, parameters=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>The Maneuver class creates the Maneuver of OpenScenario</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>name (str): name of the Maneuver
-
-parameters (ParameterDeclaration): Parameter declarations for the maneuver
-    Default: None
-</code></pre>
-<h2 id="attributes">Attributes</h2>
-<pre><code>name (str): name of the Maneuver
-
-events (list of Event): all events belonging to the Maneuver
-
-parameters (ParameterDeclaration): Parameter declarations for the maneuver
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>parse(element)
-    parses a ElementTree created by the class and returns an instance of the class
-
-add_event (event)
-    adds an event to the Maneuver
-
-append_to_catalog(filename)
-    adds the vehicle to an existing catalog
-
-dump_to_catalog(filename,name,description,author)
-    crates a new catalog with the vehicle
-
-get_element()
-    Returns the full ElementTree of the class
-
-get_attributes()
-    Returns a dictionary of all attributes of the class
-</code></pre>
-<p>initalizes the Maneuver
-Parameters</p>
-<hr>
-<pre><code>name (str): name of the Maneuver
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2385,6 +1189,44 @@ Parameters</p>
 
         return element</code></pre>
 </details>
+<div class="desc"><p>The Maneuver class creates the Maneuver of OpenScenario</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>name (str): name of the Maneuver
+
+parameters (ParameterDeclaration): Parameter declarations for the maneuver
+    Default: None
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>name (str): name of the Maneuver
+
+events (list of Event): all events belonging to the Maneuver
+
+parameters (ParameterDeclaration): Parameter declarations for the maneuver
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+add_event (event)
+    adds an event to the Maneuver
+
+append_to_catalog(filename)
+    adds the vehicle to an existing catalog
+
+dump_to_catalog(filename,name,description,author)
+    crates a new catalog with the vehicle
+
+get_element()
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of the class
+</code></pre>
+<p>initalizes the Maneuver
+Parameters</p>
+<hr>
+<pre><code>name (str): name of the Maneuver
+</code></pre></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xosc.utils._BaseCatalog</li>
@@ -2396,13 +1238,6 @@ Parameters</p>
 <span>def <span class="ident">parse</span></span>(<span>element)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Parses the xml element of Maneuver</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>element (xml.etree.ElementTree.Element): A Maneuver element (same as generated by the class itself)
-</code></pre>
-<h2 id="returns">Returns</h2>
-<pre><code>maneuver (Maneuver): a Maneuver object
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2432,6 +1267,13 @@ def parse(element):
         man.add_event(Event.parse(e))
     return man</code></pre>
 </details>
+<div class="desc"><p>Parses the xml element of Maneuver</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A Maneuver element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>maneuver (Maneuver): a Maneuver object
+</code></pre></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -2440,10 +1282,6 @@ def parse(element):
 <span>def <span class="ident">add_event</span></span>(<span>self, event)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adds an event to the Maneuver</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>name (Event): the event to add to the Maneuver
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2461,12 +1299,15 @@ def parse(element):
     self.events.append(event)
     return self</code></pre>
 </details>
+<div class="desc"><p>adds an event to the Maneuver</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>name (Event): the event to add to the Maneuver
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xosc.storyboard.Maneuver.get_attributes"><code class="name flex">
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes as a dict of the Maneuver</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2475,12 +1316,12 @@ def parse(element):
     &#34;&#34;&#34;returns the attributes as a dict of the Maneuver&#34;&#34;&#34;
     return {&#34;name&#34;: self.name}</code></pre>
 </details>
+<div class="desc"><p>returns the attributes as a dict of the Maneuver</p></div>
 </dd>
 <dt id="scenariogeneration.xosc.storyboard.Maneuver.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the Maneuver</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2497,6 +1338,7 @@ def parse(element):
 
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the Maneuver</p></div>
 </dd>
 </dl>
 </dd>
@@ -2505,49 +1347,6 @@ def parse(element):
 <span>(</span><span>name, maxexecution=1, selecttriggeringentities=False)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>the ManeuverGroup creates the ManeuverGroup of the OpenScenario</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>name (str): name of the ManeuverGroup
-
-maxexecution (int): maximum number of iterations
-
-selecttriggeringentities (bool): Have no idea what this does ??? TODO: check
-</code></pre>
-<h2 id="attributes">Attributes</h2>
-<pre><code>name (str): name of the ManeuverGroup
-
-maxexecution (int): maximum number of iterations
-
-selecttriggeringentities (bool): Have no idea what this does ??? TODO: check
-
-maneuvers (list of Maneuver): the maneuvers in the ManeuverGroup
-
-actors (_Actors): all actors of the ManeuverGroup
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>parse(element)
-    parses a ElementTree created by the class and returns an instance of the class
-
-add_maneuver(Maneuver)
-    adds a maneuver to the ManeuverGroup
-
-add_actor(entity)
-    adds an actor to the ManeuverGroup
-
-get_element()
-    Returns the full ElementTree of the class
-
-get_attributes()
-    Returns a dictionary of all attributes of the class
-</code></pre>
-<p>initalize the ManeuverGroup</p>
-<h2 id="parameters_1">Parameters</h2>
-<pre><code>name (str): name of the ManeuverGroup
-
-maxexecution (int): maximum number of iterations
-
-selecttriggeringentities (bool): Have no idea what this does ??? TODO: check
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2685,6 +1484,49 @@ selecttriggeringentities (bool): Have no idea what this does ??? TODO: check
             element.append(man.get_element())
         return element</code></pre>
 </details>
+<div class="desc"><p>the ManeuverGroup creates the ManeuverGroup of the OpenScenario</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>name (str): name of the ManeuverGroup
+
+maxexecution (int): maximum number of iterations
+
+selecttriggeringentities (bool): Have no idea what this does ??? TODO: check
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>name (str): name of the ManeuverGroup
+
+maxexecution (int): maximum number of iterations
+
+selecttriggeringentities (bool): Have no idea what this does ??? TODO: check
+
+maneuvers (list of Maneuver): the maneuvers in the ManeuverGroup
+
+actors (_Actors): all actors of the ManeuverGroup
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+add_maneuver(Maneuver)
+    adds a maneuver to the ManeuverGroup
+
+add_actor(entity)
+    adds an actor to the ManeuverGroup
+
+get_element()
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of the class
+</code></pre>
+<p>initalize the ManeuverGroup</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>name (str): name of the ManeuverGroup
+
+maxexecution (int): maximum number of iterations
+
+selecttriggeringentities (bool): Have no idea what this does ??? TODO: check
+</code></pre></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
@@ -2695,13 +1537,6 @@ selecttriggeringentities (bool): Have no idea what this does ??? TODO: check
 <span>def <span class="ident">parse</span></span>(<span>element)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Parses the xml element of ManeuverGroup</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>element (xml.etree.ElementTree.Element): A ManeuverGroup element (same as generated by the class itself)
-</code></pre>
-<h2 id="returns">Returns</h2>
-<pre><code>maneuver_group (ManeuverGroup): a ManeuverGroup object
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2732,6 +1567,13 @@ def parse(element):
 
     return maneuver_group</code></pre>
 </details>
+<div class="desc"><p>Parses the xml element of ManeuverGroup</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A ManeuverGroup element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>maneuver_group (ManeuverGroup): a ManeuverGroup object
+</code></pre></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -2740,10 +1582,6 @@ def parse(element):
 <span>def <span class="ident">add_actor</span></span>(<span>self, entity)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adds an actor to the ManeuverGroup</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>entity (str): name of the entity to add as an actor
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2759,15 +1597,15 @@ def parse(element):
     self.actors.add_actor(entity)
     return self</code></pre>
 </details>
+<div class="desc"><p>adds an actor to the ManeuverGroup</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>entity (str): name of the entity to add as an actor
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xosc.storyboard.ManeuverGroup.add_maneuver"><code class="name flex">
 <span>def <span class="ident">add_maneuver</span></span>(<span>self, maneuver)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adds a maneuver to the ManeuverGroup</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>maneuver (Maneuver, or CatalogReference): maneuver to add
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2787,12 +1625,15 @@ def parse(element):
     self.maneuvers.append(maneuver)
     return self</code></pre>
 </details>
+<div class="desc"><p>adds a maneuver to the ManeuverGroup</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>maneuver (Maneuver, or CatalogReference): maneuver to add
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xosc.storyboard.ManeuverGroup.get_attributes"><code class="name flex">
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes as a dict of the ManeuverGroup</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2801,12 +1642,12 @@ def parse(element):
     &#34;&#34;&#34;returns the attributes as a dict of the ManeuverGroup&#34;&#34;&#34;
     return {&#34;name&#34;: self.name, &#34;maximumExecutionCount&#34;: str(self.maxexecution)}</code></pre>
 </details>
+<div class="desc"><p>returns the attributes as a dict of the ManeuverGroup</p></div>
 </dd>
 <dt id="scenariogeneration.xosc.storyboard.ManeuverGroup.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the ManeuverGroup</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2819,47 +1660,15 @@ def parse(element):
         element.append(man.get_element())
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the ManeuverGroup</p></div>
 </dd>
 </dl>
 </dd>
 <dt id="scenariogeneration.xosc.storyboard.Story"><code class="flex name class">
 <span>class <span class="ident">Story</span></span>
-<span>(</span><span>name, parameters=&lt;scenariogeneration.xosc.utils.ParameterDeclarations object&gt;)</span>
+<span>(</span><span>name,<br>parameters=&lt;scenariogeneration.xosc.utils.ParameterDeclarations object&gt;)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>The Story class creates a story of the OpenScenario</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>name (str): name of the story
-
-parameters (ParameterDeclarations): the parameters of the Story
-    Default: ParameterDeclarations()
-</code></pre>
-<h2 id="attributes">Attributes</h2>
-<pre><code>name (str): name of the story
-
-parameters (ParameterDeclarations): the parameters of the story (optional)
-
-acts (list of Act): all acts belonging to the story
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>parse(element)
-    parses a ElementTree created by the class and returns an instance of the class
-
-add_act(act)
-    adds an act to the story
-
-get_element()
-    Returns the full ElementTree of the class
-
-get_attributes()
-    Returns a dictionary of all attributes of the class
-</code></pre>
-<p>initalizes the Story class</p>
-<h2 id="parameters_1">Parameters</h2>
-<pre><code>name (str): name of the story
-
-parameters (ParameterDeclarations): the parameters of the Story
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2978,6 +1787,39 @@ parameters (ParameterDeclarations): the parameters of the Story
             element.append(a.get_element())
         return element</code></pre>
 </details>
+<div class="desc"><p>The Story class creates a story of the OpenScenario</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>name (str): name of the story
+
+parameters (ParameterDeclarations): the parameters of the Story
+    Default: ParameterDeclarations()
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>name (str): name of the story
+
+parameters (ParameterDeclarations): the parameters of the story (optional)
+
+acts (list of Act): all acts belonging to the story
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+add_act(act)
+    adds an act to the story
+
+get_element()
+    Returns the full ElementTree of the class
+
+get_attributes()
+    Returns a dictionary of all attributes of the class
+</code></pre>
+<p>initalizes the Story class</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>name (str): name of the story
+
+parameters (ParameterDeclarations): the parameters of the Story
+</code></pre></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
@@ -2988,13 +1830,6 @@ parameters (ParameterDeclarations): the parameters of the Story
 <span>def <span class="ident">parse</span></span>(<span>element)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Parses the xml element of Story</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>element (xml.etree.ElementTree.Element): A Story element (same as generated by the class itself)
-</code></pre>
-<h2 id="returns">Returns</h2>
-<pre><code>story (Story): a Story object
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3024,6 +1859,13 @@ def parse(element):
         story.add_act(Act.parse(a))
     return story</code></pre>
 </details>
+<div class="desc"><p>Parses the xml element of Story</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A Story element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>story (Story): a Story object
+</code></pre></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -3032,10 +1874,6 @@ def parse(element):
 <span>def <span class="ident">add_act</span></span>(<span>self, act)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adds an act to the story</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>act (Act): act to add to the story
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3053,12 +1891,15 @@ def parse(element):
     self.acts.append(act)
     return self</code></pre>
 </details>
+<div class="desc"><p>adds an act to the story</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>act (Act): act to add to the story
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xosc.storyboard.Story.get_attributes"><code class="name flex">
 <span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the attributes as a dict of the Story</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3067,12 +1908,12 @@ def parse(element):
     &#34;&#34;&#34;returns the attributes as a dict of the Story&#34;&#34;&#34;
     return {&#34;name&#34;: self.name}</code></pre>
 </details>
+<div class="desc"><p>returns the attributes as a dict of the Story</p></div>
 </dd>
 <dt id="scenariogeneration.xosc.storyboard.Story.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the Story</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3088,49 +1929,15 @@ def parse(element):
         element.append(a.get_element())
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the Story</p></div>
 </dd>
 </dl>
 </dd>
 <dt id="scenariogeneration.xosc.storyboard.StoryBoard"><code class="flex name class">
 <span>class <span class="ident">StoryBoard</span></span>
-<span>(</span><span>init=&lt;scenariogeneration.xosc.storyboard.Init object&gt;, stoptrigger=&lt;scenariogeneration.xosc.triggers.EmptyTrigger object&gt;)</span>
+<span>(</span><span>init=&lt;scenariogeneration.xosc.storyboard.Init object&gt;,<br>stoptrigger=&lt;scenariogeneration.xosc.triggers.EmptyTrigger object&gt;)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>The StoryBoard class creates the storyboard of OpenScenario</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>init (Init): the init part of the storyboard
-
-stoptrigger (Valuetrigger, Entitytrigger or EmptyTrigger):
-    the stoptrigger of the storyboard (optional)
-    Default (EmptyTrigger)
-</code></pre>
-<h2 id="attributes">Attributes</h2>
-<pre><code>init (Init): the init of the storyboard
-
-stoptrigger (Valuetrigger, Entitytrigger or EmptyTrigger):
-    the stoptrigger
-
-stories (list of Story): all stories of the scenario
-</code></pre>
-<h2 id="methods">Methods</h2>
-<pre><code>parse(element)
-    parses a ElementTree created by the class and returns an instance of the class
-
-add_story (story)
-    adds a story to the storyboard
-
-get_element()
-    Returns the full ElementTree of the class
-</code></pre>
-<p>initalizes the storyboard</p>
-<h2 id="parameters_1">Parameters</h2>
-<pre><code>init (Init): the init part of the storyboard
-    Default: Init()
-
-stoptrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigger):
-    the stoptrigger of the storyboard (optional)
-    Default: (EmptyTrigger)
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3292,11 +2099,14 @@ stoptrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigge
                 ConditionEdge.rising,
                 SimulationTimeCondition(0, Rule.greaterThan),
             )
+        elif not isinstance(starttrigger, _TriggerType):
+            raise TypeError(&#34;starttrigger is not a Trigger type&#34;)
         elif starttrigger._triggerpoint == &#34;StopTrigger&#34;:
             raise ValueError(
                 &#34;the starttrigger provided does not have start as the triggeringpoint&#34;
             )
-
+        if not isinstance(stoptrigger, _TriggerType):
+            raise TypeError(&#34;stoptrigger is not a Trigger type&#34;)
         if stoptrigger._triggerpoint == &#34;StartTrigger&#34;:
             raise ValueError(&#34;the stoptrigger provided is not of type StopTrigger&#34;)
         newact = Act(&#34;act_&#34; + maneuvergroup.name, starttrigger, stoptrigger)
@@ -3373,6 +2183,41 @@ stoptrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigge
 
         return element</code></pre>
 </details>
+<div class="desc"><p>The StoryBoard class creates the storyboard of OpenScenario</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>init (Init): the init part of the storyboard
+
+stoptrigger (Valuetrigger, Entitytrigger or EmptyTrigger):
+    the stoptrigger of the storyboard (optional)
+    Default (EmptyTrigger)
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>init (Init): the init of the storyboard
+
+stoptrigger (Valuetrigger, Entitytrigger or EmptyTrigger):
+    the stoptrigger
+
+stories (list of Story): all stories of the scenario
+</code></pre>
+<h2 id="methods">Methods</h2>
+<pre><code>parse(element)
+    parses a ElementTree created by the class and returns an instance of the class
+
+add_story (story)
+    adds a story to the storyboard
+
+get_element()
+    Returns the full ElementTree of the class
+</code></pre>
+<p>initalizes the storyboard</p>
+<h2 id="parameters_1">Parameters</h2>
+<pre><code>init (Init): the init part of the storyboard
+    Default: Init()
+
+stoptrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigger):
+    the stoptrigger of the storyboard (optional)
+    Default: (EmptyTrigger)
+</code></pre></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xosc.enumerations.VersionBase" href="enumerations.html#scenariogeneration.xosc.enumerations.VersionBase">VersionBase</a></li>
@@ -3383,13 +2228,6 @@ stoptrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigge
 <span>def <span class="ident">parse</span></span>(<span>element)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Parses the xml element of StoryBoard</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>element (xml.etree.ElementTree.Element): A StoryBoard element (same as generated by the class itself)
-</code></pre>
-<h2 id="returns">Returns</h2>
-<pre><code>storyboard (StoryBoard): a StoryBoard object
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3415,22 +2253,21 @@ def parse(element):
         storyboard.add_story(Story.parse(s))
     return storyboard</code></pre>
 </details>
+<div class="desc"><p>Parses the xml element of StoryBoard</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>element (xml.etree.ElementTree.Element): A StoryBoard element (same as generated by the class itself)
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>storyboard (StoryBoard): a StoryBoard object
+</code></pre></div>
 </dd>
 </dl>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.storyboard.StoryBoard.add_act"><code class="name flex">
-<span>def <span class="ident">add_act</span></span>(<span>self, act, parameters=&lt;scenariogeneration.xosc.utils.ParameterDeclarations object&gt;)</span>
+<span>def <span class="ident">add_act</span></span>(<span>self,<br>act,<br>parameters=&lt;scenariogeneration.xosc.utils.ParameterDeclarations object&gt;)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>add_act is a quick way to add a single act to one story, for multi act type of scenarios, use Story instead.</p>
-<p>NOTE: if used multiple times multiple stories will be created</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>act (Act): the Act to add
-
-parameters (ParameterDeclarations): the parameters of the story (optional)
-    Default: ParameterDeclarations()
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3454,27 +2291,19 @@ parameters (ParameterDeclarations): the parameters of the story (optional)
     self.stories.append(newstory)
     return self</code></pre>
 </details>
-</dd>
-<dt id="scenariogeneration.xosc.storyboard.StoryBoard.add_maneuver"><code class="name flex">
-<span>def <span class="ident">add_maneuver</span></span>(<span>self, maneuver, actors=None, starttrigger=None, stoptrigger=&lt;scenariogeneration.xosc.triggers.EmptyTrigger object&gt;, parameters=&lt;scenariogeneration.xosc.utils.ParameterDeclarations object&gt;)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>add_maneuver is a quick way to add a single maneuver to one story, for multi maneuver type of scenarios, use ManeuverGroup instead.</p>
+<div class="desc"><p>add_act is a quick way to add a single act to one story, for multi act type of scenarios, use Story instead.</p>
 <p>NOTE: if used multiple times multiple stories will be created</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>maneuver (Maneuver or CatalogReference): the Maneuver to add
-
-actors (list of 'str', or 'str'): list of all actors in the maneuver or just a name of the actor
-
-starttrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigger): starttrigger for the act
-    Default: at simulationtime 0
-
-stoptrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigger): stoptrigger for the act
-    Default: EmptyTrigger('stop')
+<pre><code>act (Act): the Act to add
 
 parameters (ParameterDeclarations): the parameters of the story (optional)
-    Default: None
+    Default: ParameterDeclarations()
 </code></pre></div>
+</dd>
+<dt id="scenariogeneration.xosc.storyboard.StoryBoard.add_maneuver"><code class="name flex">
+<span>def <span class="ident">add_maneuver</span></span>(<span>self,<br>maneuver,<br>actors=None,<br>starttrigger=None,<br>stoptrigger=&lt;scenariogeneration.xosc.triggers.EmptyTrigger object&gt;,<br>parameters=&lt;scenariogeneration.xosc.utils.ParameterDeclarations object&gt;)</span>
+</code></dt>
+<dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3531,15 +2360,12 @@ parameters (ParameterDeclarations): the parameters of the story (optional)
     )
     return self</code></pre>
 </details>
-</dd>
-<dt id="scenariogeneration.xosc.storyboard.StoryBoard.add_maneuver_group"><code class="name flex">
-<span>def <span class="ident">add_maneuver_group</span></span>(<span>self, maneuvergroup, starttrigger=None, stoptrigger=&lt;scenariogeneration.xosc.triggers.EmptyTrigger object&gt;, parameters=&lt;scenariogeneration.xosc.utils.ParameterDeclarations object&gt;)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>add_maneuver_group is a quick way to add a single maneuver_group to one story, for multi maneuver_group type of scenarios, use Act instead.</p>
+<div class="desc"><p>add_maneuver is a quick way to add a single maneuver to one story, for multi maneuver type of scenarios, use ManeuverGroup instead.</p>
 <p>NOTE: if used multiple times multiple stories will be created</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>maneuvergroup (ManeuverGroup): the ManeuverGroup to add
+<pre><code>maneuver (Maneuver or CatalogReference): the Maneuver to add
+
+actors (list of 'str', or 'str'): list of all actors in the maneuver or just a name of the actor
 
 starttrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigger): starttrigger for the act
     Default: at simulationtime 0
@@ -3548,8 +2374,13 @@ stoptrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigge
     Default: EmptyTrigger('stop')
 
 parameters (ParameterDeclarations): the parameters of the story (optional)
-    Default: ParameterDeclarations()
+    Default: None
 </code></pre></div>
+</dd>
+<dt id="scenariogeneration.xosc.storyboard.StoryBoard.add_maneuver_group"><code class="name flex">
+<span>def <span class="ident">add_maneuver_group</span></span>(<span>self,<br>maneuvergroup,<br>starttrigger=None,<br>stoptrigger=&lt;scenariogeneration.xosc.triggers.EmptyTrigger object&gt;,<br>parameters=&lt;scenariogeneration.xosc.utils.ParameterDeclarations object&gt;)</span>
+</code></dt>
+<dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3588,11 +2419,14 @@ parameters (ParameterDeclarations): the parameters of the story (optional)
             ConditionEdge.rising,
             SimulationTimeCondition(0, Rule.greaterThan),
         )
+    elif not isinstance(starttrigger, _TriggerType):
+        raise TypeError(&#34;starttrigger is not a Trigger type&#34;)
     elif starttrigger._triggerpoint == &#34;StopTrigger&#34;:
         raise ValueError(
             &#34;the starttrigger provided does not have start as the triggeringpoint&#34;
         )
-
+    if not isinstance(stoptrigger, _TriggerType):
+        raise TypeError(&#34;stoptrigger is not a Trigger type&#34;)
     if stoptrigger._triggerpoint == &#34;StartTrigger&#34;:
         raise ValueError(&#34;the stoptrigger provided is not of type StopTrigger&#34;)
     newact = Act(&#34;act_&#34; + maneuvergroup.name, starttrigger, stoptrigger)
@@ -3600,15 +2434,25 @@ parameters (ParameterDeclarations): the parameters of the story (optional)
     self.add_act(newact, parameters)
     return self</code></pre>
 </details>
+<div class="desc"><p>add_maneuver_group is a quick way to add a single maneuver_group to one story, for multi maneuver_group type of scenarios, use Act instead.</p>
+<p>NOTE: if used multiple times multiple stories will be created</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>maneuvergroup (ManeuverGroup): the ManeuverGroup to add
+
+starttrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigger): starttrigger for the act
+    Default: at simulationtime 0
+
+stoptrigger (Valuetrigger, Entitytrigger, Trigger, ConditionGroup or EmptyTrigger): stoptrigger for the act
+    Default: EmptyTrigger('stop')
+
+parameters (ParameterDeclarations): the parameters of the story (optional)
+    Default: ParameterDeclarations()
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xosc.storyboard.StoryBoard.add_story"><code class="name flex">
 <span>def <span class="ident">add_story</span></span>(<span>self, story)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adds a story to the storyboard</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>story (Story): the story to be added
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3626,12 +2470,15 @@ parameters (ParameterDeclarations): the parameters of the story (optional)
     self.stories.append(story)
     return self</code></pre>
 </details>
+<div class="desc"><p>adds a story to the storyboard</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>story (Story): the story to be added
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xosc.storyboard.StoryBoard.get_element"><code class="name flex">
 <span>def <span class="ident">get_element</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the elementTree of the Storyboard</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3653,6 +2500,7 @@ parameters (ParameterDeclarations): the parameters of the story (optional)
 
     return element</code></pre>
 </details>
+<div class="desc"><p>returns the elementTree of the Storyboard</p></div>
 </dd>
 </dl>
 </dd>
@@ -3660,7 +2508,6 @@ parameters (ParameterDeclarations): the parameters of the story (optional)
 </section>
 </article>
 <nav id="sidebar">
-<h1>Index</h1>
 <div class="toc">
 <ul></ul>
 </div>
@@ -3746,7 +2593,7 @@ parameters (ParameterDeclarations): the parameters of the story (optional)
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
 </footer>
 </body>
 </html>

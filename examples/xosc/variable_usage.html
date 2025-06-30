@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.6">
-<title>examples.generator.generate_from_main API documentation</title>
+<title>examples.xosc.variable_usage API documentation</title>
 <meta name="description" content="scenariogeneration
 https://github.com/pyoscx/scenariogeneration …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
@@ -34,7 +34,7 @@ el.replaceWith(d);
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>examples.generator.generate_from_main</code></h1>
+<h1 class="title">Module <code>examples.xosc.variable_usage</code></h1>
 </header>
 <section id="section-intro">
 <p>scenariogeneration
@@ -43,9 +43,23 @@ el.replaceWith(d);
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
 <p>Copyright (c) 2022 The scenariogeneration Authors.</p>
-<p>example of creating OpenSCENARIO and OpenDRIVE file, with the parameters defined outside the class structure</p>
-<p>Example usage: when a itterative procedure is defined and the parameters to the Scenario will change</p>
-<p>Will generate 9 scenarios</p>
+<p>An example creates a variable and change it, triggering an entity
+based on the variable</p>
+<p>Some features used:</p>
+<ul>
+<li>
+<p>VariableCondition</p>
+</li>
+<li>
+<p>VariableDeclarations</p>
+</li>
+<li>
+<p>RelativeLaneChangeAction</p>
+</li>
+<li>
+<p>VariableSetAction</p>
+</li>
+</ul>
 </section>
 <section>
 </section>
@@ -56,7 +70,7 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="examples.generator.generate_from_main.Scenario"><code class="flex name class">
+<dt id="examples.xosc.variable_usage.Scenario"><code class="flex name class">
 <span>class <span class="ident">Scenario</span></span>
 </code></dt>
 <dd>
@@ -66,95 +80,118 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 </summary>
 <pre><code class="python">class Scenario(ScenarioGenerator):
     def __init__(self):
-        ScenarioGenerator.__init__(self)
-        self.naming = &#34;numerical&#34;
-
-    def road(self, **kwargs):
-        road = xodr.create_road(
-            [
-                xodr.Spiral(0.0000000001, kwargs[&#34;road_curvature&#34;], 100),
-                xodr.Arc(kwargs[&#34;road_curvature&#34;], 50),
-                xodr.Spiral(kwargs[&#34;road_curvature&#34;], 0.0000000001, 100),
-                xodr.Line(100),
-            ],
-            id=0,
-            left_lanes=2,
-            right_lanes=2,
-        )
-        odr = xodr.OpenDrive(&#34;myroad&#34;)
-        odr.add_road(road)
-        odr.adjust_roads_and_lanes()
-        return odr
+        super().__init__()
+        self.open_scenario_version = 2
 
     def scenario(self, **kwargs):
-        road = xosc.RoadNetwork(self.road_file)
+        ### create catalogs
+        catalog = xosc.Catalog()
+        catalog.add_catalog(&#34;VehicleCatalog&#34;, &#34;../xosc/Catalogs/Vehicles&#34;)
+
+        ### create road
+        road = xosc.RoadNetwork(
+            roadfile=&#34;../xodr/e6mini.xodr&#34;, scenegraph=&#34;../models/e6mini.osgb&#34;
+        )
+
+        ### create parameters
+        paramdec = xosc.ParameterDeclarations()
+        variabledec = xosc.VariableDeclarations()
+        variabledec.add_variable(
+            xosc.Variable(&#34;myvar&#34;, xosc.ParameterType.integer, 0)
+        )
+        ## create entities
+
         egoname = &#34;Ego&#34;
+
         entities = xosc.Entities()
         entities.add_scenario_object(
             egoname, xosc.CatalogReference(&#34;VehicleCatalog&#34;, &#34;car_white&#34;)
         )
 
-        catalog = xosc.Catalog()
-        catalog.add_catalog(&#34;VehicleCatalog&#34;, &#34;../xosc/Catalogs/Vehicles&#34;)
+        ### create init
 
         init = xosc.Init()
-
-        init.add_init_action(
-            egoname, xosc.TeleportAction(xosc.LanePosition(50, 0, -2, 0))
-        )
-        init.add_init_action(
-            egoname,
-            xosc.AbsoluteSpeedAction(
-                kwargs[&#34;speed&#34;],
-                xosc.TransitionDynamics(
-                    xosc.DynamicsShapes.step, xosc.DynamicsDimension.time, 1
-                ),
-            ),
+        step_time = xosc.TransitionDynamics(
+            xosc.DynamicsShapes.step, xosc.DynamicsDimension.time, 1
         )
 
-        event = xosc.Event(&#34;my event&#34;, xosc.Priority.overwrite)
-        event.add_action(
-            &#34;lane change&#34;,
-            xosc.AbsoluteLaneChangeAction(
+        init.add_init_action(egoname, xosc.AbsoluteSpeedAction(30, step_time))
+        init.add_init_action(
+            egoname, xosc.TeleportAction(xosc.LanePosition(25, 0, -3, 0))
+        )
+
+        var_event = xosc.Event(&#34;change_variable_event&#34;, xosc.Priority.override)
+        var_event.add_action(
+            &#34;change variable&#34;, xosc.VariableSetAction(&#34;myvar&#34;, 1)
+        )
+        var_event.add_trigger(
+            xosc.ValueTrigger(
+                &#34;timetrigger&#34;,
+                0,
+                xosc.ConditionEdge.none,
+                xosc.SimulationTimeCondition(2, xosc.Rule.greaterThan),
+            )
+        )
+        var_man = xosc.Maneuver(&#34;change_variable&#34;)
+        var_man.add_event(var_event)
+
+        var_mangr = xosc.ManeuverGroup(&#34;mangroup&#34;)
+        var_mangr.add_maneuver(var_man)
+
+        ego_event = xosc.Event(&#34;ego_event&#34;, xosc.Priority.override)
+        ego_event.add_action(
+            &#34;ego action&#34;,
+            xosc.RelativeLaneChangeAction(
                 -1,
+                egoname,
                 xosc.TransitionDynamics(
                     xosc.DynamicsShapes.sinusoidal,
                     xosc.DynamicsDimension.time,
-                    4,
+                    3,
                 ),
             ),
         )
-        event.add_trigger(
+        ego_event.add_trigger(
             xosc.ValueTrigger(
-                &#34;start_trigger &#34;,
-                0,
+                &#34;timetrigger&#34;,
+                1,
                 xosc.ConditionEdge.none,
-                xosc.SimulationTimeCondition(4, xosc.Rule.greaterThan),
+                xosc.VariableCondition(&#34;myvar&#34;, 1, xosc.Rule.equalTo),
             )
         )
+        ego_man = xosc.Maneuver(&#34;ego_maneuver&#34;)
+        ego_man.add_event(ego_event)
+        ego_mangr = xosc.ManeuverGroup(&#34;ego_mangroup&#34;)
+        ego_mangr.add_actor(egoname)
+        ego_mangr.add_maneuver(ego_man)
 
-        man = xosc.Maneuver(&#34;maneuver&#34;)
-        man.add_event(event)
-
+        act = xosc.Act(&#34;act1&#34;)
+        act.add_maneuver_group(var_mangr)
+        act.add_maneuver_group(ego_mangr)
+        ## create the storyboard
         sb = xosc.StoryBoard(
             init,
-            stoptrigger=xosc.ValueTrigger(
-                &#34;start_trigger &#34;,
+            xosc.ValueTrigger(
+                &#34;stop_simulation&#34;,
                 0,
-                xosc.ConditionEdge.none,
-                xosc.SimulationTimeCondition(13, xosc.Rule.greaterThan),
+                xosc.ConditionEdge.rising,
+                xosc.SimulationTimeCondition(10, xosc.Rule.greaterThan),
                 &#34;stop&#34;,
             ),
         )
-        sb.add_maneuver(man, egoname)
+        sb.add_act(act)
+
+        ## create the scenario
         sce = xosc.Scenario(
-            &#34;my scenario&#34;,
+            &#34;adaptspeed_example&#34;,
             &#34;Mandolin&#34;,
-            xosc.ParameterDeclarations(),
-            entities,
-            sb,
-            road,
-            catalog,
+            paramdec,
+            entities=entities,
+            storyboard=sb,
+            roadnetwork=road,
+            catalog=catalog,
+            osc_minor_version=self.open_scenario_version,
+            variable_declaration=variabledec,
         )
 
         return sce</code></pre>
@@ -212,13 +249,13 @@ the list is one scenario</p>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="examples.generator" href="index.html">examples.generator</a></code></li>
+<li><code><a title="examples.xosc" href="index.html">examples.xosc</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="examples.generator.generate_from_main.Scenario" href="#examples.generator.generate_from_main.Scenario">Scenario</a></code></h4>
+<h4><code><a title="examples.xosc.variable_usage.Scenario" href="#examples.xosc.variable_usage.Scenario">Scenario</a></code></h4>
 </li>
 </ul>
 </li>

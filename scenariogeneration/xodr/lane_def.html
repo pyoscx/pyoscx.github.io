@@ -2,19 +2,33 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.10.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
 <title>scenariogeneration.xodr.lane_def API documentation</title>
 <meta name="description" content="scenariogeneration
-https://github.com/pyoscx/scenariogeneration …" />
-<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
-<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
-<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
-<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
-<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+https://github.com/pyoscx/scenariogeneration …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
-<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
 </head>
 <body>
 <main>
@@ -30,594 +44,6 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
 <p>Copyright (c) 2022 The scenariogeneration Authors.</p>
 <p>This is a collection methods and classes not related to OpenDRIVE, but relates to automation of lane creations</p>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">&#34;&#34;&#34;
-  scenariogeneration
-  https://github.com/pyoscx/scenariogeneration
-
-  This Source Code Form is subject to the terms of the Mozilla Public
-  License, v. 2.0. If a copy of the MPL was not distributed with this
-  file, You can obtain one at https://mozilla.org/MPL/2.0/.
-
-  Copyright (c) 2022 The scenariogeneration Authors.
-
-
-    This is a collection methods and classes not related to OpenDRIVE, but relates to automation of lane creations
-
-&#34;&#34;&#34;
-import copy
-import numpy as np
-
-from .links import LaneLinker
-from .utils import get_coeffs_for_poly3
-from .lane import RoadMark, RoadMarkType, RoadLine, Lane, LaneSection, Lanes
-
-
-def std_roadmark_solid():
-    return RoadMark(RoadMarkType.solid, 0.2)
-
-
-def std_roadmark_broken():
-    roadmark = RoadMark(RoadMarkType.broken, 0.2)
-    roadmark.add_specific_road_line(RoadLine(0.15, 3, 9, 0, 0))
-    return roadmark
-
-
-def std_roadmark_broken_long_line():
-    roadmark = RoadMark(RoadMarkType.broken, 0.2)
-    roadmark.add_specific_road_line(RoadLine(0.15, 9, 3, 0, 0))
-    return roadmark
-
-
-def std_roadmark_broken_tight():
-    roadmark = RoadMark(RoadMarkType.broken, 0.2)
-    roadmark.add_specific_road_line(RoadLine(0.15, 3, 3, 0, 0))
-    return roadmark
-
-
-def std_roadmark_broken_broken():
-    roadmark = RoadMark(RoadMarkType.broken_broken)
-    roadmark.add_specific_road_line(RoadLine(0.2, 3, 3, 0.2, 0))
-    roadmark.add_specific_road_line(RoadLine(0.2, 3, 3, -0.2, 0))
-    return roadmark
-
-
-def std_roadmark_solid_solid():
-    roadmark = RoadMark(RoadMarkType.solid_solid)
-    roadmark.add_specific_road_line(RoadLine(0.2, 0, 0, 0.2, 0))
-    roadmark.add_specific_road_line(RoadLine(0.2, 0, 0, -0.2, 0))
-    return roadmark
-
-
-def std_roadmark_solid_broken():
-    roadmark = RoadMark(RoadMarkType.solid_broken)
-    roadmark.add_specific_road_line(RoadLine(0.2, 0, 0, 0.2, 0))
-    roadmark.add_specific_road_line(RoadLine(0.2, 3, 3, -0.2, 0))
-    return roadmark
-
-
-def std_roadmark_broken_solid():
-    roadmark = RoadMark(RoadMarkType.broken_solid)
-    roadmark.add_specific_road_line(RoadLine(0.2, 0, 0, -0.2, 0))
-    roadmark.add_specific_road_line(RoadLine(0.2, 3, 3, 0.2, 0))
-    return roadmark
-
-
-def create_lanes_merge_split(
-    right_lane_def,
-    left_lane_def,
-    road_length,
-    center_road_mark,
-    lane_width,
-    lane_width_end,
-):
-    &#34;&#34;&#34;create_lanes_merge_split is a generator that will create the Lanes of a road road that can contain one or more lane merges/splits
-    This is a simple implementation and has some constraints:
-     - left and right merges has to be at the same place (or one per lane), TODO: will be fixed with the singleSide attribute later on.
-     - the change will be a 3 degree polynomial with the derivative 0 on both start and end.
-
-    Please note that the merges/splits are defined in the road direction, NOT the driving direction.
-
-    Parameters
-    ----------
-        right_lane_def (list of LaneDef, or an int): a list of the splits/merges that are wanted on the right side of the road, if int constant number of lanes
-
-        left_lane_def (list of LaneDef, or an int): a list of the splits/merges that are wanted on the left side of the road, if int constant number of lanes.
-
-        road_length (float): the full length of the road
-
-        center_road_mark (RoadMark): roadmark for the center line
-
-        lane_width (float): the width of the lanes
-
-        lane_width_end (float): the end width of the lanes
-
-    Return
-    ------
-        road (Lanes): the lanes of a road
-    &#34;&#34;&#34;
-
-    lanesections = []
-    # expand the lane list
-    right_lane, left_lane = _create_lane_lists(
-        right_lane_def, left_lane_def, road_length, lane_width
-    )
-
-    # create the lanesections needed
-    for ls in range(len(left_lane)):
-        lc = Lane(a=0)
-        lc.add_roadmark(copy.deepcopy(center_road_mark))
-        lsec = LaneSection(left_lane[ls].s_start, lc)
-        # do the right lanes
-        for i in range(max(right_lane[ls].n_lanes_start, right_lane[ls].n_lanes_end)):
-            # add broken roadmarks for all lanes, except for the outer lane where a solid line is added
-            if i == max(right_lane[ls].n_lanes_start, right_lane[ls].n_lanes_end) - 1:
-                rm = std_roadmark_solid()
-            else:
-                rm = std_roadmark_broken()
-
-            # check if the number of lanes should change or not
-            if (
-                right_lane[ls].n_lanes_start &gt; right_lane[ls].n_lanes_end
-                and i == np.abs(right_lane[ls].sub_lane) - 1
-            ):
-                # lane merge
-                coeff = get_coeffs_for_poly3(
-                    right_lane[ls].s_end - right_lane[ls].s_start,
-                    right_lane[ls].lane_start_widths[i],
-                    False,
-                    right_lane[ls].lane_end_widths[i],
-                )
-                rightlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
-                rightlane.add_roadmark(rm)
-            elif (
-                right_lane[ls].n_lanes_start &lt; right_lane[ls].n_lanes_end
-                and i == np.abs(right_lane[ls].sub_lane) - 1
-            ):
-                # lane split
-                coeff = get_coeffs_for_poly3(
-                    right_lane[ls].s_end - right_lane[ls].s_start,
-                    right_lane[ls].lane_start_widths[i],
-                    True,
-                    right_lane[ls].lane_end_widths[i],
-                )
-                rightlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
-                rightlane.add_roadmark(rm)
-            elif (lane_width_end is not None) and (lane_width != lane_width_end):
-                coeff = get_coeffs_for_poly3(
-                    right_lane[ls].s_end - right_lane[ls].s_start,
-                    lane_width,
-                    False,
-                    lane_width_end=lane_width_end,
-                )
-                rightlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
-                rightlane.add_roadmark(rm)
-            elif right_lane[ls].lane_start_widths:
-                coeff = get_coeffs_for_poly3(
-                    right_lane[ls].s_end - right_lane[ls].s_start,
-                    right_lane[ls].lane_start_widths[i],
-                    False,
-                    lane_width_end=right_lane[ls].lane_end_widths[i],
-                )
-                rightlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
-                rightlane.add_roadmark(rm)
-            else:
-                rightlane = Lane(lane_width)
-                rightlane.add_roadmark(rm)
-            lsec.add_right_lane(rightlane)
-
-        # do the left lanes
-        for i in range(max(left_lane[ls].n_lanes_start, left_lane[ls].n_lanes_end)):
-            # add broken roadmarks for all lanes, except for the outer lane where a solid line is added
-            if i == max(left_lane[ls].n_lanes_start, left_lane[ls].n_lanes_end) - 1:
-                rm = std_roadmark_solid()
-            else:
-                rm = std_roadmark_broken()
-
-            # check if the number of lanes should change or not
-            if (
-                left_lane[ls].n_lanes_start &lt; left_lane[ls].n_lanes_end
-                and i == left_lane[ls].sub_lane - 1
-            ):
-                # lane split
-                coeff = get_coeffs_for_poly3(
-                    left_lane[ls].s_end - left_lane[ls].s_start,
-                    left_lane[ls].lane_start_widths[i],
-                    True,
-                    left_lane[ls].lane_end_widths[i],
-                )
-                leftlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
-                leftlane.add_roadmark(rm)
-            elif (
-                left_lane[ls].n_lanes_start &gt; left_lane[ls].n_lanes_end
-                and i == left_lane[ls].sub_lane - 1
-            ):
-                # lane merge
-                coeff = get_coeffs_for_poly3(
-                    left_lane[ls].s_end - left_lane[ls].s_start,
-                    left_lane[ls].lane_start_widths[i],
-                    False,
-                    left_lane[ls].lane_end_widths[i],
-                )
-                leftlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
-                leftlane.add_roadmark(rm)
-            elif (lane_width_end is not None) and (lane_width != lane_width_end):
-                coeff = get_coeffs_for_poly3(
-                    left_lane[ls].s_end - left_lane[ls].s_start,
-                    lane_width,
-                    False,
-                    lane_width_end=lane_width_end,
-                )
-                leftlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
-                leftlane.add_roadmark(rm)
-            elif left_lane[ls].lane_start_widths:
-                coeff = get_coeffs_for_poly3(
-                    left_lane[ls].s_end - left_lane[ls].s_start,
-                    left_lane[ls].lane_start_widths[i],
-                    False,
-                    lane_width_end=left_lane[ls].lane_end_widths[i],
-                )
-                leftlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
-                leftlane.add_roadmark(rm)
-            else:
-                leftlane = Lane(lane_width)
-                leftlane.add_roadmark(rm)
-            lsec.add_left_lane(leftlane)
-
-        lanesections.append(lsec)
-
-    # create the lane linker to link the lanes correctly
-    lanelinker = LaneLinker()
-    for i in range(1, len(right_lane)):
-        if right_lane[i].n_lanes_end &gt; right_lane[i].n_lanes_start:
-            # lane split
-            for j in range(0, right_lane[i - 1].n_lanes_end + 1):
-                # adjust for the new lane
-                if right_lane[i].sub_lane &lt; -(j + 1):
-                    lanelinker.add_link(
-                        lanesections[i - 1].rightlanes[j], lanesections[i].rightlanes[j]
-                    )
-                elif right_lane[i].sub_lane &gt; -(j + 1):
-                    lanelinker.add_link(
-                        lanesections[i - 1].rightlanes[j - 1],
-                        lanesections[i].rightlanes[j],
-                    )
-        elif right_lane[i - 1].n_lanes_end &lt; right_lane[i - 1].n_lanes_start:
-            # lane merge
-            for j in range(0, right_lane[i - 1].n_lanes_end + 1):
-                # adjust for the lost lane
-                if right_lane[i - 1].sub_lane &lt; -(j + 1):
-                    lanelinker.add_link(
-                        lanesections[i - 1].rightlanes[j], lanesections[i].rightlanes[j]
-                    )
-                elif right_lane[i - 1].sub_lane &gt; -(j + 1):
-                    lanelinker.add_link(
-                        lanesections[i - 1].rightlanes[j],
-                        lanesections[i].rightlanes[j - 1],
-                    )
-
-        else:
-            # same number of lanes, just add the links
-            for j in range(right_lane[i - 1].n_lanes_end):
-                lanelinker.add_link(
-                    lanesections[i - 1].rightlanes[j], lanesections[i].rightlanes[j]
-                )
-
-    for i in range(1, len(left_lane)):
-        if left_lane[i].n_lanes_end &gt; left_lane[i].n_lanes_start:
-            # lane split
-            for j in range(0, left_lane[i - 1].n_lanes_end + 1):
-                # adjust for the new lane
-                if left_lane[i].sub_lane &lt; (j + 1):
-                    lanelinker.add_link(
-                        lanesections[i - 1].leftlanes[j - 1],
-                        lanesections[i].leftlanes[j],
-                    )
-                elif left_lane[i].sub_lane &gt; (j + 1):
-                    lanelinker.add_link(
-                        lanesections[i - 1].leftlanes[j], lanesections[i].leftlanes[j]
-                    )
-        elif left_lane[i - 1].n_lanes_end &lt; left_lane[i - 1].n_lanes_start:
-            # lane merge
-            for j in range(0, left_lane[i - 1].n_lanes_end + 1):
-                # adjust for the lost lane
-                if left_lane[i - 1].sub_lane &lt; (j + 1):
-                    lanelinker.add_link(
-                        lanesections[i - 1].leftlanes[j],
-                        lanesections[i].leftlanes[j - 1],
-                    )
-                elif left_lane[i - 1].sub_lane &gt; (j + 1):
-                    lanelinker.add_link(
-                        lanesections[i - 1].leftlanes[j], lanesections[i].leftlanes[j]
-                    )
-
-        else:
-            # same number of lanes, just add the links
-            for j in range(left_lane[i - 1].n_lanes_end):
-                lanelinker.add_link(
-                    lanesections[i - 1].leftlanes[j], lanesections[i].leftlanes[j]
-                )
-
-    # Add the lanesections to the lanes struct together the lanelinker
-    lanes = Lanes()
-    for ls in lanesections:
-        lanes.add_lanesection(ls, lanelinker)
-    return lanes
-
-
-class LaneDef:
-    &#34;&#34;&#34;LaneDef is used to help create a lane merge or split. Can handle one lane merging or spliting.
-
-    NOTE: This is not part of the OpenDRIVE standard, but a helper for the xodr module.
-
-    Parameters
-    ----------
-        s_start (float): s coordinate of the start of the change
-
-        s_end (float): s coordinate of the end of the change
-
-        n_lanes_start (int): number of lanes at s_start
-
-        n_lanes_end (int): number of lanes at s_end
-
-        sub_lane (int): the lane that should be created (split) or removed (merge)
-
-        lane_start_widths (list of float): widths of lanes at start, must be [] or same length as n_lanes_start
-            Default: []
-
-        lane_end_widths (list of float): widths of lanes at end, must be [] or same length as n_lanes_end
-            Default: same as lane_start_widths
-
-    Attributes
-    ----------
-        s_start (float): s coordinate of the start of the change
-
-        s_end (float): s coordinate of the end of the change
-
-        n_lanes_start (int): number of lanes at s_start
-
-        n_lanes_end (int): number of lanes at s_end
-
-        sub_lane (int): the lane that should be created (split) or removed (merge)
-
-        lane_start_widths (list of float): widths of lanes at start, must be [] or same length as n_lanes_start
-
-        lane_end_widths (list of float): widths of lanes at end, must be [] or same length as n_lanes_end
-    &#34;&#34;&#34;
-
-    def __init__(
-        self,
-        s_start,
-        s_end,
-        n_lanes_start,
-        n_lanes_end,
-        sub_lane=None,
-        lane_start_widths=[],
-        lane_end_widths=[],
-    ):
-        self.s_start = s_start
-        self.s_end = s_end
-        self.n_lanes_start = n_lanes_start
-        self.n_lanes_end = n_lanes_end
-        self.sub_lane = sub_lane
-        self.lane_start_widths = lane_start_widths
-        if lane_end_widths == []:
-            self.lane_end_widths = self.lane_start_widths.copy()
-        else:
-            self.lane_end_widths = lane_end_widths
-
-    def _adjust_lane_widths(self):
-        if self.sub_lane:
-            if self.lane_end_widths and len(self.lane_end_widths) &lt; self.n_lanes_start:
-                # mergeo
-                self.lane_end_widths.insert(abs(self.sub_lane) - 1, 0)
-            elif (
-                self.lane_start_widths
-                and len(self.lane_start_widths) &lt; self.n_lanes_end
-            ):
-                # split
-                self.lane_start_widths.insert(abs(self.sub_lane) - 1, 0)
-        # TODO: add some checks here?
-
-
-def _create_lane_lists(right, left, tot_length, default_lane_width):
-    &#34;&#34;&#34;_create_lane_lists is a function used by create_lanes_merge_split to expand the list of LaneDefs to be used to create stuffs
-
-    Parameters
-    ----------
-        right (list of LaneDef, or int): the list of LaneDef for the right lane
-
-        left (list of LaneDef, or int): the list of LaneDef for the left lane
-
-        tot_length (float): the total length of the road
-
-        default_lane_width (float): lane_width to be used if not defined in LaneDef
-    &#34;&#34;&#34;
-
-    # TODO: implement for left and right lanesection...
-    def _check_lane_widths(lane):
-        if lane.lane_start_widths == []:
-            lane.lane_start_widths = [
-                default_lane_width for x in range(lane.n_lanes_start)
-            ]
-        if lane.lane_end_widths == []:
-            lane.lane_end_widths = [default_lane_width for x in range(lane.n_lanes_end)]
-
-    const_right_lanes = None
-    const_left_lanes = None
-
-    retlanes_right = []
-    retlanes_left = []
-    present_s = 0
-
-    r_it = 0
-    l_it = 0
-    # some primariy checks to handle int instead of LaneDef
-
-    if not isinstance(right, list):
-        const_right_lanes = right
-        right = []
-
-    if not isinstance(left, list):
-        const_left_lanes = left
-        left = []
-
-    while present_s &lt; tot_length:
-        if r_it &lt; len(right):
-            # check if there is still a right LaneDef to be used, and is the next one to add
-            if right[r_it].s_start == present_s:
-                add_right = True
-            else:
-                next_right = right[r_it].s_start
-                add_right = False
-                n_r_lanes = right[r_it].n_lanes_start
-        else:
-            # no more LaneDefs, just add new right lanes with the const/or last number of lanes
-            add_right = False
-            next_right = tot_length
-            if const_right_lanes or const_right_lanes == 0:
-                n_r_lanes = const_right_lanes
-            else:
-                n_r_lanes = right[-1].n_lanes_end
-
-        if l_it &lt; len(left):
-            # check if there is still a left LaneDef to be used, and is the next one to add
-            if left[l_it].s_start == present_s:
-                add_left = True
-            else:
-                next_left = left[l_it].s_start
-                add_left = False
-                n_l_lanes = left[l_it].n_lanes_start
-        else:
-            # no more LaneDefs, just add new left lanes with the const/or last number of lanes
-            add_left = False
-            next_left = tot_length
-            if const_left_lanes or const_left_lanes == 0:
-                n_l_lanes = const_left_lanes
-            else:
-                n_l_lanes = left[-1].n_lanes_end
-
-        # create and add the requiered LaneDefs
-        if not add_left and not add_right:
-            # no LaneDefs, just add same amout of lanes
-            s_end = min(next_left, next_right)
-            if const_right_lanes is not None:
-                retlanes_right.append(
-                    LaneDef(
-                        present_s,
-                        s_end,
-                        n_r_lanes,
-                        n_r_lanes,
-                        lane_start_widths=[
-                            default_lane_width for x in range(n_r_lanes)
-                        ],
-                        lane_end_widths=[default_lane_width for x in range(n_r_lanes)],
-                    )
-                )
-            else:
-                lane_start_widths = [default_lane_width for x in range(n_r_lanes)]
-                lane_end_widths = [default_lane_width for x in range(n_r_lanes)]
-                if r_it == len(right):
-                    if right[r_it - 1].lane_end_widths:
-                        lane_start_widths = right[r_it - 1].lane_end_widths.copy()
-                        lane_end_widths = right[r_it - 1].lane_end_widths.copy()
-                elif right[r_it].lane_start_widths:
-                    lane_start_widths = right[r_it].lane_start_widths.copy()
-                    lane_end_widths = right[r_it].lane_start_widths.copy()
-                retlanes_right.append(
-                    LaneDef(
-                        present_s,
-                        s_end,
-                        n_r_lanes,
-                        n_r_lanes,
-                        lane_start_widths=lane_start_widths,
-                        lane_end_widths=lane_end_widths,
-                    )
-                )
-            if const_left_lanes is not None:
-                retlanes_left.append(
-                    LaneDef(
-                        present_s,
-                        s_end,
-                        n_l_lanes,
-                        n_l_lanes,
-                        lane_start_widths=[
-                            default_lane_width for x in range(n_l_lanes)
-                        ],
-                        lane_end_widths=[default_lane_width for x in range(n_l_lanes)],
-                    )
-                )
-            else:
-                lane_start_widths = [default_lane_width for x in range(n_l_lanes)]
-                lane_end_widths = [default_lane_width for x in range(n_l_lanes)]
-                if l_it == len(left):
-                    if left[l_it - 1].lane_end_widths:
-                        lane_start_widths = left[l_it - 1].lane_end_widths.copy()
-                        lane_end_widths = left[l_it - 1].lane_end_widths.copy()
-                elif left[l_it].lane_start_widths:
-                    lane_start_widths = left[l_it].lane_start_widths.copy()
-                    lane_end_widths = left[l_it].lane_start_widths.copy()
-
-                retlanes_left.append(
-                    LaneDef(
-                        present_s,
-                        s_end,
-                        n_l_lanes,
-                        n_l_lanes,
-                        lane_start_widths=lane_start_widths,
-                        lane_end_widths=lane_end_widths,
-                    )
-                )
-
-            present_s = s_end
-        elif add_left and add_right:
-            # Both have changes in the amount of lanes,
-            _check_lane_widths(left[l_it])
-            _check_lane_widths(right[r_it])
-            retlanes_left.append(left[l_it])
-            retlanes_right.append(right[r_it])
-            present_s = left[l_it].s_end
-            r_it += 1
-            l_it += 1
-        elif add_right:
-            # only the right lane changes the amount of lanes, and add a LaneDef with the same amount of lanes to the left
-            _check_lane_widths(right[r_it])
-            retlanes_right.append(right[r_it])
-            retlanes_left.append(
-                LaneDef(
-                    present_s,
-                    right[r_it].s_end,
-                    n_l_lanes,
-                    n_l_lanes,
-                    lane_start_widths=[default_lane_width for x in range(n_l_lanes)],
-                    lane_end_widths=[default_lane_width for x in range(n_l_lanes)],
-                )
-            )
-            present_s = right[r_it].s_end
-            r_it += 1
-        elif add_left:
-            # only the left lane changes the amount of lanes, and add a LaneDef with the same amount of lanes to the right
-            _check_lane_widths(left[l_it])
-            retlanes_left.append(left[l_it])
-            retlanes_right.append(
-                LaneDef(
-                    present_s,
-                    left[l_it].s_end,
-                    n_r_lanes,
-                    n_r_lanes,
-                    lane_start_widths=[default_lane_width for x in range(n_r_lanes)],
-                    lane_end_widths=[default_lane_width for x in range(n_r_lanes)],
-                )
-            )
-            present_s = left[l_it].s_end
-            l_it += 1
-    [x._adjust_lane_widths() for x in retlanes_right]
-    [x._adjust_lane_widths() for x in retlanes_left]
-    return retlanes_right, retlanes_left</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -627,30 +53,9 @@ def _create_lane_lists(right, left, tot_length, default_lane_width):
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="scenariogeneration.xodr.lane_def.create_lanes_merge_split"><code class="name flex">
-<span>def <span class="ident">create_lanes_merge_split</span></span>(<span>right_lane_def, left_lane_def, road_length, center_road_mark, lane_width, lane_width_end)</span>
+<span>def <span class="ident">create_lanes_merge_split</span></span>(<span>right_lane_def,<br>left_lane_def,<br>road_length,<br>center_road_mark,<br>lane_width,<br>lane_width_end)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>create_lanes_merge_split is a generator that will create the Lanes of a road road that can contain one or more lane merges/splits
-This is a simple implementation and has some constraints:
-- left and right merges has to be at the same place (or one per lane), TODO: will be fixed with the singleSide attribute later on.
-- the change will be a 3 degree polynomial with the derivative 0 on both start and end.</p>
-<p>Please note that the merges/splits are defined in the road direction, NOT the driving direction.</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>right_lane_def (list of LaneDef, or an int): a list of the splits/merges that are wanted on the right side of the road, if int constant number of lanes
-
-left_lane_def (list of LaneDef, or an int): a list of the splits/merges that are wanted on the left side of the road, if int constant number of lanes.
-
-road_length (float): the full length of the road
-
-center_road_mark (RoadMark): roadmark for the center line
-
-lane_width (float): the width of the lanes
-
-lane_width_end (float): the end width of the lanes
-</code></pre>
-<h2 id="return">Return</h2>
-<pre><code>road (Lanes): the lanes of a road
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -896,12 +301,32 @@ lane_width_end (float): the end width of the lanes
         lanes.add_lanesection(ls, lanelinker)
     return lanes</code></pre>
 </details>
+<div class="desc"><p>create_lanes_merge_split is a generator that will create the Lanes of a road road that can contain one or more lane merges/splits
+This is a simple implementation and has some constraints:
+- left and right merges has to be at the same place (or one per lane), TODO: will be fixed with the singleSide attribute later on.
+- the change will be a 3 degree polynomial with the derivative 0 on both start and end.</p>
+<p>Please note that the merges/splits are defined in the road direction, NOT the driving direction.</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>right_lane_def (list of LaneDef, or an int): a list of the splits/merges that are wanted on the right side of the road, if int constant number of lanes
+
+left_lane_def (list of LaneDef, or an int): a list of the splits/merges that are wanted on the left side of the road, if int constant number of lanes.
+
+road_length (float): the full length of the road
+
+center_road_mark (RoadMark): roadmark for the center line
+
+lane_width (float): the width of the lanes
+
+lane_width_end (float): the end width of the lanes
+</code></pre>
+<h2 id="return">Return</h2>
+<pre><code>road (Lanes): the lanes of a road
+</code></pre></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane_def.std_roadmark_broken"><code class="name flex">
 <span>def <span class="ident">std_roadmark_broken</span></span>(<span>)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -911,12 +336,12 @@ lane_width_end (float): the end width of the lanes
     roadmark.add_specific_road_line(RoadLine(0.15, 3, 9, 0, 0))
     return roadmark</code></pre>
 </details>
+<div class="desc"></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane_def.std_roadmark_broken_broken"><code class="name flex">
 <span>def <span class="ident">std_roadmark_broken_broken</span></span>(<span>)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -927,12 +352,12 @@ lane_width_end (float): the end width of the lanes
     roadmark.add_specific_road_line(RoadLine(0.2, 3, 3, -0.2, 0))
     return roadmark</code></pre>
 </details>
+<div class="desc"></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane_def.std_roadmark_broken_long_line"><code class="name flex">
 <span>def <span class="ident">std_roadmark_broken_long_line</span></span>(<span>)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -942,12 +367,12 @@ lane_width_end (float): the end width of the lanes
     roadmark.add_specific_road_line(RoadLine(0.15, 9, 3, 0, 0))
     return roadmark</code></pre>
 </details>
+<div class="desc"></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane_def.std_roadmark_broken_solid"><code class="name flex">
 <span>def <span class="ident">std_roadmark_broken_solid</span></span>(<span>)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -958,12 +383,12 @@ lane_width_end (float): the end width of the lanes
     roadmark.add_specific_road_line(RoadLine(0.2, 3, 3, 0.2, 0))
     return roadmark</code></pre>
 </details>
+<div class="desc"></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane_def.std_roadmark_broken_tight"><code class="name flex">
 <span>def <span class="ident">std_roadmark_broken_tight</span></span>(<span>)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -973,12 +398,12 @@ lane_width_end (float): the end width of the lanes
     roadmark.add_specific_road_line(RoadLine(0.15, 3, 3, 0, 0))
     return roadmark</code></pre>
 </details>
+<div class="desc"></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane_def.std_roadmark_solid"><code class="name flex">
 <span>def <span class="ident">std_roadmark_solid</span></span>(<span>)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -986,12 +411,12 @@ lane_width_end (float): the end width of the lanes
 <pre><code class="python">def std_roadmark_solid():
     return RoadMark(RoadMarkType.solid, 0.2)</code></pre>
 </details>
+<div class="desc"></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane_def.std_roadmark_solid_broken"><code class="name flex">
 <span>def <span class="ident">std_roadmark_solid_broken</span></span>(<span>)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1002,12 +427,12 @@ lane_width_end (float): the end width of the lanes
     roadmark.add_specific_road_line(RoadLine(0.2, 3, 3, -0.2, 0))
     return roadmark</code></pre>
 </details>
+<div class="desc"></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane_def.std_roadmark_solid_solid"><code class="name flex">
 <span>def <span class="ident">std_roadmark_solid_solid</span></span>(<span>)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1018,6 +443,7 @@ lane_width_end (float): the end width of the lanes
     roadmark.add_specific_road_line(RoadLine(0.2, 0, 0, -0.2, 0))
     return roadmark</code></pre>
 </details>
+<div class="desc"></div>
 </dd>
 </dl>
 </section>
@@ -1026,43 +452,9 @@ lane_width_end (float): the end width of the lanes
 <dl>
 <dt id="scenariogeneration.xodr.lane_def.LaneDef"><code class="flex name class">
 <span>class <span class="ident">LaneDef</span></span>
-<span>(</span><span>s_start, s_end, n_lanes_start, n_lanes_end, sub_lane=None, lane_start_widths=[], lane_end_widths=[])</span>
+<span>(</span><span>s_start,<br>s_end,<br>n_lanes_start,<br>n_lanes_end,<br>sub_lane=None,<br>lane_start_widths=[],<br>lane_end_widths=[])</span>
 </code></dt>
 <dd>
-<div class="desc"><p>LaneDef is used to help create a lane merge or split. Can handle one lane merging or spliting.</p>
-<p>NOTE: This is not part of the OpenDRIVE standard, but a helper for the xodr module.</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>s_start (float): s coordinate of the start of the change
-
-s_end (float): s coordinate of the end of the change
-
-n_lanes_start (int): number of lanes at s_start
-
-n_lanes_end (int): number of lanes at s_end
-
-sub_lane (int): the lane that should be created (split) or removed (merge)
-
-lane_start_widths (list of float): widths of lanes at start, must be [] or same length as n_lanes_start
-    Default: []
-
-lane_end_widths (list of float): widths of lanes at end, must be [] or same length as n_lanes_end
-    Default: same as lane_start_widths
-</code></pre>
-<h2 id="attributes">Attributes</h2>
-<pre><code>s_start (float): s coordinate of the start of the change
-
-s_end (float): s coordinate of the end of the change
-
-n_lanes_start (int): number of lanes at s_start
-
-n_lanes_end (int): number of lanes at s_end
-
-sub_lane (int): the lane that should be created (split) or removed (merge)
-
-lane_start_widths (list of float): widths of lanes at start, must be [] or same length as n_lanes_start
-
-lane_end_widths (list of float): widths of lanes at end, must be [] or same length as n_lanes_end
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1141,12 +533,45 @@ lane_end_widths (list of float): widths of lanes at end, must be [] or same leng
                 self.lane_start_widths.insert(abs(self.sub_lane) - 1, 0)
         # TODO: add some checks here?</code></pre>
 </details>
+<div class="desc"><p>LaneDef is used to help create a lane merge or split. Can handle one lane merging or spliting.</p>
+<p>NOTE: This is not part of the OpenDRIVE standard, but a helper for the xodr module.</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>s_start (float): s coordinate of the start of the change
+
+s_end (float): s coordinate of the end of the change
+
+n_lanes_start (int): number of lanes at s_start
+
+n_lanes_end (int): number of lanes at s_end
+
+sub_lane (int): the lane that should be created (split) or removed (merge)
+
+lane_start_widths (list of float): widths of lanes at start, must be [] or same length as n_lanes_start
+    Default: []
+
+lane_end_widths (list of float): widths of lanes at end, must be [] or same length as n_lanes_end
+    Default: same as lane_start_widths
+</code></pre>
+<h2 id="attributes">Attributes</h2>
+<pre><code>s_start (float): s coordinate of the start of the change
+
+s_end (float): s coordinate of the end of the change
+
+n_lanes_start (int): number of lanes at s_start
+
+n_lanes_end (int): number of lanes at s_end
+
+sub_lane (int): the lane that should be created (split) or removed (merge)
+
+lane_start_widths (list of float): widths of lanes at start, must be [] or same length as n_lanes_start
+
+lane_end_widths (list of float): widths of lanes at end, must be [] or same length as n_lanes_end
+</code></pre></div>
 </dd>
 </dl>
 </section>
 </article>
 <nav id="sidebar">
-<h1>Index</h1>
 <div class="toc">
 <ul></ul>
 </div>
@@ -1180,7 +605,7 @@ lane_end_widths (list of float): widths of lanes at end, must be [] or same leng
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
 </footer>
 </body>
 </html>
