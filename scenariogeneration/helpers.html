@@ -51,101 +51,73 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="scenariogeneration.helpers.convert_bool"><code class="name flex">
-<span>def <span class="ident">convert_bool</span></span>(<span>value)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def convert_bool(value):
-    &#34;&#34;&#34;Method to transform booleans to correct xml version (lower case)
-
-    Parameter
-    ---------
-        value (bool): the boolean
-
-    Return
-    ------
-        boolean (str)
-    &#34;&#34;&#34;
-    if isinstance(value, str):
-        if value == &#34;true&#34; or value == &#34;1&#34;:
-            return True
-        elif value == &#34;false&#34; or value == &#34;0&#34;:
-            return False
-        elif value[0] == &#34;$&#34;:
-            return value
-        else:
-            raise ValueError(
-                value
-                + &#34;is not a valid type of float input to openscenario, if a string is used as a float value (parameter or expression), it should have a $ as the first char..&#34;
-            )
-
-    if value:
-        return &#34;true&#34;
-    else:
-        return &#34;false&#34;</code></pre>
-</details>
-<div class="desc"><p>Method to transform booleans to correct xml version (lower case)</p>
-<h2 id="parameter">Parameter</h2>
-<pre><code>value (bool): the boolean
-</code></pre>
-<h2 id="return">Return</h2>
-<pre><code>boolean (str)
-</code></pre></div>
-</dd>
 <dt id="scenariogeneration.helpers.enum2str"><code class="name flex">
-<span>def <span class="ident">enum2str</span></span>(<span>enum)</span>
+<span>def <span class="ident">enum2str</span></span>(<span>enum: Enum) ‑> str</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def enum2str(enum):
-    &#34;&#34;&#34;helper to create strings from enums that should contain space but have to have _
+<pre><code class="python">def enum2str(enum: &#34;Enum&#34;) -&gt; str:
+    &#34;&#34;&#34;Helper to create strings from enums that should contain spaces but
+    use underscores internally.
 
     Parameters
     ----------
-        enum (Enum): a enum of pyodrx
+    enum : Enum
+        An enum instance from pyodrx.
 
     Returns
     -------
-        enumstr (str): the enum as a string replacing _ with &#39; &#39;
-
+    str
+        The enum as a string with underscores replaced by spaces.
     &#34;&#34;&#34;
     return enum.name.replace(&#34;_&#34;, &#34; &#34;)</code></pre>
 </details>
-<div class="desc"><p>helper to create strings from enums that should contain space but have to have _</p>
+<div class="desc"><p>Helper to create strings from enums that should contain spaces but
+use underscores internally.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>enum (Enum): a enum of pyodrx
-</code></pre>
+<dl>
+<dt><strong><code>enum</code></strong> :&ensp;<code>Enum</code></dt>
+<dd>An enum instance from pyodrx.</dd>
+</dl>
 <h2 id="returns">Returns</h2>
-<pre><code>enumstr (str): the enum as a string replacing _ with ' '
-</code></pre></div>
+<dl>
+<dt><code>str</code></dt>
+<dd>The enum as a string with underscores replaced by spaces.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.helpers.prettify"><code class="name flex">
-<span>def <span class="ident">prettify</span></span>(<span>element, encoding=None, xml_declaration=True)</span>
+<span>def <span class="ident">prettify</span></span>(<span>element: xml.etree.ElementTree.Element,<br>encoding: str | None = None,<br>xml_declaration: bool = True) ‑> bytes</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def prettify(element, encoding=None, xml_declaration=True):
-    &#34;&#34;&#34;Returns a bytes string representing a prettified version of an XML element.
+<pre><code class="python">def prettify(
+    element: ET.Element,
+    encoding: Optional[str] = None,
+    xml_declaration: bool = True,
+) -&gt; bytes:
+    &#34;&#34;&#34;Returns a bytes string representing a prettified version of an XML
+    element.
 
-    Parameters:
+    Parameters
     ----------
-        element (ET.Element): The XML element to prettify.
-        encoding (str): The encoding to use for the output, defaults to &#39;utf-8&#39;.
-                        If None, then &#39;utf-8&#39; will be used as default.
+    element : ET.Element
+        The XML element to prettify.
+    encoding : str, optional
+        The encoding to use for the output. Defaults to &#39;utf-8&#39;. If None,
+        &#39;utf-8&#39; will be used as the default.
+    xml_declaration : bool, optional
+        Whether to include the XML declaration in the output. Default is True.
 
-    Returns:
-    ----------
-        bytes: The prettified XML as bytes string with 4-space indentation.
+    Returns
+    -------
+    bytes
+        The prettified XML as a bytes string with 4-space indentation.
     &#34;&#34;&#34;
     if not isinstance(element, ET.Element):
         element = element.get_element()
@@ -160,10 +132,14 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
     parser = etree.XMLParser(remove_blank_text=True, strip_cdata=False)
 
     # Convert the ElementTree element to an lxml etree form
-    lxml_element = etree.fromstring(ET.tostring(element, encoding), parser=parser)
+    lxml_element = etree.fromstring(
+        ET.tostring(element, encoding), parser=parser
+    )
 
     # Replace the CDATA marker with a real CDATA node
-    for cdata_marker in lxml_element.xpath(&#39;//*[starts-with(text(), &#34;&lt;![CDATA[&#34;)]&#39;):
+    for cdata_marker in lxml_element.xpath(
+        &#39;//*[starts-with(text(), &#34;&lt;![CDATA[&#34;)]&#39;
+    ):
         cdata_content = cdata_marker.text[len(&#34;&lt;![CDATA[&#34;) : -len(&#34;]]&gt;&#34;)]
         cdata_marker.text = etree.CDATA(cdata_content)
 
@@ -185,66 +161,98 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
     # Encode the string back into bytes type and return
     return pretty_print_str.encode(encoding)</code></pre>
 </details>
-<div class="desc"><p>Returns a bytes string representing a prettified version of an XML element.</p>
-<h2 id="parameters">Parameters:</h2>
-<pre><code>element (ET.Element): The XML element to prettify.
-encoding (str): The encoding to use for the output, defaults to 'utf-8'.
-                If None, then 'utf-8' will be used as default.
-</code></pre>
-<h2 id="returns">Returns:</h2>
-<pre><code>bytes: The prettified XML as bytes string with 4-space indentation.
-</code></pre></div>
+<div class="desc"><p>Returns a bytes string representing a prettified version of an XML
+element.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>element</code></strong> :&ensp;<code>ET.Element</code></dt>
+<dd>The XML element to prettify.</dd>
+<dt><strong><code>encoding</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>The encoding to use for the output. Defaults to 'utf-8'. If None,
+'utf-8' will be used as the default.</dd>
+<dt><strong><code>xml_declaration</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Whether to include the XML declaration in the output. Default is True.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bytes</code></dt>
+<dd>The prettified XML as a bytes string with 4-space indentation.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.helpers.prettyprint"><code class="name flex">
-<span>def <span class="ident">prettyprint</span></span>(<span>element, encoding=None)</span>
+<span>def <span class="ident">prettyprint</span></span>(<span>element: xml.etree.ElementTree.Element, encoding: str | None = None) ‑> None</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def prettyprint(element, encoding=None):
-    &#34;&#34;&#34;returns the element prettyfied for writing to file or printing to the commandline
+<pre><code class="python">def prettyprint(element: ET.Element, encoding: Optional[str] = None) -&gt; None:
+    &#34;&#34;&#34;Returns the element prettified for writing to a file or printing to
+    the command line.
 
     Parameters
     ----------
-        element (Element, or any generation class of scenariogeneration): element to print
+    element : ET.Element
+        The XML element to print. Can also be any generation class of
+        scenariogeneration.
+    encoding : str, optional
+        Specify the output encoding. Default is None, which works best for
+        printing in the terminal on Ubuntu.
 
-        encoding (str): specify the output encoding
-            Default: None (works best for printing in terminal on ubuntu atleast)
-
+    Returns
+    -------
+    None
     &#34;&#34;&#34;
     print(prettify(element, encoding=encoding).decode())</code></pre>
 </details>
-<div class="desc"><p>returns the element prettyfied for writing to file or printing to the commandline</p>
+<div class="desc"><p>Returns the element prettified for writing to a file or printing to
+the command line.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>element (Element, or any generation class of scenariogeneration): element to print
-
-encoding (str): specify the output encoding
-    Default: None (works best for printing in terminal on ubuntu atleast)
-</code></pre></div>
+<dl>
+<dt><strong><code>element</code></strong> :&ensp;<code>ET.Element</code></dt>
+<dd>The XML element to print. Can also be any generation class of
+scenariogeneration.</dd>
+<dt><strong><code>encoding</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Specify the output encoding. Default is None, which works best for
+printing in the terminal on Ubuntu.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.helpers.printToFile"><code class="name flex">
-<span>def <span class="ident">printToFile</span></span>(<span>element, filename, prettyprint=True, encoding='utf-8')</span>
+<span>def <span class="ident">printToFile</span></span>(<span>element: xml.etree.ElementTree.Element,<br>filename: str,<br>prettyprint: bool = True,<br>encoding: str = 'utf-8') ‑> None</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def printToFile(element, filename, prettyprint=True, encoding=&#34;utf-8&#34;):
-    &#34;&#34;&#34;prints the element to a xml file
+<pre><code class="python">def printToFile(
+    element: ET.Element,
+    filename: str,
+    prettyprint: bool = True,
+    encoding: str = &#34;utf-8&#34;,
+) -&gt; None:
+    &#34;&#34;&#34;Prints the element to an XML file.
 
     Parameters
     ----------
-        element (Element): element to print
+    element : ET.Element
+        The XML element to print.
+    filename : str
+        The file path to save the XML content.
+    prettyprint : bool, optional
+        Whether to format the XML with indentation. Default is True.
+    encoding : str, optional
+        The output encoding to use. Default is &#39;utf-8&#39;.
 
-        filename (str): file to save to
-
-        prettyprint (bool): pretty or &#34;ugly&#34; print
-
-        encoding (str): specify the output encoding
-            Default: &#39;utf-8&#39;
+    Returns
+    -------
+    None
     &#34;&#34;&#34;
     if prettyprint:
         try:
@@ -262,17 +270,23 @@ encoding (str): specify the output encoding
         except LookupError:
             print(&#34;%s is not a valid encoding option.&#34; % encoding)</code></pre>
 </details>
-<div class="desc"><p>prints the element to a xml file</p>
+<div class="desc"><p>Prints the element to an XML file.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>element (Element): element to print
-
-filename (str): file to save to
-
-prettyprint (bool): pretty or "ugly" print
-
-encoding (str): specify the output encoding
-    Default: 'utf-8'
-</code></pre></div>
+<dl>
+<dt><strong><code>element</code></strong> :&ensp;<code>ET.Element</code></dt>
+<dd>The XML element to print.</dd>
+<dt><strong><code>filename</code></strong> :&ensp;<code>str</code></dt>
+<dd>The file path to save the XML content.</dd>
+<dt><strong><code>prettyprint</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Whether to format the XML with indentation. Default is True.</dd>
+<dt><strong><code>encoding</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>The output encoding to use. Default is 'utf-8'.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
 </dd>
 </dl>
 </section>
@@ -291,7 +305,6 @@ encoding (str): specify the output encoding
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="scenariogeneration.helpers.convert_bool" href="#scenariogeneration.helpers.convert_bool">convert_bool</a></code></li>
 <li><code><a title="scenariogeneration.helpers.enum2str" href="#scenariogeneration.helpers.enum2str">enum2str</a></code></li>
 <li><code><a title="scenariogeneration.helpers.prettify" href="#scenariogeneration.helpers.prettify">prettify</a></code></li>
 <li><code><a title="scenariogeneration.helpers.prettyprint" href="#scenariogeneration.helpers.prettyprint">prettyprint</a></code></li>

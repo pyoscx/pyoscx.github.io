@@ -71,7 +71,7 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <dl>
 <dt id="scenariogeneration.xodr.geometry.AdjustablePlanview"><code class="flex name class">
 <span>class <span class="ident">AdjustablePlanview</span></span>
-<span>(</span><span>left_lane_defs=None,<br>right_lane_defs=None,<br>center_road_mark=None,<br>lane_width=None,<br>lane_width_end=None)</span>
+<span>(</span><span>left_lane_defs: List | None = None,<br>right_lane_defs: List | None = None,<br>center_road_mark: str | None = None,<br>lane_width: float | None = None,<br>lane_width_end: float | None = None)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -79,16 +79,67 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class AdjustablePlanview:
-    &#34;&#34;&#34;AdjustablePlanview can be used to fit a geometry between two fixed roads.&#34;&#34;&#34;
+    &#34;&#34;&#34;AdjustablePlanview can be used to fit a geometry between two fixed
+    roads.
+
+    Parameters
+    ----------
+    left_lane_defs : optional
+        Definitions for the left lanes.
+    right_lane_defs : optional
+        Definitions for the right lanes.
+    center_road_mark : optional
+        Definition for the center road marking.
+    lane_width : optional
+        Width of the lanes at the start.
+    lane_width_end : optional
+        Width of the lanes at the end.
+
+    Attributes
+    ----------
+    fixed : bool
+        Indicates whether the planview is fixed.
+    adjusted : bool
+        Indicates whether the planview has been adjusted.
+    left_lane_defs : optional
+        Definitions for the left lanes.
+    right_lane_defs : optional
+        Definitions for the right lanes.
+    center_road_mark : optional
+        Definition for the center road marking.
+    lane_width : optional
+        Width of the lanes at the start.
+    lane_width_end : optional
+        Width of the lanes at the end.
+    &#34;&#34;&#34;
 
     def __init__(
         self,
-        left_lane_defs=None,
-        right_lane_defs=None,
-        center_road_mark=None,
-        lane_width=None,
-        lane_width_end=None,
-    ):
+        left_lane_defs: Optional[List] = None,
+        right_lane_defs: Optional[List] = None,
+        center_road_mark: Optional[str] = None,
+        lane_width: Optional[float] = None,
+        lane_width_end: Optional[float] = None,
+    ) -&gt; None:
+        &#34;&#34;&#34;Initialize the `AdjustablePlanview` instance.
+
+        Parameters
+        ----------
+        left_lane_defs : list, optional
+            Definitions for the left lanes. Default is None.
+        right_lane_defs : list, optional
+            Definitions for the right lanes. Default is None.
+        center_road_mark : str, optional
+            Definition for the center road marking. Default is None.
+        lane_width : float, optional
+            Width of the lanes at the start. Default is None.
+        lane_width_end : float, optional
+            Width of the lanes at the end. Default is None.
+
+        Returns
+        -------
+        None
+        &#34;&#34;&#34;
         self.fixed = False
         self.adjusted = False
         self.left_lane_defs = left_lane_defs
@@ -97,11 +148,61 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
         self.lane_width = lane_width
         self.lane_width_end = lane_width_end</code></pre>
 </details>
-<div class="desc"><p>AdjustablePlanview can be used to fit a geometry between two fixed roads.</p></div>
+<div class="desc"><p>AdjustablePlanview can be used to fit a geometry between two fixed
+roads.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>left_lane_defs</code></strong> :&ensp;<code>optional</code></dt>
+<dd>Definitions for the left lanes.</dd>
+<dt><strong><code>right_lane_defs</code></strong> :&ensp;<code>optional</code></dt>
+<dd>Definitions for the right lanes.</dd>
+<dt><strong><code>center_road_mark</code></strong> :&ensp;<code>optional</code></dt>
+<dd>Definition for the center road marking.</dd>
+<dt><strong><code>lane_width</code></strong> :&ensp;<code>optional</code></dt>
+<dd>Width of the lanes at the start.</dd>
+<dt><strong><code>lane_width_end</code></strong> :&ensp;<code>optional</code></dt>
+<dd>Width of the lanes at the end.</dd>
+</dl>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>fixed</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Indicates whether the planview is fixed.</dd>
+<dt><strong><code>adjusted</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Indicates whether the planview has been adjusted.</dd>
+<dt><strong><code>left_lane_defs</code></strong> :&ensp;<code>optional</code></dt>
+<dd>Definitions for the left lanes.</dd>
+<dt><strong><code>right_lane_defs</code></strong> :&ensp;<code>optional</code></dt>
+<dd>Definitions for the right lanes.</dd>
+<dt><strong><code>center_road_mark</code></strong> :&ensp;<code>optional</code></dt>
+<dd>Definition for the center road marking.</dd>
+<dt><strong><code>lane_width</code></strong> :&ensp;<code>optional</code></dt>
+<dd>Width of the lanes at the start.</dd>
+<dt><strong><code>lane_width_end</code></strong> :&ensp;<code>optional</code></dt>
+<dd>Width of the lanes at the end.</dd>
+</dl>
+<p>Initialize the <code><a title="scenariogeneration.xodr.geometry.AdjustablePlanview" href="#scenariogeneration.xodr.geometry.AdjustablePlanview">AdjustablePlanview</a></code> instance.</p>
+<h2 id="parameters_1">Parameters</h2>
+<dl>
+<dt><strong><code>left_lane_defs</code></strong> :&ensp;<code>list</code>, optional</dt>
+<dd>Definitions for the left lanes. Default is None.</dd>
+<dt><strong><code>right_lane_defs</code></strong> :&ensp;<code>list</code>, optional</dt>
+<dd>Definitions for the right lanes. Default is None.</dd>
+<dt><strong><code>center_road_mark</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Definition for the center road marking. Default is None.</dd>
+<dt><strong><code>lane_width</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Width of the lanes at the start. Default is None.</dd>
+<dt><strong><code>lane_width_end</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Width of the lanes at the end. Default is None.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.Arc"><code class="flex name class">
 <span>class <span class="ident">Arc</span></span>
-<span>(</span><span>curvature, length=None, angle=None)</span>
+<span>(</span><span>curvature: float, length: float | None = None, angle: float | None = None)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -109,51 +210,69 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Arc(_BaseGeometry):
-    &#34;&#34;&#34;the Arc creates a arc type of geometry
+    &#34;&#34;&#34;The `Arc` class creates an arc type of geometry.
 
     Parameters
     ----------
-        curvature (float): curvature of the arc
-
-        length (float): length of the arc (optional or use angle)
-
-        angle (float): angle of the arc (optional or use length)
+    curvature : float
+        The curvature of the arc.
+    length : float, optional
+        The length of the arc. Either `length` or `angle` must be provided.
+    angle : float, optional
+        The angle of the arc. Either `angle` or `length` must be provided.
 
     Attributes
     ----------
-        curvature (float): curvature of the arc
-
-        length (float): length of the arc
-
-        angle (float): angle of the arc
+    curvature : float
+        The curvature of the arc.
+    length : float
+        The length of the arc.
+    angle : float
+        The angle of the arc.
 
     Methods
     -------
-        get_element()
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
-        get_end_data(x,y,h)
-            Returns the end point of the geometry
+    get_element()
+        Returns the full ElementTree representation of the class.
+    get_attributes()
+        Returns a dictionary of all attributes of the class.
+    get_end_data(x, y, h)
+        Returns the end point of the geometry.
+    get_start_data(end_x, end_y, end_h)
+        Returns the start point of the geometry.
     &#34;&#34;&#34;
 
-    def __init__(self, curvature, length=None, angle=None):
-        &#34;&#34;&#34;initalizes the Arc
+    def __init__(
+        self,
+        curvature: float,
+        length: Optional[float] = None,
+        angle: Optional[float] = None,
+    ) -&gt; None:
+        &#34;&#34;&#34;Initialize the `Arc` instance.
 
         Parameters
         ----------
-            curvature (float): curvature of the arc
+        curvature : float
+            The curvature of the arc.
+        length : float, optional
+            The length of the arc. Either `length` or `angle` must be provided.
+        angle : float, optional
+            The angle of the arc. Either `angle` or `length` must be provided.
 
-            length (float): length of the arc (optional or use angle)
-
-            angle (float): angle of the arc (optional or use length)
-
+        Raises
+        ------
+        NotEnoughInputArguments
+            If neither `length` nor `angle` is provided.
+        ToManyOptionalArguments
+            If both `length` and `angle` are provided.
+        ValueError
+            If `curvature` is 0, as it would create a straight line.
         &#34;&#34;&#34;
         super().__init__()
         if length == None and angle == None:
-            raise NotEnoughInputArguments(&#34;neither length nor angle defined, for arc&#34;)
+            raise NotEnoughInputArguments(
+                &#34;neither length nor angle defined, for arc&#34;
+            )
 
         if length != None and angle != None:
             raise ToManyOptionalArguments(
@@ -174,34 +293,38 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
         if self.angle:
             _, _, _, self.length = self.get_end_data(0, 0, 0)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -&gt; bool:
         if isinstance(other, Arc) and super().__eq__(other):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
 
-    def get_end_data(self, x, y, h):
-        &#34;&#34;&#34;Returns information about the end point of the geometry
+    def get_end_data(
+        self, x: float, y: float, h: float
+    ) -&gt; tuple[float, float, float, float]:
+        &#34;&#34;&#34;Return the end point of the geometry.
 
         Parameters
         ----------
-            x (float): x start point of the geometry
-
-            y (float): y start point of the geometry
-
-            h (float): start heading of the geometry
+        x : float
+            The x start coordinate of the geometry.
+        y : float
+            The y start coordinate of the geometry.
+        h : float
+            The start heading of the geometry.
 
         Returns
-        ---------
-
-            x (float): the final x point
-
-            y (float): the final y point
-
-            h (float): the final heading
-
-            length (float): length of the element
-
+        -------
+        tuple of (float, float, float, float)
+            A tuple containing:
+            - x_end : float
+                The x end coordinate of the geometry.
+            - y_end : float
+                The y end coordinate of the geometry.
+            - h_end : float
+                The end heading of the geometry.
+            - length : float
+                The length of the geometry.
         &#34;&#34;&#34;
         radius = 1 / np.abs(self.curvature)
         if self.curvature &lt; 0:
@@ -228,28 +351,33 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 
         return new_x, new_y, new_h, self.length
 
-    def get_start_data(self, end_x, end_y, end_h):
-        &#34;&#34;&#34;Returns information about the end point of the geometry
+    def get_start_data(
+        self, end_x: float, end_y: float, end_h: float
+    ) -&gt; tuple[float, float, float, float]:
+        &#34;&#34;&#34;Returns information about the end point of the geometry.
 
         Parameters
         ----------
-            end_x (float): x final point of the geometry
+        end_x : float
+            The end x coordinate of the geometry
+        end_y : float
+            The end y coordinate of the geometry
 
-            end_y (float): y final point of the geometry
-
-            end_h (float): final heading of the geometry
+        end_h : float
+            The end h coordinate of the geometry
 
         Returns
         ---------
-
-            x (float): the start x point
-
-            y (float): the start y point
-
-            h (float): the start heading of the inverse geometry
-
-            length (float): length of the element
-
+        tuple of (float, float, float, float)
+            A tuple containing:
+            - x_start : float
+                The x start coordinate of the geometry.
+            - y_start : float
+                The y start coordinate of the geometry.
+            - h_start : float
+                The start heading of the geometry.
+            - length : float
+                The length of the geometry.
         &#34;&#34;&#34;
         x = end_x
         y = end_y
@@ -278,49 +406,80 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
         new_y = np.sin(new_ang) * radius + y_0
         return new_x, new_y, new_h, self.length
 
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes of the Arc as a dict&#34;&#34;&#34;
+    def get_attributes(self) -&gt; dict:
+        &#34;&#34;&#34;Return the attributes of the `Arc` as a dictionary.
+
+        Returns
+        -------
+        dict
+            A dictionary containing the attributes of the `Arc`:
+            - &#34;curvature&#34; : str
+                The curvature of the arc.
+        &#34;&#34;&#34;
         return {&#34;curvature&#34;: str(self.curvature)}
 
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the Arc&#34;&#34;&#34;
+    def get_element(self) -&gt; ET.Element:
+        &#34;&#34;&#34;Return the ElementTree representation of the `Arc`.
+
+        This method generates an XML element for the `Arc`, including
+        its attributes and any additional data.
+
+        Returns
+        -------
+        xml.etree.ElementTree.Element
+            The ElementTree representation of the `Arc`.
+        &#34;&#34;&#34;
         element = ET.Element(&#34;arc&#34;, attrib=self.get_attributes())
         self._add_additional_data_to_element(element)
         return element</code></pre>
 </details>
-<div class="desc"><p>the Arc creates a arc type of geometry</p>
+<div class="desc"><p>The <code><a title="scenariogeneration.xodr.geometry.Arc" href="#scenariogeneration.xodr.geometry.Arc">Arc</a></code> class creates an arc type of geometry.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>curvature (float): curvature of the arc
-
-length (float): length of the arc (optional or use angle)
-
-angle (float): angle of the arc (optional or use length)
-</code></pre>
+<dl>
+<dt><strong><code>curvature</code></strong> :&ensp;<code>float</code></dt>
+<dd>The curvature of the arc.</dd>
+<dt><strong><code>length</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>The length of the arc. Either <code>length</code> or <code>angle</code> must be provided.</dd>
+<dt><strong><code>angle</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>The angle of the arc. Either <code>angle</code> or <code>length</code> must be provided.</dd>
+</dl>
 <h2 id="attributes">Attributes</h2>
-<pre><code>curvature (float): curvature of the arc
-
-length (float): length of the arc
-
-angle (float): angle of the arc
-</code></pre>
+<dl>
+<dt><strong><code>curvature</code></strong> :&ensp;<code>float</code></dt>
+<dd>The curvature of the arc.</dd>
+<dt><strong><code>length</code></strong> :&ensp;<code>float</code></dt>
+<dd>The length of the arc.</dd>
+<dt><strong><code>angle</code></strong> :&ensp;<code>float</code></dt>
+<dd>The angle of the arc.</dd>
+</dl>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
-    Returns the full ElementTree of the class
-
+<p>get_element()
+Returns the full ElementTree representation of the class.
 get_attributes()
-    Returns a dictionary of all attributes of the class
-
-get_end_data(x,y,h)
-    Returns the end point of the geometry
-</code></pre>
-<p>initalizes the Arc</p>
+Returns a dictionary of all attributes of the class.
+get_end_data(x, y, h)
+Returns the end point of the geometry.
+get_start_data(end_x, end_y, end_h)
+Returns the start point of the geometry.</p>
+<p>Initialize the <code><a title="scenariogeneration.xodr.geometry.Arc" href="#scenariogeneration.xodr.geometry.Arc">Arc</a></code> instance.</p>
 <h2 id="parameters_1">Parameters</h2>
-<pre><code>curvature (float): curvature of the arc
-
-length (float): length of the arc (optional or use angle)
-
-angle (float): angle of the arc (optional or use length)
-</code></pre></div>
+<dl>
+<dt><strong><code>curvature</code></strong> :&ensp;<code>float</code></dt>
+<dd>The curvature of the arc.</dd>
+<dt><strong><code>length</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>The length of the arc. Either <code>length</code> or <code>angle</code> must be provided.</dd>
+<dt><strong><code>angle</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>The angle of the arc. Either <code>angle</code> or <code>length</code> must be provided.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>NotEnoughInputArguments</code></dt>
+<dd>If neither <code>length</code> nor <code>angle</code> is provided.</dd>
+<dt><code>ToManyOptionalArguments</code></dt>
+<dd>If both <code>length</code> and <code>angle</code> are provided.</dd>
+<dt><code>ValueError</code></dt>
+<dd>If <code>curvature</code> is 0, as it would create a straight line.</dd>
+</dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xodr.geometry._BaseGeometry</li>
@@ -329,65 +488,100 @@ angle (float): angle of the arc (optional or use length)
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.geometry.Arc.get_attributes"><code class="name flex">
-<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+<span>def <span class="ident">get_attributes</span></span>(<span>self) ‑> dict</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34;returns the attributes of the Arc as a dict&#34;&#34;&#34;
+<pre><code class="python">def get_attributes(self) -&gt; dict:
+    &#34;&#34;&#34;Return the attributes of the `Arc` as a dictionary.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the attributes of the `Arc`:
+        - &#34;curvature&#34; : str
+            The curvature of the arc.
+    &#34;&#34;&#34;
     return {&#34;curvature&#34;: str(self.curvature)}</code></pre>
 </details>
-<div class="desc"><p>returns the attributes of the Arc as a dict</p></div>
+<div class="desc"><p>Return the attributes of the <code><a title="scenariogeneration.xodr.geometry.Arc" href="#scenariogeneration.xodr.geometry.Arc">Arc</a></code> as a dictionary.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict</code></dt>
+<dd>A dictionary containing the attributes of the <code><a title="scenariogeneration.xodr.geometry.Arc" href="#scenariogeneration.xodr.geometry.Arc">Arc</a></code>:
+- "curvature" : str
+The curvature of the arc.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.Arc.get_element"><code class="name flex">
-<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+<span>def <span class="ident">get_element</span></span>(<span>self) ‑> xml.etree.ElementTree.Element</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_element(self):
-    &#34;&#34;&#34;returns the elementTree of the Arc&#34;&#34;&#34;
+<pre><code class="python">def get_element(self) -&gt; ET.Element:
+    &#34;&#34;&#34;Return the ElementTree representation of the `Arc`.
+
+    This method generates an XML element for the `Arc`, including
+    its attributes and any additional data.
+
+    Returns
+    -------
+    xml.etree.ElementTree.Element
+        The ElementTree representation of the `Arc`.
+    &#34;&#34;&#34;
     element = ET.Element(&#34;arc&#34;, attrib=self.get_attributes())
     self._add_additional_data_to_element(element)
     return element</code></pre>
 </details>
-<div class="desc"><p>returns the elementTree of the Arc</p></div>
+<div class="desc"><p>Return the ElementTree representation of the <code><a title="scenariogeneration.xodr.geometry.Arc" href="#scenariogeneration.xodr.geometry.Arc">Arc</a></code>.</p>
+<p>This method generates an XML element for the <code><a title="scenariogeneration.xodr.geometry.Arc" href="#scenariogeneration.xodr.geometry.Arc">Arc</a></code>, including
+its attributes and any additional data.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>xml.etree.ElementTree.Element</code></dt>
+<dd>The ElementTree representation of the <code><a title="scenariogeneration.xodr.geometry.Arc" href="#scenariogeneration.xodr.geometry.Arc">Arc</a></code>.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.Arc.get_end_data"><code class="name flex">
-<span>def <span class="ident">get_end_data</span></span>(<span>self, x, y, h)</span>
+<span>def <span class="ident">get_end_data</span></span>(<span>self, x: float, y: float, h: float) ‑> tuple[float, float, float, float]</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_end_data(self, x, y, h):
-    &#34;&#34;&#34;Returns information about the end point of the geometry
+<pre><code class="python">def get_end_data(
+    self, x: float, y: float, h: float
+) -&gt; tuple[float, float, float, float]:
+    &#34;&#34;&#34;Return the end point of the geometry.
 
     Parameters
     ----------
-        x (float): x start point of the geometry
-
-        y (float): y start point of the geometry
-
-        h (float): start heading of the geometry
+    x : float
+        The x start coordinate of the geometry.
+    y : float
+        The y start coordinate of the geometry.
+    h : float
+        The start heading of the geometry.
 
     Returns
-    ---------
-
-        x (float): the final x point
-
-        y (float): the final y point
-
-        h (float): the final heading
-
-        length (float): length of the element
-
+    -------
+    tuple of (float, float, float, float)
+        A tuple containing:
+        - x_end : float
+            The x end coordinate of the geometry.
+        - y_end : float
+            The y end coordinate of the geometry.
+        - h_end : float
+            The end heading of the geometry.
+        - length : float
+            The length of the geometry.
     &#34;&#34;&#34;
     radius = 1 / np.abs(self.curvature)
     if self.curvature &lt; 0:
@@ -414,54 +608,65 @@ angle (float): angle of the arc (optional or use length)
 
     return new_x, new_y, new_h, self.length</code></pre>
 </details>
-<div class="desc"><p>Returns information about the end point of the geometry</p>
+<div class="desc"><p>Return the end point of the geometry.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>x (float): x start point of the geometry
-
-y (float): y start point of the geometry
-
-h (float): start heading of the geometry
-</code></pre>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>float</code></dt>
+<dd>The x start coordinate of the geometry.</dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>float</code></dt>
+<dd>The y start coordinate of the geometry.</dd>
+<dt><strong><code>h</code></strong> :&ensp;<code>float</code></dt>
+<dd>The start heading of the geometry.</dd>
+</dl>
 <h2 id="returns">Returns</h2>
-<pre><code>x (float): the final x point
-
-y (float): the final y point
-
-h (float): the final heading
-
-length (float): length of the element
-</code></pre></div>
+<dl>
+<dt><code>tuple</code> of <code>(float, float, float, float)</code></dt>
+<dd>A tuple containing:
+- x_end : float
+The x end coordinate of the geometry.
+- y_end : float
+The y end coordinate of the geometry.
+- h_end : float
+The end heading of the geometry.
+- length : float
+The length of the geometry.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.Arc.get_start_data"><code class="name flex">
-<span>def <span class="ident">get_start_data</span></span>(<span>self, end_x, end_y, end_h)</span>
+<span>def <span class="ident">get_start_data</span></span>(<span>self, end_x: float, end_y: float, end_h: float) ‑> tuple[float, float, float, float]</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_start_data(self, end_x, end_y, end_h):
-    &#34;&#34;&#34;Returns information about the end point of the geometry
+<pre><code class="python">def get_start_data(
+    self, end_x: float, end_y: float, end_h: float
+) -&gt; tuple[float, float, float, float]:
+    &#34;&#34;&#34;Returns information about the end point of the geometry.
 
     Parameters
     ----------
-        end_x (float): x final point of the geometry
+    end_x : float
+        The end x coordinate of the geometry
+    end_y : float
+        The end y coordinate of the geometry
 
-        end_y (float): y final point of the geometry
-
-        end_h (float): final heading of the geometry
+    end_h : float
+        The end h coordinate of the geometry
 
     Returns
     ---------
-
-        x (float): the start x point
-
-        y (float): the start y point
-
-        h (float): the start heading of the inverse geometry
-
-        length (float): length of the element
-
+    tuple of (float, float, float, float)
+        A tuple containing:
+        - x_start : float
+            The x start coordinate of the geometry.
+        - y_start : float
+            The y start coordinate of the geometry.
+        - h_start : float
+            The start heading of the geometry.
+        - length : float
+            The length of the geometry.
     &#34;&#34;&#34;
     x = end_x
     y = end_y
@@ -490,23 +695,29 @@ length (float): length of the element
     new_y = np.sin(new_ang) * radius + y_0
     return new_x, new_y, new_h, self.length</code></pre>
 </details>
-<div class="desc"><p>Returns information about the end point of the geometry</p>
+<div class="desc"><p>Returns information about the end point of the geometry.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>end_x (float): x final point of the geometry
-
-end_y (float): y final point of the geometry
-
-end_h (float): final heading of the geometry
-</code></pre>
+<dl>
+<dt><strong><code>end_x</code></strong> :&ensp;<code>float</code></dt>
+<dd>The end x coordinate of the geometry</dd>
+<dt><strong><code>end_y</code></strong> :&ensp;<code>float</code></dt>
+<dd>The end y coordinate of the geometry</dd>
+<dt><strong><code>end_h</code></strong> :&ensp;<code>float</code></dt>
+<dd>The end h coordinate of the geometry</dd>
+</dl>
 <h2 id="returns">Returns</h2>
-<pre><code>x (float): the start x point
-
-y (float): the start y point
-
-h (float): the start heading of the inverse geometry
-
-length (float): length of the element
-</code></pre></div>
+<dl>
+<dt><code>tuple</code> of <code>(float, float, float, float)</code></dt>
+<dd>A tuple containing:
+- x_start : float
+The x start coordinate of the geometry.
+- y_start : float
+The y start coordinate of the geometry.
+- h_start : float
+The start heading of the geometry.
+- length : float
+The length of the geometry.</dd>
+</dl></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -521,7 +732,7 @@ length (float): length of the element
 </dd>
 <dt id="scenariogeneration.xodr.geometry.Line"><code class="flex name class">
 <span>class <span class="ident">Line</span></span>
-<span>(</span><span>length)</span>
+<span>(</span><span>length: float)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -529,54 +740,72 @@ length (float): length of the element
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Line(_BaseGeometry):
-    &#34;&#34;&#34;the line class creates a line type of geometry
+    &#34;&#34;&#34;The `Line` class creates a line type of geometry.
 
     Parameters
     ----------
-        length (float): length of the line
+    length : float
+        The length of the line.
 
     Attributes
     ----------
-        length (float): length of the line
+    length : float
+        The length of the line.
 
     Methods
     -------
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-        get_end_data(x,y,h)
-            Returns the end point of the geometry
-
+    get_element()
+        Returns the full ElementTree representation of the class.
+    get_end_data(x, y, h)
+        Returns the end point of the geometry.
+    get_start_data(end_x, end_y, end_h)
+        Returns the start point of the geometry.
     &#34;&#34;&#34;
 
-    def __init__(self, length):
-        super().__init__()
-        self.length = length
-
-    def __eq__(self, other):
-        return super().__eq__(other)
-
-    def get_end_data(self, x, y, h):
-        &#34;&#34;&#34;Returns the end point of the geometry
+    def __init__(self, length: float) -&gt; None:
+        &#34;&#34;&#34;Initialize the `Line` instance.
 
         Parameters
         ----------
-            x (float): x start point of the geometry
-
-            y (float): y start point of the geometry
-
-            h (float): start heading of the geometry
+        length : float
+            The length of the line.
 
         Returns
+        -------
+        None
+        &#34;&#34;&#34;
+        super().__init__()
+        self.length = length
+
+    def __eq__(self, other: object) -&gt; bool:
+        return super().__eq__(other)
+
+    def get_end_data(
+        self, x: float, y: float, h: float
+    ) -&gt; tuple[float, float, float, float]:
+        &#34;&#34;&#34;Return the end point of the geometry.
+
+        Parameters
         ----------
-            x (float): the final x point
+        x : float
+            The x start coordinate of the geometry.
+        y : float
+            The y start coordinate of the geometry.
+        h : float
+            The start heading of the geometry.
 
-            y (float): the final y point
-
-            h (float): the final heading
-
-            length (float): length of the road
-
+        Returns
+        -------
+        tuple of (float, float, float, float)
+            A tuple containing:
+            - x_end : float
+                The x end coordinate of the geometry.
+            - y_end : float
+                The y end coordinate of the geometry.
+            - h_end : float
+                The end heading of the geometry.
+            - length : float
+                The length of the geometry.
         &#34;&#34;&#34;
 
         new_x = self.length * np.cos(h) + x
@@ -585,27 +814,32 @@ length (float): length of the element
 
         return new_x, new_y, new_h, self.length
 
-    def get_start_data(self, end_x, end_y, end_h):
-        &#34;&#34;&#34;Returns the end point of the geometry
+    def get_start_data(
+        self, end_x: float, end_y: float, end_h: float
+    ) -&gt; tuple[float, float, float, float]:
+        &#34;&#34;&#34;Return the start point of the geometry.
 
         Parameters
         ----------
-            end_x (float): x end point of the geometry
-
-            end_y (float): y end point of the geometry
-
-            end_h (float): end heading of the geometry
+        end_x : float
+            The x end coordinate of the geometry.
+        end_y : float
+            The y end coordinate of the geometry.
+        end_h : float
+            The end heading of the geometry.
 
         Returns
-        ----------
-            x (float): the start x point
-
-            y (float): the start y point
-
-            h (float): the start heading
-
-            length (float): length of the road
-
+        -------
+        tuple of (float, float, float, float)
+            A tuple containing:
+            - x_start : float
+                The start x coordinate of the geometry.
+            - y_start : float
+                The start y coordinate of the geometry.
+            - h_start : float
+                The start heading of the geometry.
+            - length : float
+                The length of the geometry.
         &#34;&#34;&#34;
         start_x = self.length * np.cos(end_h) + end_x
         start_y = self.length * np.sin(end_h) + end_y
@@ -613,27 +847,50 @@ length (float): length of the element
 
         return start_x, start_y, start_h, self.length
 
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the Line&#34;&#34;&#34;
+    def get_element(self) -&gt; ET.Element:
+        &#34;&#34;&#34;Return the ElementTree representation of the `Line`.
+
+        This method generates an XML element for the `Line`, including
+        any additional data.
+
+        Returns
+        -------
+        xml.etree.ElementTree.Element
+            The ElementTree representation of the `Line`.
+        &#34;&#34;&#34;
         element = ET.Element(&#34;line&#34;)
         self._add_additional_data_to_element(element)
         return element</code></pre>
 </details>
-<div class="desc"><p>the line class creates a line type of geometry</p>
+<div class="desc"><p>The <code><a title="scenariogeneration.xodr.geometry.Line" href="#scenariogeneration.xodr.geometry.Line">Line</a></code> class creates a line type of geometry.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>length (float): length of the line
-</code></pre>
+<dl>
+<dt><strong><code>length</code></strong> :&ensp;<code>float</code></dt>
+<dd>The length of the line.</dd>
+</dl>
 <h2 id="attributes">Attributes</h2>
-<pre><code>length (float): length of the line
-</code></pre>
+<dl>
+<dt><strong><code>length</code></strong> :&ensp;<code>float</code></dt>
+<dd>The length of the line.</dd>
+</dl>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element(elementname)
-    Returns the full ElementTree of the class
-
-get_end_data(x,y,h)
-    Returns the end point of the geometry
-</code></pre>
-<p>initalize the UserData</p></div>
+<p>get_element()
+Returns the full ElementTree representation of the class.
+get_end_data(x, y, h)
+Returns the end point of the geometry.
+get_start_data(end_x, end_y, end_h)
+Returns the start point of the geometry.</p>
+<p>Initialize the <code><a title="scenariogeneration.xodr.geometry.Line" href="#scenariogeneration.xodr.geometry.Line">Line</a></code> instance.</p>
+<h2 id="parameters_1">Parameters</h2>
+<dl>
+<dt><strong><code>length</code></strong> :&ensp;<code>float</code></dt>
+<dd>The length of the line.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xodr.geometry._BaseGeometry</li>
@@ -642,50 +899,71 @@ get_end_data(x,y,h)
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.geometry.Line.get_element"><code class="name flex">
-<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+<span>def <span class="ident">get_element</span></span>(<span>self) ‑> xml.etree.ElementTree.Element</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_element(self):
-    &#34;&#34;&#34;returns the elementTree of the Line&#34;&#34;&#34;
+<pre><code class="python">def get_element(self) -&gt; ET.Element:
+    &#34;&#34;&#34;Return the ElementTree representation of the `Line`.
+
+    This method generates an XML element for the `Line`, including
+    any additional data.
+
+    Returns
+    -------
+    xml.etree.ElementTree.Element
+        The ElementTree representation of the `Line`.
+    &#34;&#34;&#34;
     element = ET.Element(&#34;line&#34;)
     self._add_additional_data_to_element(element)
     return element</code></pre>
 </details>
-<div class="desc"><p>returns the elementTree of the Line</p></div>
+<div class="desc"><p>Return the ElementTree representation of the <code><a title="scenariogeneration.xodr.geometry.Line" href="#scenariogeneration.xodr.geometry.Line">Line</a></code>.</p>
+<p>This method generates an XML element for the <code><a title="scenariogeneration.xodr.geometry.Line" href="#scenariogeneration.xodr.geometry.Line">Line</a></code>, including
+any additional data.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>xml.etree.ElementTree.Element</code></dt>
+<dd>The ElementTree representation of the <code><a title="scenariogeneration.xodr.geometry.Line" href="#scenariogeneration.xodr.geometry.Line">Line</a></code>.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.Line.get_end_data"><code class="name flex">
-<span>def <span class="ident">get_end_data</span></span>(<span>self, x, y, h)</span>
+<span>def <span class="ident">get_end_data</span></span>(<span>self, x: float, y: float, h: float) ‑> tuple[float, float, float, float]</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_end_data(self, x, y, h):
-    &#34;&#34;&#34;Returns the end point of the geometry
+<pre><code class="python">def get_end_data(
+    self, x: float, y: float, h: float
+) -&gt; tuple[float, float, float, float]:
+    &#34;&#34;&#34;Return the end point of the geometry.
 
     Parameters
     ----------
-        x (float): x start point of the geometry
-
-        y (float): y start point of the geometry
-
-        h (float): start heading of the geometry
+    x : float
+        The x start coordinate of the geometry.
+    y : float
+        The y start coordinate of the geometry.
+    h : float
+        The start heading of the geometry.
 
     Returns
-    ----------
-        x (float): the final x point
-
-        y (float): the final y point
-
-        h (float): the final heading
-
-        length (float): length of the road
-
+    -------
+    tuple of (float, float, float, float)
+        A tuple containing:
+        - x_end : float
+            The x end coordinate of the geometry.
+        - y_end : float
+            The y end coordinate of the geometry.
+        - h_end : float
+            The end heading of the geometry.
+        - length : float
+            The length of the geometry.
     &#34;&#34;&#34;
 
     new_x = self.length * np.cos(h) + x
@@ -694,53 +972,64 @@ get_end_data(x,y,h)
 
     return new_x, new_y, new_h, self.length</code></pre>
 </details>
-<div class="desc"><p>Returns the end point of the geometry</p>
+<div class="desc"><p>Return the end point of the geometry.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>x (float): x start point of the geometry
-
-y (float): y start point of the geometry
-
-h (float): start heading of the geometry
-</code></pre>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>float</code></dt>
+<dd>The x start coordinate of the geometry.</dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>float</code></dt>
+<dd>The y start coordinate of the geometry.</dd>
+<dt><strong><code>h</code></strong> :&ensp;<code>float</code></dt>
+<dd>The start heading of the geometry.</dd>
+</dl>
 <h2 id="returns">Returns</h2>
-<pre><code>x (float): the final x point
-
-y (float): the final y point
-
-h (float): the final heading
-
-length (float): length of the road
-</code></pre></div>
+<dl>
+<dt><code>tuple</code> of <code>(float, float, float, float)</code></dt>
+<dd>A tuple containing:
+- x_end : float
+The x end coordinate of the geometry.
+- y_end : float
+The y end coordinate of the geometry.
+- h_end : float
+The end heading of the geometry.
+- length : float
+The length of the geometry.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.Line.get_start_data"><code class="name flex">
-<span>def <span class="ident">get_start_data</span></span>(<span>self, end_x, end_y, end_h)</span>
+<span>def <span class="ident">get_start_data</span></span>(<span>self, end_x: float, end_y: float, end_h: float) ‑> tuple[float, float, float, float]</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_start_data(self, end_x, end_y, end_h):
-    &#34;&#34;&#34;Returns the end point of the geometry
+<pre><code class="python">def get_start_data(
+    self, end_x: float, end_y: float, end_h: float
+) -&gt; tuple[float, float, float, float]:
+    &#34;&#34;&#34;Return the start point of the geometry.
 
     Parameters
     ----------
-        end_x (float): x end point of the geometry
-
-        end_y (float): y end point of the geometry
-
-        end_h (float): end heading of the geometry
+    end_x : float
+        The x end coordinate of the geometry.
+    end_y : float
+        The y end coordinate of the geometry.
+    end_h : float
+        The end heading of the geometry.
 
     Returns
-    ----------
-        x (float): the start x point
-
-        y (float): the start y point
-
-        h (float): the start heading
-
-        length (float): length of the road
-
+    -------
+    tuple of (float, float, float, float)
+        A tuple containing:
+        - x_start : float
+            The start x coordinate of the geometry.
+        - y_start : float
+            The start y coordinate of the geometry.
+        - h_start : float
+            The start heading of the geometry.
+        - length : float
+            The length of the geometry.
     &#34;&#34;&#34;
     start_x = self.length * np.cos(end_h) + end_x
     start_y = self.length * np.sin(end_h) + end_y
@@ -748,23 +1037,29 @@ length (float): length of the road
 
     return start_x, start_y, start_h, self.length</code></pre>
 </details>
-<div class="desc"><p>Returns the end point of the geometry</p>
+<div class="desc"><p>Return the start point of the geometry.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>end_x (float): x end point of the geometry
-
-end_y (float): y end point of the geometry
-
-end_h (float): end heading of the geometry
-</code></pre>
+<dl>
+<dt><strong><code>end_x</code></strong> :&ensp;<code>float</code></dt>
+<dd>The x end coordinate of the geometry.</dd>
+<dt><strong><code>end_y</code></strong> :&ensp;<code>float</code></dt>
+<dd>The y end coordinate of the geometry.</dd>
+<dt><strong><code>end_h</code></strong> :&ensp;<code>float</code></dt>
+<dd>The end heading of the geometry.</dd>
+</dl>
 <h2 id="returns">Returns</h2>
-<pre><code>x (float): the start x point
-
-y (float): the start y point
-
-h (float): the start heading
-
-length (float): length of the road
-</code></pre></div>
+<dl>
+<dt><code>tuple</code> of <code>(float, float, float, float)</code></dt>
+<dd>A tuple containing:
+- x_start : float
+The start x coordinate of the geometry.
+- y_start : float
+The start y coordinate of the geometry.
+- h_start : float
+The start heading of the geometry.
+- length : float
+The length of the geometry.</dd>
+</dl></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -779,7 +1074,7 @@ length (float): length of the road
 </dd>
 <dt id="scenariogeneration.xodr.geometry.ParamPoly3"><code class="flex name class">
 <span>class <span class="ident">ParamPoly3</span></span>
-<span>(</span><span>au, bu, cu, du, av, bv, cv, dv, prange='normalized', length=None)</span>
+<span>(</span><span>au: float,<br>bu: float,<br>cu: float,<br>du: float,<br>av: float,<br>bv: float,<br>cv: float,<br>dv: float,<br>prange: str = 'normalized',<br>length: float | None = None)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -787,96 +1082,110 @@ length (float): length of the road
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ParamPoly3(_BaseGeometry):
-    &#34;&#34;&#34;the ParamPoly3 class creates a parampoly3 type of geometry, in the coordinate systeme U (along road), V (normal to the road)
+    &#34;&#34;&#34;The `ParamPoly3` class creates a parametric polynomial type of geometry
+    in the coordinate system U (along the road) and V (normal to the road).
 
-    the polynomials are on the form
-    uv(p) = a + b*p + c*p^2 + d*p^3
+    The polynomials are of the form:
+        uv(p) = a + b*p + c*p^2 + d*p^3
 
     Parameters
     ----------
-        au (float): coefficient a of the u polynomial
-
-        bu (float): coefficient b of the u polynomial
-
-        cu (float): coefficient c of the u polynomial
-
-        du (float): coefficient d of the u polynomial
-
-        av (float): coefficient a of the v polynomial
-
-        bv (float): coefficient b of the v polynomial
-
-        cv (float): coefficient c of the v polynomial
-
-        dv (float): coefficient d of the v polynomial
-
-        prange (str): &#34;normalized&#34; or &#34;arcLength&#34;
-            Default: &#34;normalized&#34;
-
-        length (float): total length of arc, used if prange == arcLength
+    au : float
+        Coefficient `a` of the `u` polynomial.
+    bu : float
+        Coefficient `b` of the `u` polynomial.
+    cu : float
+        Coefficient `c` of the `u` polynomial.
+    du : float
+        Coefficient `d` of the `u` polynomial.
+    av : float
+        Coefficient `a` of the `v` polynomial.
+    bv : float
+        Coefficient `b` of the `v` polynomial.
+    cv : float
+        Coefficient `c` of the `v` polynomial.
+    dv : float
+        Coefficient `d` of the `v` polynomial.
+    prange : str, optional
+        Either `&#34;normalized&#34;` or `&#34;arcLength&#34;`. Default is `&#34;normalized&#34;`.
+    length : float, optional
+        Total length of the arc, used if `prange == &#34;arcLength&#34;`.
 
     Attributes
     ----------
-        au (float): coefficient a of the u polynomial
-
-        bu (float): coefficient b of the u polynomial
-
-        cu (float): coefficient c of the u polynomial
-
-        du (float): coefficient d of the u polynomial
-
-        av (float): coefficient a of the v polynomial
-
-        bv (float): coefficient b of the v polynomial
-
-        cv (float): coefficient c of the v polynomial
-
-        dv (float): coefficient d of the v polynomial
-
-        prange (str): &#34;normalized&#34; or &#34;arcLength&#34;
-            Default: &#34;normalized&#34;
-
-        length (float): total length of arc, used if prange == arcLength
+    au : float
+        Coefficient `a` of the `u` polynomial.
+    bu : float
+        Coefficient `b` of the `u` polynomial.
+    cu : float
+        Coefficient `c` of the `u` polynomial.
+    du : float
+        Coefficient `d` of the `u` polynomial.
+    av : float
+        Coefficient `a` of the `v` polynomial.
+    bv : float
+        Coefficient `b` of the `v` polynomial.
+    cv : float
+        Coefficient `c` of the `v` polynomial.
+    dv : float
+        Coefficient `d` of the `v` polynomial.
+    prange : str
+        Either `&#34;normalized&#34;` or `&#34;arcLength&#34;`. Default is `&#34;normalized&#34;`.
+    length : float
+        Total length of the arc, used if `prange == &#34;arcLength&#34;`.
 
     Methods
     -------
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
-        get_end_coordinate(length,x,y,h)
-            Returns the end point of the geometry
+    get_element(elementname)
+        Returns the full ElementTree representation of the class.
+    get_attributes()
+        Returns a dictionary of all attributes of the class.
+    get_end_coordinate(length, x, y, h)
+        Returns the end point of the geometry.
     &#34;&#34;&#34;
 
     def __init__(
-        self, au, bu, cu, du, av, bv, cv, dv, prange=&#34;normalized&#34;, length=None
-    ):
-        &#34;&#34;&#34;initalizes the ParamPoly3
+        self,
+        au: float,
+        bu: float,
+        cu: float,
+        du: float,
+        av: float,
+        bv: float,
+        cv: float,
+        dv: float,
+        prange: str = &#34;normalized&#34;,
+        length: Optional[float] = None,
+    ) -&gt; None:
+        &#34;&#34;&#34;Initialize the `ParamPoly3` instance.
 
         Parameters
         ----------
-            au (float): coefficient a of the u polynomial
+        au : float
+            Coefficient `a` of the `u` polynomial.
+        bu : float
+            Coefficient `b` of the `u` polynomial.
+        cu : float
+            Coefficient `c` of the `u` polynomial.
+        du : float
+            Coefficient `d` of the `u` polynomial.
+        av : float
+            Coefficient `a` of the `v` polynomial.
+        bv : float
+            Coefficient `b` of the `v` polynomial.
+        cv : float
+            Coefficient `c` of the `v` polynomial.
+        dv : float
+            Coefficient `d` of the `v` polynomial.
+        prange : str, optional
+            Either `&#34;normalized&#34;` or `&#34;arcLength&#34;`. Default is `&#34;normalized&#34;`.
+        length : float, optional
+            Total length of the arc, used if `prange == &#34;arcLength&#34;`.
 
-            bu (float): coefficient b of the u polynomial
-
-            cu (float): coefficient c of the u polynomial
-
-            du (float): coefficient d of the u polynomial
-
-            av (float): coefficient a of the v polynomial
-
-            bv (float): coefficient b of the v polynomial
-
-            cv (float): coefficient c of the v polynomial
-
-            dv (float): coefficient d of the v polynomial
-
-            prange (str): &#34;normalized&#34; or &#34;arcLength&#34;
-                Default: &#34;normalized&#34;
-
-            length (float): total length of arc, used if prange == arcLength
+        Raises
+        ------
+        ValueError
+            If `prange == &#34;arcLength&#34;` and `length` is not provided.
         &#34;&#34;&#34;
         super().__init__()
         self.au = au
@@ -897,39 +1206,60 @@ length (float): length of the road
         else:
             _, _, _, self.length = self.get_end_data(0, 0, 0)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -&gt; bool:
         if isinstance(other, ParamPoly3) and super().__eq__(other):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
 
-    def _integrand(self, p):
-        &#34;&#34;&#34;integral function to calulate length of polynomial,
-        #TODO: This is not tested or verified...
+    def _integrand(self, p: float) -&gt; float:
+        &#34;&#34;&#34;Integral function to calculate the length of the polynomial.
+
+        Note
+        ----
+        This method is not tested or verified.
+
+        Parameters
+        ----------
+        p : float
+            The parameter value for the polynomial.
+
+        Returns
+        -------
+        float
+            The value of the integral function at `p`.
         &#34;&#34;&#34;
         return np.sqrt(
             (abs(3 * self.du * p**2 + 2 * self.cu * p + self.bu)) ** 2
             + (abs(3 * self.dv * p**2 + 2 * self.cv * p + self.bv)) ** 2
         )
 
-    def get_start_data(self, x, y, h):
-        &#34;&#34;&#34;Returns the start point of the geometry
+    def get_start_data(
+        self, x: float, y: float, h: float
+    ) -&gt; tuple[float, float, float, float]:
+        &#34;&#34;&#34;Returns the start point of the geometry.
 
         Parameters
         ----------
-            x (float): x end point of the geometry
-
-            y (float): y end point of the geometry
-
-            h (float): end heading of the geometry
+        x : float
+            The x end coordinate of the geometry
+        y : float
+            The y end coordinate of the geometry
+        h : float
+            The x end heading of the geometry
 
         Returns
         ---------
-            x (float): the start x point
-            y (float): the start y point
-            h (float): the start heading
-            length (float): the length of the geometry
-
+        tuple of (float, float, float, float)
+            A tuple containing:
+            - x_start : float
+                The start x coordinate of the geometry.
+            - y_start : float
+                The start y coordinate of the geometry.
+            - h_start : float
+                The start heading of the geometry.
+            - length : float
+                The length of the geometry.
         &#34;&#34;&#34;
         if self.prange == &#34;normalized&#34;:
             p = 1
@@ -949,24 +1279,32 @@ length (float): length of the road
 
         return new_x, new_y, new_h, self.length
 
-    def get_end_data(self, x, y, h):
-        &#34;&#34;&#34;Returns the end point of the geometry
+    def get_end_data(
+        self, x: float, y: float, h: float
+    ) -&gt; tuple[float, float, float, float]:
+        &#34;&#34;&#34;Returns the end point of the geometry.
 
         Parameters
         ----------
-            x (float): x final point of the geometry
-
-            y (float): y final point of the geometry
-
-            h (float): final heading of the geometry
+        x : float
+            The x start coordinate of the geometry.
+        y : float
+            The y start coordinate of the geometry.
+        h : float
+            The start heading of the geometry.
 
         Returns
-        ---------
-            x (float): the start x point
-            y (float): the start y point
-            h (float): the start heading of the inverse geometry
-            length (float): length of the polynomial
-
+        -------
+        tuple of (float, float, float, float)
+            A tuple containing:
+            - x_end : float
+                The x end coordinate of the geometry.
+            - y_end : float
+                The y end coordinate of the geometry.
+            - h_end : float
+                The end heading of the geometry.
+            - length : float
+                The length of the geometry.
         &#34;&#34;&#34;
         if self.prange == &#34;normalized&#34;:
             p = 1
@@ -986,8 +1324,33 @@ length (float): length of the road
 
         return new_x, new_y, new_h, self.length
 
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes of the ParamPoly3 as a dict&#34;&#34;&#34;
+    def get_attributes(self) -&gt; dict:
+        &#34;&#34;&#34;Return the attributes of the `ParamPoly3` as a dictionary.
+
+        Returns
+        -------
+        dict
+            A dictionary containing the attributes of the `ParamPoly3`:
+            - &#34;aU&#34; : str
+                Coefficient `a` of the `u` polynomial.
+            - &#34;bU&#34; : str
+                Coefficient `b` of the `u` polynomial.
+            - &#34;cU&#34; : str
+                Coefficient `c` of the `u` polynomial.
+            - &#34;dU&#34; : str
+                Coefficient `d` of the `u` polynomial.
+            - &#34;aV&#34; : str
+                Coefficient `a` of the `v` polynomial.
+            - &#34;bV&#34; : str
+                Coefficient `b` of the `v` polynomial.
+            - &#34;cV&#34; : str
+                Coefficient `c` of the `v` polynomial.
+            - &#34;dV&#34; : str
+                Coefficient `d` of the `v` polynomial.
+            - &#34;pRange&#34; : str
+                The range type of the polynomial
+                (`&#34;normalized&#34;` or `&#34;arcLength&#34;`).
+        &#34;&#34;&#34;
         retdict = {}
         retdict[&#34;aU&#34;] = str(self.au)
         retdict[&#34;bU&#34;] = str(self.bu)
@@ -1000,92 +1363,107 @@ length (float): length of the road
         retdict[&#34;pRange&#34;] = self.prange
         return retdict
 
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the ParamPoly3&#34;&#34;&#34;
+    def get_element(self) -&gt; ET.Element:
+        &#34;&#34;&#34;Return the ElementTree representation of the `ParamPoly3`.
+
+        This method generates an XML element for the `ParamPoly3`,
+        including its attributes and any additional data.
+
+        Returns
+        -------
+        xml.etree.ElementTree.Element
+            The ElementTree representation of the `ParamPoly3`.
+        &#34;&#34;&#34;
         element = ET.Element(&#34;paramPoly3&#34;, attrib=self.get_attributes())
         self._add_additional_data_to_element(element)
         return element</code></pre>
 </details>
-<div class="desc"><p>the ParamPoly3 class creates a parampoly3 type of geometry, in the coordinate systeme U (along road), V (normal to the road)</p>
-<p>the polynomials are on the form
+<div class="desc"><p>The <code><a title="scenariogeneration.xodr.geometry.ParamPoly3" href="#scenariogeneration.xodr.geometry.ParamPoly3">ParamPoly3</a></code> class creates a parametric polynomial type of geometry
+in the coordinate system U (along the road) and V (normal to the road).</p>
+<p>The polynomials are of the form:
 uv(p) = a + b<em>p + c</em>p^2 + d*p^3</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>au (float): coefficient a of the u polynomial
-
-bu (float): coefficient b of the u polynomial
-
-cu (float): coefficient c of the u polynomial
-
-du (float): coefficient d of the u polynomial
-
-av (float): coefficient a of the v polynomial
-
-bv (float): coefficient b of the v polynomial
-
-cv (float): coefficient c of the v polynomial
-
-dv (float): coefficient d of the v polynomial
-
-prange (str): "normalized" or "arcLength"
-    Default: "normalized"
-
-length (float): total length of arc, used if prange == arcLength
-</code></pre>
+<dl>
+<dt><strong><code>au</code></strong> :&ensp;<code>float</code></dt>
+<dd>Coefficient <code>a</code> of the <code>u</code> polynomial.</dd>
+<dt><strong><code>bu</code></strong> :&ensp;<code>float</code></dt>
+<dd>Coefficient <code>b</code> of the <code>u</code> polynomial.</dd>
+<dt><strong><code>cu</code></strong> :&ensp;<code>float</code></dt>
+<dd>Coefficient <code>c</code> of the <code>u</code> polynomial.</dd>
+<dt><strong><code>du</code></strong> :&ensp;<code>float</code></dt>
+<dd>Coefficient <code>d</code> of the <code>u</code> polynomial.</dd>
+<dt><strong><code>av</code></strong> :&ensp;<code>float</code></dt>
+<dd>Coefficient <code>a</code> of the <code>v</code> polynomial.</dd>
+<dt><strong><code>bv</code></strong> :&ensp;<code>float</code></dt>
+<dd>Coefficient <code>b</code> of the <code>v</code> polynomial.</dd>
+<dt><strong><code>cv</code></strong> :&ensp;<code>float</code></dt>
+<dd>Coefficient <code>c</code> of the <code>v</code> polynomial.</dd>
+<dt><strong><code>dv</code></strong> :&ensp;<code>float</code></dt>
+<dd>Coefficient <code>d</code> of the <code>v</code> polynomial.</dd>
+<dt><strong><code>prange</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Either <code>"normalized"</code> or <code>"arcLength"</code>. Default is <code>"normalized"</code>.</dd>
+<dt><strong><code>length</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Total length of the arc, used if <code>prange == "arcLength"</code>.</dd>
+</dl>
 <h2 id="attributes">Attributes</h2>
-<pre><code>au (float): coefficient a of the u polynomial
-
-bu (float): coefficient b of the u polynomial
-
-cu (float): coefficient c of the u polynomial
-
-du (float): coefficient d of the u polynomial
-
-av (float): coefficient a of the v polynomial
-
-bv (float): coefficient b of the v polynomial
-
-cv (float): coefficient c of the v polynomial
-
-dv (float): coefficient d of the v polynomial
-
-prange (str): "normalized" or "arcLength"
-    Default: "normalized"
-
-length (float): total length of arc, used if prange == arcLength
-</code></pre>
+<dl>
+<dt><strong><code>au</code></strong> :&ensp;<code>float</code></dt>
+<dd>Coefficient <code>a</code> of the <code>u</code> polynomial.</dd>
+<dt><strong><code>bu</code></strong> :&ensp;<code>float</code></dt>
+<dd>Coefficient <code>b</code> of the <code>u</code> polynomial.</dd>
+<dt><strong><code>cu</code></strong> :&ensp;<code>float</code></dt>
+<dd>Coefficient <code>c</code> of the <code>u</code> polynomial.</dd>
+<dt><strong><code>du</code></strong> :&ensp;<code>float</code></dt>
+<dd>Coefficient <code>d</code> of the <code>u</code> polynomial.</dd>
+<dt><strong><code>av</code></strong> :&ensp;<code>float</code></dt>
+<dd>Coefficient <code>a</code> of the <code>v</code> polynomial.</dd>
+<dt><strong><code>bv</code></strong> :&ensp;<code>float</code></dt>
+<dd>Coefficient <code>b</code> of the <code>v</code> polynomial.</dd>
+<dt><strong><code>cv</code></strong> :&ensp;<code>float</code></dt>
+<dd>Coefficient <code>c</code> of the <code>v</code> polynomial.</dd>
+<dt><strong><code>dv</code></strong> :&ensp;<code>float</code></dt>
+<dd>Coefficient <code>d</code> of the <code>v</code> polynomial.</dd>
+<dt><strong><code>prange</code></strong> :&ensp;<code>str</code></dt>
+<dd>Either <code>"normalized"</code> or <code>"arcLength"</code>. Default is <code>"normalized"</code>.</dd>
+<dt><strong><code>length</code></strong> :&ensp;<code>float</code></dt>
+<dd>Total length of the arc, used if <code>prange == "arcLength"</code>.</dd>
+</dl>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element(elementname)
-    Returns the full ElementTree of the class
-
+<p>get_element(elementname)
+Returns the full ElementTree representation of the class.
 get_attributes()
-    Returns a dictionary of all attributes of the class
-
-get_end_coordinate(length,x,y,h)
-    Returns the end point of the geometry
-</code></pre>
-<p>initalizes the ParamPoly3</p>
+Returns a dictionary of all attributes of the class.
+get_end_coordinate(length, x, y, h)
+Returns the end point of the geometry.</p>
+<p>Initialize the <code><a title="scenariogeneration.xodr.geometry.ParamPoly3" href="#scenariogeneration.xodr.geometry.ParamPoly3">ParamPoly3</a></code> instance.</p>
 <h2 id="parameters_1">Parameters</h2>
-<pre><code>au (float): coefficient a of the u polynomial
-
-bu (float): coefficient b of the u polynomial
-
-cu (float): coefficient c of the u polynomial
-
-du (float): coefficient d of the u polynomial
-
-av (float): coefficient a of the v polynomial
-
-bv (float): coefficient b of the v polynomial
-
-cv (float): coefficient c of the v polynomial
-
-dv (float): coefficient d of the v polynomial
-
-prange (str): "normalized" or "arcLength"
-    Default: "normalized"
-
-length (float): total length of arc, used if prange == arcLength
-</code></pre></div>
+<dl>
+<dt><strong><code>au</code></strong> :&ensp;<code>float</code></dt>
+<dd>Coefficient <code>a</code> of the <code>u</code> polynomial.</dd>
+<dt><strong><code>bu</code></strong> :&ensp;<code>float</code></dt>
+<dd>Coefficient <code>b</code> of the <code>u</code> polynomial.</dd>
+<dt><strong><code>cu</code></strong> :&ensp;<code>float</code></dt>
+<dd>Coefficient <code>c</code> of the <code>u</code> polynomial.</dd>
+<dt><strong><code>du</code></strong> :&ensp;<code>float</code></dt>
+<dd>Coefficient <code>d</code> of the <code>u</code> polynomial.</dd>
+<dt><strong><code>av</code></strong> :&ensp;<code>float</code></dt>
+<dd>Coefficient <code>a</code> of the <code>v</code> polynomial.</dd>
+<dt><strong><code>bv</code></strong> :&ensp;<code>float</code></dt>
+<dd>Coefficient <code>b</code> of the <code>v</code> polynomial.</dd>
+<dt><strong><code>cv</code></strong> :&ensp;<code>float</code></dt>
+<dd>Coefficient <code>c</code> of the <code>v</code> polynomial.</dd>
+<dt><strong><code>dv</code></strong> :&ensp;<code>float</code></dt>
+<dd>Coefficient <code>d</code> of the <code>v</code> polynomial.</dd>
+<dt><strong><code>prange</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Either <code>"normalized"</code> or <code>"arcLength"</code>. Default is <code>"normalized"</code>.</dd>
+<dt><strong><code>length</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Total length of the arc, used if <code>prange == "arcLength"</code>.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If <code>prange == "arcLength"</code> and <code>length</code> is not provided.</dd>
+</dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xodr.geometry._BaseGeometry</li>
@@ -1094,15 +1472,40 @@ length (float): total length of arc, used if prange == arcLength
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.geometry.ParamPoly3.get_attributes"><code class="name flex">
-<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+<span>def <span class="ident">get_attributes</span></span>(<span>self) ‑> dict</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34;returns the attributes of the ParamPoly3 as a dict&#34;&#34;&#34;
+<pre><code class="python">def get_attributes(self) -&gt; dict:
+    &#34;&#34;&#34;Return the attributes of the `ParamPoly3` as a dictionary.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the attributes of the `ParamPoly3`:
+        - &#34;aU&#34; : str
+            Coefficient `a` of the `u` polynomial.
+        - &#34;bU&#34; : str
+            Coefficient `b` of the `u` polynomial.
+        - &#34;cU&#34; : str
+            Coefficient `c` of the `u` polynomial.
+        - &#34;dU&#34; : str
+            Coefficient `d` of the `u` polynomial.
+        - &#34;aV&#34; : str
+            Coefficient `a` of the `v` polynomial.
+        - &#34;bV&#34; : str
+            Coefficient `b` of the `v` polynomial.
+        - &#34;cV&#34; : str
+            Coefficient `c` of the `v` polynomial.
+        - &#34;dV&#34; : str
+            Coefficient `d` of the `v` polynomial.
+        - &#34;pRange&#34; : str
+            The range type of the polynomial
+            (`&#34;normalized&#34;` or `&#34;arcLength&#34;`).
+    &#34;&#34;&#34;
     retdict = {}
     retdict[&#34;aU&#34;] = str(self.au)
     retdict[&#34;bU&#34;] = str(self.bu)
@@ -1115,50 +1518,98 @@ length (float): total length of arc, used if prange == arcLength
     retdict[&#34;pRange&#34;] = self.prange
     return retdict</code></pre>
 </details>
-<div class="desc"><p>returns the attributes of the ParamPoly3 as a dict</p></div>
+<div class="desc"><p>Return the attributes of the <code><a title="scenariogeneration.xodr.geometry.ParamPoly3" href="#scenariogeneration.xodr.geometry.ParamPoly3">ParamPoly3</a></code> as a dictionary.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict</code></dt>
+<dd>A dictionary containing the attributes of the <code><a title="scenariogeneration.xodr.geometry.ParamPoly3" href="#scenariogeneration.xodr.geometry.ParamPoly3">ParamPoly3</a></code>:
+- "aU" : str
+Coefficient <code>a</code> of the <code>u</code> polynomial.
+- "bU" : str
+Coefficient <code>b</code> of the <code>u</code> polynomial.
+- "cU" : str
+Coefficient <code>c</code> of the <code>u</code> polynomial.
+- "dU" : str
+Coefficient <code>d</code> of the <code>u</code> polynomial.
+- "aV" : str
+Coefficient <code>a</code> of the <code>v</code> polynomial.
+- "bV" : str
+Coefficient <code>b</code> of the <code>v</code> polynomial.
+- "cV" : str
+Coefficient <code>c</code> of the <code>v</code> polynomial.
+- "dV" : str
+Coefficient <code>d</code> of the <code>v</code> polynomial.
+- "pRange" : str
+The range type of the polynomial
+(<code>"normalized"</code> or <code>"arcLength"</code>).</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.ParamPoly3.get_element"><code class="name flex">
-<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+<span>def <span class="ident">get_element</span></span>(<span>self) ‑> xml.etree.ElementTree.Element</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_element(self):
-    &#34;&#34;&#34;returns the elementTree of the ParamPoly3&#34;&#34;&#34;
+<pre><code class="python">def get_element(self) -&gt; ET.Element:
+    &#34;&#34;&#34;Return the ElementTree representation of the `ParamPoly3`.
+
+    This method generates an XML element for the `ParamPoly3`,
+    including its attributes and any additional data.
+
+    Returns
+    -------
+    xml.etree.ElementTree.Element
+        The ElementTree representation of the `ParamPoly3`.
+    &#34;&#34;&#34;
     element = ET.Element(&#34;paramPoly3&#34;, attrib=self.get_attributes())
     self._add_additional_data_to_element(element)
     return element</code></pre>
 </details>
-<div class="desc"><p>returns the elementTree of the ParamPoly3</p></div>
+<div class="desc"><p>Return the ElementTree representation of the <code><a title="scenariogeneration.xodr.geometry.ParamPoly3" href="#scenariogeneration.xodr.geometry.ParamPoly3">ParamPoly3</a></code>.</p>
+<p>This method generates an XML element for the <code><a title="scenariogeneration.xodr.geometry.ParamPoly3" href="#scenariogeneration.xodr.geometry.ParamPoly3">ParamPoly3</a></code>,
+including its attributes and any additional data.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>xml.etree.ElementTree.Element</code></dt>
+<dd>The ElementTree representation of the <code><a title="scenariogeneration.xodr.geometry.ParamPoly3" href="#scenariogeneration.xodr.geometry.ParamPoly3">ParamPoly3</a></code>.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.ParamPoly3.get_end_data"><code class="name flex">
-<span>def <span class="ident">get_end_data</span></span>(<span>self, x, y, h)</span>
+<span>def <span class="ident">get_end_data</span></span>(<span>self, x: float, y: float, h: float) ‑> tuple[float, float, float, float]</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_end_data(self, x, y, h):
-    &#34;&#34;&#34;Returns the end point of the geometry
+<pre><code class="python">def get_end_data(
+    self, x: float, y: float, h: float
+) -&gt; tuple[float, float, float, float]:
+    &#34;&#34;&#34;Returns the end point of the geometry.
 
     Parameters
     ----------
-        x (float): x final point of the geometry
-
-        y (float): y final point of the geometry
-
-        h (float): final heading of the geometry
+    x : float
+        The x start coordinate of the geometry.
+    y : float
+        The y start coordinate of the geometry.
+    h : float
+        The start heading of the geometry.
 
     Returns
-    ---------
-        x (float): the start x point
-        y (float): the start y point
-        h (float): the start heading of the inverse geometry
-        length (float): length of the polynomial
-
+    -------
+    tuple of (float, float, float, float)
+        A tuple containing:
+        - x_end : float
+            The x end coordinate of the geometry.
+        - y_end : float
+            The y end coordinate of the geometry.
+        - h_end : float
+            The end heading of the geometry.
+        - length : float
+            The length of the geometry.
     &#34;&#34;&#34;
     if self.prange == &#34;normalized&#34;:
         p = 1
@@ -1178,47 +1629,64 @@ length (float): total length of arc, used if prange == arcLength
 
     return new_x, new_y, new_h, self.length</code></pre>
 </details>
-<div class="desc"><p>Returns the end point of the geometry</p>
+<div class="desc"><p>Returns the end point of the geometry.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>x (float): x final point of the geometry
-
-y (float): y final point of the geometry
-
-h (float): final heading of the geometry
-</code></pre>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>float</code></dt>
+<dd>The x start coordinate of the geometry.</dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>float</code></dt>
+<dd>The y start coordinate of the geometry.</dd>
+<dt><strong><code>h</code></strong> :&ensp;<code>float</code></dt>
+<dd>The start heading of the geometry.</dd>
+</dl>
 <h2 id="returns">Returns</h2>
-<pre><code>x (float): the start x point
-y (float): the start y point
-h (float): the start heading of the inverse geometry
-length (float): length of the polynomial
-</code></pre></div>
+<dl>
+<dt><code>tuple</code> of <code>(float, float, float, float)</code></dt>
+<dd>A tuple containing:
+- x_end : float
+The x end coordinate of the geometry.
+- y_end : float
+The y end coordinate of the geometry.
+- h_end : float
+The end heading of the geometry.
+- length : float
+The length of the geometry.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.ParamPoly3.get_start_data"><code class="name flex">
-<span>def <span class="ident">get_start_data</span></span>(<span>self, x, y, h)</span>
+<span>def <span class="ident">get_start_data</span></span>(<span>self, x: float, y: float, h: float) ‑> tuple[float, float, float, float]</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_start_data(self, x, y, h):
-    &#34;&#34;&#34;Returns the start point of the geometry
+<pre><code class="python">def get_start_data(
+    self, x: float, y: float, h: float
+) -&gt; tuple[float, float, float, float]:
+    &#34;&#34;&#34;Returns the start point of the geometry.
 
     Parameters
     ----------
-        x (float): x end point of the geometry
-
-        y (float): y end point of the geometry
-
-        h (float): end heading of the geometry
+    x : float
+        The x end coordinate of the geometry
+    y : float
+        The y end coordinate of the geometry
+    h : float
+        The x end heading of the geometry
 
     Returns
     ---------
-        x (float): the start x point
-        y (float): the start y point
-        h (float): the start heading
-        length (float): the length of the geometry
-
+    tuple of (float, float, float, float)
+        A tuple containing:
+        - x_start : float
+            The start x coordinate of the geometry.
+        - y_start : float
+            The start y coordinate of the geometry.
+        - h_start : float
+            The start heading of the geometry.
+        - length : float
+            The length of the geometry.
     &#34;&#34;&#34;
     if self.prange == &#34;normalized&#34;:
         p = 1
@@ -1238,20 +1706,29 @@ length (float): length of the polynomial
 
     return new_x, new_y, new_h, self.length</code></pre>
 </details>
-<div class="desc"><p>Returns the start point of the geometry</p>
+<div class="desc"><p>Returns the start point of the geometry.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>x (float): x end point of the geometry
-
-y (float): y end point of the geometry
-
-h (float): end heading of the geometry
-</code></pre>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>float</code></dt>
+<dd>The x end coordinate of the geometry</dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>float</code></dt>
+<dd>The y end coordinate of the geometry</dd>
+<dt><strong><code>h</code></strong> :&ensp;<code>float</code></dt>
+<dd>The x end heading of the geometry</dd>
+</dl>
 <h2 id="returns">Returns</h2>
-<pre><code>x (float): the start x point
-y (float): the start y point
-h (float): the start heading
-length (float): the length of the geometry
-</code></pre></div>
+<dl>
+<dt><code>tuple</code> of <code>(float, float, float, float)</code></dt>
+<dd>A tuple containing:
+- x_start : float
+The start x coordinate of the geometry.
+- y_start : float
+The start y coordinate of the geometry.
+- h_start : float
+The start heading of the geometry.
+- length : float
+The length of the geometry.</dd>
+</dl></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -1266,7 +1743,7 @@ length (float): the length of the geometry
 </dd>
 <dt id="scenariogeneration.xodr.geometry.PlanView"><code class="flex name class">
 <span>class <span class="ident">PlanView</span></span>
-<span>(</span><span>x_start=None, y_start=None, h_start=None)</span>
+<span>(</span><span>x_start: float | None = None,<br>y_start: float | None = None,<br>h_start: float | None = None)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -1274,60 +1751,71 @@ length (float): the length of the geometry
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class PlanView(XodrBase):
-    &#34;&#34;&#34;the PlanView is the geometrical description of a road,
+    &#34;&#34;&#34;The PlanView is the geometrical description of a road.
 
     Parameters
     ----------
-        x_start (float): start x coordinate of the first geometry
-            Default: None
-
-        y_start (float): start y coordinate of the first geometry
-            Default: None
-
-        h_start (float): starting heading of the first geometry
-            Default: None
+    x_start : float, optional
+        Start x coordinate of the first geometry. Default is None.
+    y_start : float, optional
+        Start y coordinate of the first geometry. Default is None.
+    h_start : float, optional
+        Starting heading of the first geometry. Default is None.
 
     Attributes
     ----------
-        present_x (float): the start x coordinate of the next geometry added
-
-        present_y (float): the y coordinate of the next geometry added
-
-        present_h (float): the heading coordinate of the next geometry added
-
-        present_s (float): the along road measure of the next geometry added
+    present_x : float
+        The start x coordinate of the next geometry added.
+    present_y : float
+        The y coordinate of the next geometry added.
+    present_h : float
+        The heading coordinate of the next geometry added.
+    present_s : float
+        The along-road measure of the next geometry added.
 
     Methods
     -------
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-        get_total_length()
-            Returns the full length of the PlanView
-
-        add_geometry(geom,lenght)
-            adds a new geometry entry to the planeview
-
-        set_start_point(x_start,y_start,h_start)
-            sets the start point and heading of the planview
-
-        adjust_geometries()
-            based on the start point, it will adjust all geometries in the planview
-
+    get_element(elementname)
+        Returns the full ElementTree of the class.
+    get_total_length()
+        Returns the full length of the PlanView.
+    add_geometry(geom, length)
+        Adds a new geometry entry to the PlanView.
+    set_start_point(x_start, y_start, h_start)
+        Sets the start point and heading of the PlanView.
+    adjust_geometries()
+        Adjusts all geometries in the PlanView based on the start point.
     &#34;&#34;&#34;
 
-    def __init__(self, x_start=None, y_start=None, h_start=None):
-        &#34;&#34;&#34;initalizes the PlanView
-        Note: if multiple roads are used, the start values can be recalculated.
+    def __init__(
+        self,
+        x_start: Optional[float] = None,
+        y_start: Optional[float] = None,
+        h_start: Optional[float] = None,
+    ) -&gt; None:
+        &#34;&#34;&#34;Initialize the PlanView.
 
+        Parameters
+        ----------
+        x_start : float, optional
+            Start x coordinate of the first geometry. Default is None.
+        y_start : float, optional
+            Start y coordinate of the first geometry. Default is None.
+        h_start : float, optional
+            Starting heading of the first geometry. Default is None.
 
+        Raises
+        ------
+        NotEnoughInputArguments
+            If only some of the start values are provided but not all.
         &#34;&#34;&#34;
         super().__init__()
-        self.present_x = 0
-        self.present_y = 0
-        self.present_h = 0
-        self.present_s = 0
-        self.fixed = False
+        self.present_x: float = 0
+        self.present_y: float = 0
+        self.present_h: float = 0
+        self.present_s: float = 0
+        self.fixed: bool = False
+
         if all([x_start != None, y_start != None, h_start != None]):
             self.set_start_point(x_start, y_start, h_start)
         elif any([x_start != None, y_start != None, h_start != None]):
@@ -1352,7 +1840,7 @@ length (float): the length of the geometry
 
         self._addition_mode = None
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -&gt; bool:
         if isinstance(other, PlanView) and super().__eq__(other):
             if self.adjusted and other.adjusted:
                 if self._adjusted_geometries == other._adjusted_geometries:
@@ -1365,20 +1853,38 @@ length (float): the length of the geometry
 
         return False
 
-    def add_geometry(self, geom, heading=None):
-        &#34;&#34;&#34;add_geometry adds a geometry to the planview and will stich together all geometries (in order the order added)
+    def add_geometry(
+        self, geom: _BaseGeometry, heading: Optional[float] = None
+    ) -&gt; &#34;PlanView&#34;:
+        &#34;&#34;&#34;Add a geometry to the PlanView and stitch together all geometries in
+        the order they are added.
 
-            Should be used together with &#34;adjust_roads_and_lanes&#34; in the OpenDrive class.
+        This method should be used together with the
+        `adjust_roads_and_lanes` method in the OpenDrive class.
 
-            NOTE: DO NOT MIX WITH with add_fixed_geometry
+        Note
+        ----
+        Do not mix this method with `add_fixed_geometry`.
 
         Parameters
         ----------
-            geom (_BaseGeometry): the type of geometry
+        geom : _BaseGeometry
+            The geometry to add. Must be an instance of `_BaseGeometry`.
+        heading : float, optional
+            Override the previous heading (not recommended). If used, it
+            must be applied consistently for all geometries. Default is None.
 
-            heading (float): override the previous heading (optional), not recommended
-                if used, use for ALL geometries
+        Returns
+        -------
+        PlanView
+            The updated PlanView instance.
 
+        Raises
+        ------
+        MixOfGeometryAddition
+            If a fixed geometry has already been added.
+        TypeError
+            If `geom` is not an instance of `_BaseGeometry`.
         &#34;&#34;&#34;
         if self._addition_mode == &#34;add_fixed_geometry&#34;:
             raise MixOfGeometryAddition(
@@ -1393,28 +1899,48 @@ length (float): the length of the geometry
         self._addition_mode = &#34;add_geometry&#34;
         return self
 
-    def add_fixed_geometry(self, geom, x_start, y_start, h_start, s=None):
-        &#34;&#34;&#34;add_fixed_geometry adds a geometry to a certain point to the planview
+    def add_fixed_geometry(
+        self,
+        geom: Union[&#34;Line&#34;, &#34;Spiral&#34;, &#34;ParamPoly3&#34;, &#34;Arc&#34;],
+        x_start: float,
+        y_start: float,
+        h_start: float,
+        s: Optional[float] = None,
+    ) -&gt; &#34;PlanView&#34;:
+        &#34;&#34;&#34;Add a fixed geometry to the PlanView at a specific point.
 
-            if s is used, the values will be coded and is up to the user to make correct, not for a correct opendrive file please add the geometires in order
-            if s is not used, the geometries are supposed to be added in order (and s will be calculated)
+        If `s` is provided, the values will be coded, and it is up to the
+        user to ensure correctness. If `s` is not provided, the geometries
+        are expected to be added in order, and `s` will be calculated.
 
-            NOTE: DO NOT MIX WITH the method add_geometry
+        Note
+        ----
+        Do not mix this method with `add_geometry`.
 
         Parameters
         ----------
-            geom (Line, Spiral, ParamPoly3, or Arc): the geometry to add
+        geom : Line, Spiral, ParamPoly3, or Arc
+            The geometry to add.
+        x_start : float
+            Start x position of the geometry.
+        y_start : float
+            Start y position of the geometry.
+        h_start : float
+            Start heading of the geometry.
+        s : float, optional
+            Start s value of the geometry. Default is None.
 
-            x_start (float): start x position of the geometry
+        Returns
+        -------
+        PlanView
+            The updated PlanView instance.
 
-            y_start (float): start y position of the geometry
-
-            h_start (float): start heading of the geometry
-
-            s (float): start s value of the geometry (optional)
-                Default: None
-
+        Raises
+        ------
+        MixOfGeometryAddition
+            If a geometry has already been added using `add_geometry`.
         &#34;&#34;&#34;
+
         if self._addition_mode == &#34;add_geometry&#34;:
             raise MixOfGeometryAddition(
                 &#34;A geometry has already been added with add_geometry, please use either add_geometry, or add_fixed_geometry not both&#34;
@@ -1439,19 +1965,23 @@ length (float): the length of the geometry
         self._addition_mode = &#34;add_fixed_geometry&#34;
         return self
 
-    def set_start_point(self, x_start=0, y_start=0, h_start=0):
-        &#34;&#34;&#34;sets the start point of the planview
+    def set_start_point(
+        self, x_start: float = 0, y_start: float = 0, h_start: float = 0
+    ) -&gt; None:
+        &#34;&#34;&#34;Set the start point of the PlanView.
 
         Parameters
         ----------
-        x_start (float): start x coordinate of the first geometry
-            Default: 0
+        x_start : float, optional
+            Start x coordinate of the first geometry. Default is 0.
+        y_start : float, optional
+            Start y coordinate of the first geometry. Default is 0.
+        h_start : float, optional
+            Starting heading of the first geometry. Default is 0.
 
-        y_start (float): start y coordinate of the first geometry
-            Default: 0
-
-        h_start (float): starting heading of the first geometry
-            Default: 0
+        Returns
+        -------
+        None
         &#34;&#34;&#34;
 
         self.present_x = x_start
@@ -1459,40 +1989,59 @@ length (float): the length of the geometry
         self.present_h = h_start
         self.fixed = True
 
-    def get_start_point(self):
-        &#34;&#34;&#34;returns the start point of the planview
+    def get_start_point(
+        self,
+    ) -&gt; tuple[Optional[float], Optional[float], Optional[float]]:
+        &#34;&#34;&#34;Return the start point of the PlanView.
 
-        Parameters
-        ----------
+        Returns
+        -------
+        tuple of (float or None, float or None, float or None)
+            A tuple containing:
+            - x_start : float or None
+                The start x coordinate of the PlanView.
+            - y_start : float or None
+                The start y coordinate of the PlanView.
+            - h_start : float or None
+                The starting heading of the PlanView.
         &#34;&#34;&#34;
 
         return self.x_start, self.y_start, self.h_start
         # return self._adjusted_geometries[-1].get_end_point
 
-    def get_end_point(self):
-        &#34;&#34;&#34;sets the start point of the planview
+    def get_end_point(
+        self,
+    ) -&gt; tuple[Optional[float], Optional[float], Optional[float]]:
+        &#34;&#34;&#34;Return the end point of the PlanView.
 
-        Parameters
-        ----------
-        x_start (float): start x coordinate of the first geometry
-            Default: 0
-
-        y_start (float): start y coordinate of the first geometry
-            Default: 0
-
-        h_start (float): starting heading of the first geometry
-            Default: 0
+        Returns
+        -------
+        tuple of (float or None, float or None, float or None)
+            A tuple containing:
+            - x_end : float or None
+                The end x coordinate of the PlanView.
+            - y_end : float or None
+                The end y coordinate of the PlanView.
+            - h_end : float or None
+                The ending heading of the PlanView.
         &#34;&#34;&#34;
 
         return self.x_end, self.y_end, self.h_end
 
-    def adjust_geometries(self, from_end=False):
-        &#34;&#34;&#34;Adjusts all geometries to have the correct start point and heading
+    def adjust_geometries(self, from_end: bool = False) -&gt; None:
+        &#34;&#34;&#34;Adjust all geometries to have the correct start point and heading.
 
         Parameters
         ----------
-        from_end ([optional]bool): states if (self.present_x, self.present_y, self.present_h) are being interpreted as starting point or ending point of the geometry
+        from_end : bool, optional
+            Indicates whether `(self.present_x, self.present_y,
+            self.present_h)` are interpreted as the starting point
+            (`False`) or the ending point (`True`) of the geometry.
+            Default is `False`.
 
+        Returns
+        -------
+        None
         &#34;&#34;&#34;
         if from_end == False:
             self.x_start = self.present_x
@@ -1561,15 +2110,34 @@ length (float): the length of the geometry
         self.h_end = wrap_pi(self.h_end)
         self.adjusted = True
 
-    def get_total_length(self):
-        &#34;&#34;&#34;returns the total length of the planView&#34;&#34;&#34;
+    def get_total_length(self) -&gt; float:
+        &#34;&#34;&#34;Return the total length of the PlanView.
+
+        If the geometries have been adjusted, the total length is
+        calculated based on the adjusted geometries. Otherwise, it is
+        calculated based on the raw geometries.
+
+        Returns
+        -------
+        float
+            The total length of the PlanView.
+        &#34;&#34;&#34;
         if self.adjusted:
             return self.present_s
         else:
             return sum([x.length for x in self._raw_geometries])
 
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the WorldPostion&#34;&#34;&#34;
+    def get_element(self) -&gt; ET.Element:
+        &#34;&#34;&#34;Return the ElementTree representation of the PlanView.
+
+        This method generates an XML element for the PlanView, including
+        all adjusted geometries.
+
+        Returns
+        -------
+        xml.etree.ElementTree.Element
+            The ElementTree representation of the PlanView.
+        &#34;&#34;&#34;
 
         element = ET.Element(&#34;planView&#34;)
         self._add_additional_data_to_element(element)
@@ -1577,44 +2145,53 @@ length (float): the length of the geometry
             element.append(geom.get_element())
         return element</code></pre>
 </details>
-<div class="desc"><p>the PlanView is the geometrical description of a road,</p>
+<div class="desc"><p>The PlanView is the geometrical description of a road.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>x_start (float): start x coordinate of the first geometry
-    Default: None
-
-y_start (float): start y coordinate of the first geometry
-    Default: None
-
-h_start (float): starting heading of the first geometry
-    Default: None
-</code></pre>
+<dl>
+<dt><strong><code>x_start</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Start x coordinate of the first geometry. Default is None.</dd>
+<dt><strong><code>y_start</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Start y coordinate of the first geometry. Default is None.</dd>
+<dt><strong><code>h_start</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Starting heading of the first geometry. Default is None.</dd>
+</dl>
 <h2 id="attributes">Attributes</h2>
-<pre><code>present_x (float): the start x coordinate of the next geometry added
-
-present_y (float): the y coordinate of the next geometry added
-
-present_h (float): the heading coordinate of the next geometry added
-
-present_s (float): the along road measure of the next geometry added
-</code></pre>
+<dl>
+<dt><strong><code>present_x</code></strong> :&ensp;<code>float</code></dt>
+<dd>The start x coordinate of the next geometry added.</dd>
+<dt><strong><code>present_y</code></strong> :&ensp;<code>float</code></dt>
+<dd>The y coordinate of the next geometry added.</dd>
+<dt><strong><code>present_h</code></strong> :&ensp;<code>float</code></dt>
+<dd>The heading coordinate of the next geometry added.</dd>
+<dt><strong><code>present_s</code></strong> :&ensp;<code>float</code></dt>
+<dd>The along-road measure of the next geometry added.</dd>
+</dl>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element(elementname)
-    Returns the full ElementTree of the class
-
+<p>get_element(elementname)
+Returns the full ElementTree of the class.
 get_total_length()
-    Returns the full length of the PlanView
-
-add_geometry(geom,lenght)
-    adds a new geometry entry to the planeview
-
-set_start_point(x_start,y_start,h_start)
-    sets the start point and heading of the planview
-
+Returns the full length of the PlanView.
+add_geometry(geom, length)
+Adds a new geometry entry to the PlanView.
+set_start_point(x_start, y_start, h_start)
+Sets the start point and heading of the PlanView.
 adjust_geometries()
-    based on the start point, it will adjust all geometries in the planview
-</code></pre>
-<p>initalizes the PlanView
-Note: if multiple roads are used, the start values can be recalculated.</p></div>
+Adjusts all geometries in the PlanView based on the start point.</p>
+<p>Initialize the PlanView.</p>
+<h2 id="parameters_1">Parameters</h2>
+<dl>
+<dt><strong><code>x_start</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Start x coordinate of the first geometry. Default is None.</dd>
+<dt><strong><code>y_start</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Start y coordinate of the first geometry. Default is None.</dd>
+<dt><strong><code>h_start</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Starting heading of the first geometry. Default is None.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>NotEnoughInputArguments</code></dt>
+<dd>If only some of the start values are provided but not all.</dd>
+</dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
@@ -1622,35 +2199,55 @@ Note: if multiple roads are used, the start values can be recalculated.</p></div
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.geometry.PlanView.add_fixed_geometry"><code class="name flex">
-<span>def <span class="ident">add_fixed_geometry</span></span>(<span>self, geom, x_start, y_start, h_start, s=None)</span>
+<span>def <span class="ident">add_fixed_geometry</span></span>(<span>self,<br>geom: ForwardRef('<a title="scenariogeneration.xodr.geometry.Line" href="#scenariogeneration.xodr.geometry.Line">Line</a>') | ForwardRef('<a title="scenariogeneration.xodr.geometry.Spiral" href="#scenariogeneration.xodr.geometry.Spiral">Spiral</a>') | ForwardRef('<a title="scenariogeneration.xodr.geometry.ParamPoly3" href="#scenariogeneration.xodr.geometry.ParamPoly3">ParamPoly3</a>') | ForwardRef('<a title="scenariogeneration.xodr.geometry.Arc" href="#scenariogeneration.xodr.geometry.Arc">Arc</a>'),<br>x_start: float,<br>y_start: float,<br>h_start: float,<br>s: float | None = None) ‑> <a title="scenariogeneration.xodr.geometry.PlanView" href="#scenariogeneration.xodr.geometry.PlanView">PlanView</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_fixed_geometry(self, geom, x_start, y_start, h_start, s=None):
-    &#34;&#34;&#34;add_fixed_geometry adds a geometry to a certain point to the planview
+<pre><code class="python">def add_fixed_geometry(
+    self,
+    geom: Union[&#34;Line&#34;, &#34;Spiral&#34;, &#34;ParamPoly3&#34;, &#34;Arc&#34;],
+    x_start: float,
+    y_start: float,
+    h_start: float,
+    s: Optional[float] = None,
+) -&gt; &#34;PlanView&#34;:
+    &#34;&#34;&#34;Add a fixed geometry to the PlanView at a specific point.
 
-        if s is used, the values will be coded and is up to the user to make correct, not for a correct opendrive file please add the geometires in order
-        if s is not used, the geometries are supposed to be added in order (and s will be calculated)
+    If `s` is provided, the values will be coded, and it is up to the
+    user to ensure correctness. If `s` is not provided, the geometries
+    are expected to be added in order, and `s` will be calculated.
 
-        NOTE: DO NOT MIX WITH the method add_geometry
+    Note
+    ----
+    Do not mix this method with `add_geometry`.
 
     Parameters
     ----------
-        geom (Line, Spiral, ParamPoly3, or Arc): the geometry to add
+    geom : Line, Spiral, ParamPoly3, or Arc
+        The geometry to add.
+    x_start : float
+        Start x position of the geometry.
+    y_start : float
+        Start y position of the geometry.
+    h_start : float
+        Start heading of the geometry.
+    s : float, optional
+        Start s value of the geometry. Default is None.
 
-        x_start (float): start x position of the geometry
+    Returns
+    -------
+    PlanView
+        The updated PlanView instance.
 
-        y_start (float): start y position of the geometry
-
-        h_start (float): start heading of the geometry
-
-        s (float): start s value of the geometry (optional)
-            Default: None
-
+    Raises
+    ------
+    MixOfGeometryAddition
+        If a geometry has already been added using `add_geometry`.
     &#34;&#34;&#34;
+
     if self._addition_mode == &#34;add_geometry&#34;:
         raise MixOfGeometryAddition(
             &#34;A geometry has already been added with add_geometry, please use either add_geometry, or add_fixed_geometry not both&#34;
@@ -1675,47 +2272,76 @@ Note: if multiple roads are used, the start values can be recalculated.</p></div
     self._addition_mode = &#34;add_fixed_geometry&#34;
     return self</code></pre>
 </details>
-<div class="desc"><p>add_fixed_geometry adds a geometry to a certain point to the planview</p>
-<pre><code>if s is used, the values will be coded and is up to the user to make correct, not for a correct opendrive file please add the geometires in order
-if s is not used, the geometries are supposed to be added in order (and s will be calculated)
-
-NOTE: DO NOT MIX WITH the method add_geometry
-</code></pre>
+<div class="desc"><p>Add a fixed geometry to the PlanView at a specific point.</p>
+<p>If <code>s</code> is provided, the values will be coded, and it is up to the
+user to ensure correctness. If <code>s</code> is not provided, the geometries
+are expected to be added in order, and <code>s</code> will be calculated.</p>
+<h2 id="note">Note</h2>
+<p>Do not mix this method with <code>add_geometry</code>.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>geom (Line, Spiral, ParamPoly3, or Arc): the geometry to add
-
-x_start (float): start x position of the geometry
-
-y_start (float): start y position of the geometry
-
-h_start (float): start heading of the geometry
-
-s (float): start s value of the geometry (optional)
-    Default: None
-</code></pre></div>
+<dl>
+<dt><strong><code>geom</code></strong> :&ensp;<code><a title="scenariogeneration.xodr.geometry.Line" href="#scenariogeneration.xodr.geometry.Line">Line</a>, <a title="scenariogeneration.xodr.geometry.Spiral" href="#scenariogeneration.xodr.geometry.Spiral">Spiral</a>, <a title="scenariogeneration.xodr.geometry.ParamPoly3" href="#scenariogeneration.xodr.geometry.ParamPoly3">ParamPoly3</a>,</code> or <code><a title="scenariogeneration.xodr.geometry.Arc" href="#scenariogeneration.xodr.geometry.Arc">Arc</a></code></dt>
+<dd>The geometry to add.</dd>
+<dt><strong><code>x_start</code></strong> :&ensp;<code>float</code></dt>
+<dd>Start x position of the geometry.</dd>
+<dt><strong><code>y_start</code></strong> :&ensp;<code>float</code></dt>
+<dd>Start y position of the geometry.</dd>
+<dt><strong><code>h_start</code></strong> :&ensp;<code>float</code></dt>
+<dd>Start heading of the geometry.</dd>
+<dt><strong><code>s</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Start s value of the geometry. Default is None.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="scenariogeneration.xodr.geometry.PlanView" href="#scenariogeneration.xodr.geometry.PlanView">PlanView</a></code></dt>
+<dd>The updated PlanView instance.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>MixOfGeometryAddition</code></dt>
+<dd>If a geometry has already been added using <code>add_geometry</code>.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.PlanView.add_geometry"><code class="name flex">
-<span>def <span class="ident">add_geometry</span></span>(<span>self, geom, heading=None)</span>
+<span>def <span class="ident">add_geometry</span></span>(<span>self,<br>geom: scenariogeneration.xodr.geometry._BaseGeometry,<br>heading: float | None = None) ‑> <a title="scenariogeneration.xodr.geometry.PlanView" href="#scenariogeneration.xodr.geometry.PlanView">PlanView</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_geometry(self, geom, heading=None):
-    &#34;&#34;&#34;add_geometry adds a geometry to the planview and will stich together all geometries (in order the order added)
+<pre><code class="python">def add_geometry(
+    self, geom: _BaseGeometry, heading: Optional[float] = None
+) -&gt; &#34;PlanView&#34;:
+    &#34;&#34;&#34;Add a geometry to the PlanView and stitch together all geometries in
+    the order they are added.
 
-        Should be used together with &#34;adjust_roads_and_lanes&#34; in the OpenDrive class.
+    This method should be used together with the
+    `adjust_roads_and_lanes` method in the OpenDrive class.
 
-        NOTE: DO NOT MIX WITH with add_fixed_geometry
+    Note
+    ----
+    Do not mix this method with `add_fixed_geometry`.
 
     Parameters
     ----------
-        geom (_BaseGeometry): the type of geometry
+    geom : _BaseGeometry
+        The geometry to add. Must be an instance of `_BaseGeometry`.
+    heading : float, optional
+        Override the previous heading (not recommended). If used, it
+        must be applied consistently for all geometries. Default is None.
 
-        heading (float): override the previous heading (optional), not recommended
-            if used, use for ALL geometries
+    Returns
+    -------
+    PlanView
+        The updated PlanView instance.
 
+    Raises
+    ------
+    MixOfGeometryAddition
+        If a fixed geometry has already been added.
+    TypeError
+        If `geom` is not an instance of `_BaseGeometry`.
     &#34;&#34;&#34;
     if self._addition_mode == &#34;add_fixed_geometry&#34;:
         raise MixOfGeometryAddition(
@@ -1730,33 +2356,55 @@ s (float): start s value of the geometry (optional)
     self._addition_mode = &#34;add_geometry&#34;
     return self</code></pre>
 </details>
-<div class="desc"><p>add_geometry adds a geometry to the planview and will stich together all geometries (in order the order added)</p>
-<pre><code>Should be used together with "adjust_roads_and_lanes" in the OpenDrive class.
-
-NOTE: DO NOT MIX WITH with add_fixed_geometry
-</code></pre>
+<div class="desc"><p>Add a geometry to the PlanView and stitch together all geometries in
+the order they are added.</p>
+<p>This method should be used together with the
+<code>adjust_roads_and_lanes</code> method in the OpenDrive class.</p>
+<h2 id="note">Note</h2>
+<p>Do not mix this method with <code>add_fixed_geometry</code>.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>geom (_BaseGeometry): the type of geometry
-
-heading (float): override the previous heading (optional), not recommended
-    if used, use for ALL geometries
-</code></pre></div>
+<dl>
+<dt><strong><code>geom</code></strong> :&ensp;<code>_BaseGeometry</code></dt>
+<dd>The geometry to add. Must be an instance of <code>_BaseGeometry</code>.</dd>
+<dt><strong><code>heading</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Override the previous heading (not recommended). If used, it
+must be applied consistently for all geometries. Default is None.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="scenariogeneration.xodr.geometry.PlanView" href="#scenariogeneration.xodr.geometry.PlanView">PlanView</a></code></dt>
+<dd>The updated PlanView instance.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>MixOfGeometryAddition</code></dt>
+<dd>If a fixed geometry has already been added.</dd>
+<dt><code>TypeError</code></dt>
+<dd>If <code>geom</code> is not an instance of <code>_BaseGeometry</code>.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.PlanView.adjust_geometries"><code class="name flex">
-<span>def <span class="ident">adjust_geometries</span></span>(<span>self, from_end=False)</span>
+<span>def <span class="ident">adjust_geometries</span></span>(<span>self, from_end: bool = False) ‑> None</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def adjust_geometries(self, from_end=False):
-    &#34;&#34;&#34;Adjusts all geometries to have the correct start point and heading
+<pre><code class="python">def adjust_geometries(self, from_end: bool = False) -&gt; None:
+    &#34;&#34;&#34;Adjust all geometries to have the correct start point and heading.
 
     Parameters
     ----------
-    from_end ([optional]bool): states if (self.present_x, self.present_y, self.present_h) are being interpreted as starting point or ending point of the geometry
+    from_end : bool, optional
+        Indicates whether `(self.present_x, self.present_y,
+        self.present_h)` are interpreted as the starting point
+        (`False`) or the ending point (`True`) of the geometry.
+        Default is `False`.
 
+    Returns
+    -------
+    None
     &#34;&#34;&#34;
     if from_end == False:
         self.x_start = self.present_x
@@ -1825,20 +2473,40 @@ heading (float): override the previous heading (optional), not recommended
     self.h_end = wrap_pi(self.h_end)
     self.adjusted = True</code></pre>
 </details>
-<div class="desc"><p>Adjusts all geometries to have the correct start point and heading</p>
+<div class="desc"><p>Adjust all geometries to have the correct start point and heading.</p>
 <h2 id="parameters">Parameters</h2>
-<p>from_end ([optional]bool): states if (self.present_x, self.present_y, self.present_h) are being interpreted as starting point or ending point of the geometry</p></div>
+<dl>
+<dt><strong><code>from_end</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Indicates whether <code>(self.present_x, self.present_y,
+self.present_h)</code> are interpreted as the starting point
+(<code>False</code>) or the ending point (<code>True</code>) of the geometry.
+Default is <code>False</code>.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.PlanView.get_element"><code class="name flex">
-<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+<span>def <span class="ident">get_element</span></span>(<span>self) ‑> xml.etree.ElementTree.Element</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_element(self):
-    &#34;&#34;&#34;returns the elementTree of the WorldPostion&#34;&#34;&#34;
+<pre><code class="python">def get_element(self) -&gt; ET.Element:
+    &#34;&#34;&#34;Return the ElementTree representation of the PlanView.
+
+    This method generates an XML element for the PlanView, including
+    all adjusted geometries.
+
+    Returns
+    -------
+    xml.etree.ElementTree.Element
+        The ElementTree representation of the PlanView.
+    &#34;&#34;&#34;
 
     element = ET.Element(&#34;planView&#34;)
     self._add_additional_data_to_element(element)
@@ -1846,101 +2514,156 @@ heading (float): override the previous heading (optional), not recommended
         element.append(geom.get_element())
     return element</code></pre>
 </details>
-<div class="desc"><p>returns the elementTree of the WorldPostion</p></div>
+<div class="desc"><p>Return the ElementTree representation of the PlanView.</p>
+<p>This method generates an XML element for the PlanView, including
+all adjusted geometries.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>xml.etree.ElementTree.Element</code></dt>
+<dd>The ElementTree representation of the PlanView.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.PlanView.get_end_point"><code class="name flex">
-<span>def <span class="ident">get_end_point</span></span>(<span>self)</span>
+<span>def <span class="ident">get_end_point</span></span>(<span>self) ‑> tuple[float | None, float | None, float | None]</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_end_point(self):
-    &#34;&#34;&#34;sets the start point of the planview
+<pre><code class="python">def get_end_point(
+    self,
+) -&gt; tuple[Optional[float], Optional[float], Optional[float]]:
+    &#34;&#34;&#34;Return the end point of the PlanView.
 
-    Parameters
-    ----------
-    x_start (float): start x coordinate of the first geometry
-        Default: 0
-
-    y_start (float): start y coordinate of the first geometry
-        Default: 0
-
-    h_start (float): starting heading of the first geometry
-        Default: 0
+    Returns
+    -------
+    tuple of (float or None, float or None, float or None)
+        A tuple containing:
+        - x_end : float or None
+            The end x coordinate of the PlanView.
+        - y_end : float or None
+            The end y coordinate of the PlanView.
+        - h_end : float or None
+            The ending heading of the PlanView.
     &#34;&#34;&#34;
 
     return self.x_end, self.y_end, self.h_end</code></pre>
 </details>
-<div class="desc"><p>sets the start point of the planview</p>
-<h2 id="parameters">Parameters</h2>
-<p>x_start (float): start x coordinate of the first geometry
-Default: 0</p>
-<p>y_start (float): start y coordinate of the first geometry
-Default: 0</p>
-<p>h_start (float): starting heading of the first geometry
-Default: 0</p></div>
+<div class="desc"><p>Return the end point of the PlanView.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>tuple</code> of <code>(float</code> or <code>None, float</code> or <code>None, float</code> or <code>None)</code></dt>
+<dd>A tuple containing:
+- x_end : float or None
+The end x coordinate of the PlanView.
+- y_end : float or None
+The end y coordinate of the PlanView.
+- h_end : float or None
+The ending heading of the PlanView.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.PlanView.get_start_point"><code class="name flex">
-<span>def <span class="ident">get_start_point</span></span>(<span>self)</span>
+<span>def <span class="ident">get_start_point</span></span>(<span>self) ‑> tuple[float | None, float | None, float | None]</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_start_point(self):
-    &#34;&#34;&#34;returns the start point of the planview
+<pre><code class="python">def get_start_point(
+    self,
+) -&gt; tuple[Optional[float], Optional[float], Optional[float]]:
+    &#34;&#34;&#34;Return the start point of the PlanView.
 
-    Parameters
-    ----------
+    Returns
+    -------
+    tuple of (float or None, float or None, float or None)
+        A tuple containing:
+        - x_start : float or None
+            The start x coordinate of the PlanView.
+        - y_start : float or None
+            The start y coordinate of the PlanView.
+        - h_start : float or None
+            The starting heading of the PlanView.
     &#34;&#34;&#34;
 
     return self.x_start, self.y_start, self.h_start
     # return self._adjusted_geometries[-1].get_end_point</code></pre>
 </details>
-<div class="desc"><p>returns the start point of the planview</p>
-<h2 id="parameters">Parameters</h2></div>
+<div class="desc"><p>Return the start point of the PlanView.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>tuple</code> of <code>(float</code> or <code>None, float</code> or <code>None, float</code> or <code>None)</code></dt>
+<dd>A tuple containing:
+- x_start : float or None
+The start x coordinate of the PlanView.
+- y_start : float or None
+The start y coordinate of the PlanView.
+- h_start : float or None
+The starting heading of the PlanView.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.PlanView.get_total_length"><code class="name flex">
-<span>def <span class="ident">get_total_length</span></span>(<span>self)</span>
+<span>def <span class="ident">get_total_length</span></span>(<span>self) ‑> float</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_total_length(self):
-    &#34;&#34;&#34;returns the total length of the planView&#34;&#34;&#34;
+<pre><code class="python">def get_total_length(self) -&gt; float:
+    &#34;&#34;&#34;Return the total length of the PlanView.
+
+    If the geometries have been adjusted, the total length is
+    calculated based on the adjusted geometries. Otherwise, it is
+    calculated based on the raw geometries.
+
+    Returns
+    -------
+    float
+        The total length of the PlanView.
+    &#34;&#34;&#34;
     if self.adjusted:
         return self.present_s
     else:
         return sum([x.length for x in self._raw_geometries])</code></pre>
 </details>
-<div class="desc"><p>returns the total length of the planView</p></div>
+<div class="desc"><p>Return the total length of the PlanView.</p>
+<p>If the geometries have been adjusted, the total length is
+calculated based on the adjusted geometries. Otherwise, it is
+calculated based on the raw geometries.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>float</code></dt>
+<dd>The total length of the PlanView.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.PlanView.set_start_point"><code class="name flex">
-<span>def <span class="ident">set_start_point</span></span>(<span>self, x_start=0, y_start=0, h_start=0)</span>
+<span>def <span class="ident">set_start_point</span></span>(<span>self, x_start: float = 0, y_start: float = 0, h_start: float = 0) ‑> None</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def set_start_point(self, x_start=0, y_start=0, h_start=0):
-    &#34;&#34;&#34;sets the start point of the planview
+<pre><code class="python">def set_start_point(
+    self, x_start: float = 0, y_start: float = 0, h_start: float = 0
+) -&gt; None:
+    &#34;&#34;&#34;Set the start point of the PlanView.
 
     Parameters
     ----------
-    x_start (float): start x coordinate of the first geometry
-        Default: 0
+    x_start : float, optional
+        Start x coordinate of the first geometry. Default is 0.
+    y_start : float, optional
+        Start y coordinate of the first geometry. Default is 0.
+    h_start : float, optional
+        Starting heading of the first geometry. Default is 0.
 
-    y_start (float): start y coordinate of the first geometry
-        Default: 0
-
-    h_start (float): starting heading of the first geometry
-        Default: 0
+    Returns
+    -------
+    None
     &#34;&#34;&#34;
 
     self.present_x = x_start
@@ -1948,14 +2671,21 @@ Default: 0</p></div>
     self.present_h = h_start
     self.fixed = True</code></pre>
 </details>
-<div class="desc"><p>sets the start point of the planview</p>
+<div class="desc"><p>Set the start point of the PlanView.</p>
 <h2 id="parameters">Parameters</h2>
-<p>x_start (float): start x coordinate of the first geometry
-Default: 0</p>
-<p>y_start (float): start y coordinate of the first geometry
-Default: 0</p>
-<p>h_start (float): starting heading of the first geometry
-Default: 0</p></div>
+<dl>
+<dt><strong><code>x_start</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Start x coordinate of the first geometry. Default is 0.</dd>
+<dt><strong><code>y_start</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Start y coordinate of the first geometry. Default is 0.</dd>
+<dt><strong><code>h_start</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Starting heading of the first geometry. Default is 0.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -1970,7 +2700,7 @@ Default: 0</p></div>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.Spiral"><code class="flex name class">
 <span>class <span class="ident">Spiral</span></span>
-<span>(</span><span>curvstart, curvend, length=None, angle=None, cdot=None)</span>
+<span>(</span><span>curvstart: float,<br>curvend: float,<br>length: float | None = None,<br>angle: float | None = None,<br>cdot: float | None = None)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -1978,52 +2708,75 @@ Default: 0</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Spiral(_BaseGeometry):
-    &#34;&#34;&#34;the Spiral (Clothoid) creates a spiral type of geometry
+    &#34;&#34;&#34;The `Spiral` (Clothoid) class creates a spiral type of geometry.
 
     Parameters
     ----------
-        curvstart (float): starting curvature of the Spiral
-
-        curvend (float): final curvature of the Spiral
-
-        length (float): length of the spiral (optional, or use, angle, or cdot)
-
-        angle (float): the angle of the spiral (optional, or use length, or cdot)
-
-        cdot (float): the curvature change of the spiral (optional, or use length, or angle)
+    curvstart : float
+        Starting curvature of the spiral.
+    curvend : float
+        Final curvature of the spiral.
+    length : float, optional
+        Length of the spiral. Either `length`, `angle`, or `cdot` must
+        be provided.
+    angle : float, optional
+        Angle of the spiral. Either `length`, `angle`, or `cdot` must
+        be provided.
+    cdot : float, optional
+        Curvature change of the spiral. Either `length`, `angle`, or
+        `cdot` must be provided.
 
     Attributes
     ----------
-        curvstart (float): starting curvature of the Spiral
-
-        curvend (float): final curvature of the Spiral
+    curvstart : float
+        Starting curvature of the spiral.
+    curvend : float
+        Final curvature of the spiral.
 
     Methods
     -------
-        get_element()
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
-        get_end_data(x,y,h)
-            Returns the end point of the geometry
+    get_element()
+        Returns the full ElementTree representation of the class.
+    get_attributes()
+        Returns a dictionary of all attributes of the class.
+    get_end_data(x, y, h)
+        Returns the end point of the geometry.
+    get_start_data(end_x, end_y, end_h)
+        Returns the start point of the geometry.
     &#34;&#34;&#34;
 
-    def __init__(self, curvstart, curvend, length=None, angle=None, cdot=None):
-        &#34;&#34;&#34;initalizes the Spline
+    def __init__(
+        self,
+        curvstart: float,
+        curvend: float,
+        length: Optional[float] = None,
+        angle: Optional[float] = None,
+        cdot: Optional[float] = None,
+    ) -&gt; None:
+        &#34;&#34;&#34;Initialize the `Spiral` instance.
 
         Parameters
         ----------
-            curvstart (float): starting curvature of the Spiral
+        curvstart : float
+            Starting curvature of the spiral.
+        curvend : float
+            Final curvature of the spiral.
+        length : float, optional
+            Length of the spiral. Either `length`, `angle`, or `cdot` must
+            be provided.
+        angle : float, optional
+            Angle of the spiral. Either `length`, `angle`, or `cdot` must
+            be provided.
+        cdot : float, optional
+            Curvature change of the spiral. Either `length`, `angle`, or
+            `cdot` must be provided.
 
-            curvend (float): final curvature of the Spiral
-
-            length (float): length of the spiral (optional, or use, angle, or cdot)
-
-            angle (float): the angle of the spiral (optional, or use length, or cdot)
-
-            cdot (float): the curvature change of the spiral (optional, or use length, or angle)
+        Raises
+        ------
+        NotEnoughInputArguments
+            If none of `length`, `angle`, or `cdot` is provided.
+        ToManyOptionalArguments
+            If more than one of `length`, `angle`, or `cdot` is provided.
         &#34;&#34;&#34;
         super().__init__()
         self.curvstart = curvstart
@@ -2035,37 +2788,47 @@ Default: 0</p></div>
                 &#34;Spiral is overdefined, please use only one of the optional inputs&#34;
             )
         if angle:
-            self.length = 2 * abs(angle) / np.maximum(abs(curvend), abs(curvstart))
+            self.length = (
+                2 * abs(angle) / np.maximum(abs(curvend), abs(curvstart))
+            )
 
         elif cdot:
             self.length = (self.curvend - self.curvstart) / cdot
         else:
             self.length = length
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -&gt; bool:
         if isinstance(other, Spiral) and super().__eq__(other):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
 
-    def get_end_data(self, x, y, h):
-        &#34;&#34;&#34;Returns the end point of the geometry
+    def get_end_data(
+        self, x: float, y: float, h: float
+    ) -&gt; tuple[float, float, float, float]:
+        &#34;&#34;&#34;Returns the end point of the geometry.
 
         Parameters
         ----------
-            x (float): x start point of the geometry
-
-            y (float): y start point of the geometry
-
-            h (float): start heading of the geometry
+        x : float
+            The x start coordinate of the geometry.
+        y : float
+            The y start coordinate of the geometry.
+        h : float
+            The start heading of the geometry.
 
         Returns
-        ---------
-
-            x (float): the final x point
-            y (float): the final y point
-            h (float): the final heading
-            l (float): length of the spiral
+        -------
+        tuple of (float, float, float, float)
+            A tuple containing:
+            - x_end : float
+                The x end coordinate of the geometry.
+            - y_end : float
+                The y end coordinate of the geometry.
+            - h_end : float
+                The end heading of the geometry.
+            - length : float
+                The length of the spiral.
         &#34;&#34;&#34;
 
         cloth = pcloth.Clothoid.StandardParams(
@@ -2079,25 +2842,32 @@ Default: 0</p></div>
 
         return cloth.XEnd, cloth.YEnd, cloth.ThetaEnd, cloth.length
 
-    def get_start_data(self, end_x, end_y, end_h):
-        &#34;&#34;&#34;Returns the end point of the geometry
+    def get_start_data(
+        self, end_x: float, end_y: float, end_h: float
+    ) -&gt; tuple[float, float, float, float]:
+        &#34;&#34;&#34;Returns the start point of the geometry.
 
         Parameters
         ----------
-            end_x (float): x end point of the geometry
-
-            end_y (float): y end point of the geometry
-
-            end_h (float): end heading of the geometry
+        end_x : float
+            The x end coordinate of the geometry.
+        end_y : float
+            The y end coordinate of the geometry.
+        end_h : float
+            The end heading of the geometry.
 
         Returns
-        ---------
-
-            x (float): the start x point
-            y (float): the start y point
-            h (float): the start heading of the inverse geometry
-            l (float): length of the spiral
-
+        -------
+        tuple of (float, float, float, float)
+            A tuple containing:
+            - x_start : float
+                The start x coordinate of the geometry.
+            - y_start : float
+                The start y coordinate of the geometry.
+            - h_start : float
+                The start heading of the inverse geometry.
+            - length : float
+                The length of the spiral.
         &#34;&#34;&#34;
         cloth = pcloth.Clothoid.StandardParams(
             end_x,
@@ -2110,55 +2880,92 @@ Default: 0</p></div>
 
         return cloth.XEnd, cloth.YEnd, cloth.ThetaEnd, cloth.length
 
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes of the Line as a dict&#34;&#34;&#34;
+    def get_attributes(self) -&gt; dict:
+        &#34;&#34;&#34;Return the attributes of the `Spiral` as a dictionary.
+
+        Returns
+        -------
+        dict
+            A dictionary containing the attributes of the `Spiral`:
+            - &#34;curvStart&#34; : str
+                Starting curvature of the spiral.
+            - &#34;curvEnd&#34; : str
+                Final curvature of the spiral.
+        &#34;&#34;&#34;
         return {&#34;curvStart&#34;: str(self.curvstart), &#34;curvEnd&#34;: str(self.curvend)}
 
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the Line&#34;&#34;&#34;
+    def get_element(self) -&gt; ET.Element:
+        &#34;&#34;&#34;Return the ElementTree representation of the `Spiral`.
+
+        This method generates an XML element for the `Spiral`, including
+        its attributes and any additional data.
+
+        Returns
+        -------
+        xml.etree.ElementTree.Element
+            The ElementTree representation of the `Spiral`.
+        &#34;&#34;&#34;
         element = ET.Element(&#34;spiral&#34;, attrib=self.get_attributes())
         self._add_additional_data_to_element(element)
         return element</code></pre>
 </details>
-<div class="desc"><p>the Spiral (Clothoid) creates a spiral type of geometry</p>
+<div class="desc"><p>The <code><a title="scenariogeneration.xodr.geometry.Spiral" href="#scenariogeneration.xodr.geometry.Spiral">Spiral</a></code> (Clothoid) class creates a spiral type of geometry.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>curvstart (float): starting curvature of the Spiral
-
-curvend (float): final curvature of the Spiral
-
-length (float): length of the spiral (optional, or use, angle, or cdot)
-
-angle (float): the angle of the spiral (optional, or use length, or cdot)
-
-cdot (float): the curvature change of the spiral (optional, or use length, or angle)
-</code></pre>
+<dl>
+<dt><strong><code>curvstart</code></strong> :&ensp;<code>float</code></dt>
+<dd>Starting curvature of the spiral.</dd>
+<dt><strong><code>curvend</code></strong> :&ensp;<code>float</code></dt>
+<dd>Final curvature of the spiral.</dd>
+<dt><strong><code>length</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Length of the spiral. Either <code>length</code>, <code>angle</code>, or <code>cdot</code> must
+be provided.</dd>
+<dt><strong><code>angle</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Angle of the spiral. Either <code>length</code>, <code>angle</code>, or <code>cdot</code> must
+be provided.</dd>
+<dt><strong><code>cdot</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Curvature change of the spiral. Either <code>length</code>, <code>angle</code>, or
+<code>cdot</code> must be provided.</dd>
+</dl>
 <h2 id="attributes">Attributes</h2>
-<pre><code>curvstart (float): starting curvature of the Spiral
-
-curvend (float): final curvature of the Spiral
-</code></pre>
+<dl>
+<dt><strong><code>curvstart</code></strong> :&ensp;<code>float</code></dt>
+<dd>Starting curvature of the spiral.</dd>
+<dt><strong><code>curvend</code></strong> :&ensp;<code>float</code></dt>
+<dd>Final curvature of the spiral.</dd>
+</dl>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
-    Returns the full ElementTree of the class
-
+<p>get_element()
+Returns the full ElementTree representation of the class.
 get_attributes()
-    Returns a dictionary of all attributes of the class
-
-get_end_data(x,y,h)
-    Returns the end point of the geometry
-</code></pre>
-<p>initalizes the Spline</p>
+Returns a dictionary of all attributes of the class.
+get_end_data(x, y, h)
+Returns the end point of the geometry.
+get_start_data(end_x, end_y, end_h)
+Returns the start point of the geometry.</p>
+<p>Initialize the <code><a title="scenariogeneration.xodr.geometry.Spiral" href="#scenariogeneration.xodr.geometry.Spiral">Spiral</a></code> instance.</p>
 <h2 id="parameters_1">Parameters</h2>
-<pre><code>curvstart (float): starting curvature of the Spiral
-
-curvend (float): final curvature of the Spiral
-
-length (float): length of the spiral (optional, or use, angle, or cdot)
-
-angle (float): the angle of the spiral (optional, or use length, or cdot)
-
-cdot (float): the curvature change of the spiral (optional, or use length, or angle)
-</code></pre></div>
+<dl>
+<dt><strong><code>curvstart</code></strong> :&ensp;<code>float</code></dt>
+<dd>Starting curvature of the spiral.</dd>
+<dt><strong><code>curvend</code></strong> :&ensp;<code>float</code></dt>
+<dd>Final curvature of the spiral.</dd>
+<dt><strong><code>length</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Length of the spiral. Either <code>length</code>, <code>angle</code>, or <code>cdot</code> must
+be provided.</dd>
+<dt><strong><code>angle</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Angle of the spiral. Either <code>length</code>, <code>angle</code>, or <code>cdot</code> must
+be provided.</dd>
+<dt><strong><code>cdot</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Curvature change of the spiral. Either <code>length</code>, <code>angle</code>, or
+<code>cdot</code> must be provided.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>NotEnoughInputArguments</code></dt>
+<dd>If none of <code>length</code>, <code>angle</code>, or <code>cdot</code> is provided.</dd>
+<dt><code>ToManyOptionalArguments</code></dt>
+<dd>If more than one of <code>length</code>, <code>angle</code>, or <code>cdot</code> is provided.</dd>
+</dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xodr.geometry._BaseGeometry</li>
@@ -2167,61 +2974,104 @@ cdot (float): the curvature change of the spiral (optional, or use length, or an
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.geometry.Spiral.get_attributes"><code class="name flex">
-<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+<span>def <span class="ident">get_attributes</span></span>(<span>self) ‑> dict</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34;returns the attributes of the Line as a dict&#34;&#34;&#34;
+<pre><code class="python">def get_attributes(self) -&gt; dict:
+    &#34;&#34;&#34;Return the attributes of the `Spiral` as a dictionary.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the attributes of the `Spiral`:
+        - &#34;curvStart&#34; : str
+            Starting curvature of the spiral.
+        - &#34;curvEnd&#34; : str
+            Final curvature of the spiral.
+    &#34;&#34;&#34;
     return {&#34;curvStart&#34;: str(self.curvstart), &#34;curvEnd&#34;: str(self.curvend)}</code></pre>
 </details>
-<div class="desc"><p>returns the attributes of the Line as a dict</p></div>
+<div class="desc"><p>Return the attributes of the <code><a title="scenariogeneration.xodr.geometry.Spiral" href="#scenariogeneration.xodr.geometry.Spiral">Spiral</a></code> as a dictionary.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict</code></dt>
+<dd>A dictionary containing the attributes of the <code><a title="scenariogeneration.xodr.geometry.Spiral" href="#scenariogeneration.xodr.geometry.Spiral">Spiral</a></code>:
+- "curvStart" : str
+Starting curvature of the spiral.
+- "curvEnd" : str
+Final curvature of the spiral.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.Spiral.get_element"><code class="name flex">
-<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+<span>def <span class="ident">get_element</span></span>(<span>self) ‑> xml.etree.ElementTree.Element</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_element(self):
-    &#34;&#34;&#34;returns the elementTree of the Line&#34;&#34;&#34;
+<pre><code class="python">def get_element(self) -&gt; ET.Element:
+    &#34;&#34;&#34;Return the ElementTree representation of the `Spiral`.
+
+    This method generates an XML element for the `Spiral`, including
+    its attributes and any additional data.
+
+    Returns
+    -------
+    xml.etree.ElementTree.Element
+        The ElementTree representation of the `Spiral`.
+    &#34;&#34;&#34;
     element = ET.Element(&#34;spiral&#34;, attrib=self.get_attributes())
     self._add_additional_data_to_element(element)
     return element</code></pre>
 </details>
-<div class="desc"><p>returns the elementTree of the Line</p></div>
+<div class="desc"><p>Return the ElementTree representation of the <code><a title="scenariogeneration.xodr.geometry.Spiral" href="#scenariogeneration.xodr.geometry.Spiral">Spiral</a></code>.</p>
+<p>This method generates an XML element for the <code><a title="scenariogeneration.xodr.geometry.Spiral" href="#scenariogeneration.xodr.geometry.Spiral">Spiral</a></code>, including
+its attributes and any additional data.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>xml.etree.ElementTree.Element</code></dt>
+<dd>The ElementTree representation of the <code><a title="scenariogeneration.xodr.geometry.Spiral" href="#scenariogeneration.xodr.geometry.Spiral">Spiral</a></code>.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.Spiral.get_end_data"><code class="name flex">
-<span>def <span class="ident">get_end_data</span></span>(<span>self, x, y, h)</span>
+<span>def <span class="ident">get_end_data</span></span>(<span>self, x: float, y: float, h: float) ‑> tuple[float, float, float, float]</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_end_data(self, x, y, h):
-    &#34;&#34;&#34;Returns the end point of the geometry
+<pre><code class="python">def get_end_data(
+    self, x: float, y: float, h: float
+) -&gt; tuple[float, float, float, float]:
+    &#34;&#34;&#34;Returns the end point of the geometry.
 
     Parameters
     ----------
-        x (float): x start point of the geometry
-
-        y (float): y start point of the geometry
-
-        h (float): start heading of the geometry
+    x : float
+        The x start coordinate of the geometry.
+    y : float
+        The y start coordinate of the geometry.
+    h : float
+        The start heading of the geometry.
 
     Returns
-    ---------
-
-        x (float): the final x point
-        y (float): the final y point
-        h (float): the final heading
-        l (float): length of the spiral
+    -------
+    tuple of (float, float, float, float)
+        A tuple containing:
+        - x_end : float
+            The x end coordinate of the geometry.
+        - y_end : float
+            The y end coordinate of the geometry.
+        - h_end : float
+            The end heading of the geometry.
+        - length : float
+            The length of the spiral.
     &#34;&#34;&#34;
 
     cloth = pcloth.Clothoid.StandardParams(
@@ -2235,48 +3085,64 @@ cdot (float): the curvature change of the spiral (optional, or use length, or an
 
     return cloth.XEnd, cloth.YEnd, cloth.ThetaEnd, cloth.length</code></pre>
 </details>
-<div class="desc"><p>Returns the end point of the geometry</p>
+<div class="desc"><p>Returns the end point of the geometry.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>x (float): x start point of the geometry
-
-y (float): y start point of the geometry
-
-h (float): start heading of the geometry
-</code></pre>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>float</code></dt>
+<dd>The x start coordinate of the geometry.</dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>float</code></dt>
+<dd>The y start coordinate of the geometry.</dd>
+<dt><strong><code>h</code></strong> :&ensp;<code>float</code></dt>
+<dd>The start heading of the geometry.</dd>
+</dl>
 <h2 id="returns">Returns</h2>
-<pre><code>x (float): the final x point
-y (float): the final y point
-h (float): the final heading
-l (float): length of the spiral
-</code></pre></div>
+<dl>
+<dt><code>tuple</code> of <code>(float, float, float, float)</code></dt>
+<dd>A tuple containing:
+- x_end : float
+The x end coordinate of the geometry.
+- y_end : float
+The y end coordinate of the geometry.
+- h_end : float
+The end heading of the geometry.
+- length : float
+The length of the spiral.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.geometry.Spiral.get_start_data"><code class="name flex">
-<span>def <span class="ident">get_start_data</span></span>(<span>self, end_x, end_y, end_h)</span>
+<span>def <span class="ident">get_start_data</span></span>(<span>self, end_x: float, end_y: float, end_h: float) ‑> tuple[float, float, float, float]</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_start_data(self, end_x, end_y, end_h):
-    &#34;&#34;&#34;Returns the end point of the geometry
+<pre><code class="python">def get_start_data(
+    self, end_x: float, end_y: float, end_h: float
+) -&gt; tuple[float, float, float, float]:
+    &#34;&#34;&#34;Returns the start point of the geometry.
 
     Parameters
     ----------
-        end_x (float): x end point of the geometry
-
-        end_y (float): y end point of the geometry
-
-        end_h (float): end heading of the geometry
+    end_x : float
+        The x end coordinate of the geometry.
+    end_y : float
+        The y end coordinate of the geometry.
+    end_h : float
+        The end heading of the geometry.
 
     Returns
-    ---------
-
-        x (float): the start x point
-        y (float): the start y point
-        h (float): the start heading of the inverse geometry
-        l (float): length of the spiral
-
+    -------
+    tuple of (float, float, float, float)
+        A tuple containing:
+        - x_start : float
+            The start x coordinate of the geometry.
+        - y_start : float
+            The start y coordinate of the geometry.
+        - h_start : float
+            The start heading of the inverse geometry.
+        - length : float
+            The length of the spiral.
     &#34;&#34;&#34;
     cloth = pcloth.Clothoid.StandardParams(
         end_x,
@@ -2289,20 +3155,29 @@ l (float): length of the spiral
 
     return cloth.XEnd, cloth.YEnd, cloth.ThetaEnd, cloth.length</code></pre>
 </details>
-<div class="desc"><p>Returns the end point of the geometry</p>
+<div class="desc"><p>Returns the start point of the geometry.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>end_x (float): x end point of the geometry
-
-end_y (float): y end point of the geometry
-
-end_h (float): end heading of the geometry
-</code></pre>
+<dl>
+<dt><strong><code>end_x</code></strong> :&ensp;<code>float</code></dt>
+<dd>The x end coordinate of the geometry.</dd>
+<dt><strong><code>end_y</code></strong> :&ensp;<code>float</code></dt>
+<dd>The y end coordinate of the geometry.</dd>
+<dt><strong><code>end_h</code></strong> :&ensp;<code>float</code></dt>
+<dd>The end heading of the geometry.</dd>
+</dl>
 <h2 id="returns">Returns</h2>
-<pre><code>x (float): the start x point
-y (float): the start y point
-h (float): the start heading of the inverse geometry
-l (float): length of the spiral
-</code></pre></div>
+<dl>
+<dt><code>tuple</code> of <code>(float, float, float, float)</code></dt>
+<dd>A tuple containing:
+- x_start : float
+The start x coordinate of the geometry.
+- y_start : float
+The start y coordinate of the geometry.
+- h_start : float
+The start heading of the inverse geometry.
+- length : float
+The length of the spiral.</dd>
+</dl></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>

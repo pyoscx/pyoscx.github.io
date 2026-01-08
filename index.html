@@ -59,7 +59,7 @@ For simple scenarios the multiple top level layers (like Story, Act or ManeuverG
 <h3 id="generate-different-versions-of-openscenario">Generate different versions of OpenSCENARIO</h3>
 <p>As of scenariogeneration V0.5.0, it is possible to generate different versions of the resulting OpenSCENARIO xml.
 This feature is enabled by one simple input to the Scenario class as:</p>
-<pre><code>sce = Scenario(... , osc_minor_version=0)
+<pre><code class="language-python">sce = Scenario(... , osc_minor_version=0)
 </code></pre>
 <p>The default is 2 (V1.2.0), but with this V1.0.0 OpenSCENARIO xmls can be generated.</p>
 <p>The V1.2.0 will remove the depricated attributes, and have a pure V1.2.0 xml. If version specific elements are used together with the wrong version, a <strong>OpenSCENARIOVersionError</strong> will be raised.</p>
@@ -67,13 +67,13 @@ This feature is enabled by one simple input to the Scenario class as:</p>
 <h3 id="parsing-an-xosc-file-and-get-the-python-object-back">Parsing an .xosc file and get the Python object back</h3>
 <p>As of scenariogeneration V0.7.0, the <strong>xosc</strong> module supports parsing an existing .xosc file.
 This enables modifying already exisisting xosc files, eg. from a Scenario editor.</p>
-<pre><code>scenario = ParseOpenScenario('my_non_python_made_scenario.xosc')
+<pre><code class="language-python">scenario = ParseOpenScenario('my_non_python_made_scenario.xosc')
 </code></pre>
 <p><strong>ParseOpenScenario</strong> can read all types of OpenSCENARIO files (Scenario, Catalog and ParameterValueDistribution), and will return the Object related to that file type.</p>
 <p><strong>NOTE:</strong> more layers of classes are added in some cases, that the user don't usually see/use. Eg. the <strong>ValueTrigger</strong> and <strong>EntityTrigger</strong> will never be returned, but a <strong>Trigger</strong> and <strong>ConditionGroup</strong> will always be present. Same for the <strong>StoryBoard</strong> that will contain all hierarcies from <strong>Story</strong> down to Actions.</p>
 <h3 id="example-usage-of-parsing-and-openscenario-versions">Example usage of parsing and OpenSCENARIO versions</h3>
 <p>Sometimes you might recive a <em>.xosc</em> file that is in a newer version than what your simulator needs, for this the <em>xosc</em> module can be used to convert (if possible), to a older version like this:</p>
-<pre><code>from scenariogeneration import xosc
+<pre><code class="language-python">from scenariogeneration import xosc
 
 scenario = xosc.ParseOpenScenario(&quot;multiple_maneuvers_1.xosc&quot;)
 
@@ -132,7 +132,7 @@ Some example usage of this can be seen in <a href="examples/xodr/highway_example
 </ul>
 <p><img alt="Circular" src="https://github.com/pyoscx/scenariogeneration/blob/main/docu/circular.png?raw=true" title="Circular geometry"></p>
 <p>An example can be seen below:</p>
-<pre><code>from scenariogeneration import xodr
+<pre><code class="language-python">from scenariogeneration import xodr
 
 road1 = xodr.create_road(xodr.Line(100), id=1, left_lanes=2, right_lanes=2)
 road2 = xodr.create_road(xodr.Line(100), id=2, left_lanes=1, right_lanes=1)
@@ -162,7 +162,7 @@ junction_creator.add_incoming_road_cartesian_geometry(road3,
 <p>With all the roads added to the junction, connections can be added using the <em>add_connection</em> method. The minimum input of the <em>add_connection</em> method is the road ids (in the example above 1 and 2). This will generate a connecting road with the minimum equal number of lanes between the two roads (in the example above a road with one left and one right lanes). And simultaneously create the entries in the <em>junction</em> element.</p>
 <p>In some cases only some lanes should be connected between two roads, then the optional parameters to the <em>add_connection</em> method can be used, specifying the lanes that should be connected. This will generate a connecting road just between those two lanes.</p>
 <p>Continuing the example above:</p>
-<pre><code>junction_creator.add_connection(road_one_id = 1,
+<pre><code class="language-python">junction_creator.add_connection(road_one_id = 1,
                                 road_two_id = 3)
 
 junction_creator.add_connection(road_one_id = 1,
@@ -178,7 +178,7 @@ junction_creator.add_connection(road_one_id = 2,
 </code></pre>
 <p>Finally the roads and junction have to be added to the <em>OpenDrive</em> object, and for simplicity, the <em>add_junction_creator</em> can be used.
 The final part of the example will look like this</p>
-<pre><code>odr = xodr.OpenDrive('myroad')
+<pre><code class="language-python">odr = xodr.OpenDrive('myroad')
 
 odr.add_road(road1)
 odr.add_road(road2)
@@ -191,7 +191,7 @@ odr.adjust_roads_and_lanes()
 <h4 id="directjunctioncreator">DirectJunctionCreator</h4>
 <p>To create <em>direct</em> type of junctions, the DirectJunctionCreator can be used. Since a <em>DirectJunction</em> has no need to generate roads in the junction, no geometrical description is needed. For each road connected to the <em>DirectJunction</em>, the successor/predecessor has to be added with the add_successor/add_predecessor methods.
 An example can be se below:</p>
-<pre><code>from scenariogeneration import xodr
+<pre><code class="language-python">from scenariogeneration import xodr
 junction_id = 100
 direct_junction = xodr.DirectJunctionCreator(junction_id,'my_direct_junction')
 
@@ -216,7 +216,7 @@ off_ramp.add_predecessor(xodr.ElementType.junction, junction_id)
 </code></pre>
 <p>To create the connections in the <em>DirectJunction</em> the <em>add_connection</em> method is used, taking the road objects as inputs. To connect only certain lanes, the optional inputs <em>incoming_lane_id</em> and <em>linked_lane_id</em> parameters.</p>
 <p>An example (continuation of the example above):</p>
-<pre><code>direct_junction.add_connection(
+<pre><code class="language-python">direct_junction.add_connection(
             incoming_road = first_road,
             linked_road = continuation_road)
 direct_junction.add_connection(
@@ -226,7 +226,7 @@ direct_junction.add_connection(
             linked_lane_id = -1)
 </code></pre>
 <p>and finally adding the roads to opendrive:</p>
-<pre><code>odr = xodr.OpenDrive('myroad')
+<pre><code class="language-python">odr = xodr.OpenDrive('myroad')
 
 odr.add_road(road1)
 odr.add_road(road2)
@@ -238,10 +238,190 @@ odr.adjust_roads_and_lanes()
 </code></pre>
 <h2 id="scenariogenerator">ScenarioGenerator</h2>
 <p>The ScenarioGenerator class can be used as a glue to parametrize and generate connected OpenSCENARIO and OpenDRIVE xmls, for large scale, parametrized simulations (In the OpenSCENARIO standard since V1.1.0, this is included in the standard).</p>
-<p>To utilize this, let your Scenario class inherit ScenarioGenerator and initalize it.
-Some options can be used to parameterize your Scenario either by:
-- let self.parameters be a dict containing lists. This in turn will yield all permutations of the inputs (<strong>WARNING:</strong> this grows quickly, so be careful)
-- let self.parameters be a list of dicts (same structure in each element). This will yield a scenario for each entry in the list.</p>
+<p>To utilize this, let your Scenario class inherit ScenarioGenerator and initalize it.</p>
+<p>Some options can be used to parameterize your Scenario:</p>
+<ul>
+<li><strong>Dict containing lists</strong>: let self.parameters be a dict containing lists. This in turn will yield all permutations of the inputs (<strong>WARNING:</strong> this grows quickly, so be careful). </li>
+</ul>
+<p>Example: <code>self.parameters = {'road_curvature': [0.001, 0.002], 'speed': [10, 20, 30]}</code></p>
+<p>This will generate 6 scenarios (2 curvatures × 3 speeds):</p>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>road_curvature</th>
+<th>speed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>0.001</td>
+<td>10</td>
+</tr>
+<tr>
+<td>2</td>
+<td>0.001</td>
+<td>20</td>
+</tr>
+<tr>
+<td>3</td>
+<td>0.001</td>
+<td>30</td>
+</tr>
+<tr>
+<td>4</td>
+<td>0.002</td>
+<td>10</td>
+</tr>
+<tr>
+<td>5</td>
+<td>0.002</td>
+<td>20</td>
+</tr>
+<tr>
+<td>6</td>
+<td>0.002</td>
+<td>30</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>List of dicts</strong>: let self.parameters be a list of dicts (same structure in each element). This will yield a scenario for each entry in the list.</li>
+</ul>
+<p>Example: <code>self.parameters = [{'road_curvature': 0.001, 'speed': 10}, {'road_curvature': 0.002, 'speed': 20}]</code></p>
+<p>This will generate 2 scenarios:</p>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>road_curvature</th>
+<th>speed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>0.001</td>
+<td>10</td>
+</tr>
+<tr>
+<td>2</td>
+<td>0.002</td>
+<td>20</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>List of dicts with expand_permutations</strong>: let self.parameters be a list of dicts, and use self.expand_permutations to add parameter sweeps on top of the fixed sets.</li>
+</ul>
+<p>Example:
+<code>python
+self.parameters = [
+{'road_curvature': 0.001, 'speed': 10},
+{'road_curvature': 0.002, 'speed': 20}
+]
+self.expand_permutations = [
+{'initial_distance': [40, 50, 60], 'line_length': [100, 200]}
+]</code></p>
+<p>This will generate 12 scenarios (2 base scenarios × 3 distances × 2 lengths):</p>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>road_curvature</th>
+<th>speed</th>
+<th>initial_distance</th>
+<th>line_length</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>0.001</td>
+<td>10</td>
+<td>40</td>
+<td>100</td>
+</tr>
+<tr>
+<td>2</td>
+<td>0.001</td>
+<td>10</td>
+<td>40</td>
+<td>200</td>
+</tr>
+<tr>
+<td>3</td>
+<td>0.001</td>
+<td>10</td>
+<td>50</td>
+<td>100</td>
+</tr>
+<tr>
+<td>4</td>
+<td>0.001</td>
+<td>10</td>
+<td>50</td>
+<td>200</td>
+</tr>
+<tr>
+<td>5</td>
+<td>0.001</td>
+<td>10</td>
+<td>60</td>
+<td>100</td>
+</tr>
+<tr>
+<td>6</td>
+<td>0.001</td>
+<td>10</td>
+<td>60</td>
+<td>200</td>
+</tr>
+<tr>
+<td>7</td>
+<td>0.002</td>
+<td>20</td>
+<td>40</td>
+<td>100</td>
+</tr>
+<tr>
+<td>8</td>
+<td>0.002</td>
+<td>20</td>
+<td>40</td>
+<td>200</td>
+</tr>
+<tr>
+<td>9</td>
+<td>0.002</td>
+<td>20</td>
+<td>50</td>
+<td>100</td>
+</tr>
+<tr>
+<td>10</td>
+<td>0.002</td>
+<td>20</td>
+<td>50</td>
+<td>200</td>
+</tr>
+<tr>
+<td>11</td>
+<td>0.002</td>
+<td>20</td>
+<td>60</td>
+<td>100</td>
+</tr>
+<tr>
+<td>12</td>
+<td>0.002</td>
+<td>20</td>
+<td>60</td>
+<td>200</td>
+</tr>
+</tbody>
+</table>
 <p>Then implement the road and/or the scenario methods where the road should return an xodr.OpenDrive object, and the scenario method should return a xosc.Scenario object.
 To connect the scenario and the generated road, create the RoadNetwork object in the scenario as: xosc.RoadNetwork(self.road_file).</p>
 <p>Finally the <em>generate</em> method can be used to generate all permutations of the defined parameters.</p>

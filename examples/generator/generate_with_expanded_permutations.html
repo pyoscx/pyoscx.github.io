@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.6">
-<title>examples.xodr.road_link_unequal_number_of_lanes API documentation</title>
+<title>examples.generator.generate_with_expanded_permutations API documentation</title>
 <meta name="description" content="scenariogeneration
 https://github.com/pyoscx/scenariogeneration …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
@@ -34,7 +34,7 @@ el.replaceWith(d);
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>examples.xodr.road_link_unequal_number_of_lanes</code></h1>
+<h1 class="title">Module <code>examples.generator.generate_with_expanded_permutations</code></h1>
 </header>
 <section id="section-intro">
 <p>scenariogeneration
@@ -43,10 +43,34 @@ el.replaceWith(d);
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
 <p>Copyright (c) 2022 The scenariogeneration Authors.</p>
-<p>Example for linking two roads with an unequal number of lanes.</p>
-<p>Note: This is possible and valid according to the OpenDRIVE standard. It is
-sometimes necessary to use this approach but it might often be prefered to begin
-a new lane section to change the number of lanes instead.</p>
+<p>Example of creating OpenSCENARIO and OpenDRIVE files with a combination of fixed parameter sets and parameter permutations that will generate the scenarios and roads</p>
+<p>Example usage: when very precise permutations of a scenario is wanted with additional parameter sweeps</p>
+<p>This example demonstrates how expand_permutations works with fixed parameter sets.</p>
+<p>Given:
+parameters = [
+{'road_curvature': 0.001, 'speed': 10},
+{'road_curvature': 0.002, 'speed': 20}
+]</p>
+<pre><code>expand_permutations = [
+    {'initial_distance': [40, 50, 60], 'line_length': [100, 200]}
+]
+</code></pre>
+<p>The result will be 12 scenarios (2 base scenarios × 3 distances × 2 lengths):</p>
+<pre><code>| Scenario | road_curvature | speed | initial_distance | line_length |
+|----------|----------------|-------|------------------|-------------|
+| 1        | 0.001          | 10    | 40               | 100         |
+| 2        | 0.001          | 10    | 40               | 200         |
+| 3        | 0.001          | 10    | 50               | 100         |
+| 4        | 0.001          | 10    | 50               | 200         |
+| 5        | 0.001          | 10    | 60               | 100         |
+| 6        | 0.001          | 10    | 60               | 200         |
+| 7        | 0.002          | 20    | 40               | 100         |
+| 8        | 0.002          | 20    | 40               | 200         |
+| 9        | 0.002          | 20    | 50               | 100         |
+| 10       | 0.002          | 20    | 50               | 200         |
+| 11       | 0.002          | 20    | 60               | 100         |
+| 12       | 0.002          | 20    | 60               | 200         |
+</code></pre>
 </section>
 <section>
 </section>
@@ -57,7 +81,7 @@ a new lane section to change the number of lanes instead.</p>
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="examples.xodr.road_link_unequal_number_of_lanes.Scenario"><code class="flex name class">
+<dt id="examples.generator.generate_with_expanded_permutations.Scenario"><code class="flex name class">
 <span>class <span class="ident">Scenario</span></span>
 </code></dt>
 <dd>
@@ -67,51 +91,118 @@ a new lane section to change the number of lanes instead.</p>
 </summary>
 <pre><code class="python">class Scenario(ScenarioGenerator):
     def __init__(self):
-        super().__init__()
+        ScenarioGenerator.__init__(self)
+        self.parameters = []
+        d1 = {}
+        d1[&#34;road_curvature&#34;] = 0.001
+        d1[&#34;speed&#34;] = 10
+
+        d2 = {}
+        d2[&#34;road_curvature&#34;] = 0.002
+        d2[&#34;speed&#34;] = 20
+
+        self.parameters.append(d1)
+        self.parameters.append(d2)
+
+        d3 = {}
+        d3[&#34;initial_distance&#34;] = [40, 50, 60]
+        d3[&#34;line_length&#34;] = [100, 200]
+        self.expand_permutations.append(d3)
+
+        self.naming = &#34;parameter&#34;
 
     def road(self, **kwargs):
-        # Create roads
-        length_road = 100.0
-        road_first = xodr.create_road([xodr.Line(length_road)], 1, 2, 3)
-        road_first.planview.adjust_geometries()
-
-        road_second = xodr.create_road([xodr.Line(length_road)], 2, 2, 4)
-        road_second.planview.set_start_point(100, 0, 0)
-        road_second.planview.adjust_geometries()
-        # Make a new lane open up/branch out
-        new_lane_width = 3.0
-        road_second.lanes.lanesections[0].rightlanes[2].a = 0.0
-        road_second.lanes.lanesections[0].rightlanes[2].b = 0.0
-        road_second.lanes.lanesections[0].rightlanes[2].c = (
-            3.0 / length_road**2 * new_lane_width
+        road = xodr.create_road(
+            [
+                xodr.Spiral(0.0000000001, kwargs[&#34;road_curvature&#34;], 100),
+                xodr.Arc(kwargs[&#34;road_curvature&#34;], 50),
+                xodr.Spiral(kwargs[&#34;road_curvature&#34;], 0.0000000001, 100),
+                xodr.Line(kwargs[&#34;line_length&#34;]),
+            ],
+            id=0,
+            left_lanes=2,
+            right_lanes=2,
         )
-        road_second.lanes.lanesections[0].rightlanes[2].d = (
-            -2.0 / length_road**3 * new_lane_width
-        )
+        odr = xodr.OpenDrive(&#34;myroad&#34;)
+        odr.add_road(road)
+        odr.adjust_roads_and_lanes()
+        return odr
 
-        ## Create the OpenDrive class (Master class)
-        odr = xodr.OpenDrive(&#34;myroads&#34;)
-
-        ## Finally add roads to Opendrive
-        odr.add_road(road_first)
-        odr.add_road(road_second)
-
-        # Link roads
-        road_first.add_successor(
-            xodr.ElementType.road, 2, xodr.ContactPoint.start
-        )
-        road_second.add_predecessor(
-            xodr.ElementType.road, 1, xodr.ContactPoint.end
+    def scenario(self, **kwargs):
+        road = xosc.RoadNetwork(self.road_file)
+        egoname = &#34;Ego&#34;
+        entities = xosc.Entities()
+        entities.add_scenario_object(
+            egoname, xosc.CatalogReference(&#34;VehicleCatalog&#34;, &#34;car_white&#34;)
         )
 
-        # Link lanes but do not link the newly beginning lane
-        link_lane_ids_first = [2, 1, -1, -2, -3]
-        link_lane_ids_second = [2, 1, -1, -2, -4]
-        xodr.create_lane_links_from_ids(
-            road_first, road_second, link_lane_ids_first, link_lane_ids_second
+        catalog = xosc.Catalog()
+        catalog.add_catalog(&#34;VehicleCatalog&#34;, &#34;../xosc/Catalogs/Vehicles&#34;)
+
+        init = xosc.Init()
+
+        init.add_init_action(
+            egoname,
+            xosc.TeleportAction(
+                xosc.LanePosition(kwargs[&#34;initial_distance&#34;], 0, -2, 0)
+            ),
+        )
+        init.add_init_action(
+            egoname,
+            xosc.AbsoluteSpeedAction(
+                kwargs[&#34;speed&#34;],
+                xosc.TransitionDynamics(
+                    xosc.DynamicsShapes.step, xosc.DynamicsDimension.time, 1
+                ),
+            ),
         )
 
-        return odr</code></pre>
+        event = xosc.Event(&#34;my event&#34;, xosc.Priority.override)
+        event.add_action(
+            &#34;lane change&#34;,
+            xosc.AbsoluteLaneChangeAction(
+                -1,
+                xosc.TransitionDynamics(
+                    xosc.DynamicsShapes.sinusoidal,
+                    xosc.DynamicsDimension.time,
+                    4,
+                ),
+            ),
+        )
+        event.add_trigger(
+            xosc.ValueTrigger(
+                &#34;start_trigger &#34;,
+                0,
+                xosc.ConditionEdge.none,
+                xosc.SimulationTimeCondition(4, xosc.Rule.greaterThan),
+            )
+        )
+
+        man = xosc.Maneuver(&#34;maneuver&#34;)
+        man.add_event(event)
+
+        sb = xosc.StoryBoard(
+            init,
+            stoptrigger=xosc.ValueTrigger(
+                &#34;start_trigger &#34;,
+                0,
+                xosc.ConditionEdge.none,
+                xosc.SimulationTimeCondition(13, xosc.Rule.greaterThan),
+                &#34;stop&#34;,
+            ),
+        )
+        sb.add_maneuver(man, egoname)
+        sce = xosc.Scenario(
+            &#34;my scenario&#34;,
+            &#34;atingber&#34;,
+            xosc.ParameterDeclarations(),
+            entities,
+            sb,
+            road,
+            catalog,
+        )
+
+        return sce</code></pre>
 </details>
 <div class="desc"><p>ScenarioTemplate is a class that should be inherited by a Scenario class
 in order to generate xodr and xosc files based on the submodules xodr and
@@ -172,13 +263,13 @@ permutations</dd>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="examples.xodr" href="index.html">examples.xodr</a></code></li>
+<li><code><a title="examples.generator" href="index.html">examples.generator</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="examples.xodr.road_link_unequal_number_of_lanes.Scenario" href="#examples.xodr.road_link_unequal_number_of_lanes.Scenario">Scenario</a></code></h4>
+<h4><code><a title="examples.generator.generate_with_expanded_permutations.Scenario" href="#examples.generator.generate_with_expanded_permutations.Scenario">Scenario</a></code></h4>
 </li>
 </ul>
 </li>

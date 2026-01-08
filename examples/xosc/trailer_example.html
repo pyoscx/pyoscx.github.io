@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.6">
-<title>examples.xodr.road_link_unequal_number_of_lanes API documentation</title>
+<title>examples.xosc.trailer_example API documentation</title>
 <meta name="description" content="scenariogeneration
 https://github.com/pyoscx/scenariogeneration …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
@@ -34,7 +34,7 @@ el.replaceWith(d);
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>examples.xodr.road_link_unequal_number_of_lanes</code></h1>
+<h1 class="title">Module <code>examples.xosc.trailer_example</code></h1>
 </header>
 <section id="section-intro">
 <p>scenariogeneration
@@ -43,10 +43,20 @@ el.replaceWith(d);
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
 <p>Copyright (c) 2022 The scenariogeneration Authors.</p>
-<p>Example for linking two roads with an unequal number of lanes.</p>
-<p>Note: This is possible and valid according to the OpenDRIVE standard. It is
-sometimes necessary to use this approach but it might often be prefered to begin
-a new lane section to change the number of lanes instead.</p>
+<p>Simple example showing how one vehicle connects to a trailer</p>
+<p>Some features used:
+- HitchCoupler</p>
+<ul>
+<li>
+<p>TrailerConnectAction</p>
+</li>
+<li>
+<p>TrailerDisconnectAction</p>
+</li>
+<li>
+<p>StoryboardElementStateCondition</p>
+</li>
+</ul>
 </section>
 <section>
 </section>
@@ -57,7 +67,7 @@ a new lane section to change the number of lanes instead.</p>
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="examples.xodr.road_link_unequal_number_of_lanes.Scenario"><code class="flex name class">
+<dt id="examples.xosc.trailer_example.Scenario"><code class="flex name class">
 <span>class <span class="ident">Scenario</span></span>
 </code></dt>
 <dd>
@@ -68,50 +78,195 @@ a new lane section to change the number of lanes instead.</p>
 <pre><code class="python">class Scenario(ScenarioGenerator):
     def __init__(self):
         super().__init__()
+        self.open_scenario_version = 2
 
-    def road(self, **kwargs):
-        # Create roads
-        length_road = 100.0
-        road_first = xodr.create_road([xodr.Line(length_road)], 1, 2, 3)
-        road_first.planview.adjust_geometries()
+    def scenario(self, **kwargs):
+        ### create catalogs
+        catalog = xosc.Catalog()
 
-        road_second = xodr.create_road([xodr.Line(length_road)], 2, 2, 4)
-        road_second.planview.set_start_point(100, 0, 0)
-        road_second.planview.adjust_geometries()
-        # Make a new lane open up/branch out
-        new_lane_width = 3.0
-        road_second.lanes.lanesections[0].rightlanes[2].a = 0.0
-        road_second.lanes.lanesections[0].rightlanes[2].b = 0.0
-        road_second.lanes.lanesections[0].rightlanes[2].c = (
-            3.0 / length_road**2 * new_lane_width
-        )
-        road_second.lanes.lanesections[0].rightlanes[2].d = (
-            -2.0 / length_road**3 * new_lane_width
-        )
+        ### create road
+        road = xosc.RoadNetwork(roadfile=&#34;../xodr/straight_500m.xodr&#34;)
 
-        ## Create the OpenDrive class (Master class)
-        odr = xodr.OpenDrive(&#34;myroads&#34;)
+        ### create entities
 
-        ## Finally add roads to Opendrive
-        odr.add_road(road_first)
-        odr.add_road(road_second)
+        trailername = &#34;trailer&#34;
 
-        # Link roads
-        road_first.add_successor(
-            xodr.ElementType.road, 2, xodr.ContactPoint.start
-        )
-        road_second.add_predecessor(
-            xodr.ElementType.road, 1, xodr.ContactPoint.end
+        bb = xosc.BoundingBox(2, 5, 1.8, 1.0, 0, 0.9)
+        fa = xosc.Axle(0.523598775598, 0.8, 1.68, 2.98, 0.4)
+        ba = xosc.Axle(0.523598775598, 0.8, 1.68, 0, 0.4)
+        white_veh = xosc.Vehicle(
+            &#34;car_white&#34;,
+            xosc.VehicleCategory.car,
+            bb,
+            fa,
+            ba,
+            69,
+            10,
+            10,
+            trailer_hitch=xosc.HitchCoupler(-1.5),
         )
 
-        # Link lanes but do not link the newly beginning lane
-        link_lane_ids_first = [2, 1, -1, -2, -3]
-        link_lane_ids_second = [2, 1, -1, -2, -4]
-        xodr.create_lane_links_from_ids(
-            road_first, road_second, link_lane_ids_first, link_lane_ids_second
+        white_veh.add_property_file(&#34;../models/car_white.osgb&#34;)
+
+        bb = xosc.BoundingBox(1.8, 3, 0.5, 0, 0, 0.8)
+
+        trailer = xosc.Vehicle(
+            &#34;car_red&#34;,
+            xosc.VehicleCategory.trailer,
+            bb,
+            None,
+            ba,
+            69,
+            10,
+            10,
+            trailer_coupler=xosc.HitchCoupler(1.6),
         )
 
-        return odr</code></pre>
+        trailer.add_property_file(&#34;../models/car_trailer.osgb&#34;)
+
+        ## create entities
+
+        egoname = &#34;Ego&#34;
+
+        entities = xosc.Entities()
+        entities.add_scenario_object(egoname, white_veh)
+        entities.add_scenario_object(trailername, trailer)
+
+        ### create init
+
+        init = xosc.Init()
+
+        egostart = xosc.TeleportAction(xosc.LanePosition(25, 0, -1, 1))
+
+        targetstart = xosc.TeleportAction(xosc.LanePosition(15, 0, -1, 1))
+
+        init.add_init_action(egoname, egostart)
+        init.add_init_action(trailername, targetstart)
+
+        ### create an event
+
+        ego_maneuver = xosc.Maneuver(&#34;ego pick up trailer&#34;)
+        ego_event = xosc.Event(&#34;reverse&#34;, xosc.Priority.override)
+        ego_event.add_trigger(
+            xosc.ValueTrigger(
+                &#34;start reverse&#34;,
+                0.5,
+                xosc.ConditionEdge.none,
+                xosc.SimulationTimeCondition(0, xosc.Rule.greaterThan),
+            )
+        )
+        ego_event.add_action(
+            &#34;reverse action&#34;,
+            xosc.AbsoluteSpeedAction(
+                -2,
+                xosc.TransitionDynamics(
+                    xosc.DynamicsShapes.linear,
+                    xosc.DynamicsDimension.time,
+                    0.5,
+                ),
+            ),
+        )
+
+        ego_stop = xosc.Event(&#34;stop&#34;, xosc.Priority.override)
+        ego_stop.add_trigger(
+            xosc.EntityTrigger(
+                &#34;ego should stop&#34;,
+                0,
+                xosc.ConditionEdge.none,
+                xosc.RelativeDistanceCondition(
+                    0.05,
+                    xosc.Rule.lessOrEqual,
+                    xosc.RelativeDistanceType.longitudinal,
+                    trailername,
+                    alongroute=False,
+                ),
+                egoname,
+            )
+        )
+        ego_stop.add_action(
+            &#34;stop action&#34;,
+            xosc.AbsoluteSpeedAction(
+                0,
+                xosc.TransitionDynamics(
+                    xosc.DynamicsShapes.linear,
+                    xosc.DynamicsDimension.time,
+                    0.1,
+                ),
+            ),
+        )
+
+        ego_hitch = xosc.Event(&#34;connect&#34;, xosc.Priority.override)
+        ego_hitch.add_trigger(
+            xosc.EntityTrigger(
+                &#34;stand still&#34;,
+                0,
+                xosc.ConditionEdge.none,
+                xosc.StandStillCondition(1),
+                egoname,
+            )
+        )
+        ego_hitch.add_action(
+            &#34;connect trailer&#34;, xosc.ConnectTrailerAction(trailername)
+        )
+
+        ego_drive = xosc.Event(&#34;start driving&#34;, xosc.Priority.override)
+        ego_drive.add_trigger(
+            xosc.ValueTrigger(
+                &#34;start driving condition&#34;,
+                1,
+                xosc.ConditionEdge.none,
+                xosc.StoryboardElementStateCondition(
+                    xosc.StoryboardElementType.event,
+                    &#34;connect&#34;,
+                    xosc.StoryboardElementState.completeState,
+                ),
+            )
+        )
+        ego_drive.add_action(
+            &#34;drive action action&#34;,
+            xosc.AbsoluteSpeedAction(
+                10,
+                xosc.TransitionDynamics(
+                    xosc.DynamicsShapes.cubic, xosc.DynamicsDimension.time, 5
+                ),
+            ),
+        )
+
+        ego_detach = xosc.Event(&#34;disconnect&#34;, xosc.Priority.parallel)
+        ego_detach.add_trigger(
+            xosc.ValueTrigger(
+                &#34;disconnect trailer&#34;,
+                0,
+                xosc.ConditionEdge.none,
+                xosc.SimulationTimeCondition(8, xosc.Rule.greaterThan),
+            )
+        )
+        ego_detach.add_action(
+            &#34;disconnect trailer&#34;, xosc.DisconnectTrailerAction()
+        )
+
+        ego_maneuver.add_event(ego_event)
+        ego_maneuver.add_event(ego_stop)
+        ego_maneuver.add_event(ego_hitch)
+        ego_maneuver.add_event(ego_drive)
+        ego_maneuver.add_event(ego_detach)
+
+        ## create the storyboard
+        sb = xosc.StoryBoard(init)
+        sb.add_maneuver(ego_maneuver, egoname)
+        paramdec = xosc.ParameterDeclarations()
+        ## create the scenario
+        sce = xosc.Scenario(
+            &#34;adapt_speed_example&#34;,
+            &#34;Mandolin&#34;,
+            paramdec,
+            entities=entities,
+            storyboard=sb,
+            roadnetwork=road,
+            catalog=catalog,
+            osc_minor_version=3,
+        )
+        return sce</code></pre>
 </details>
 <div class="desc"><p>ScenarioTemplate is a class that should be inherited by a Scenario class
 in order to generate xodr and xosc files based on the submodules xodr and
@@ -172,13 +327,13 @@ permutations</dd>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="examples.xodr" href="index.html">examples.xodr</a></code></li>
+<li><code><a title="examples.xosc" href="index.html">examples.xosc</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="examples.xodr.road_link_unequal_number_of_lanes.Scenario" href="#examples.xodr.road_link_unequal_number_of_lanes.Scenario">Scenario</a></code></h4>
+<h4><code><a title="examples.xosc.trailer_example.Scenario" href="#examples.xosc.trailer_example.Scenario">Scenario</a></code></h4>
 </li>
 </ul>
 </li>

@@ -53,7 +53,7 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="scenariogeneration.xodr.lane_def.create_lanes_merge_split"><code class="name flex">
-<span>def <span class="ident">create_lanes_merge_split</span></span>(<span>right_lane_def,<br>left_lane_def,<br>road_length,<br>center_road_mark,<br>lane_width,<br>lane_width_end)</span>
+<span>def <span class="ident">create_lanes_merge_split</span></span>(<span>right_lane_def: list['<a title="scenariogeneration.xodr.lane_def.LaneDef" href="#scenariogeneration.xodr.lane_def.LaneDef">LaneDef</a>'] | int,<br>left_lane_def: list['<a title="scenariogeneration.xodr.lane_def.LaneDef" href="#scenariogeneration.xodr.lane_def.LaneDef">LaneDef</a>'] | int,<br>road_length: float,<br>center_road_mark: <a title="scenariogeneration.xodr.lane.RoadMark" href="lane.html#scenariogeneration.xodr.lane.RoadMark">RoadMark</a>,<br>lane_width: float,<br>lane_width_end: float | None = None) ‑> <a title="scenariogeneration.xodr.lane.Lanes" href="lane.html#scenariogeneration.xodr.lane.Lanes">Lanes</a></span>
 </code></dt>
 <dd>
 <details class="source">
@@ -61,37 +61,49 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def create_lanes_merge_split(
-    right_lane_def,
-    left_lane_def,
-    road_length,
-    center_road_mark,
-    lane_width,
-    lane_width_end,
-):
-    &#34;&#34;&#34;create_lanes_merge_split is a generator that will create the Lanes of a road road that can contain one or more lane merges/splits
-    This is a simple implementation and has some constraints:
-     - left and right merges has to be at the same place (or one per lane), TODO: will be fixed with the singleSide attribute later on.
-     - the change will be a 3 degree polynomial with the derivative 0 on both start and end.
+    right_lane_def: Union[list[&#34;LaneDef&#34;], int],
+    left_lane_def: Union[list[&#34;LaneDef&#34;], int],
+    road_length: float,
+    center_road_mark: RoadMark,
+    lane_width: float,
+    lane_width_end: Optional[float] = None,
+) -&gt; Lanes:
+    &#34;&#34;&#34;Create lanes for a road with one or more lane merges or splits.
 
-    Please note that the merges/splits are defined in the road direction, NOT the driving direction.
+    This function generates the lanes of a road that can contain one or
+    more lane merges or splits. It has the following constraints:
+    - Left and right merges must occur at the same location (or one per
+    lane).
+      This will be fixed with the `singleSide` attribute in the future.
+    - The lane change is modeled as a 3rd-degree polynomial with zero
+      derivatives at both the start and end.
+
+    Note
+    ----
+    The merges and splits are defined in the road direction, not the
+    driving direction.
 
     Parameters
     ----------
-        right_lane_def (list of LaneDef, or an int): a list of the splits/merges that are wanted on the right side of the road, if int constant number of lanes
+    right_lane_def : list of LaneDef or int
+        A list of lane definitions for the right side of the road, or an
+        integer specifying a constant number of lanes.
+    left_lane_def : list of LaneDef or int
+        A list of lane definitions for the left side of the road, or an
+        integer specifying a constant number of lanes.
+    road_length : float
+        The total length of the road.
+    center_road_mark : RoadMark
+        The roadmark for the center line.
+    lane_width : float
+        The width of the lanes.
+    lane_width_end : float, optional
+        The width of the lanes at the end of the road. Default is None.
 
-        left_lane_def (list of LaneDef, or an int): a list of the splits/merges that are wanted on the left side of the road, if int constant number of lanes.
-
-        road_length (float): the full length of the road
-
-        center_road_mark (RoadMark): roadmark for the center line
-
-        lane_width (float): the width of the lanes
-
-        lane_width_end (float): the end width of the lanes
-
-    Return
-    ------
-        road (Lanes): the lanes of a road
+    Returns
+    -------
+    Lanes
+        A `Lanes` object representing the lanes of the road.
     &#34;&#34;&#34;
 
     lanesections = []
@@ -106,9 +118,17 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
         lc.add_roadmark(copy.deepcopy(center_road_mark))
         lsec = LaneSection(left_lane[ls].s_start, lc)
         # do the right lanes
-        for i in range(max(right_lane[ls].n_lanes_start, right_lane[ls].n_lanes_end)):
+        for i in range(
+            max(right_lane[ls].n_lanes_start, right_lane[ls].n_lanes_end)
+        ):
             # add broken roadmarks for all lanes, except for the outer lane where a solid line is added
-            if i == max(right_lane[ls].n_lanes_start, right_lane[ls].n_lanes_end) - 1:
+            if (
+                i
+                == max(
+                    right_lane[ls].n_lanes_start, right_lane[ls].n_lanes_end
+                )
+                - 1
+            ):
                 rm = std_roadmark_solid()
             else:
                 rm = std_roadmark_broken()
@@ -125,7 +145,9 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
                     False,
                     right_lane[ls].lane_end_widths[i],
                 )
-                rightlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
+                rightlane = Lane(
+                    a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3]
+                )
                 rightlane.add_roadmark(rm)
             elif (
                 right_lane[ls].n_lanes_start &lt; right_lane[ls].n_lanes_end
@@ -138,16 +160,22 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
                     True,
                     right_lane[ls].lane_end_widths[i],
                 )
-                rightlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
+                rightlane = Lane(
+                    a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3]
+                )
                 rightlane.add_roadmark(rm)
-            elif (lane_width_end is not None) and (lane_width != lane_width_end):
+            elif (lane_width_end is not None) and (
+                lane_width != lane_width_end
+            ):
                 coeff = get_coeffs_for_poly3(
                     right_lane[ls].s_end - right_lane[ls].s_start,
                     lane_width,
                     False,
                     lane_width_end=lane_width_end,
                 )
-                rightlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
+                rightlane = Lane(
+                    a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3]
+                )
                 rightlane.add_roadmark(rm)
             elif right_lane[ls].lane_start_widths:
                 coeff = get_coeffs_for_poly3(
@@ -156,7 +184,9 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
                     False,
                     lane_width_end=right_lane[ls].lane_end_widths[i],
                 )
-                rightlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
+                rightlane = Lane(
+                    a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3]
+                )
                 rightlane.add_roadmark(rm)
             else:
                 rightlane = Lane(lane_width)
@@ -164,9 +194,15 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
             lsec.add_right_lane(rightlane)
 
         # do the left lanes
-        for i in range(max(left_lane[ls].n_lanes_start, left_lane[ls].n_lanes_end)):
+        for i in range(
+            max(left_lane[ls].n_lanes_start, left_lane[ls].n_lanes_end)
+        ):
             # add broken roadmarks for all lanes, except for the outer lane where a solid line is added
-            if i == max(left_lane[ls].n_lanes_start, left_lane[ls].n_lanes_end) - 1:
+            if (
+                i
+                == max(left_lane[ls].n_lanes_start, left_lane[ls].n_lanes_end)
+                - 1
+            ):
                 rm = std_roadmark_solid()
             else:
                 rm = std_roadmark_broken()
@@ -198,7 +234,9 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
                 )
                 leftlane = Lane(a=coeff[0], b=coeff[1], c=coeff[2], d=coeff[3])
                 leftlane.add_roadmark(rm)
-            elif (lane_width_end is not None) and (lane_width != lane_width_end):
+            elif (lane_width_end is not None) and (
+                lane_width != lane_width_end
+            ):
                 coeff = get_coeffs_for_poly3(
                     left_lane[ls].s_end - left_lane[ls].s_start,
                     lane_width,
@@ -232,7 +270,8 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
                 # adjust for the new lane
                 if right_lane[i].sub_lane &lt; -(j + 1):
                     lanelinker.add_link(
-                        lanesections[i - 1].rightlanes[j], lanesections[i].rightlanes[j]
+                        lanesections[i - 1].rightlanes[j],
+                        lanesections[i].rightlanes[j],
                     )
                 elif right_lane[i].sub_lane &gt; -(j + 1):
                     lanelinker.add_link(
@@ -245,7 +284,8 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
                 # adjust for the lost lane
                 if right_lane[i - 1].sub_lane &lt; -(j + 1):
                     lanelinker.add_link(
-                        lanesections[i - 1].rightlanes[j], lanesections[i].rightlanes[j]
+                        lanesections[i - 1].rightlanes[j],
+                        lanesections[i].rightlanes[j],
                     )
                 elif right_lane[i - 1].sub_lane &gt; -(j + 1):
                     lanelinker.add_link(
@@ -257,7 +297,8 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
             # same number of lanes, just add the links
             for j in range(right_lane[i - 1].n_lanes_end):
                 lanelinker.add_link(
-                    lanesections[i - 1].rightlanes[j], lanesections[i].rightlanes[j]
+                    lanesections[i - 1].rightlanes[j],
+                    lanesections[i].rightlanes[j],
                 )
 
     for i in range(1, len(left_lane)):
@@ -272,7 +313,8 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
                     )
                 elif left_lane[i].sub_lane &gt; (j + 1):
                     lanelinker.add_link(
-                        lanesections[i - 1].leftlanes[j], lanesections[i].leftlanes[j]
+                        lanesections[i - 1].leftlanes[j],
+                        lanesections[i].leftlanes[j],
                     )
         elif left_lane[i - 1].n_lanes_end &lt; left_lane[i - 1].n_lanes_start:
             # lane merge
@@ -285,14 +327,16 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
                     )
                 elif left_lane[i - 1].sub_lane &gt; (j + 1):
                     lanelinker.add_link(
-                        lanesections[i - 1].leftlanes[j], lanesections[i].leftlanes[j]
+                        lanesections[i - 1].leftlanes[j],
+                        lanesections[i].leftlanes[j],
                     )
 
         else:
             # same number of lanes, just add the links
             for j in range(left_lane[i - 1].n_lanes_end):
                 lanelinker.add_link(
-                    lanesections[i - 1].leftlanes[j], lanesections[i].leftlanes[j]
+                    lanesections[i - 1].leftlanes[j],
+                    lanesections[i].leftlanes[j],
                 )
 
     # Add the lanesections to the lanes struct together the lanelinker
@@ -301,149 +345,303 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
         lanes.add_lanesection(ls, lanelinker)
     return lanes</code></pre>
 </details>
-<div class="desc"><p>create_lanes_merge_split is a generator that will create the Lanes of a road road that can contain one or more lane merges/splits
-This is a simple implementation and has some constraints:
-- left and right merges has to be at the same place (or one per lane), TODO: will be fixed with the singleSide attribute later on.
-- the change will be a 3 degree polynomial with the derivative 0 on both start and end.</p>
-<p>Please note that the merges/splits are defined in the road direction, NOT the driving direction.</p>
+<div class="desc"><p>Create lanes for a road with one or more lane merges or splits.</p>
+<p>This function generates the lanes of a road that can contain one or
+more lane merges or splits. It has the following constraints:
+- Left and right merges must occur at the same location (or one per
+lane).
+This will be fixed with the <code>singleSide</code> attribute in the future.
+- The lane change is modeled as a 3rd-degree polynomial with zero
+derivatives at both the start and end.</p>
+<h2 id="note">Note</h2>
+<p>The merges and splits are defined in the road direction, not the
+driving direction.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>right_lane_def (list of LaneDef, or an int): a list of the splits/merges that are wanted on the right side of the road, if int constant number of lanes
-
-left_lane_def (list of LaneDef, or an int): a list of the splits/merges that are wanted on the left side of the road, if int constant number of lanes.
-
-road_length (float): the full length of the road
-
-center_road_mark (RoadMark): roadmark for the center line
-
-lane_width (float): the width of the lanes
-
-lane_width_end (float): the end width of the lanes
-</code></pre>
-<h2 id="return">Return</h2>
-<pre><code>road (Lanes): the lanes of a road
-</code></pre></div>
+<dl>
+<dt><strong><code>right_lane_def</code></strong> :&ensp;<code>list</code> of <code><a title="scenariogeneration.xodr.lane_def.LaneDef" href="#scenariogeneration.xodr.lane_def.LaneDef">LaneDef</a></code> or <code>int</code></dt>
+<dd>A list of lane definitions for the right side of the road, or an
+integer specifying a constant number of lanes.</dd>
+<dt><strong><code>left_lane_def</code></strong> :&ensp;<code>list</code> of <code><a title="scenariogeneration.xodr.lane_def.LaneDef" href="#scenariogeneration.xodr.lane_def.LaneDef">LaneDef</a></code> or <code>int</code></dt>
+<dd>A list of lane definitions for the left side of the road, or an
+integer specifying a constant number of lanes.</dd>
+<dt><strong><code>road_length</code></strong> :&ensp;<code>float</code></dt>
+<dd>The total length of the road.</dd>
+<dt><strong><code>center_road_mark</code></strong> :&ensp;<code>RoadMark</code></dt>
+<dd>The roadmark for the center line.</dd>
+<dt><strong><code>lane_width</code></strong> :&ensp;<code>float</code></dt>
+<dd>The width of the lanes.</dd>
+<dt><strong><code>lane_width_end</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>The width of the lanes at the end of the road. Default is None.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Lanes</code></dt>
+<dd>A <code>Lanes</code> object representing the lanes of the road.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane_def.std_roadmark_broken"><code class="name flex">
-<span>def <span class="ident">std_roadmark_broken</span></span>(<span>)</span>
+<span>def <span class="ident">std_roadmark_broken</span></span>(<span>) ‑> <a title="scenariogeneration.xodr.lane.RoadMark" href="lane.html#scenariogeneration.xodr.lane.RoadMark">RoadMark</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def std_roadmark_broken():
+<pre><code class="python">def std_roadmark_broken() -&gt; RoadMark:
+    &#34;&#34;&#34;Create a standard broken roadmark.
+
+    This function generates a broken roadmark with a default width of 0.2
+    and a specific road line pattern.
+
+    Returns
+    -------
+    RoadMark
+        A `RoadMark` object representing a broken roadmark.
+    &#34;&#34;&#34;
     roadmark = RoadMark(RoadMarkType.broken, 0.2)
     roadmark.add_specific_road_line(RoadLine(0.15, 3, 9, 0, 0))
     return roadmark</code></pre>
 </details>
-<div class="desc"></div>
+<div class="desc"><p>Create a standard broken roadmark.</p>
+<p>This function generates a broken roadmark with a default width of 0.2
+and a specific road line pattern.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>RoadMark</code></dt>
+<dd>A <code>RoadMark</code> object representing a broken roadmark.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane_def.std_roadmark_broken_broken"><code class="name flex">
-<span>def <span class="ident">std_roadmark_broken_broken</span></span>(<span>)</span>
+<span>def <span class="ident">std_roadmark_broken_broken</span></span>(<span>) ‑> <a title="scenariogeneration.xodr.lane.RoadMark" href="lane.html#scenariogeneration.xodr.lane.RoadMark">RoadMark</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def std_roadmark_broken_broken():
+<pre><code class="python">def std_roadmark_broken_broken() -&gt; RoadMark:
+    &#34;&#34;&#34;Create a standard broken-broken roadmark.
+
+    This function generates a broken-broken roadmark with two parallel
+    broken lines, each with a default width of 0.2.
+
+    Returns
+    -------
+    RoadMark
+        A `RoadMark` object representing a broken-broken roadmark.
+    &#34;&#34;&#34;
     roadmark = RoadMark(RoadMarkType.broken_broken)
     roadmark.add_specific_road_line(RoadLine(0.2, 3, 3, 0.2, 0))
     roadmark.add_specific_road_line(RoadLine(0.2, 3, 3, -0.2, 0))
     return roadmark</code></pre>
 </details>
-<div class="desc"></div>
+<div class="desc"><p>Create a standard broken-broken roadmark.</p>
+<p>This function generates a broken-broken roadmark with two parallel
+broken lines, each with a default width of 0.2.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>RoadMark</code></dt>
+<dd>A <code>RoadMark</code> object representing a broken-broken roadmark.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane_def.std_roadmark_broken_long_line"><code class="name flex">
-<span>def <span class="ident">std_roadmark_broken_long_line</span></span>(<span>)</span>
+<span>def <span class="ident">std_roadmark_broken_long_line</span></span>(<span>) ‑> <a title="scenariogeneration.xodr.lane.RoadMark" href="lane.html#scenariogeneration.xodr.lane.RoadMark">RoadMark</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def std_roadmark_broken_long_line():
+<pre><code class="python">def std_roadmark_broken_long_line() -&gt; RoadMark:
+    &#34;&#34;&#34;Create a standard broken roadmark with a long line pattern.
+
+    This function generates a broken roadmark with a default width of 0.2
+    and a specific road line pattern where the line is longer than the
+    gap.
+
+    Returns
+    -------
+    RoadMark
+        A `RoadMark` object representing a broken roadmark with a long
+        line.
+    &#34;&#34;&#34;
     roadmark = RoadMark(RoadMarkType.broken, 0.2)
     roadmark.add_specific_road_line(RoadLine(0.15, 9, 3, 0, 0))
     return roadmark</code></pre>
 </details>
-<div class="desc"></div>
+<div class="desc"><p>Create a standard broken roadmark with a long line pattern.</p>
+<p>This function generates a broken roadmark with a default width of 0.2
+and a specific road line pattern where the line is longer than the
+gap.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>RoadMark</code></dt>
+<dd>A <code>RoadMark</code> object representing a broken roadmark with a long
+line.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane_def.std_roadmark_broken_solid"><code class="name flex">
-<span>def <span class="ident">std_roadmark_broken_solid</span></span>(<span>)</span>
+<span>def <span class="ident">std_roadmark_broken_solid</span></span>(<span>) ‑> <a title="scenariogeneration.xodr.lane.RoadMark" href="lane.html#scenariogeneration.xodr.lane.RoadMark">RoadMark</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def std_roadmark_broken_solid():
+<pre><code class="python">def std_roadmark_broken_solid() -&gt; RoadMark:
+    &#34;&#34;&#34;Create a standard broken-solid roadmark.
+
+    This function generates a broken-solid roadmark with two paralle
+    lines: one broken and one solid, each with a default width of 0.2.
+
+    Returns
+    -------
+    RoadMark
+        A `RoadMark` object representing a broken-solid roadmark.
+    &#34;&#34;&#34;
     roadmark = RoadMark(RoadMarkType.broken_solid)
-    roadmark.add_specific_road_line(RoadLine(0.2, 0, 0, -0.2, 0))
     roadmark.add_specific_road_line(RoadLine(0.2, 3, 3, 0.2, 0))
+    roadmark.add_specific_road_line(RoadLine(0.2, 0, 0, -0.2, 0))
     return roadmark</code></pre>
 </details>
-<div class="desc"></div>
+<div class="desc"><p>Create a standard broken-solid roadmark.</p>
+<p>This function generates a broken-solid roadmark with two paralle
+lines: one broken and one solid, each with a default width of 0.2.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>RoadMark</code></dt>
+<dd>A <code>RoadMark</code> object representing a broken-solid roadmark.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane_def.std_roadmark_broken_tight"><code class="name flex">
-<span>def <span class="ident">std_roadmark_broken_tight</span></span>(<span>)</span>
+<span>def <span class="ident">std_roadmark_broken_tight</span></span>(<span>) ‑> <a title="scenariogeneration.xodr.lane.RoadMark" href="lane.html#scenariogeneration.xodr.lane.RoadMark">RoadMark</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def std_roadmark_broken_tight():
+<pre><code class="python">def std_roadmark_broken_tight() -&gt; RoadMark:
+    &#34;&#34;&#34;Create a standard broken roadmark with a tight line pattern.
+
+    This function generates a broken roadmark with a default width of 0.2
+    and a specific road line pattern where the line and gap are of equal
+    length.
+
+    Returns
+    -------
+    RoadMark
+        A `RoadMark` object representing a broken roadmark with a tight
+        line pattern.
+    &#34;&#34;&#34;
     roadmark = RoadMark(RoadMarkType.broken, 0.2)
     roadmark.add_specific_road_line(RoadLine(0.15, 3, 3, 0, 0))
     return roadmark</code></pre>
 </details>
-<div class="desc"></div>
+<div class="desc"><p>Create a standard broken roadmark with a tight line pattern.</p>
+<p>This function generates a broken roadmark with a default width of 0.2
+and a specific road line pattern where the line and gap are of equal
+length.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>RoadMark</code></dt>
+<dd>A <code>RoadMark</code> object representing a broken roadmark with a tight
+line pattern.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane_def.std_roadmark_solid"><code class="name flex">
-<span>def <span class="ident">std_roadmark_solid</span></span>(<span>)</span>
+<span>def <span class="ident">std_roadmark_solid</span></span>(<span>) ‑> <a title="scenariogeneration.xodr.lane.RoadMark" href="lane.html#scenariogeneration.xodr.lane.RoadMark">RoadMark</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def std_roadmark_solid():
+<pre><code class="python">def std_roadmark_solid() -&gt; RoadMark:
+    &#34;&#34;&#34;Create a standard solid roadmark.
+
+    This function generates a solid roadmark with a default width of 0.2.
+
+    Returns
+    -------
+    RoadMark
+        A `RoadMark` object representing a solid roadmark.
+    &#34;&#34;&#34;
     return RoadMark(RoadMarkType.solid, 0.2)</code></pre>
 </details>
-<div class="desc"></div>
+<div class="desc"><p>Create a standard solid roadmark.</p>
+<p>This function generates a solid roadmark with a default width of 0.2.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>RoadMark</code></dt>
+<dd>A <code>RoadMark</code> object representing a solid roadmark.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane_def.std_roadmark_solid_broken"><code class="name flex">
-<span>def <span class="ident">std_roadmark_solid_broken</span></span>(<span>)</span>
+<span>def <span class="ident">std_roadmark_solid_broken</span></span>(<span>) ‑> <a title="scenariogeneration.xodr.lane.RoadMark" href="lane.html#scenariogeneration.xodr.lane.RoadMark">RoadMark</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def std_roadmark_solid_broken():
+<pre><code class="python">def std_roadmark_solid_broken() -&gt; RoadMark:
+    &#34;&#34;&#34;Create a standard solid-broken roadmark.
+
+    This function generates a solid-broken roadmark with two parallel
+    lines: one solid and one broken, each with a default width of 0.2.
+
+    Returns
+    -------
+    RoadMark
+        A `RoadMark` object representing a solid-broken roadmark.
+    &#34;&#34;&#34;
     roadmark = RoadMark(RoadMarkType.solid_broken)
     roadmark.add_specific_road_line(RoadLine(0.2, 0, 0, 0.2, 0))
     roadmark.add_specific_road_line(RoadLine(0.2, 3, 3, -0.2, 0))
     return roadmark</code></pre>
 </details>
-<div class="desc"></div>
+<div class="desc"><p>Create a standard solid-broken roadmark.</p>
+<p>This function generates a solid-broken roadmark with two parallel
+lines: one solid and one broken, each with a default width of 0.2.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>RoadMark</code></dt>
+<dd>A <code>RoadMark</code> object representing a solid-broken roadmark.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.lane_def.std_roadmark_solid_solid"><code class="name flex">
-<span>def <span class="ident">std_roadmark_solid_solid</span></span>(<span>)</span>
+<span>def <span class="ident">std_roadmark_solid_solid</span></span>(<span>) ‑> <a title="scenariogeneration.xodr.lane.RoadMark" href="lane.html#scenariogeneration.xodr.lane.RoadMark">RoadMark</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def std_roadmark_solid_solid():
+<pre><code class="python">def std_roadmark_solid_solid() -&gt; RoadMark:
+    &#34;&#34;&#34;Create a standard solid-solid roadmark.
+
+    This function generates a solid-solid roadmark with two parallel solid
+    lines, each with a default width of 0.2.
+
+    Returns
+    -------
+    RoadMark
+        A `RoadMark` object representing a solid-solid roadmark.
+    &#34;&#34;&#34;
     roadmark = RoadMark(RoadMarkType.solid_solid)
     roadmark.add_specific_road_line(RoadLine(0.2, 0, 0, 0.2, 0))
     roadmark.add_specific_road_line(RoadLine(0.2, 0, 0, -0.2, 0))
     return roadmark</code></pre>
 </details>
-<div class="desc"></div>
+<div class="desc"><p>Create a standard solid-solid roadmark.</p>
+<p>This function generates a solid-solid roadmark with two parallel solid
+lines, each with a default width of 0.2.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>RoadMark</code></dt>
+<dd>A <code>RoadMark</code> object representing a solid-solid roadmark.</dd>
+</dl></div>
 </dd>
 </dl>
 </section>
@@ -452,7 +650,7 @@ lane_width_end (float): the end width of the lanes
 <dl>
 <dt id="scenariogeneration.xodr.lane_def.LaneDef"><code class="flex name class">
 <span>class <span class="ident">LaneDef</span></span>
-<span>(</span><span>s_start,<br>s_end,<br>n_lanes_start,<br>n_lanes_end,<br>sub_lane=None,<br>lane_start_widths=[],<br>lane_end_widths=[])</span>
+<span>(</span><span>s_start: float,<br>s_end: float,<br>n_lanes_start: int,<br>n_lanes_end: int,<br>sub_lane: int | None = None,<br>lane_start_widths: list[float] | None = [],<br>lane_end_widths: list[float] | None = [])</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -460,55 +658,86 @@ lane_width_end (float): the end width of the lanes
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class LaneDef:
-    &#34;&#34;&#34;LaneDef is used to help create a lane merge or split. Can handle one lane merging or spliting.
+    &#34;&#34;&#34;Helper class to define a lane merge or split.
 
-    NOTE: This is not part of the OpenDRIVE standard, but a helper for the xodr module.
+    This class is not part of the OpenDRIVE standard but is used as a
+    helper for the xodr module to handle lane merges or splits.
 
     Parameters
     ----------
-        s_start (float): s coordinate of the start of the change
-
-        s_end (float): s coordinate of the end of the change
-
-        n_lanes_start (int): number of lanes at s_start
-
-        n_lanes_end (int): number of lanes at s_end
-
-        sub_lane (int): the lane that should be created (split) or removed (merge)
-
-        lane_start_widths (list of float): widths of lanes at start, must be [] or same length as n_lanes_start
-            Default: []
-
-        lane_end_widths (list of float): widths of lanes at end, must be [] or same length as n_lanes_end
-            Default: same as lane_start_widths
+    s_start : float
+        The `s` coordinate of the start of the change.
+    s_end : float
+        The `s` coordinate of the end of the change.
+    n_lanes_start : int
+        The number of lanes at `s_start`.
+    n_lanes_end : int
+        The number of lanes at `s_end`.
+    sub_lane : int, optional
+        The lane that should be created (split) or removed (merge).
+        Default is None.
+    lane_start_widths : list of float, optional
+        The widths of lanes at the start. Must be empty or the same length
+        as `n_lanes_start`. Default is an empty list.
+    lane_end_widths : list of float, optional
+        The widths of lanes at the end. Must be empty or the same length
+        as `n_lanes_end`. Default is the same as `lane_start_widths`.
 
     Attributes
     ----------
-        s_start (float): s coordinate of the start of the change
-
-        s_end (float): s coordinate of the end of the change
-
-        n_lanes_start (int): number of lanes at s_start
-
-        n_lanes_end (int): number of lanes at s_end
-
-        sub_lane (int): the lane that should be created (split) or removed (merge)
-
-        lane_start_widths (list of float): widths of lanes at start, must be [] or same length as n_lanes_start
-
-        lane_end_widths (list of float): widths of lanes at end, must be [] or same length as n_lanes_end
+    s_start : float
+        The `s` coordinate of the start of the change.
+    s_end : float
+        The `s` coordinate of the end of the change.
+    n_lanes_start : int
+        The number of lanes at `s_start`.
+    n_lanes_end : int
+        The number of lanes at `s_end`.
+    sub_lane : int
+        The lane that should be created (split) or removed (merge).
+    lane_start_widths : list of float
+        The widths of lanes at the start.
+    lane_end_widths : list of float
+        The widths of lanes at the end.
     &#34;&#34;&#34;
 
     def __init__(
         self,
-        s_start,
-        s_end,
-        n_lanes_start,
-        n_lanes_end,
-        sub_lane=None,
-        lane_start_widths=[],
-        lane_end_widths=[],
-    ):
+        s_start: float,
+        s_end: float,
+        n_lanes_start: int,
+        n_lanes_end: int,
+        sub_lane: Optional[int] = None,
+        lane_start_widths: Optional[list[float]] = [],
+        lane_end_widths: Optional[list[float]] = [],
+    ) -&gt; None:
+        &#34;&#34;&#34;Initialize a `LaneDef` instance.
+
+        Parameters
+        ----------
+        s_start : float
+            The `s` coordinate of the start of the change.
+        s_end : float
+            The `s` coordinate of the end of the change.
+        n_lanes_start : int
+            The number of lanes at `s_start`.
+        n_lanes_end : int
+            The number of lanes at `s_end`.
+        sub_lane : int, optional
+            The lane that should be created (split) or removed (merge).
+            Default is None.
+        lane_start_widths : list of float, optional
+            The widths of lanes at the start. Must be empty or the same
+            length as `n_lanes_start`. Default is an empty list.
+        lane_end_widths : list of float, optional
+            The widths of lanes at the end. Must be empty or the same
+            length as `n_lanes_end`. Default is the same as
+            `lane_start_widths`.
+
+        Returns
+        -------
+        None
+        &#34;&#34;&#34;
         self.s_start = s_start
         self.s_end = s_end
         self.n_lanes_start = n_lanes_start
@@ -520,9 +749,21 @@ lane_width_end (float): the end width of the lanes
         else:
             self.lane_end_widths = lane_end_widths
 
-    def _adjust_lane_widths(self):
+    def _adjust_lane_widths(self) -&gt; None:
+        &#34;&#34;&#34;Adjust lane widths for merges or splits.
+
+        This method ensures that the lane widths are consistent when a
+        laneis created (split) or removed (merge).
+
+        Returns
+        -------
+        None
+        &#34;&#34;&#34;
         if self.sub_lane:
-            if self.lane_end_widths and len(self.lane_end_widths) &lt; self.n_lanes_start:
+            if (
+                self.lane_end_widths
+                and len(self.lane_end_widths) &lt; self.n_lanes_start
+            ):
                 # mergeo
                 self.lane_end_widths.insert(abs(self.sub_lane) - 1, 0)
             elif (
@@ -533,40 +774,73 @@ lane_width_end (float): the end width of the lanes
                 self.lane_start_widths.insert(abs(self.sub_lane) - 1, 0)
         # TODO: add some checks here?</code></pre>
 </details>
-<div class="desc"><p>LaneDef is used to help create a lane merge or split. Can handle one lane merging or spliting.</p>
-<p>NOTE: This is not part of the OpenDRIVE standard, but a helper for the xodr module.</p>
+<div class="desc"><p>Helper class to define a lane merge or split.</p>
+<p>This class is not part of the OpenDRIVE standard but is used as a
+helper for the xodr module to handle lane merges or splits.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>s_start (float): s coordinate of the start of the change
-
-s_end (float): s coordinate of the end of the change
-
-n_lanes_start (int): number of lanes at s_start
-
-n_lanes_end (int): number of lanes at s_end
-
-sub_lane (int): the lane that should be created (split) or removed (merge)
-
-lane_start_widths (list of float): widths of lanes at start, must be [] or same length as n_lanes_start
-    Default: []
-
-lane_end_widths (list of float): widths of lanes at end, must be [] or same length as n_lanes_end
-    Default: same as lane_start_widths
-</code></pre>
+<dl>
+<dt><strong><code>s_start</code></strong> :&ensp;<code>float</code></dt>
+<dd>The <code>s</code> coordinate of the start of the change.</dd>
+<dt><strong><code>s_end</code></strong> :&ensp;<code>float</code></dt>
+<dd>The <code>s</code> coordinate of the end of the change.</dd>
+<dt><strong><code>n_lanes_start</code></strong> :&ensp;<code>int</code></dt>
+<dd>The number of lanes at <code>s_start</code>.</dd>
+<dt><strong><code>n_lanes_end</code></strong> :&ensp;<code>int</code></dt>
+<dd>The number of lanes at <code>s_end</code>.</dd>
+<dt><strong><code>sub_lane</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>The lane that should be created (split) or removed (merge).
+Default is None.</dd>
+<dt><strong><code>lane_start_widths</code></strong> :&ensp;<code>list</code> of <code>float</code>, optional</dt>
+<dd>The widths of lanes at the start. Must be empty or the same length
+as <code>n_lanes_start</code>. Default is an empty list.</dd>
+<dt><strong><code>lane_end_widths</code></strong> :&ensp;<code>list</code> of <code>float</code>, optional</dt>
+<dd>The widths of lanes at the end. Must be empty or the same length
+as <code>n_lanes_end</code>. Default is the same as <code>lane_start_widths</code>.</dd>
+</dl>
 <h2 id="attributes">Attributes</h2>
-<pre><code>s_start (float): s coordinate of the start of the change
-
-s_end (float): s coordinate of the end of the change
-
-n_lanes_start (int): number of lanes at s_start
-
-n_lanes_end (int): number of lanes at s_end
-
-sub_lane (int): the lane that should be created (split) or removed (merge)
-
-lane_start_widths (list of float): widths of lanes at start, must be [] or same length as n_lanes_start
-
-lane_end_widths (list of float): widths of lanes at end, must be [] or same length as n_lanes_end
-</code></pre></div>
+<dl>
+<dt><strong><code>s_start</code></strong> :&ensp;<code>float</code></dt>
+<dd>The <code>s</code> coordinate of the start of the change.</dd>
+<dt><strong><code>s_end</code></strong> :&ensp;<code>float</code></dt>
+<dd>The <code>s</code> coordinate of the end of the change.</dd>
+<dt><strong><code>n_lanes_start</code></strong> :&ensp;<code>int</code></dt>
+<dd>The number of lanes at <code>s_start</code>.</dd>
+<dt><strong><code>n_lanes_end</code></strong> :&ensp;<code>int</code></dt>
+<dd>The number of lanes at <code>s_end</code>.</dd>
+<dt><strong><code>sub_lane</code></strong> :&ensp;<code>int</code></dt>
+<dd>The lane that should be created (split) or removed (merge).</dd>
+<dt><strong><code>lane_start_widths</code></strong> :&ensp;<code>list</code> of <code>float</code></dt>
+<dd>The widths of lanes at the start.</dd>
+<dt><strong><code>lane_end_widths</code></strong> :&ensp;<code>list</code> of <code>float</code></dt>
+<dd>The widths of lanes at the end.</dd>
+</dl>
+<p>Initialize a <code><a title="scenariogeneration.xodr.lane_def.LaneDef" href="#scenariogeneration.xodr.lane_def.LaneDef">LaneDef</a></code> instance.</p>
+<h2 id="parameters_1">Parameters</h2>
+<dl>
+<dt><strong><code>s_start</code></strong> :&ensp;<code>float</code></dt>
+<dd>The <code>s</code> coordinate of the start of the change.</dd>
+<dt><strong><code>s_end</code></strong> :&ensp;<code>float</code></dt>
+<dd>The <code>s</code> coordinate of the end of the change.</dd>
+<dt><strong><code>n_lanes_start</code></strong> :&ensp;<code>int</code></dt>
+<dd>The number of lanes at <code>s_start</code>.</dd>
+<dt><strong><code>n_lanes_end</code></strong> :&ensp;<code>int</code></dt>
+<dd>The number of lanes at <code>s_end</code>.</dd>
+<dt><strong><code>sub_lane</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>The lane that should be created (split) or removed (merge).
+Default is None.</dd>
+<dt><strong><code>lane_start_widths</code></strong> :&ensp;<code>list</code> of <code>float</code>, optional</dt>
+<dd>The widths of lanes at the start. Must be empty or the same
+length as <code>n_lanes_start</code>. Default is an empty list.</dd>
+<dt><strong><code>lane_end_widths</code></strong> :&ensp;<code>list</code> of <code>float</code>, optional</dt>
+<dd>The widths of lanes at the end. Must be empty or the same
+length as <code>n_lanes_end</code>. Default is the same as
+<code>lane_start_widths</code>.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
 </dd>
 </dl>
 </section>

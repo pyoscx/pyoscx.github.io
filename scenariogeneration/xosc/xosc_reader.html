@@ -60,7 +60,8 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def CatalogReader(catalog_reference, catalog_path):
-    &#34;&#34;&#34;CatalogReader is a function that will read a openscenario catalog and return the corresponding scenariogeneration.xosc object
+    &#34;&#34;&#34;CatalogReader is a function that will read a openscenario catalog and
+    return the corresponding scenariogeneration.xosc object.
 
     Main use case for this is to be able to parametrize and write scenarios based on a catalog based entry
 
@@ -81,11 +82,12 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
     loaded_catalog = catalog_reference.catalogname
 
     with open(
-        os.path.join(catalog_path, catalog_reference.catalogname + &#34;.xosc&#34;), &#34;r&#34;
+        os.path.join(catalog_path, catalog_reference.catalogname + &#34;.xosc&#34;),
+        &#34;r&#34;,
     ) as f:
         loaded_catalog = ET.parse(f)
 
-        catalog = loaded_catalog.find(&#34;Catalog&#34;)
+        catalog = find_mandatory_field(loaded_catalog, &#34;Catalog&#34;)
 
         for entry in catalog:
             if entry.tag == &#34;Vehicle&#34;:
@@ -113,7 +115,9 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
                 if entry.attrib[&#34;name&#34;] == catalog_reference.entryname:
                     return Route.parse(entry)
             else:
-                raise NotImplementedError(&#34;This catalogtype is not supported yet.&#34;)
+                raise NotImplementedError(
+                    &#34;This catalogtype is not supported yet.&#34;
+                )
 
         raise NoCatalogFoundError(
             &#34;A catalog entry with the name &#34;
@@ -121,7 +125,8 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
             + &#34; could not be found in the given Catalog.&#34;
         )</code></pre>
 </details>
-<div class="desc"><p>CatalogReader is a function that will read a openscenario catalog and return the corresponding scenariogeneration.xosc object</p>
+<div class="desc"><p>CatalogReader is a function that will read a openscenario catalog and
+return the corresponding scenariogeneration.xosc object.</p>
 <p>Main use case for this is to be able to parametrize and write scenarios based on a catalog based entry</p>
 <p>NOTE: only Vehicle, and Pedestrian is implemented</p>
 <h2 id="parameters">Parameters</h2>
@@ -142,22 +147,23 @@ catalog_path (str): path to the catalog
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def ParameterDeclarationReader(file_path):
-    &#34;&#34;&#34;ParameterDeclarationReader reads the parameter declaration of a xosc file and creates a ParameterDeclaration object from it
+    &#34;&#34;&#34;ParameterDeclarationReader reads the parameter declaration of a xosc
+    file and creates a ParameterDeclaration object from it.
 
     Parameters
     ----------
         file_path (str): path to the xosc file wanted to be parsed
-
     &#34;&#34;&#34;
     param_decl = ParameterDeclarations()
     with open(file_path, &#34;r&#34;) as f:
         loaded_xosc = ET.parse(f)
-        paramdec = loaded_xosc.find(&#34;ParameterDeclarations&#34;)
+        paramdec = find_mandatory_field(loaded_xosc, &#34;ParameterDeclarations&#34;)
         param_decl = ParameterDeclarations.parse(paramdec)
 
     return param_decl</code></pre>
 </details>
-<div class="desc"><p>ParameterDeclarationReader reads the parameter declaration of a xosc file and creates a ParameterDeclaration object from it</p>
+<div class="desc"><p>ParameterDeclarationReader reads the parameter declaration of a xosc
+file and creates a ParameterDeclaration object from it.</p>
 <h2 id="parameters">Parameters</h2>
 <pre><code>file_path (str): path to the xosc file wanted to be parsed
 </code></pre></div>
@@ -171,7 +177,8 @@ catalog_path (str): path to the catalog
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def ParseOpenScenario(file_path):
-    &#34;&#34;&#34;ParseOpenScenario parses a openscenario file (of any type) and returns the python object
+    &#34;&#34;&#34;ParseOpenScenario parses a openscenario file (of any type) and returns
+    the python object.
 
     Parameters
     ----------
@@ -181,8 +188,12 @@ catalog_path (str): path to the catalog
     -------
         xosc_object (Scenario, Catalog, or ParameterValueDistribution)
     &#34;&#34;&#34;
-    with open(file_path, &#34;r&#34;) as f:
+    with open(file_path, &#34;r&#34;, encoding=&#34;utf-8&#34;) as f:
         loaded_xosc = ET.parse(f)
+        if not validate_schema(loaded_xosc):
+            warnings.warn(
+                &#34;The provided file is not valid according to the OpenSCENARIO schema.&#34;
+            )
         if loaded_xosc.find(&#34;ParameterValueDistribution&#34;) is not None:
             return ParameterValueDistribution.parse(loaded_xosc)
         elif loaded_xosc.find(&#34;Catalog&#34;) is not None:
@@ -194,12 +205,60 @@ catalog_path (str): path to the catalog
                 &#34;The provided file is not on a OpenSCENARIO compatible format.&#34;
             )</code></pre>
 </details>
-<div class="desc"><p>ParseOpenScenario parses a openscenario file (of any type) and returns the python object</p>
+<div class="desc"><p>ParseOpenScenario parses a openscenario file (of any type) and returns
+the python object.</p>
 <h2 id="parameters">Parameters</h2>
 <pre><code>file_path (str): full path to the .xosc file
 </code></pre>
 <h2 id="returns">Returns</h2>
 <pre><code>xosc_object (Scenario, Catalog, or ParameterValueDistribution)
+</code></pre></div>
+</dd>
+<dt id="scenariogeneration.xosc.xosc_reader.validate_schema"><code class="name flex">
+<span>def <span class="ident">validate_schema</span></span>(<span>loaded_xosc: xml.etree.ElementTree.ElementTree) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_schema(loaded_xosc: ET.ElementTree) -&gt; bool:
+    &#34;&#34;&#34;validate_schema checks if the loaded xosc file is valid according to
+    the OpenSCENARIO schema. It returns True if valid, False otherwise.
+    Parameters
+    ----------
+        loaded_xosc (ElementTree): loaded xosc file
+    Returns
+    -------
+        matched (bool): True if valid, False otherwise
+    &#34;&#34;&#34;
+
+    minor_version = loaded_xosc.find(&#34;FileHeader&#34;).attrib[&#34;revMinor&#34;]
+    major_version = loaded_xosc.find(&#34;FileHeader&#34;).attrib[&#34;revMajor&#34;]
+    print(f&#34;OpenSCENARIO version detected: {major_version}.{minor_version}&#34;)
+    if int(minor_version) &gt; 3 or int(major_version) != 1:
+        raise ValueError(
+            f&#34;OpenSCENARIO version {major_version}.{minor_version} does not exist in the schema files provided.&#34;
+        )
+    if minor_version == &#34;3&#34; and major_version == &#34;1&#34;:
+        minor_version = &#34;3_1&#34;
+    xsd_path = os.path.join(
+        Path(__file__).parent.parent.parent,
+        &#34;schemas&#34;,
+        &#34;OpenSCENARIO_&#34; + major_version + &#34;_&#34; + minor_version + &#34;.xsd&#34;,
+    )
+    schema = xmlschema.XMLSchema(xsd_path)
+    matched = schema.is_valid(loaded_xosc)
+    return matched</code></pre>
+</details>
+<div class="desc"><p>validate_schema checks if the loaded xosc file is valid according to
+the OpenSCENARIO schema. It returns True if valid, False otherwise.
+Parameters</p>
+<hr>
+<pre><code>loaded_xosc (ElementTree): loaded xosc file
+</code></pre>
+<h2 id="returns">Returns</h2>
+<pre><code>matched (bool): True if valid, False otherwise
 </code></pre></div>
 </dd>
 </dl>
@@ -216,8 +275,7 @@ catalog_path (str): path to the catalog
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class CatalogLoader:
-    &#34;&#34;&#34;CatalogLoader makes it possible to read certain elements from a catalog
-
+    &#34;&#34;&#34;CatalogLoader makes it possible to read certain elements from a catalog.
 
     Attributes
     ----------
@@ -234,15 +292,17 @@ catalog_path (str): path to the catalog
     &#34;&#34;&#34;
 
     def __init__(self):
-        &#34;&#34;&#34;CatalogLoader makes it possible to read certain elements from a catalog
+        &#34;&#34;&#34;CatalogLoader makes it possible to read certain elements from a
+        catalog.
 
-        Main use case for this is to be able to parametrize and write scenarios based on a catalog based entry
-
+        Main use case for this is to be able to parametrize and write
+        scenarios based on a catalog based entry
         &#34;&#34;&#34;
         self.all_catalogs = {}
 
     def load_catalog(self, catalog_reference, catalog_path):
-        &#34;&#34;&#34;CatalogLoader makes it possible to read certain elements from a catalog
+        &#34;&#34;&#34;CatalogLoader makes it possible to read certain elements from a
+        catalog.
 
         Parameters
         ----------
@@ -260,11 +320,11 @@ catalog_path (str): path to the catalog
             name_ref = catalog_reference
 
         with open(fullpath, &#34;r&#34;, encoding=&#34;utf-8&#34;) as f:
-            catalog_element = ET.parse(f).find(&#34;Catalog&#34;)
+            catalog_element = find_mandatory_field(ET.parse(f), &#34;Catalog&#34;)
             self.all_catalogs[name_ref] = catalog_element
 
     def parse(self, catalog_reference):
-        &#34;&#34;&#34;parse reads reads a specific entry from a loaded catalog
+        &#34;&#34;&#34;Parse reads reads a specific entry from a loaded catalog.
 
         Parameters
         ----------
@@ -273,11 +333,12 @@ catalog_path (str): path to the catalog
         Returns
         -------
             The catalog entry
-
         &#34;&#34;&#34;
         if not catalog_reference.catalogname in self.all_catalogs:
             raise NoCatalogFoundError(
-                &#34;Catalog &#34; + catalog_reference.catalogname + &#34; is not loaded yet.&#34;
+                &#34;Catalog &#34;
+                + catalog_reference.catalogname
+                + &#34; is not loaded yet.&#34;
             )
         catalog = self.all_catalogs[catalog_reference.catalogname]
         for entry in catalog:
@@ -305,11 +366,12 @@ catalog_path (str): path to the catalog
             elif entry.tag == &#34;Route&#34;:
                 if entry.attrib[&#34;name&#34;] == catalog_reference.entryname:
                     return Route.parse(entry)
-            else:
-                raise NotImplementedError(&#34;This catalogtype is not supported yet.&#34;)
+
+        raise NotImplementedError(&#34;This catalogtype is not supported yet.&#34;)
 
     def read_entry(self, catalog_reference, catalog_path):
-        &#34;&#34;&#34;read_entry loads and reads a catalog directly (both load_catalog, and parse)
+        &#34;&#34;&#34;read_entry loads and reads a catalog directly (both load_catalog,
+        and parse)
 
         The catalog will still be loaded and can be used with parse after this.
 
@@ -322,7 +384,7 @@ catalog_path (str): path to the catalog
         self.load_catalog(catalog_reference, catalog_path)
         return self.parse(catalog_reference)</code></pre>
 </details>
-<div class="desc"><p>CatalogLoader makes it possible to read certain elements from a catalog</p>
+<div class="desc"><p>CatalogLoader makes it possible to read certain elements from a catalog.</p>
 <h2 id="attributes">Attributes</h2>
 <pre><code>all_catalogs (dict with all catalogs): all catalogs loaded
 </code></pre>
@@ -333,8 +395,10 @@ catalog_path (str): path to the catalog
 get_entry(catalog_reference)
     reads a loaded catalog and returns the object
 </code></pre>
-<p>CatalogLoader makes it possible to read certain elements from a catalog</p>
-<p>Main use case for this is to be able to parametrize and write scenarios based on a catalog based entry</p></div>
+<p>CatalogLoader makes it possible to read certain elements from a
+catalog.</p>
+<p>Main use case for this is to be able to parametrize and write
+scenarios based on a catalog based entry</p></div>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xosc.xosc_reader.CatalogLoader.load_catalog"><code class="name flex">
@@ -346,7 +410,8 @@ get_entry(catalog_reference)
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def load_catalog(self, catalog_reference, catalog_path):
-    &#34;&#34;&#34;CatalogLoader makes it possible to read certain elements from a catalog
+    &#34;&#34;&#34;CatalogLoader makes it possible to read certain elements from a
+    catalog.
 
     Parameters
     ----------
@@ -364,10 +429,11 @@ get_entry(catalog_reference)
         name_ref = catalog_reference
 
     with open(fullpath, &#34;r&#34;, encoding=&#34;utf-8&#34;) as f:
-        catalog_element = ET.parse(f).find(&#34;Catalog&#34;)
+        catalog_element = find_mandatory_field(ET.parse(f), &#34;Catalog&#34;)
         self.all_catalogs[name_ref] = catalog_element</code></pre>
 </details>
-<div class="desc"><p>CatalogLoader makes it possible to read certain elements from a catalog</p>
+<div class="desc"><p>CatalogLoader makes it possible to read certain elements from a
+catalog.</p>
 <h2 id="parameters">Parameters</h2>
 <pre><code>catalog_reference (CatalogReference or str): name/reference to the catalog
 
@@ -383,7 +449,7 @@ catalog_path (str): path to the catalog
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def parse(self, catalog_reference):
-    &#34;&#34;&#34;parse reads reads a specific entry from a loaded catalog
+    &#34;&#34;&#34;Parse reads reads a specific entry from a loaded catalog.
 
     Parameters
     ----------
@@ -392,11 +458,12 @@ catalog_path (str): path to the catalog
     Returns
     -------
         The catalog entry
-
     &#34;&#34;&#34;
     if not catalog_reference.catalogname in self.all_catalogs:
         raise NoCatalogFoundError(
-            &#34;Catalog &#34; + catalog_reference.catalogname + &#34; is not loaded yet.&#34;
+            &#34;Catalog &#34;
+            + catalog_reference.catalogname
+            + &#34; is not loaded yet.&#34;
         )
     catalog = self.all_catalogs[catalog_reference.catalogname]
     for entry in catalog:
@@ -424,10 +491,10 @@ catalog_path (str): path to the catalog
         elif entry.tag == &#34;Route&#34;:
             if entry.attrib[&#34;name&#34;] == catalog_reference.entryname:
                 return Route.parse(entry)
-        else:
-            raise NotImplementedError(&#34;This catalogtype is not supported yet.&#34;)</code></pre>
+
+    raise NotImplementedError(&#34;This catalogtype is not supported yet.&#34;)</code></pre>
 </details>
-<div class="desc"><p>parse reads reads a specific entry from a loaded catalog</p>
+<div class="desc"><p>Parse reads reads a specific entry from a loaded catalog.</p>
 <h2 id="parameters">Parameters</h2>
 <pre><code>catalog_reference (CatalogReference): reference to the catalog
 </code></pre>
@@ -444,7 +511,8 @@ catalog_path (str): path to the catalog
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def read_entry(self, catalog_reference, catalog_path):
-    &#34;&#34;&#34;read_entry loads and reads a catalog directly (both load_catalog, and parse)
+    &#34;&#34;&#34;read_entry loads and reads a catalog directly (both load_catalog,
+    and parse)
 
     The catalog will still be loaded and can be used with parse after this.
 
@@ -457,7 +525,8 @@ catalog_path (str): path to the catalog
     self.load_catalog(catalog_reference, catalog_path)
     return self.parse(catalog_reference)</code></pre>
 </details>
-<div class="desc"><p>read_entry loads and reads a catalog directly (both load_catalog, and parse)</p>
+<div class="desc"><p>read_entry loads and reads a catalog directly (both load_catalog,
+and parse)</p>
 <p>The catalog will still be loaded and can be used with parse after this.</p>
 <h2 id="parameters">Parameters</h2>
 <pre><code>catalog_reference (CatalogReference): reference to the catalog
@@ -485,6 +554,7 @@ catalog_path (str): path to the catalog
 <li><code><a title="scenariogeneration.xosc.xosc_reader.CatalogReader" href="#scenariogeneration.xosc.xosc_reader.CatalogReader">CatalogReader</a></code></li>
 <li><code><a title="scenariogeneration.xosc.xosc_reader.ParameterDeclarationReader" href="#scenariogeneration.xosc.xosc_reader.ParameterDeclarationReader">ParameterDeclarationReader</a></code></li>
 <li><code><a title="scenariogeneration.xosc.xosc_reader.ParseOpenScenario" href="#scenariogeneration.xosc.xosc_reader.ParseOpenScenario">ParseOpenScenario</a></code></li>
+<li><code><a title="scenariogeneration.xosc.xosc_reader.validate_schema" href="#scenariogeneration.xosc.xosc_reader.validate_schema">validate_schema</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>

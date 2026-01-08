@@ -55,7 +55,7 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <dl>
 <dt id="scenariogeneration.xodr.signals_objects.CornerLocal"><code class="flex name class">
 <span>class <span class="ident">CornerLocal</span></span>
-<span>(</span><span>u, v, z, height, id=None)</span>
+<span>(</span><span>u: float, v: float, z: float, height: float, id: int | None = None)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -63,57 +63,51 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class CornerLocal(XodrBase):
-    &#34;&#34;&#34;CornerLocal is one way to describe outline in for objects
-
-    Parameters
-    ----------
-        u (float): local u-coordinate
-
-        v (float): local v-coordinate
-
-        z (float): local z-coordinate
-
-        height (float): height of the object at this corner
-
-        id (int): id of the point (optional)
+    &#34;&#34;&#34;CornerLocal is one way to describe an outline for objects.
 
     Attributes
     ----------
-        u (float): local u-coordinate
-
-        v (float): local v-coordinate
-
-        z (float): local z-coordinate
-
-        height (float): height of the object at this corner
-
-        id (int): id of the point (optional)
+    u : float
+        Local u-coordinate.
+    v : float
+        Local v-coordinate.
+    z : float
+        Local z-coordinate.
+    height : float
+        Height of the object at this corner.
+    id : int, optional
+        ID of the point.
 
     Methods
     -------
-        get_element()
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
+    get_element()
+        Returns the full ElementTree representation of the CornerLocal.
+    get_attributes()
+        Returns a dictionary of all attributes of the CornerLocal.
     &#34;&#34;&#34;
 
-    def __init__(self, u, v, z, height, id=None):
-        &#34;&#34;&#34;initalize the cornerLocal
+    def __init__(
+        self,
+        u: float,
+        v: float,
+        z: float,
+        height: float,
+        id: Optional[int] = None,
+    ) -&gt; None:
+        &#34;&#34;&#34;Initialize the CornerLocal.
 
         Parameters
         ----------
-            u (float): local u-coordinate
-
-            v (float): local v-coordinate
-
-            z (float): local z-coordinate
-
-            height (float): height of the object at this corner
-
-            id (int): id of the point (optional)
-
+        u : float
+            Local u-coordinate.
+        v : float
+            Local v-coordinate.
+        z : float
+            Local z-coordinate.
+        height : float
+            Height of the object at this corner.
+        id : int, optional
+            ID of the point. Default is None.
         &#34;&#34;&#34;
         super().__init__()
         self.u = u
@@ -122,14 +116,20 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
         self.height = height
         self.id = id
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -&gt; bool:
         if isinstance(other, CornerLocal) and super().__eq__(other):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
 
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes of cornerLocal as a dict&#34;&#34;&#34;
+    def get_attributes(self) -&gt; dict[str, str]:
+        &#34;&#34;&#34;Return the attributes of the CornerLocal as a dictionary.
+
+        Returns
+        -------
+        dict[str, str]
+            A dictionary containing the attributes of the CornerLocal.
+        &#34;&#34;&#34;
         retdict = {}
         retdict[&#34;u&#34;] = str(self.u)
         retdict[&#34;v&#34;] = str(self.v)
@@ -139,54 +139,51 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
             retdict[&#34;id&#34;] = str(self.id)
         return retdict
 
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of cornerLocal&#34;&#34;&#34;
+    def get_element(self) -&gt; ET.Element:
+        &#34;&#34;&#34;Return the ElementTree representation of the CornerLocal.
+
+        Returns
+        -------
+        ET.Element
+            The XML ElementTree representation of the CornerLocal.
+        &#34;&#34;&#34;
         element = ET.Element(&#34;cornerLocal&#34;, attrib=self.get_attributes())
         self._add_additional_data_to_element(element)
         return element</code></pre>
 </details>
-<div class="desc"><p>CornerLocal is one way to describe outline in for objects</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>u (float): local u-coordinate
-
-v (float): local v-coordinate
-
-z (float): local z-coordinate
-
-height (float): height of the object at this corner
-
-id (int): id of the point (optional)
-</code></pre>
+<div class="desc"><p>CornerLocal is one way to describe an outline for objects.</p>
 <h2 id="attributes">Attributes</h2>
-<pre><code>u (float): local u-coordinate
-
-v (float): local v-coordinate
-
-z (float): local z-coordinate
-
-height (float): height of the object at this corner
-
-id (int): id of the point (optional)
-</code></pre>
+<dl>
+<dt><strong><code>u</code></strong> :&ensp;<code>float</code></dt>
+<dd>Local u-coordinate.</dd>
+<dt><strong><code>v</code></strong> :&ensp;<code>float</code></dt>
+<dd>Local v-coordinate.</dd>
+<dt><strong><code>z</code></strong> :&ensp;<code>float</code></dt>
+<dd>Local z-coordinate.</dd>
+<dt><strong><code>height</code></strong> :&ensp;<code>float</code></dt>
+<dd>Height of the object at this corner.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>ID of the point.</dd>
+</dl>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
-    Returns the full ElementTree of the class
-
+<p>get_element()
+Returns the full ElementTree representation of the CornerLocal.
 get_attributes()
-    Returns a dictionary of all attributes of the class
-</code></pre>
-<p>initalize the cornerLocal</p>
-<h2 id="parameters_1">Parameters</h2>
-<pre><code>u (float): local u-coordinate
-
-v (float): local v-coordinate
-
-z (float): local z-coordinate
-
-height (float): height of the object at this corner
-
-id (int): id of the point (optional)
-</code></pre></div>
+Returns a dictionary of all attributes of the CornerLocal.</p>
+<p>Initialize the CornerLocal.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>u</code></strong> :&ensp;<code>float</code></dt>
+<dd>Local u-coordinate.</dd>
+<dt><strong><code>v</code></strong> :&ensp;<code>float</code></dt>
+<dd>Local v-coordinate.</dd>
+<dt><strong><code>z</code></strong> :&ensp;<code>float</code></dt>
+<dd>Local z-coordinate.</dd>
+<dt><strong><code>height</code></strong> :&ensp;<code>float</code></dt>
+<dd>Height of the object at this corner.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>ID of the point. Default is None.</dd>
+</dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
@@ -194,15 +191,21 @@ id (int): id of the point (optional)
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.signals_objects.CornerLocal.get_attributes"><code class="name flex">
-<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+<span>def <span class="ident">get_attributes</span></span>(<span>self) ‑> dict[str, str]</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34;returns the attributes of cornerLocal as a dict&#34;&#34;&#34;
+<pre><code class="python">def get_attributes(self) -&gt; dict[str, str]:
+    &#34;&#34;&#34;Return the attributes of the CornerLocal as a dictionary.
+
+    Returns
+    -------
+    dict[str, str]
+        A dictionary containing the attributes of the CornerLocal.
+    &#34;&#34;&#34;
     retdict = {}
     retdict[&#34;u&#34;] = str(self.u)
     retdict[&#34;v&#34;] = str(self.v)
@@ -212,23 +215,39 @@ id (int): id of the point (optional)
         retdict[&#34;id&#34;] = str(self.id)
     return retdict</code></pre>
 </details>
-<div class="desc"><p>returns the attributes of cornerLocal as a dict</p></div>
+<div class="desc"><p>Return the attributes of the CornerLocal as a dictionary.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict[str, str]</code></dt>
+<dd>A dictionary containing the attributes of the CornerLocal.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.CornerLocal.get_element"><code class="name flex">
-<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+<span>def <span class="ident">get_element</span></span>(<span>self) ‑> xml.etree.ElementTree.Element</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_element(self):
-    &#34;&#34;&#34;returns the elementTree of cornerLocal&#34;&#34;&#34;
+<pre><code class="python">def get_element(self) -&gt; ET.Element:
+    &#34;&#34;&#34;Return the ElementTree representation of the CornerLocal.
+
+    Returns
+    -------
+    ET.Element
+        The XML ElementTree representation of the CornerLocal.
+    &#34;&#34;&#34;
     element = ET.Element(&#34;cornerLocal&#34;, attrib=self.get_attributes())
     self._add_additional_data_to_element(element)
     return element</code></pre>
 </details>
-<div class="desc"><p>returns the elementTree of cornerLocal</p></div>
+<div class="desc"><p>Return the ElementTree representation of the CornerLocal.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ET.Element</code></dt>
+<dd>The XML ElementTree representation of the CornerLocal.</dd>
+</dl></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -243,7 +262,7 @@ id (int): id of the point (optional)
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.CornerRoad"><code class="flex name class">
 <span>class <span class="ident">CornerRoad</span></span>
-<span>(</span><span>s, t, dz, height, id=None)</span>
+<span>(</span><span>s: float, t: float, dz: float, height: float, id: int | None = None)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -251,56 +270,51 @@ id (int): id of the point (optional)
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class CornerRoad(XodrBase):
-    &#34;&#34;&#34;CornerRoad is one way to describe outline in for objects
-
-    Parameters
-    ----------
-        s (float): s-coordinate of the corner
-
-        t (float): t-coordinate of the corner
-
-        dz (float): z-coordinate relative to the road
-
-        height (float): height of the object at this corner
-
-        id (int): id of the point (optional)
+    &#34;&#34;&#34;CornerRoad is one way to describe an outline for objects.
 
     Attributes
     ----------
-        s (float): s-coordinate of the corner
+    s : float
+        s-coordinate of the corner.
+    t : float
+        t-coordinate of the corner.
+    dz : float
+        z-coordinate relative to the road.
+    height : float
+        Height of the object at this corner.
+    id : int, optional
+        ID of the point.
 
-        t (float): t-coordinate of the corner
-
-        dz (float): z-coordinate relative to the road
-
-        height (float): height of the object at this corner
-
-        id (int): id of the point (optional)
     Methods
     -------
-        get_element()
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
+    get_element()
+        Returns the full ElementTree representation of the CornerRoad.
+    get_attributes()
+        Returns a dictionary of all attributes of the CornerRoad.
     &#34;&#34;&#34;
 
-    def __init__(self, s, t, dz, height, id=None):
-        &#34;&#34;&#34;initalize the CornerRoad
+    def __init__(
+        self,
+        s: float,
+        t: float,
+        dz: float,
+        height: float,
+        id: Optional[int] = None,
+    ) -&gt; None:
+        &#34;&#34;&#34;Initialize the CornerRoad.
 
         Parameters
         ----------
-            s (float): s-coordinate of the corner
-
-            t (float): t-coordinate of the corner
-
-            dz (float): z-coordinate relative to the road
-
-            height (float): height of the object at this corner
-
-            id (int): id of the point (optional)
-
+        s : float
+            s-coordinate of the corner.
+        t : float
+            t-coordinate of the corner.
+        dz : float
+            z-coordinate relative to the road.
+        height : float
+            Height of the object at this corner.
+        id : int, optional
+            ID of the point. Default is None.
         &#34;&#34;&#34;
         super().__init__()
         self.s = s
@@ -309,14 +323,20 @@ id (int): id of the point (optional)
         self.height = height
         self.id = id
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -&gt; bool:
         if isinstance(other, CornerRoad) and super().__eq__(other):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
 
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes of cornerRoad as a dict&#34;&#34;&#34;
+    def get_attributes(self) -&gt; dict[str, str]:
+        &#34;&#34;&#34;Return the attributes of the CornerRoad as a dictionary.
+
+        Returns
+        -------
+        dict[str, str]
+            A dictionary containing the attributes of the CornerRoad.
+        &#34;&#34;&#34;
         retdict = {}
         retdict[&#34;s&#34;] = str(self.s)
         retdict[&#34;t&#34;] = str(self.t)
@@ -326,54 +346,51 @@ id (int): id of the point (optional)
             retdict[&#34;id&#34;] = str(self.id)
         return retdict
 
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of cornerRoad&#34;&#34;&#34;
+    def get_element(self) -&gt; ET.Element:
+        &#34;&#34;&#34;Return the ElementTree representation of the CornerRoad.
+
+        Returns
+        -------
+        ET.Element
+            The XML ElementTree representation of the CornerRoad.
+        &#34;&#34;&#34;
         element = ET.Element(&#34;cornerRoad&#34;, attrib=self.get_attributes())
         self._add_additional_data_to_element(element)
         return element</code></pre>
 </details>
-<div class="desc"><p>CornerRoad is one way to describe outline in for objects</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>s (float): s-coordinate of the corner
-
-t (float): t-coordinate of the corner
-
-dz (float): z-coordinate relative to the road
-
-height (float): height of the object at this corner
-
-id (int): id of the point (optional)
-</code></pre>
+<div class="desc"><p>CornerRoad is one way to describe an outline for objects.</p>
 <h2 id="attributes">Attributes</h2>
-<pre><code>s (float): s-coordinate of the corner
-
-t (float): t-coordinate of the corner
-
-dz (float): z-coordinate relative to the road
-
-height (float): height of the object at this corner
-
-id (int): id of the point (optional)
-</code></pre>
+<dl>
+<dt><strong><code>s</code></strong> :&ensp;<code>float</code></dt>
+<dd>s-coordinate of the corner.</dd>
+<dt><strong><code>t</code></strong> :&ensp;<code>float</code></dt>
+<dd>t-coordinate of the corner.</dd>
+<dt><strong><code>dz</code></strong> :&ensp;<code>float</code></dt>
+<dd>z-coordinate relative to the road.</dd>
+<dt><strong><code>height</code></strong> :&ensp;<code>float</code></dt>
+<dd>Height of the object at this corner.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>ID of the point.</dd>
+</dl>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
-    Returns the full ElementTree of the class
-
+<p>get_element()
+Returns the full ElementTree representation of the CornerRoad.
 get_attributes()
-    Returns a dictionary of all attributes of the class
-</code></pre>
-<p>initalize the CornerRoad</p>
-<h2 id="parameters_1">Parameters</h2>
-<pre><code>s (float): s-coordinate of the corner
-
-t (float): t-coordinate of the corner
-
-dz (float): z-coordinate relative to the road
-
-height (float): height of the object at this corner
-
-id (int): id of the point (optional)
-</code></pre></div>
+Returns a dictionary of all attributes of the CornerRoad.</p>
+<p>Initialize the CornerRoad.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>s</code></strong> :&ensp;<code>float</code></dt>
+<dd>s-coordinate of the corner.</dd>
+<dt><strong><code>t</code></strong> :&ensp;<code>float</code></dt>
+<dd>t-coordinate of the corner.</dd>
+<dt><strong><code>dz</code></strong> :&ensp;<code>float</code></dt>
+<dd>z-coordinate relative to the road.</dd>
+<dt><strong><code>height</code></strong> :&ensp;<code>float</code></dt>
+<dd>Height of the object at this corner.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>ID of the point. Default is None.</dd>
+</dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
@@ -381,15 +398,21 @@ id (int): id of the point (optional)
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.signals_objects.CornerRoad.get_attributes"><code class="name flex">
-<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+<span>def <span class="ident">get_attributes</span></span>(<span>self) ‑> dict[str, str]</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34;returns the attributes of cornerRoad as a dict&#34;&#34;&#34;
+<pre><code class="python">def get_attributes(self) -&gt; dict[str, str]:
+    &#34;&#34;&#34;Return the attributes of the CornerRoad as a dictionary.
+
+    Returns
+    -------
+    dict[str, str]
+        A dictionary containing the attributes of the CornerRoad.
+    &#34;&#34;&#34;
     retdict = {}
     retdict[&#34;s&#34;] = str(self.s)
     retdict[&#34;t&#34;] = str(self.t)
@@ -399,23 +422,39 @@ id (int): id of the point (optional)
         retdict[&#34;id&#34;] = str(self.id)
     return retdict</code></pre>
 </details>
-<div class="desc"><p>returns the attributes of cornerRoad as a dict</p></div>
+<div class="desc"><p>Return the attributes of the CornerRoad as a dictionary.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict[str, str]</code></dt>
+<dd>A dictionary containing the attributes of the CornerRoad.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.CornerRoad.get_element"><code class="name flex">
-<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+<span>def <span class="ident">get_element</span></span>(<span>self) ‑> xml.etree.ElementTree.Element</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_element(self):
-    &#34;&#34;&#34;returns the elementTree of cornerRoad&#34;&#34;&#34;
+<pre><code class="python">def get_element(self) -&gt; ET.Element:
+    &#34;&#34;&#34;Return the ElementTree representation of the CornerRoad.
+
+    Returns
+    -------
+    ET.Element
+        The XML ElementTree representation of the CornerRoad.
+    &#34;&#34;&#34;
     element = ET.Element(&#34;cornerRoad&#34;, attrib=self.get_attributes())
     self._add_additional_data_to_element(element)
     return element</code></pre>
 </details>
-<div class="desc"><p>returns the elementTree of cornerRoad</p></div>
+<div class="desc"><p>Return the ElementTree representation of the CornerRoad.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ET.Element</code></dt>
+<dd>The XML ElementTree representation of the CornerRoad.</dd>
+</dl></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -430,7 +469,7 @@ id (int): id of the point (optional)
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.Dependency"><code class="flex name class">
 <span>class <span class="ident">Dependency</span></span>
-<span>(</span><span>id, type)</span>
+<span>(</span><span>id: str, type: str)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -438,66 +477,89 @@ id (int): id of the point (optional)
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Dependency(XodrBase):
-    &#34;&#34;&#34;
-    Dependency defines the dependency element in Opendrive. It is placed within the signal element.
-    Parameters
-        ----------
-            id (str): id of the controlled signal
-            type (str): type of dependency
+    &#34;&#34;&#34;Dependency defines the dependency element in OpenDRIVE. It is placed
+    within the signal element.
 
-        Attributes
-        ----------
-            id (str): id of the controlled signal
-            type (str): type of dependency
+    Attributes
+    ----------
+    id : str
+        ID of the controlled signal.
+    type : str
+        Type of dependency.
 
-        Methods
-        -------
-            get_element()
-                Returns the full ElementTree of the class
-
-            get_attributes()
-                Returns a dictionary of all attributes of the class
+    Methods
+    -------
+    get_element()
+        Returns the full ElementTree representation of the Dependency.
+    get_attributes()
+        Returns a dictionary of all attributes of the Dependency.
     &#34;&#34;&#34;
 
-    def __init__(self, id, type):
+    def __init__(self, id: str, type: str) -&gt; None:
+        &#34;&#34;&#34;Initialize the Dependency.
+
+        Parameters
+        ----------
+        id : str
+            ID of the controlled signal.
+        type : str
+            Type of dependency.
+        &#34;&#34;&#34;
         super().__init__()
         self.id = id
         self.type = type
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -&gt; bool:
         if isinstance(other, Dependency) and super().__eq__(other):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
 
-    def get_attributes(self):
+    def get_attributes(self) -&gt; dict[str, str]:
+        &#34;&#34;&#34;Return the attributes of the Dependency as a dictionary.
+
+        Returns
+        -------
+        dict[str, str]
+            A dictionary containing the attributes of the Dependency.
+        &#34;&#34;&#34;
         retdict = {&#34;id&#34;: str(self.id), &#34;type&#34;: str(self.type)}
         return retdict
 
-    def get_element(self):
+    def get_element(self) -&gt; ET.Element:
+        &#34;&#34;&#34;Return the ElementTree representation of the Dependency.
+
+        Returns
+        -------
+        ET.Element
+            The XML ElementTree representation of the Dependency.
+        &#34;&#34;&#34;
         element = ET.Element(&#34;dependency&#34;, attrib=self.get_attributes())
         self._add_additional_data_to_element(element)
         return element</code></pre>
 </details>
-<div class="desc"><p>Dependency defines the dependency element in Opendrive. It is placed within the signal element.
-Parameters
-----------
-id (str): id of the controlled signal
-type (str): type of dependency</p>
-<pre><code>Attributes
-----------
-    id (str): id of the controlled signal
-    type (str): type of dependency
-
-Methods
--------
-    get_element()
-        Returns the full ElementTree of the class
-
-    get_attributes()
-        Returns a dictionary of all attributes of the class
-</code></pre>
-<p>initalize the UserData</p></div>
+<div class="desc"><p>Dependency defines the dependency element in OpenDRIVE. It is placed
+within the signal element.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>id</code></strong> :&ensp;<code>str</code></dt>
+<dd>ID of the controlled signal.</dd>
+<dt><strong><code>type</code></strong> :&ensp;<code>str</code></dt>
+<dd>Type of dependency.</dd>
+</dl>
+<h2 id="methods">Methods</h2>
+<p>get_element()
+Returns the full ElementTree representation of the Dependency.
+get_attributes()
+Returns a dictionary of all attributes of the Dependency.</p>
+<p>Initialize the Dependency.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>id</code></strong> :&ensp;<code>str</code></dt>
+<dd>ID of the controlled signal.</dd>
+<dt><strong><code>type</code></strong> :&ensp;<code>str</code></dt>
+<dd>Type of dependency.</dd>
+</dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
@@ -505,33 +567,338 @@ Methods
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.signals_objects.Dependency.get_attributes"><code class="name flex">
-<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+<span>def <span class="ident">get_attributes</span></span>(<span>self) ‑> dict[str, str]</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_attributes(self):
+<pre><code class="python">def get_attributes(self) -&gt; dict[str, str]:
+    &#34;&#34;&#34;Return the attributes of the Dependency as a dictionary.
+
+    Returns
+    -------
+    dict[str, str]
+        A dictionary containing the attributes of the Dependency.
+    &#34;&#34;&#34;
     retdict = {&#34;id&#34;: str(self.id), &#34;type&#34;: str(self.type)}
     return retdict</code></pre>
 </details>
-<div class="desc"></div>
+<div class="desc"><p>Return the attributes of the Dependency as a dictionary.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict[str, str]</code></dt>
+<dd>A dictionary containing the attributes of the Dependency.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.Dependency.get_element"><code class="name flex">
-<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+<span>def <span class="ident">get_element</span></span>(<span>self) ‑> xml.etree.ElementTree.Element</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_element(self):
+<pre><code class="python">def get_element(self) -&gt; ET.Element:
+    &#34;&#34;&#34;Return the ElementTree representation of the Dependency.
+
+    Returns
+    -------
+    ET.Element
+        The XML ElementTree representation of the Dependency.
+    &#34;&#34;&#34;
     element = ET.Element(&#34;dependency&#34;, attrib=self.get_attributes())
     self._add_additional_data_to_element(element)
     return element</code></pre>
 </details>
-<div class="desc"></div>
+<div class="desc"><p>Return the ElementTree representation of the Dependency.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ET.Element</code></dt>
+<dd>The XML ElementTree representation of the Dependency.</dd>
+</dl></div>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_dataquality" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_dataquality">add_dataquality</a></code></li>
+<li><code><a title="scenariogeneration.xodr.utils.XodrBase.add_userdata" href="utils.html#scenariogeneration.xodr.utils.XodrBase.add_userdata">add_userdata</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="scenariogeneration.xodr.signals_objects.Marking"><code class="flex name class">
+<span>class <span class="ident">Marking</span></span>
+<span>(</span><span>color: <a title="scenariogeneration.xodr.enumerations.RoadMarkColor" href="enumerations.html#scenariogeneration.xodr.enumerations.RoadMarkColor">RoadMarkColor</a>,<br>lineLength: float,<br>side: <a title="scenariogeneration.xodr.enumerations.SideType" href="enumerations.html#scenariogeneration.xodr.enumerations.SideType">SideType</a>,<br>spaceLength: float,<br>startOffset: float,<br>stopOffset: float,<br>weight: <a title="scenariogeneration.xodr.enumerations.RoadMarkWeight" href="enumerations.html#scenariogeneration.xodr.enumerations.RoadMarkWeight">RoadMarkWeight</a> | None = None,<br>width: float | None = None,<br>zOffset: float | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Marking(XodrBase):
+    &#34;&#34;&#34;Marking describes the road marks of any objects like crosswalks,
+    stopping-lines, and parking spaces. Marking is defined either in accordance
+    to the bounding box of the element or by referencing outline points of the
+    object.
+
+    Attributes
+    ----------
+    color : RoadMarkColor
+        Color of the marking.
+    lineLength : float
+        Length of the visible part.
+    side : SideType
+        Side of the bounding box described in &lt;object&gt; element in the local
+        coordinate system u/v
+    spaceLength : float
+        ength of the gap between the visible parts.
+    startOffset : float
+        Lateral offset in u-direction from start of bounding box side where
+        the first marking starts
+    stopOffset : float
+        Lateral offset in u-direction from end of bounding box side where the
+        marking ends
+    weight : RoadMarkWeight, optional
+        Optical &#34;weight&#34; of the marking
+    width : float, optional
+        Width of the marking
+    zOffset : float, optional
+        Height of road mark above the road, i.e. thickness of the road mark
+
+    Methods
+    -------
+    add_cornerReference(corner)
+        Adds a cornerReference to the Marking.
+    get_element()
+        Returns the full ElementTree representation of the Marking.
+    get_attributes()
+        Returns a dictionary of all attributes of the Marking.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        color: RoadMarkColor,
+        lineLength: float,
+        side: SideType,
+        spaceLength: float,
+        startOffset: float,
+        stopOffset: float,
+        weight: Optional[RoadMarkWeight] = None,
+        width: Optional[float] = None,
+        zOffset: Optional[float] = None,
+    ) -&gt; None:
+        &#34;&#34;&#34;Initialize the Marking.&#34;&#34;&#34;
+        super().__init__()
+        self.color = enumchecker(color, RoadMarkColor)
+        self.lineLength = lineLength
+        self.side = enumchecker(side, SideType)
+        self.spaceLength = spaceLength
+        self.startOffset = startOffset
+        self.stopOffset = stopOffset
+        self.weight = enumchecker(weight, RoadMarkWeight, True)
+        self.width = width
+        self.zOffset = zOffset
+        self.cornerReferences = []
+
+    def __eq__(self, other: object) -&gt; bool:
+        if isinstance(other, Marking) and super().__eq__(other):
+            if (
+                self.get_attributes() == other.get_attributes()
+                and self.cornerReferences == other.cornerReferences
+            ):
+                return True
+        return False
+
+    def get_attributes(self) -&gt; dict[str, str]:
+        &#34;&#34;&#34;Return the attributes of the Marking as a dictionary.
+
+        Returns
+        -------
+        dict[str, str]
+            A dictionary containing the attributes of the Marking.
+        &#34;&#34;&#34;
+        retdict = {}
+        retdict[&#34;color&#34;] = enum2str(self.color)
+        retdict[&#34;lineLength&#34;] = str(self.lineLength)
+        retdict[&#34;side&#34;] = enum2str(self.side)
+        retdict[&#34;spaceLength&#34;] = str(self.spaceLength)
+        retdict[&#34;startOffset&#34;] = str(self.startOffset)
+        retdict[&#34;stopOffset&#34;] = str(self.stopOffset)
+        if self.weight is not None:
+            retdict[&#34;weight&#34;] = enum2str(self.weight)
+        if self.width is not None:
+            retdict[&#34;width&#34;] = str(self.width)
+        if self.zOffset is not None:
+            retdict[&#34;zOffset&#34;] = str(self.zOffset)
+        return retdict
+
+    def add_cornerReference(self, cornerReference: int) -&gt; None:
+        &#34;&#34;&#34;Add a cornerReference to the Marking.
+
+        Parameters
+        ----------
+        cornerReference : int
+            The cornerReference to add.
+        &#34;&#34;&#34;
+        self.cornerReferences.append(cornerReference)
+
+    def get_element(self) -&gt; ET.Element:
+        &#34;&#34;&#34;Return the ElementTree representation of the Marking.
+
+        Returns
+        -------
+        ET.Element
+            The XML ElementTree representation of the Marking.
+        &#34;&#34;&#34;
+        element = ET.Element(&#34;marking&#34;, attrib=self.get_attributes())
+        self._add_additional_data_to_element(element)
+        for cornerReference in self.cornerReferences:
+            ET.SubElement(
+                element, &#34;cornerReference&#34;, attrib={&#34;id&#34;: str(cornerReference)}
+            )
+
+        return element</code></pre>
+</details>
+<div class="desc"><p>Marking describes the road marks of any objects like crosswalks,
+stopping-lines, and parking spaces. Marking is defined either in accordance
+to the bounding box of the element or by referencing outline points of the
+object.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>color</code></strong> :&ensp;<code>RoadMarkColor</code></dt>
+<dd>Color of the marking.</dd>
+<dt><strong><code>lineLength</code></strong> :&ensp;<code>float</code></dt>
+<dd>Length of the visible part.</dd>
+<dt><strong><code>side</code></strong> :&ensp;<code>SideType</code></dt>
+<dd>Side of the bounding box described in <object> element in the local
+coordinate system u/v</dd>
+<dt><strong><code>spaceLength</code></strong> :&ensp;<code>float</code></dt>
+<dd>ength of the gap between the visible parts.</dd>
+<dt><strong><code>startOffset</code></strong> :&ensp;<code>float</code></dt>
+<dd>Lateral offset in u-direction from start of bounding box side where
+the first marking starts</dd>
+<dt><strong><code>stopOffset</code></strong> :&ensp;<code>float</code></dt>
+<dd>Lateral offset in u-direction from end of bounding box side where the
+marking ends</dd>
+<dt><strong><code>weight</code></strong> :&ensp;<code>RoadMarkWeight</code>, optional</dt>
+<dd>Optical "weight" of the marking</dd>
+<dt><strong><code>width</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Width of the marking</dd>
+<dt><strong><code>zOffset</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Height of road mark above the road, i.e. thickness of the road mark</dd>
+</dl>
+<h2 id="methods">Methods</h2>
+<p>add_cornerReference(corner)
+Adds a cornerReference to the Marking.
+get_element()
+Returns the full ElementTree representation of the Marking.
+get_attributes()
+Returns a dictionary of all attributes of the Marking.</p>
+<p>Initialize the Marking.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="scenariogeneration.xodr.signals_objects.Marking.add_cornerReference"><code class="name flex">
+<span>def <span class="ident">add_cornerReference</span></span>(<span>self, cornerReference: int) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_cornerReference(self, cornerReference: int) -&gt; None:
+    &#34;&#34;&#34;Add a cornerReference to the Marking.
+
+    Parameters
+    ----------
+    cornerReference : int
+        The cornerReference to add.
+    &#34;&#34;&#34;
+    self.cornerReferences.append(cornerReference)</code></pre>
+</details>
+<div class="desc"><p>Add a cornerReference to the Marking.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>cornerReference</code></strong> :&ensp;<code>int</code></dt>
+<dd>The cornerReference to add.</dd>
+</dl></div>
+</dd>
+<dt id="scenariogeneration.xodr.signals_objects.Marking.get_attributes"><code class="name flex">
+<span>def <span class="ident">get_attributes</span></span>(<span>self) ‑> dict[str, str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_attributes(self) -&gt; dict[str, str]:
+    &#34;&#34;&#34;Return the attributes of the Marking as a dictionary.
+
+    Returns
+    -------
+    dict[str, str]
+        A dictionary containing the attributes of the Marking.
+    &#34;&#34;&#34;
+    retdict = {}
+    retdict[&#34;color&#34;] = enum2str(self.color)
+    retdict[&#34;lineLength&#34;] = str(self.lineLength)
+    retdict[&#34;side&#34;] = enum2str(self.side)
+    retdict[&#34;spaceLength&#34;] = str(self.spaceLength)
+    retdict[&#34;startOffset&#34;] = str(self.startOffset)
+    retdict[&#34;stopOffset&#34;] = str(self.stopOffset)
+    if self.weight is not None:
+        retdict[&#34;weight&#34;] = enum2str(self.weight)
+    if self.width is not None:
+        retdict[&#34;width&#34;] = str(self.width)
+    if self.zOffset is not None:
+        retdict[&#34;zOffset&#34;] = str(self.zOffset)
+    return retdict</code></pre>
+</details>
+<div class="desc"><p>Return the attributes of the Marking as a dictionary.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict[str, str]</code></dt>
+<dd>A dictionary containing the attributes of the Marking.</dd>
+</dl></div>
+</dd>
+<dt id="scenariogeneration.xodr.signals_objects.Marking.get_element"><code class="name flex">
+<span>def <span class="ident">get_element</span></span>(<span>self) ‑> xml.etree.ElementTree.Element</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_element(self) -&gt; ET.Element:
+    &#34;&#34;&#34;Return the ElementTree representation of the Marking.
+
+    Returns
+    -------
+    ET.Element
+        The XML ElementTree representation of the Marking.
+    &#34;&#34;&#34;
+    element = ET.Element(&#34;marking&#34;, attrib=self.get_attributes())
+    self._add_additional_data_to_element(element)
+    for cornerReference in self.cornerReferences:
+        ET.SubElement(
+            element, &#34;cornerReference&#34;, attrib={&#34;id&#34;: str(cornerReference)}
+        )
+
+    return element</code></pre>
+</details>
+<div class="desc"><p>Return the ElementTree representation of the Marking.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ET.Element</code></dt>
+<dd>The XML ElementTree representation of the Marking.</dd>
+</dl></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -546,7 +913,7 @@ Methods
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.Object"><code class="flex name class">
 <span>class <span class="ident">Object</span></span>
-<span>(</span><span>s,<br>t,<br>Type=ObjectType.none,<br>subtype=None,<br>id=None,<br>name=None,<br>dynamic=Dynamic.no,<br>zOffset=0,<br>orientation=Orientation.none,<br>hdg=0,<br>pitch=0,<br>roll=0,<br>width=None,<br>length=None,<br>height=None,<br>radius=None,<br>validLength=None)</span>
+<span>(</span><span>s: float,<br>t: float,<br>Type: <a title="scenariogeneration.xodr.enumerations.ObjectType" href="enumerations.html#scenariogeneration.xodr.enumerations.ObjectType">ObjectType</a> | str = ObjectType.none,<br>subtype: str | None = None,<br>id: str | None = None,<br>name: str | None = None,<br>dynamic: <a title="scenariogeneration.xodr.enumerations.Dynamic" href="enumerations.html#scenariogeneration.xodr.enumerations.Dynamic">Dynamic</a> = Dynamic.no,<br>zOffset: float = 0,<br>orientation: <a title="scenariogeneration.xodr.enumerations.Orientation" href="enumerations.html#scenariogeneration.xodr.enumerations.Orientation">Orientation</a> = Orientation.none,<br>hdg: float = 0,<br>pitch: float = 0,<br>roll: float = 0,<br>width: float | None = None,<br>length: float | None = None,<br>height: float | None = None,<br>radius: float | None = None,<br>validLength: float | None = None)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -554,128 +921,129 @@ Methods
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Object(_SignalObjectBase):
-    &#34;&#34;&#34;creates an Object
-
-    Parameters
-    ----------
-        _SignalObjectBase: base class with common attributes of Signal / Object
+    &#34;&#34;&#34;Creates an Object in OpenDRIVE.
 
     Attributes
     ----------
-        s (float): s-coordinate of Object (init in base class)
+    s : float
+        s-coordinate of the Object (inherited from base class).
+    t : float
+        t-coordinate of the Object (inherited from base class).
+    type : ObjectType or str
+        Type of the Object (typically enum ObjectType, inherited from base class).
+    subtype : str
+        Subtype for further specification of the Object (inherited from base class).
+    id : str, optional
+        ID of the Object (inherited from base class).
+    name : str, optional
+        Name for identification of the Object (inherited from base class).
+    dynamic : Dynamic
+        Specifies if the Object is static or dynamic (inherited from base class).
+    zOffset : float
+        Vertical offset of the Object with respect to the centerline (inherited from base class).
+    orientation : Orientation
+        Orientation of the Object with respect to the road (inherited from base class).
+    hdg : float
+        Heading angle (rad) of the Object relative to the road direction.
+    pitch : float
+        Pitch angle (rad) of the Object relative to the inertial system (inherited from base class).
+    roll : float
+        Roll angle (rad) of the Object after applying pitch (inherited from base class).
+    width : float, optional
+        Width of the Object (inherited from base class).
+    length : float, optional
+        Length of the Object (shall not be used with radius).
+    height : float, optional
+        Height of the Object (inherited from base class).
+    radius : float, optional
+        Radius of the Object (shall not be used with width/length).
+    validLength : float, optional
+        Validity of the Object along the s-coordinate.
+    _repeats : list[dict]
+        List of dictionaries containing attributes for repeating Objects.
+    validity : Validity, optional
+        Explicit validity information for the Object.
+    outlines : list[Outline]
+        List of outlines for the Object.
+    markings : list[Marking]
+        List of markings for the Object.
+    parking_space : ParkingSpace, optional
+        Parking space information for the Object.
+    materials : list[Material]
+        List of materials for the Object.
 
-        t (float): t-coordinate of Object (init in base class)
-
-        type (ObjectType or string): type of Object (typically enum ObjectType) (init in base class)
-
-        subtype (string): subtype for further specification of Object (init in base class)
-
-        id (string): id of Object (init in base class)
-
-        name (string): name for identification of Object (init in base class)
-
-        dynamic (Dynamic): specifies if Object is static or dynamic (init in base class)
-
-        zOffset (float): vertical offset of Object with respect to centerline (init in base class)
-
-        orientation (Orientation): orientation of Object with respect to road (init in base class)
-
-        hdg (float): heading angle (rad) of the Object relative to road direction
-
-        pitch (float): pitch angle (rad) of Object relative to the inertial system (xy-plane) (init in base class)
-
-        roll (float): roll angle (rad) of Object after applying pitch, relative to the inertial system (x’’y’’-plane) (init in base class)
-
-        width (float): width of the Object (init in base class)
-
-        length (float): width of the Object (shall not be used with radius)
-
-        height (float): height of Object (init in base class)
-
-        radius (float): radius of the Object (shall not be used with width/length)
-
-        validLength (float): validLength
-
-        _repeats ([dict]): list of dictionary containing attributes for optional subelement for repeating Objects to be filled by repeat method
-
-        validity (Validity): explicit validity information for a signal (optional)
-
-        outlines (list of Outline): list of outlines for the object
     Methods
     -------
-        repeat()
-            adds a dictionary to _repeats[] list to create a subelement for repeating the Object
-
-        add_outline(outline)
-            adds a outline of the object
-
-        get_element()
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of FileHeader
-
+    repeat(...)
+        Adds a dictionary to `_repeats` to create a subelement for repeating the Object.
+    add_outline(outline)
+        Adds an outline to the Object.
+    add_parking_space(parking_space)
+        Adds a parking space to the Object.
+    get_element()
+        Returns the full ElementTree representation of the Object.
+    get_attributes()
+        Returns a dictionary of all attributes of the Object.
     &#34;&#34;&#34;
 
     def __init__(
         self,
-        s,
-        t,
-        Type=ObjectType.none,
-        subtype=None,
-        id=None,
-        name=None,
-        dynamic=Dynamic.no,
-        zOffset=0,
-        orientation=Orientation.none,
-        hdg=0,
-        pitch=0,
-        roll=0,
-        width=None,
-        length=None,
-        height=None,
-        radius=None,
-        validLength=None,
-    ):
-        &#34;&#34;&#34;initalizes the Object
+        s: float,
+        t: float,
+        Type: Union[ObjectType, str] = ObjectType.none,
+        subtype: Optional[str] = None,
+        id: Optional[str] = None,
+        name: Optional[str] = None,
+        dynamic: Dynamic = Dynamic.no,
+        zOffset: float = 0,
+        orientation: Orientation = Orientation.none,
+        hdg: float = 0,
+        pitch: float = 0,
+        roll: float = 0,
+        width: Optional[float] = None,
+        length: Optional[float] = None,
+        height: Optional[float] = None,
+        radius: Optional[float] = None,
+        validLength: Optional[float] = None,
+    ) -&gt; None:
+        &#34;&#34;&#34;Initialize the Object.
 
         Parameters
         ----------
-            s (float): s-coordinate of Object (init in base class)
-
-            t (float): t-coordinate of Object (init in base class)
-
-            Type (ObjectType or string): type of Object (typically enum ObjectType) (init in base class)
-                Default: ObjectType.none
-            subtype (string): subtype for further specification of Object (init in base class)
-                Default: None
-            id (string): id of Object (init in base class)
-                Default: None
-            name (string): name for identification of Object (init in base class)
-                Default: None
-            dynamic (Dynamic): specifies if Object is static or dynamic (init in base class)
-                Default: Dynamic.no
-            zOffset (float): vertical offset of Object with respect to centerline (init in base class)
-                Default: 0
-            orientation (Orientation): orientation of Object with respect to road (init in base class)
-                Default: Orientation.none
-            hdg (float): heading angle (rad) of the Object relative to road direction
-                Default: 0
-            pitch (float): pitch angle (rad) of Object relative to the inertial system (xy-plane) (init in base class)
-                Default: 0
-            roll (float): roll angle (rad) of Object after applying pitch, relative to the inertial system (x’’y’’-plane) (init in base class)
-                Default: 0
-            width (float): width of the Object (init in base class)
-                Default: None
-            length (float): length of the Object (shall not be used with radius)
-                Default: None
-            height (float): height of Object (init in base class)
-                Default: None
-            radius (float): radius of the Object (shall not be used with width/length)
-                Default: None
-            validLength (float): validity of object along s-coordinate
-                Default: None
-
+        s : float
+            s-coordinate of the Object.
+        t : float
+            t-coordinate of the Object.
+        Type : ObjectType or str, optional
+            Type of the Object. Default is ObjectType.none.
+        subtype : str, optional
+            Subtype for further specification of the Object. Default is None.
+        id : str, optional
+            ID of the Object. Default is None.
+        name : str, optional
+            Name for identification of the Object. Default is None.
+        dynamic : Dynamic, optional
+            Specifies if the Object is static or dynamic. Default is Dynamic.no.
+        zOffset : float, optional
+            Vertical offset of the Object with respect to the centerline. Default is 0.
+        orientation : Orientation, optional
+            Orientation of the Object with respect to the road. Default is Orientation.none.
+        hdg : float, optional
+            Heading angle (rad) of the Object relative to the road direction. Default is 0.
+        pitch : float, optional
+            Pitch angle (rad) of the Object relative to the inertial system. Default is 0.
+        roll : float, optional
+            Roll angle (rad) of the Object after applying pitch. Default is 0.
+        width : float, optional
+            Width of the Object. Default is None.
+        length : float, optional
+            Length of the Object. Default is None.
+        height : float, optional
+            Height of the Object. Default is None.
+        radius : float, optional
+            Radius of the Object. Default is None.
+        validLength : float, optional
+            Validity of the Object along the s-coordinate. Default is None.
         &#34;&#34;&#34;
         # get attributes that are common with signals
         super().__init__(
@@ -704,6 +1072,8 @@ Methods
         # list for repeat entries
         self._repeats = []
         self.outlines = []
+        self.markings = []
+        self.materials = []
         self.validity = None
         self.parking_space = None
 
@@ -733,34 +1103,73 @@ Methods
         else:
             pass
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -&gt; bool:
         if isinstance(other, Object) and super().__eq__(other):
             if (
                 self.get_attributes() == other.get_attributes()
                 and self._repeats == other._repeats
                 and self.outlines == other.outlines
+                and self.markings == other.markings
+                and self.validity == other.validity
+                and self.parking_space == other.parking_space
+                and self.materials == other.materials
             ):
                 return True
         return False
 
     def repeat(
         self,
-        repeatLength,
-        repeatDistance,
-        sStart=None,
-        tStart=None,
-        tEnd=None,
-        heightStart=None,
-        heightEnd=None,
-        zOffsetStart=None,
-        zOffsetEnd=None,
-        widthStart=None,
-        widthEnd=None,
-        lengthStart=None,
-        lengthEnd=None,
-        radiusStart=None,
-        radiusEnd=None,
-    ):
+        repeatLength: float,
+        repeatDistance: float,
+        sStart: Optional[float] = None,
+        tStart: Optional[float] = None,
+        tEnd: Optional[float] = None,
+        heightStart: Optional[float] = None,
+        heightEnd: Optional[float] = None,
+        zOffsetStart: Optional[float] = None,
+        zOffsetEnd: Optional[float] = None,
+        widthStart: Optional[float] = None,
+        widthEnd: Optional[float] = None,
+        lengthStart: Optional[float] = None,
+        lengthEnd: Optional[float] = None,
+        radiusStart: Optional[float] = None,
+        radiusEnd: Optional[float] = None,
+    ) -&gt; None:
+        &#34;&#34;&#34;Add a repeat entry to the Object.
+
+        Parameters
+        ----------
+        repeatLength : float
+            Length of the repeat.
+        repeatDistance : float
+            Distance between repeats.
+        sStart : float, optional
+            Starting s-coordinate. Default is None.
+        tStart : float, optional
+            Starting t-coordinate. Default is None.
+        tEnd : float, optional
+            Ending t-coordinate. Default is None.
+        heightStart : float, optional
+            Starting height. Default is None.
+        heightEnd : float, optional
+            Ending height. Default is None.
+        zOffsetStart : float, optional
+            Starting z-offset. Default is None.
+        zOffsetEnd : float, optional
+            Ending z-offset. Default is None.
+        widthStart : float, optional
+            Starting width. Default is None.
+        widthEnd : float, optional
+            Ending width. Default is None.
+        lengthStart : float, optional
+            Starting length. Default is None.
+        lengthEnd : float, optional
+            Ending length. Default is None.
+        radiusStart : float, optional
+            Starting radius. Default is None.
+        radiusEnd : float, optional
+            Ending radius. Default is None.
+        &#34;&#34;&#34;
         self._repeats.append({})
 
         self._repeats[-1][&#34;length&#34;] = str(repeatLength)
@@ -823,40 +1232,105 @@ Methods
         if radiusEnd is not None:
             self._repeats[-1][&#34;radiusEnd&#34;] = str(radiusEnd)
 
-    def add_validity(self, fromLane, toLane):
-        &#34;&#34;&#34;adds a validity to the object
+    def add_validity(self, fromLane: int, toLane: int) -&gt; &#34;Object&#34;:
+        &#34;&#34;&#34;Add a validity range to the Object.
 
         Parameters
         ----------
-            fromLane (int): the from lane
+        fromLane : int
+            The starting lane for the validity range.
+        toLane : int
+            The ending lane for the validity range.
 
-            toLane (int): the to lane
+        Returns
+        -------
+        Object
+            The updated Object instance.
+
+        Raises
+        ------
+        ValueError
+            If a validity range is already set for the Object.
         &#34;&#34;&#34;
         if self.validity:
             raise ValueError(&#34;only one validity is allowed&#34;)
         self.validity = Validity(fromLane, toLane)
         return self
 
-    def add_outline(self, outline):
-        &#34;&#34;&#34;adds an outline to the object
+    def add_outline(self, outline: &#34;Outline&#34;) -&gt; None:
+        &#34;&#34;&#34;Add an outline to the Object.
 
         Parameters
         ----------
-            outline (Outline): the outline to be added
+        outline : Outline
+            The outline to be added.
         &#34;&#34;&#34;
         self.outlines.append(outline)
 
-    def add_parking_space(self, parking_space):
-        &#34;&#34;&#34;adds an parking space to the object
+    def add_parking_space(self, parking_space: &#34;ParkingSpace&#34;) -&gt; None:
+        &#34;&#34;&#34;Add a parking space to the Object.
 
         Parameters
         ----------
-            parking_space (ParkingSpace): the outline to be added
+        parking_space : ParkingSpace
+            The parking space to be added.
         &#34;&#34;&#34;
         self.parking_space = parking_space
 
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes of the Object as a dict&#34;&#34;&#34;
+    def add_marking(self, marking: &#34;Marking&#34;) -&gt; None:
+        &#34;&#34;&#34;Add a marking to the Object.
+
+        Parameters
+        ----------
+        marking : Marking
+            The marking to be added.
+        &#34;&#34;&#34;
+        self.markings.append(marking)
+
+    def add_material(
+        self,
+        friction: Optional[float] = None,
+        roadMarkColor: Optional[RoadMarkColor] = None,
+        roughness: Optional[float] = None,
+        surface: Optional[str] = None,
+    ) -&gt; None:
+        &#34;&#34;&#34;Add a material description entry to the object.
+
+        Parameters
+        ----------
+        friction : float, optional
+            The friction coefficient of the material. Default is None.
+        roadMarkColor : RoadMarkColor, optional
+            Color of the painted road mark. Default is None.
+        roughness : float, optional
+            The roughness of the material. Default is None.
+        surface : str, optional
+            The surface material code. Default is None.
+
+        Returns
+        -------
+        None
+        &#34;&#34;&#34;
+        materialdict = {}
+        if friction is not None:
+            materialdict[&#34;friction&#34;] = str(friction)
+        if roadMarkColor is not None:
+            checked_color = enumchecker(roadMarkColor, RoadMarkColor)
+            materialdict[&#34;roadMarkColor&#34;] = enum2str(checked_color)
+        if roughness is not None:
+            materialdict[&#34;roughness&#34;] = str(roughness)
+        if surface is not None:
+            materialdict[&#34;surface&#34;] = surface
+        self.materials.append(materialdict)
+
+    def get_attributes(self) -&gt; dict[str, str]:
+        &#34;&#34;&#34;Return the attributes of the Object as a dictionary.
+
+        Returns
+        -------
+        dict[str, str]
+            A dictionary containing the attributes of the Object.
+        &#34;&#34;&#34;
         retdict = super().get_common_attributes()
         if self.validLength is not None:
             retdict[&#34;validLength&#34;] = str(self.validLength)
@@ -870,8 +1344,31 @@ Methods
 
         return retdict
 
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the WorldPostion&#34;&#34;&#34;
+    def get_element(self) -&gt; ET.Element:
+        &#34;&#34;&#34;Return the ElementTree representation of the Object.
+
+        Returns
+        -------
+        ET.Element
+            The XML ElementTree representation of the Object.
+        &#34;&#34;&#34;
+        valid_corner_ids = set()
+        for outline in self.outlines:
+            for corner in outline.corners:
+                if hasattr(corner, &#34;id&#34;) and corner.id is not None:
+                    valid_corner_ids.add(corner.id)
+
+        # Check all markings for cornerReferences
+        for marking in self.markings:
+            for ref_id in getattr(marking, &#34;cornerReferences&#34;, []):
+                if ref_id not in valid_corner_ids:
+                    raise ValueError(
+                        (
+                            f&#34;Marking references corner id {ref_id} &#34;
+                            &#34;which does not exist in outlines.&#34;
+                        )
+                    )
+
         element = ET.Element(&#34;object&#34;, attrib=self.get_attributes())
         self._add_additional_data_to_element(element)
         for _repeat in self._repeats:
@@ -884,103 +1381,114 @@ Methods
             outlines_element = ET.SubElement(element, &#34;outlines&#34;)
             for outline in self.outlines:
                 outlines_element.append(outline.get_element())
+        if self.markings:
+            markings_element = ET.SubElement(element, &#34;markings&#34;)
+            for marking in self.markings:
+                markings_element.append(marking.get_element())
+        if self.materials:
+            for material in self.materials:
+                ET.SubElement(element, &#34;material&#34;, attrib=material)
         return element</code></pre>
 </details>
-<div class="desc"><p>creates an Object</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>_SignalObjectBase: base class with common attributes of Signal / Object
-</code></pre>
+<div class="desc"><p>Creates an Object in OpenDRIVE.</p>
 <h2 id="attributes">Attributes</h2>
-<pre><code>s (float): s-coordinate of Object (init in base class)
-
-t (float): t-coordinate of Object (init in base class)
-
-type (ObjectType or string): type of Object (typically enum ObjectType) (init in base class)
-
-subtype (string): subtype for further specification of Object (init in base class)
-
-id (string): id of Object (init in base class)
-
-name (string): name for identification of Object (init in base class)
-
-dynamic (Dynamic): specifies if Object is static or dynamic (init in base class)
-
-zOffset (float): vertical offset of Object with respect to centerline (init in base class)
-
-orientation (Orientation): orientation of Object with respect to road (init in base class)
-
-hdg (float): heading angle (rad) of the Object relative to road direction
-
-pitch (float): pitch angle (rad) of Object relative to the inertial system (xy-plane) (init in base class)
-
-roll (float): roll angle (rad) of Object after applying pitch, relative to the inertial system (x’’y’’-plane) (init in base class)
-
-width (float): width of the Object (init in base class)
-
-length (float): width of the Object (shall not be used with radius)
-
-height (float): height of Object (init in base class)
-
-radius (float): radius of the Object (shall not be used with width/length)
-
-validLength (float): validLength
-
-_repeats ([dict]): list of dictionary containing attributes for optional subelement for repeating Objects to be filled by repeat method
-
-validity (Validity): explicit validity information for a signal (optional)
-
-outlines (list of Outline): list of outlines for the object
-</code></pre>
+<dl>
+<dt><strong><code>s</code></strong> :&ensp;<code>float</code></dt>
+<dd>s-coordinate of the Object (inherited from base class).</dd>
+<dt><strong><code>t</code></strong> :&ensp;<code>float</code></dt>
+<dd>t-coordinate of the Object (inherited from base class).</dd>
+<dt><strong><code>type</code></strong> :&ensp;<code>ObjectType</code> or <code>str</code></dt>
+<dd>Type of the Object (typically enum ObjectType, inherited from base class).</dd>
+<dt><strong><code>subtype</code></strong> :&ensp;<code>str</code></dt>
+<dd>Subtype for further specification of the Object (inherited from base class).</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>ID of the Object (inherited from base class).</dd>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Name for identification of the Object (inherited from base class).</dd>
+<dt><strong><code>dynamic</code></strong> :&ensp;<code>Dynamic</code></dt>
+<dd>Specifies if the Object is static or dynamic (inherited from base class).</dd>
+<dt><strong><code>zOffset</code></strong> :&ensp;<code>float</code></dt>
+<dd>Vertical offset of the Object with respect to the centerline (inherited from base class).</dd>
+<dt><strong><code>orientation</code></strong> :&ensp;<code>Orientation</code></dt>
+<dd>Orientation of the Object with respect to the road (inherited from base class).</dd>
+<dt><strong><code>hdg</code></strong> :&ensp;<code>float</code></dt>
+<dd>Heading angle (rad) of the Object relative to the road direction.</dd>
+<dt><strong><code>pitch</code></strong> :&ensp;<code>float</code></dt>
+<dd>Pitch angle (rad) of the Object relative to the inertial system (inherited from base class).</dd>
+<dt><strong><code>roll</code></strong> :&ensp;<code>float</code></dt>
+<dd>Roll angle (rad) of the Object after applying pitch (inherited from base class).</dd>
+<dt><strong><code>width</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Width of the Object (inherited from base class).</dd>
+<dt><strong><code>length</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Length of the Object (shall not be used with radius).</dd>
+<dt><strong><code>height</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Height of the Object (inherited from base class).</dd>
+<dt><strong><code>radius</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Radius of the Object (shall not be used with width/length).</dd>
+<dt><strong><code>validLength</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Validity of the Object along the s-coordinate.</dd>
+<dt><strong><code>_repeats</code></strong> :&ensp;<code>list[dict]</code></dt>
+<dd>List of dictionaries containing attributes for repeating Objects.</dd>
+<dt><strong><code>validity</code></strong> :&ensp;<code><a title="scenariogeneration.xodr.signals_objects.Validity" href="#scenariogeneration.xodr.signals_objects.Validity">Validity</a></code>, optional</dt>
+<dd>Explicit validity information for the Object.</dd>
+<dt><strong><code>outlines</code></strong> :&ensp;<code>list[<a title="scenariogeneration.xodr.signals_objects.Outline" href="#scenariogeneration.xodr.signals_objects.Outline">Outline</a>]</code></dt>
+<dd>List of outlines for the Object.</dd>
+<dt><strong><code>markings</code></strong> :&ensp;<code>list[<a title="scenariogeneration.xodr.signals_objects.Marking" href="#scenariogeneration.xodr.signals_objects.Marking">Marking</a>]</code></dt>
+<dd>List of markings for the Object.</dd>
+<dt><strong><code>parking_space</code></strong> :&ensp;<code><a title="scenariogeneration.xodr.signals_objects.ParkingSpace" href="#scenariogeneration.xodr.signals_objects.ParkingSpace">ParkingSpace</a></code>, optional</dt>
+<dd>Parking space information for the Object.</dd>
+<dt><strong><code>materials</code></strong> :&ensp;<code>list[Material]</code></dt>
+<dd>List of materials for the Object.</dd>
+</dl>
 <h2 id="methods">Methods</h2>
-<pre><code>repeat()
-    adds a dictionary to _repeats[] list to create a subelement for repeating the Object
-
+<p>repeat(&hellip;)
+Adds a dictionary to <code>_repeats</code> to create a subelement for repeating the Object.
 add_outline(outline)
-    adds a outline of the object
-
+Adds an outline to the Object.
+add_parking_space(parking_space)
+Adds a parking space to the Object.
 get_element()
-    Returns the full ElementTree of the class
-
+Returns the full ElementTree representation of the Object.
 get_attributes()
-    Returns a dictionary of all attributes of FileHeader
-</code></pre>
-<p>initalizes the Object</p>
-<h2 id="parameters_1">Parameters</h2>
-<pre><code>s (float): s-coordinate of Object (init in base class)
-
-t (float): t-coordinate of Object (init in base class)
-
-Type (ObjectType or string): type of Object (typically enum ObjectType) (init in base class)
-    Default: ObjectType.none
-subtype (string): subtype for further specification of Object (init in base class)
-    Default: None
-id (string): id of Object (init in base class)
-    Default: None
-name (string): name for identification of Object (init in base class)
-    Default: None
-dynamic (Dynamic): specifies if Object is static or dynamic (init in base class)
-    Default: Dynamic.no
-zOffset (float): vertical offset of Object with respect to centerline (init in base class)
-    Default: 0
-orientation (Orientation): orientation of Object with respect to road (init in base class)
-    Default: Orientation.none
-hdg (float): heading angle (rad) of the Object relative to road direction
-    Default: 0
-pitch (float): pitch angle (rad) of Object relative to the inertial system (xy-plane) (init in base class)
-    Default: 0
-roll (float): roll angle (rad) of Object after applying pitch, relative to the inertial system (x’’y’’-plane) (init in base class)
-    Default: 0
-width (float): width of the Object (init in base class)
-    Default: None
-length (float): length of the Object (shall not be used with radius)
-    Default: None
-height (float): height of Object (init in base class)
-    Default: None
-radius (float): radius of the Object (shall not be used with width/length)
-    Default: None
-validLength (float): validity of object along s-coordinate
-    Default: None
-</code></pre></div>
+Returns a dictionary of all attributes of the Object.</p>
+<p>Initialize the Object.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>s</code></strong> :&ensp;<code>float</code></dt>
+<dd>s-coordinate of the Object.</dd>
+<dt><strong><code>t</code></strong> :&ensp;<code>float</code></dt>
+<dd>t-coordinate of the Object.</dd>
+<dt><strong><code>Type</code></strong> :&ensp;<code>ObjectType</code> or <code>str</code>, optional</dt>
+<dd>Type of the Object. Default is ObjectType.none.</dd>
+<dt><strong><code>subtype</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Subtype for further specification of the Object. Default is None.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>ID of the Object. Default is None.</dd>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Name for identification of the Object. Default is None.</dd>
+<dt><strong><code>dynamic</code></strong> :&ensp;<code>Dynamic</code>, optional</dt>
+<dd>Specifies if the Object is static or dynamic. Default is Dynamic.no.</dd>
+<dt><strong><code>zOffset</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Vertical offset of the Object with respect to the centerline. Default is 0.</dd>
+<dt><strong><code>orientation</code></strong> :&ensp;<code>Orientation</code>, optional</dt>
+<dd>Orientation of the Object with respect to the road. Default is Orientation.none.</dd>
+<dt><strong><code>hdg</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Heading angle (rad) of the Object relative to the road direction. Default is 0.</dd>
+<dt><strong><code>pitch</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Pitch angle (rad) of the Object relative to the inertial system. Default is 0.</dd>
+<dt><strong><code>roll</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Roll angle (rad) of the Object after applying pitch. Default is 0.</dd>
+<dt><strong><code>width</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Width of the Object. Default is None.</dd>
+<dt><strong><code>length</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Length of the Object. Default is None.</dd>
+<dt><strong><code>height</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Height of the Object. Default is None.</dd>
+<dt><strong><code>radius</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Radius of the Object. Default is None.</dd>
+<dt><strong><code>validLength</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Validity of the Object along the s-coordinate. Default is None.</dd>
+</dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xodr.signals_objects._SignalObjectBase</li>
@@ -988,89 +1496,211 @@ validLength (float): validity of object along s-coordinate
 </ul>
 <h3>Methods</h3>
 <dl>
-<dt id="scenariogeneration.xodr.signals_objects.Object.add_outline"><code class="name flex">
-<span>def <span class="ident">add_outline</span></span>(<span>self, outline)</span>
+<dt id="scenariogeneration.xodr.signals_objects.Object.add_marking"><code class="name flex">
+<span>def <span class="ident">add_marking</span></span>(<span>self,<br>marking: <a title="scenariogeneration.xodr.signals_objects.Marking" href="#scenariogeneration.xodr.signals_objects.Marking">Marking</a>) ‑> None</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_outline(self, outline):
-    &#34;&#34;&#34;adds an outline to the object
+<pre><code class="python">def add_marking(self, marking: &#34;Marking&#34;) -&gt; None:
+    &#34;&#34;&#34;Add a marking to the Object.
 
     Parameters
     ----------
-        outline (Outline): the outline to be added
+    marking : Marking
+        The marking to be added.
+    &#34;&#34;&#34;
+    self.markings.append(marking)</code></pre>
+</details>
+<div class="desc"><p>Add a marking to the Object.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>marking</code></strong> :&ensp;<code><a title="scenariogeneration.xodr.signals_objects.Marking" href="#scenariogeneration.xodr.signals_objects.Marking">Marking</a></code></dt>
+<dd>The marking to be added.</dd>
+</dl></div>
+</dd>
+<dt id="scenariogeneration.xodr.signals_objects.Object.add_material"><code class="name flex">
+<span>def <span class="ident">add_material</span></span>(<span>self,<br>friction: float | None = None,<br>roadMarkColor: <a title="scenariogeneration.xodr.enumerations.RoadMarkColor" href="enumerations.html#scenariogeneration.xodr.enumerations.RoadMarkColor">RoadMarkColor</a> | None = None,<br>roughness: float | None = None,<br>surface: str | None = None) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_material(
+    self,
+    friction: Optional[float] = None,
+    roadMarkColor: Optional[RoadMarkColor] = None,
+    roughness: Optional[float] = None,
+    surface: Optional[str] = None,
+) -&gt; None:
+    &#34;&#34;&#34;Add a material description entry to the object.
+
+    Parameters
+    ----------
+    friction : float, optional
+        The friction coefficient of the material. Default is None.
+    roadMarkColor : RoadMarkColor, optional
+        Color of the painted road mark. Default is None.
+    roughness : float, optional
+        The roughness of the material. Default is None.
+    surface : str, optional
+        The surface material code. Default is None.
+
+    Returns
+    -------
+    None
+    &#34;&#34;&#34;
+    materialdict = {}
+    if friction is not None:
+        materialdict[&#34;friction&#34;] = str(friction)
+    if roadMarkColor is not None:
+        checked_color = enumchecker(roadMarkColor, RoadMarkColor)
+        materialdict[&#34;roadMarkColor&#34;] = enum2str(checked_color)
+    if roughness is not None:
+        materialdict[&#34;roughness&#34;] = str(roughness)
+    if surface is not None:
+        materialdict[&#34;surface&#34;] = surface
+    self.materials.append(materialdict)</code></pre>
+</details>
+<div class="desc"><p>Add a material description entry to the object.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>friction</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>The friction coefficient of the material. Default is None.</dd>
+<dt><strong><code>roadMarkColor</code></strong> :&ensp;<code>RoadMarkColor</code>, optional</dt>
+<dd>Color of the painted road mark. Default is None.</dd>
+<dt><strong><code>roughness</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>The roughness of the material. Default is None.</dd>
+<dt><strong><code>surface</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>The surface material code. Default is None.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+</dd>
+<dt id="scenariogeneration.xodr.signals_objects.Object.add_outline"><code class="name flex">
+<span>def <span class="ident">add_outline</span></span>(<span>self,<br>outline: <a title="scenariogeneration.xodr.signals_objects.Outline" href="#scenariogeneration.xodr.signals_objects.Outline">Outline</a>) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_outline(self, outline: &#34;Outline&#34;) -&gt; None:
+    &#34;&#34;&#34;Add an outline to the Object.
+
+    Parameters
+    ----------
+    outline : Outline
+        The outline to be added.
     &#34;&#34;&#34;
     self.outlines.append(outline)</code></pre>
 </details>
-<div class="desc"><p>adds an outline to the object</p>
+<div class="desc"><p>Add an outline to the Object.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>outline (Outline): the outline to be added
-</code></pre></div>
+<dl>
+<dt><strong><code>outline</code></strong> :&ensp;<code><a title="scenariogeneration.xodr.signals_objects.Outline" href="#scenariogeneration.xodr.signals_objects.Outline">Outline</a></code></dt>
+<dd>The outline to be added.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.Object.add_parking_space"><code class="name flex">
-<span>def <span class="ident">add_parking_space</span></span>(<span>self, parking_space)</span>
+<span>def <span class="ident">add_parking_space</span></span>(<span>self,<br>parking_space: <a title="scenariogeneration.xodr.signals_objects.ParkingSpace" href="#scenariogeneration.xodr.signals_objects.ParkingSpace">ParkingSpace</a>) ‑> None</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_parking_space(self, parking_space):
-    &#34;&#34;&#34;adds an parking space to the object
+<pre><code class="python">def add_parking_space(self, parking_space: &#34;ParkingSpace&#34;) -&gt; None:
+    &#34;&#34;&#34;Add a parking space to the Object.
 
     Parameters
     ----------
-        parking_space (ParkingSpace): the outline to be added
+    parking_space : ParkingSpace
+        The parking space to be added.
     &#34;&#34;&#34;
     self.parking_space = parking_space</code></pre>
 </details>
-<div class="desc"><p>adds an parking space to the object</p>
+<div class="desc"><p>Add a parking space to the Object.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>parking_space (ParkingSpace): the outline to be added
-</code></pre></div>
+<dl>
+<dt><strong><code>parking_space</code></strong> :&ensp;<code><a title="scenariogeneration.xodr.signals_objects.ParkingSpace" href="#scenariogeneration.xodr.signals_objects.ParkingSpace">ParkingSpace</a></code></dt>
+<dd>The parking space to be added.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.Object.add_validity"><code class="name flex">
-<span>def <span class="ident">add_validity</span></span>(<span>self, fromLane, toLane)</span>
+<span>def <span class="ident">add_validity</span></span>(<span>self, fromLane: int, toLane: int) ‑> <a title="scenariogeneration.xodr.signals_objects.Object" href="#scenariogeneration.xodr.signals_objects.Object">Object</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_validity(self, fromLane, toLane):
-    &#34;&#34;&#34;adds a validity to the object
+<pre><code class="python">def add_validity(self, fromLane: int, toLane: int) -&gt; &#34;Object&#34;:
+    &#34;&#34;&#34;Add a validity range to the Object.
 
     Parameters
     ----------
-        fromLane (int): the from lane
+    fromLane : int
+        The starting lane for the validity range.
+    toLane : int
+        The ending lane for the validity range.
 
-        toLane (int): the to lane
+    Returns
+    -------
+    Object
+        The updated Object instance.
+
+    Raises
+    ------
+    ValueError
+        If a validity range is already set for the Object.
     &#34;&#34;&#34;
     if self.validity:
         raise ValueError(&#34;only one validity is allowed&#34;)
     self.validity = Validity(fromLane, toLane)
     return self</code></pre>
 </details>
-<div class="desc"><p>adds a validity to the object</p>
+<div class="desc"><p>Add a validity range to the Object.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>fromLane (int): the from lane
-
-toLane (int): the to lane
-</code></pre></div>
+<dl>
+<dt><strong><code>fromLane</code></strong> :&ensp;<code>int</code></dt>
+<dd>The starting lane for the validity range.</dd>
+<dt><strong><code>toLane</code></strong> :&ensp;<code>int</code></dt>
+<dd>The ending lane for the validity range.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="scenariogeneration.xodr.signals_objects.Object" href="#scenariogeneration.xodr.signals_objects.Object">Object</a></code></dt>
+<dd>The updated Object instance.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If a validity range is already set for the Object.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.Object.get_attributes"><code class="name flex">
-<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+<span>def <span class="ident">get_attributes</span></span>(<span>self) ‑> dict[str, str]</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34;returns the attributes of the Object as a dict&#34;&#34;&#34;
+<pre><code class="python">def get_attributes(self) -&gt; dict[str, str]:
+    &#34;&#34;&#34;Return the attributes of the Object as a dictionary.
+
+    Returns
+    -------
+    dict[str, str]
+        A dictionary containing the attributes of the Object.
+    &#34;&#34;&#34;
     retdict = super().get_common_attributes()
     if self.validLength is not None:
         retdict[&#34;validLength&#34;] = str(self.validLength)
@@ -1084,18 +1714,46 @@ toLane (int): the to lane
 
     return retdict</code></pre>
 </details>
-<div class="desc"><p>returns the attributes of the Object as a dict</p></div>
+<div class="desc"><p>Return the attributes of the Object as a dictionary.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict[str, str]</code></dt>
+<dd>A dictionary containing the attributes of the Object.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.Object.get_element"><code class="name flex">
-<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+<span>def <span class="ident">get_element</span></span>(<span>self) ‑> xml.etree.ElementTree.Element</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_element(self):
-    &#34;&#34;&#34;returns the elementTree of the WorldPostion&#34;&#34;&#34;
+<pre><code class="python">def get_element(self) -&gt; ET.Element:
+    &#34;&#34;&#34;Return the ElementTree representation of the Object.
+
+    Returns
+    -------
+    ET.Element
+        The XML ElementTree representation of the Object.
+    &#34;&#34;&#34;
+    valid_corner_ids = set()
+    for outline in self.outlines:
+        for corner in outline.corners:
+            if hasattr(corner, &#34;id&#34;) and corner.id is not None:
+                valid_corner_ids.add(corner.id)
+
+    # Check all markings for cornerReferences
+    for marking in self.markings:
+        for ref_id in getattr(marking, &#34;cornerReferences&#34;, []):
+            if ref_id not in valid_corner_ids:
+                raise ValueError(
+                    (
+                        f&#34;Marking references corner id {ref_id} &#34;
+                        &#34;which does not exist in outlines.&#34;
+                    )
+                )
+
     element = ET.Element(&#34;object&#34;, attrib=self.get_attributes())
     self._add_additional_data_to_element(element)
     for _repeat in self._repeats:
@@ -1108,12 +1766,24 @@ toLane (int): the to lane
         outlines_element = ET.SubElement(element, &#34;outlines&#34;)
         for outline in self.outlines:
             outlines_element.append(outline.get_element())
+    if self.markings:
+        markings_element = ET.SubElement(element, &#34;markings&#34;)
+        for marking in self.markings:
+            markings_element.append(marking.get_element())
+    if self.materials:
+        for material in self.materials:
+            ET.SubElement(element, &#34;material&#34;, attrib=material)
     return element</code></pre>
 </details>
-<div class="desc"><p>returns the elementTree of the WorldPostion</p></div>
+<div class="desc"><p>Return the ElementTree representation of the Object.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ET.Element</code></dt>
+<dd>The XML ElementTree representation of the Object.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.Object.repeat"><code class="name flex">
-<span>def <span class="ident">repeat</span></span>(<span>self,<br>repeatLength,<br>repeatDistance,<br>sStart=None,<br>tStart=None,<br>tEnd=None,<br>heightStart=None,<br>heightEnd=None,<br>zOffsetStart=None,<br>zOffsetEnd=None,<br>widthStart=None,<br>widthEnd=None,<br>lengthStart=None,<br>lengthEnd=None,<br>radiusStart=None,<br>radiusEnd=None)</span>
+<span>def <span class="ident">repeat</span></span>(<span>self,<br>repeatLength: float,<br>repeatDistance: float,<br>sStart: float | None = None,<br>tStart: float | None = None,<br>tEnd: float | None = None,<br>heightStart: float | None = None,<br>heightEnd: float | None = None,<br>zOffsetStart: float | None = None,<br>zOffsetEnd: float | None = None,<br>widthStart: float | None = None,<br>widthEnd: float | None = None,<br>lengthStart: float | None = None,<br>lengthEnd: float | None = None,<br>radiusStart: float | None = None,<br>radiusEnd: float | None = None) ‑> None</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -1122,22 +1792,57 @@ toLane (int): the to lane
 </summary>
 <pre><code class="python">def repeat(
     self,
-    repeatLength,
-    repeatDistance,
-    sStart=None,
-    tStart=None,
-    tEnd=None,
-    heightStart=None,
-    heightEnd=None,
-    zOffsetStart=None,
-    zOffsetEnd=None,
-    widthStart=None,
-    widthEnd=None,
-    lengthStart=None,
-    lengthEnd=None,
-    radiusStart=None,
-    radiusEnd=None,
-):
+    repeatLength: float,
+    repeatDistance: float,
+    sStart: Optional[float] = None,
+    tStart: Optional[float] = None,
+    tEnd: Optional[float] = None,
+    heightStart: Optional[float] = None,
+    heightEnd: Optional[float] = None,
+    zOffsetStart: Optional[float] = None,
+    zOffsetEnd: Optional[float] = None,
+    widthStart: Optional[float] = None,
+    widthEnd: Optional[float] = None,
+    lengthStart: Optional[float] = None,
+    lengthEnd: Optional[float] = None,
+    radiusStart: Optional[float] = None,
+    radiusEnd: Optional[float] = None,
+) -&gt; None:
+    &#34;&#34;&#34;Add a repeat entry to the Object.
+
+    Parameters
+    ----------
+    repeatLength : float
+        Length of the repeat.
+    repeatDistance : float
+        Distance between repeats.
+    sStart : float, optional
+        Starting s-coordinate. Default is None.
+    tStart : float, optional
+        Starting t-coordinate. Default is None.
+    tEnd : float, optional
+        Ending t-coordinate. Default is None.
+    heightStart : float, optional
+        Starting height. Default is None.
+    heightEnd : float, optional
+        Ending height. Default is None.
+    zOffsetStart : float, optional
+        Starting z-offset. Default is None.
+    zOffsetEnd : float, optional
+        Ending z-offset. Default is None.
+    widthStart : float, optional
+        Starting width. Default is None.
+    widthEnd : float, optional
+        Ending width. Default is None.
+    lengthStart : float, optional
+        Starting length. Default is None.
+    lengthEnd : float, optional
+        Ending length. Default is None.
+    radiusStart : float, optional
+        Starting radius. Default is None.
+    radiusEnd : float, optional
+        Ending radius. Default is None.
+    &#34;&#34;&#34;
     self._repeats.append({})
 
     self._repeats[-1][&#34;length&#34;] = str(repeatLength)
@@ -1200,7 +1905,40 @@ toLane (int): the to lane
     if radiusEnd is not None:
         self._repeats[-1][&#34;radiusEnd&#34;] = str(radiusEnd)</code></pre>
 </details>
-<div class="desc"></div>
+<div class="desc"><p>Add a repeat entry to the Object.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>repeatLength</code></strong> :&ensp;<code>float</code></dt>
+<dd>Length of the repeat.</dd>
+<dt><strong><code>repeatDistance</code></strong> :&ensp;<code>float</code></dt>
+<dd>Distance between repeats.</dd>
+<dt><strong><code>sStart</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Starting s-coordinate. Default is None.</dd>
+<dt><strong><code>tStart</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Starting t-coordinate. Default is None.</dd>
+<dt><strong><code>tEnd</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Ending t-coordinate. Default is None.</dd>
+<dt><strong><code>heightStart</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Starting height. Default is None.</dd>
+<dt><strong><code>heightEnd</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Ending height. Default is None.</dd>
+<dt><strong><code>zOffsetStart</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Starting z-offset. Default is None.</dd>
+<dt><strong><code>zOffsetEnd</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Ending z-offset. Default is None.</dd>
+<dt><strong><code>widthStart</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Starting width. Default is None.</dd>
+<dt><strong><code>widthEnd</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Ending width. Default is None.</dd>
+<dt><strong><code>lengthStart</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Starting length. Default is None.</dd>
+<dt><strong><code>lengthEnd</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Ending length. Default is None.</dd>
+<dt><strong><code>radiusStart</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Starting radius. Default is None.</dd>
+<dt><strong><code>radiusEnd</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Ending radius. Default is None.</dd>
+</dl></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -1215,7 +1953,7 @@ toLane (int): the to lane
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.Outline"><code class="flex name class">
 <span>class <span class="ident">Outline</span></span>
-<span>(</span><span>closed=None, fill_type=None, lane_type=None, outer=None, id=None)</span>
+<span>(</span><span>closed: bool | None = None,<br>fill_type: <a title="scenariogeneration.xodr.enumerations.FillType" href="enumerations.html#scenariogeneration.xodr.enumerations.FillType">FillType</a> | None = None,<br>lane_type: <a title="scenariogeneration.xodr.enumerations.LaneType" href="enumerations.html#scenariogeneration.xodr.enumerations.LaneType">LaneType</a> | None = None,<br>outer: bool | None = None,<br>id: int | None = None)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -1223,60 +1961,55 @@ toLane (int): the to lane
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Outline(XodrBase):
-    &#34;&#34;&#34;Outline is used to wrap corners for an object in OpenDRIVE
-
-    Parameters
-    ----------
-        closed (bool): if the outline is closed (optional)
-
-        fill_type (FillType): filling of the object (optional)
-
-        lane_type (LaneType): type of the outline (optional)
-
-        outer (bool): defines if the outline is the outer outline (optional)
-
-        id (int): id of the point (optional)
+    &#34;&#34;&#34;Outline is used to wrap corners for an object in OpenDRIVE.
 
     Attributes
     ----------
-        closed (bool): if the outline is closed (optional)
+    closed : bool, optional
+        Indicates if the outline is closed.
+    fill_type : FillType, optional
+        Filling type of the object.
+    lane_type : LaneType, optional
+        Type of the outline.
+    outer : bool, optional
+        Defines if the outline is the outer outline.
+    id : int, optional
+        ID of the outline.
+    corners : list[Union[CornerRoad, CornerLocal]]
+        List of corners in the outline.
 
-        fill_type (FillType): filling of the object (optional)
-
-        lane_type (LaneType): type of the outline (optional)
-
-        outer (bool): defines if the outline is the outer outline (optional)
-
-        id (int): id of the point (optional)
-
-        corners (list of cornerRoad/cornerLocal): corners of the outline
     Methods
     -------
-        get_element()
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
+    add_corner(corner)
+        Adds a corner to the outline.
+    get_element()
+        Returns the full ElementTree representation of the Outline.
+    get_attributes()
+        Returns a dictionary of all attributes of the Outline.
     &#34;&#34;&#34;
 
     def __init__(
-        self, closed=None, fill_type=None, lane_type=None, outer=None, id=None
-    ):
-        &#34;&#34;&#34;initalize the Outline
+        self,
+        closed: Optional[bool] = None,
+        fill_type: Optional[FillType] = None,
+        lane_type: Optional[LaneType] = None,
+        outer: Optional[bool] = None,
+        id: Optional[int] = None,
+    ) -&gt; None:
+        &#34;&#34;&#34;Initialize the Outline.
 
         Parameters
         ----------
-            closed (bool): if the outline is closed (optional)
-
-            fill_type (FillType): filling of the object (optional)
-
-            lane_type (LaneType): type of the outline (optional)
-
-            outer (bool): defines if the outline is the outer outline (optional)
-
-            id (int): id of the point (optional)
-
+        closed : bool, optional
+            Indicates if the outline is closed. Default is None.
+        fill_type : FillType, optional
+            Filling type of the object. Default is None.
+        lane_type : LaneType, optional
+            Type of the outline. Default is None.
+        outer : bool, optional
+            Defines if the outline is the outer outline. Default is None.
+        id : int, optional
+            ID of the outline. Default is None.
         &#34;&#34;&#34;
         super().__init__()
         self.closed = closed
@@ -1287,7 +2020,7 @@ toLane (int): the to lane
         self.corners = []
         self._corner_type = None
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -&gt; bool:
         if isinstance(other, Outline) and super().__eq__(other):
             if (
                 self.get_attributes() == other.get_attributes()
@@ -1296,31 +2029,49 @@ toLane (int): the to lane
                 return True
         return False
 
-    def add_corner(self, corner):
-        &#34;&#34;&#34;add_corner adds a corner to the outline
+    def add_corner(self, corner: Union[CornerRoad, CornerLocal]) -&gt; None:
+        &#34;&#34;&#34;Add a corner to the outline.
 
-        Note: only the same typ of corners can be added
+        Note: Only the same type of corners can be added.
 
         Parameters
         ----------
-            corner (CornerRoad, CornerLocal)
+        corner : CornerRoad or CornerLocal
+            The corner to add.
+
+        Raises
+        ------
+        TypeError
+            If the corner is not a valid type.
+        GeneralIssueInputArguments
+            If a mix of corner types is attempted.
         &#34;&#34;&#34;
-        if not (isinstance(corner, CornerLocal) or isinstance(corner, CornerRoad)):
+        if not (
+            isinstance(corner, CornerLocal) or isinstance(corner, CornerRoad)
+        ):
             raise TypeError(&#34;Not a valid corner.&#34;)
         if len(self.corners) == 0:
             if isinstance(corner, CornerLocal):
                 self._corner_type = &#34;local&#34;
             else:
                 self._corner_type = &#34;road&#34;
-        if (isinstance(corner, CornerLocal) and self._corner_type == &#34;local&#34;) or (
-            isinstance(corner, CornerRoad) and self._corner_type == &#34;road&#34;
-        ):
+        if (
+            isinstance(corner, CornerLocal) and self._corner_type == &#34;local&#34;
+        ) or (isinstance(corner, CornerRoad) and self._corner_type == &#34;road&#34;):
             self.corners.append(corner)
         else:
-            raise GeneralIssueInputArguments(&#34;Mix of cornertypes not allowed. &#34;)
+            raise GeneralIssueInputArguments(
+                &#34;Mix of cornertypes not allowed. &#34;
+            )
 
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes of Outline as a dict&#34;&#34;&#34;
+    def get_attributes(self) -&gt; dict[str, str]:
+        &#34;&#34;&#34;Return the attributes of the Outline as a dictionary.
+
+        Returns
+        -------
+        dict[str, str]
+            A dictionary containing the attributes of the Outline.
+        &#34;&#34;&#34;
         retdict = {}
         if self.closed is not None:
             retdict[&#34;closed&#34;] = get_bool_string(self.closed)
@@ -1334,8 +2085,14 @@ toLane (int): the to lane
             retdict[&#34;id&#34;] = str(self.id)
         return retdict
 
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of Outline&#34;&#34;&#34;
+    def get_element(self) -&gt; ET.Element:
+        &#34;&#34;&#34;Return the ElementTree representation of the Outline.
+
+        Returns
+        -------
+        ET.Element
+            The XML ElementTree representation of the Outline.
+        &#34;&#34;&#34;
         element = ET.Element(&#34;outline&#34;, attrib=self.get_attributes())
         self._add_additional_data_to_element(element)
         for corner in self.corners:
@@ -1343,50 +2100,43 @@ toLane (int): the to lane
 
         return element</code></pre>
 </details>
-<div class="desc"><p>Outline is used to wrap corners for an object in OpenDRIVE</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>closed (bool): if the outline is closed (optional)
-
-fill_type (FillType): filling of the object (optional)
-
-lane_type (LaneType): type of the outline (optional)
-
-outer (bool): defines if the outline is the outer outline (optional)
-
-id (int): id of the point (optional)
-</code></pre>
+<div class="desc"><p>Outline is used to wrap corners for an object in OpenDRIVE.</p>
 <h2 id="attributes">Attributes</h2>
-<pre><code>closed (bool): if the outline is closed (optional)
-
-fill_type (FillType): filling of the object (optional)
-
-lane_type (LaneType): type of the outline (optional)
-
-outer (bool): defines if the outline is the outer outline (optional)
-
-id (int): id of the point (optional)
-
-corners (list of cornerRoad/cornerLocal): corners of the outline
-</code></pre>
+<dl>
+<dt><strong><code>closed</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Indicates if the outline is closed.</dd>
+<dt><strong><code>fill_type</code></strong> :&ensp;<code>FillType</code>, optional</dt>
+<dd>Filling type of the object.</dd>
+<dt><strong><code>lane_type</code></strong> :&ensp;<code>LaneType</code>, optional</dt>
+<dd>Type of the outline.</dd>
+<dt><strong><code>outer</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Defines if the outline is the outer outline.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>ID of the outline.</dd>
+<dt><strong><code>corners</code></strong> :&ensp;<code>list[Union[<a title="scenariogeneration.xodr.signals_objects.CornerRoad" href="#scenariogeneration.xodr.signals_objects.CornerRoad">CornerRoad</a>, <a title="scenariogeneration.xodr.signals_objects.CornerLocal" href="#scenariogeneration.xodr.signals_objects.CornerLocal">CornerLocal</a>]]</code></dt>
+<dd>List of corners in the outline.</dd>
+</dl>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
-    Returns the full ElementTree of the class
-
+<p>add_corner(corner)
+Adds a corner to the outline.
+get_element()
+Returns the full ElementTree representation of the Outline.
 get_attributes()
-    Returns a dictionary of all attributes of the class
-</code></pre>
-<p>initalize the Outline</p>
-<h2 id="parameters_1">Parameters</h2>
-<pre><code>closed (bool): if the outline is closed (optional)
-
-fill_type (FillType): filling of the object (optional)
-
-lane_type (LaneType): type of the outline (optional)
-
-outer (bool): defines if the outline is the outer outline (optional)
-
-id (int): id of the point (optional)
-</code></pre></div>
+Returns a dictionary of all attributes of the Outline.</p>
+<p>Initialize the Outline.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>closed</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Indicates if the outline is closed. Default is None.</dd>
+<dt><strong><code>fill_type</code></strong> :&ensp;<code>FillType</code>, optional</dt>
+<dd>Filling type of the object. Default is None.</dd>
+<dt><strong><code>lane_type</code></strong> :&ensp;<code>LaneType</code>, optional</dt>
+<dd>Type of the outline. Default is None.</dd>
+<dt><strong><code>outer</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Defines if the outline is the outer outline. Default is None.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>ID of the outline. Default is None.</dd>
+</dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
@@ -1394,52 +2144,79 @@ id (int): id of the point (optional)
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.signals_objects.Outline.add_corner"><code class="name flex">
-<span>def <span class="ident">add_corner</span></span>(<span>self, corner)</span>
+<span>def <span class="ident">add_corner</span></span>(<span>self,<br>corner: <a title="scenariogeneration.xodr.signals_objects.CornerRoad" href="#scenariogeneration.xodr.signals_objects.CornerRoad">CornerRoad</a> | <a title="scenariogeneration.xodr.signals_objects.CornerLocal" href="#scenariogeneration.xodr.signals_objects.CornerLocal">CornerLocal</a>) ‑> None</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_corner(self, corner):
-    &#34;&#34;&#34;add_corner adds a corner to the outline
+<pre><code class="python">def add_corner(self, corner: Union[CornerRoad, CornerLocal]) -&gt; None:
+    &#34;&#34;&#34;Add a corner to the outline.
 
-    Note: only the same typ of corners can be added
+    Note: Only the same type of corners can be added.
 
     Parameters
     ----------
-        corner (CornerRoad, CornerLocal)
+    corner : CornerRoad or CornerLocal
+        The corner to add.
+
+    Raises
+    ------
+    TypeError
+        If the corner is not a valid type.
+    GeneralIssueInputArguments
+        If a mix of corner types is attempted.
     &#34;&#34;&#34;
-    if not (isinstance(corner, CornerLocal) or isinstance(corner, CornerRoad)):
+    if not (
+        isinstance(corner, CornerLocal) or isinstance(corner, CornerRoad)
+    ):
         raise TypeError(&#34;Not a valid corner.&#34;)
     if len(self.corners) == 0:
         if isinstance(corner, CornerLocal):
             self._corner_type = &#34;local&#34;
         else:
             self._corner_type = &#34;road&#34;
-    if (isinstance(corner, CornerLocal) and self._corner_type == &#34;local&#34;) or (
-        isinstance(corner, CornerRoad) and self._corner_type == &#34;road&#34;
-    ):
+    if (
+        isinstance(corner, CornerLocal) and self._corner_type == &#34;local&#34;
+    ) or (isinstance(corner, CornerRoad) and self._corner_type == &#34;road&#34;):
         self.corners.append(corner)
     else:
-        raise GeneralIssueInputArguments(&#34;Mix of cornertypes not allowed. &#34;)</code></pre>
+        raise GeneralIssueInputArguments(
+            &#34;Mix of cornertypes not allowed. &#34;
+        )</code></pre>
 </details>
-<div class="desc"><p>add_corner adds a corner to the outline</p>
-<p>Note: only the same typ of corners can be added</p>
+<div class="desc"><p>Add a corner to the outline.</p>
+<p>Note: Only the same type of corners can be added.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>corner (CornerRoad, CornerLocal)
-</code></pre></div>
+<dl>
+<dt><strong><code>corner</code></strong> :&ensp;<code><a title="scenariogeneration.xodr.signals_objects.CornerRoad" href="#scenariogeneration.xodr.signals_objects.CornerRoad">CornerRoad</a></code> or <code><a title="scenariogeneration.xodr.signals_objects.CornerLocal" href="#scenariogeneration.xodr.signals_objects.CornerLocal">CornerLocal</a></code></dt>
+<dd>The corner to add.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>TypeError</code></dt>
+<dd>If the corner is not a valid type.</dd>
+<dt><code>GeneralIssueInputArguments</code></dt>
+<dd>If a mix of corner types is attempted.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.Outline.get_attributes"><code class="name flex">
-<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+<span>def <span class="ident">get_attributes</span></span>(<span>self) ‑> dict[str, str]</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34;returns the attributes of Outline as a dict&#34;&#34;&#34;
+<pre><code class="python">def get_attributes(self) -&gt; dict[str, str]:
+    &#34;&#34;&#34;Return the attributes of the Outline as a dictionary.
+
+    Returns
+    -------
+    dict[str, str]
+        A dictionary containing the attributes of the Outline.
+    &#34;&#34;&#34;
     retdict = {}
     if self.closed is not None:
         retdict[&#34;closed&#34;] = get_bool_string(self.closed)
@@ -1453,18 +2230,29 @@ id (int): id of the point (optional)
         retdict[&#34;id&#34;] = str(self.id)
     return retdict</code></pre>
 </details>
-<div class="desc"><p>returns the attributes of Outline as a dict</p></div>
+<div class="desc"><p>Return the attributes of the Outline as a dictionary.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict[str, str]</code></dt>
+<dd>A dictionary containing the attributes of the Outline.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.Outline.get_element"><code class="name flex">
-<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+<span>def <span class="ident">get_element</span></span>(<span>self) ‑> xml.etree.ElementTree.Element</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_element(self):
-    &#34;&#34;&#34;returns the elementTree of Outline&#34;&#34;&#34;
+<pre><code class="python">def get_element(self) -&gt; ET.Element:
+    &#34;&#34;&#34;Return the ElementTree representation of the Outline.
+
+    Returns
+    -------
+    ET.Element
+        The XML ElementTree representation of the Outline.
+    &#34;&#34;&#34;
     element = ET.Element(&#34;outline&#34;, attrib=self.get_attributes())
     self._add_additional_data_to_element(element)
     for corner in self.corners:
@@ -1472,7 +2260,12 @@ id (int): id of the point (optional)
 
     return element</code></pre>
 </details>
-<div class="desc"><p>returns the elementTree of Outline</p></div>
+<div class="desc"><p>Return the ElementTree representation of the Outline.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ET.Element</code></dt>
+<dd>The XML ElementTree representation of the Outline.</dd>
+</dl></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -1487,7 +2280,7 @@ id (int): id of the point (optional)
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.ParkingSpace"><code class="flex name class">
 <span>class <span class="ident">ParkingSpace</span></span>
-<span>(</span><span>access=None, restrictions=None)</span>
+<span>(</span><span>access: <a title="scenariogeneration.xodr.enumerations.Access" href="enumerations.html#scenariogeneration.xodr.enumerations.Access">Access</a> | None = None,<br>restrictions: str | None = None)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -1495,54 +2288,56 @@ id (int): id of the point (optional)
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ParkingSpace(XodrBase):
-    &#34;&#34;&#34;ParkingSpace is used to define access and restrictions for objects in OpenDRIVE
-
-    Parameters
-    ----------
-        access (Access): type of access of the parking space (optional)
-
-        restrictions (string): restrictions of the parking space (optional)
-
+    &#34;&#34;&#34;ParkingSpace is used to define access and restrictions for objects
+    in OpenDRIVE.
 
     Attributes
     ----------
-        access (Access): type of access of the parking space (optional)
-
-        restrictions (string): restrictions of the parking space (optional)
+    access : Access, optional
+        Type of access of the parking space.
+    restrictions : str, optional
+        Restrictions of the parking space.
 
     Methods
     -------
-        get_element()
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
+    get_element()
+        Returns the full ElementTree representation of the ParkingSpace.
+    get_attributes()
+        Returns a dictionary of all attributes of the ParkingSpace.
     &#34;&#34;&#34;
 
-    def __init__(self, access=None, restrictions=None):
-        &#34;&#34;&#34;initalize the ParkingSpace
+    def __init__(
+        self,
+        access: Optional[Access] = None,
+        restrictions: Optional[str] = None,
+    ) -&gt; None:
+        &#34;&#34;&#34;Initialize the ParkingSpace.
 
         Parameters
         ----------
-            access (Access): type of access of the parking space (optional)
-
-            restrictions (string): restrictions of the parking space (optional)
-
-
+        access : Access, optional
+            Type of access of the parking space. Default is None.
+        restrictions : str, optional
+            Restrictions of the parking space. Default is None.
         &#34;&#34;&#34;
         super().__init__()
         self.access = enumchecker(access, Access)
         self.restrictions = restrictions
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -&gt; bool:
         if isinstance(other, Outline) and super().__eq__(other):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
 
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes of ParkingSpace as a dict&#34;&#34;&#34;
+    def get_attributes(self) -&gt; dict[str, str]:
+        &#34;&#34;&#34;Return the attributes of the ParkingSpace as a dictionary.
+
+        Returns
+        -------
+        dict[str, str]
+            A dictionary containing the attributes of the ParkingSpace.
+        &#34;&#34;&#34;
         retdict = {}
         if self.access is not None:
             retdict[&#34;access&#34;] = enum2str(self.access)
@@ -1551,37 +2346,41 @@ id (int): id of the point (optional)
 
         return retdict
 
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of ParkingSpace&#34;&#34;&#34;
+    def get_element(self) -&gt; ET.Element:
+        &#34;&#34;&#34;Return the ElementTree representation of the ParkingSpace.
+
+        Returns
+        -------
+        ET.Element
+            The XML ElementTree representation of the ParkingSpace.
+        &#34;&#34;&#34;
         element = ET.Element(&#34;parkingSpace&#34;, attrib=self.get_attributes())
         self._add_additional_data_to_element(element)
 
         return element</code></pre>
 </details>
-<div class="desc"><p>ParkingSpace is used to define access and restrictions for objects in OpenDRIVE</p>
-<h2 id="parameters">Parameters</h2>
-<pre><code>access (Access): type of access of the parking space (optional)
-
-restrictions (string): restrictions of the parking space (optional)
-</code></pre>
+<div class="desc"><p>ParkingSpace is used to define access and restrictions for objects
+in OpenDRIVE.</p>
 <h2 id="attributes">Attributes</h2>
-<pre><code>access (Access): type of access of the parking space (optional)
-
-restrictions (string): restrictions of the parking space (optional)
-</code></pre>
+<dl>
+<dt><strong><code>access</code></strong> :&ensp;<code>Access</code>, optional</dt>
+<dd>Type of access of the parking space.</dd>
+<dt><strong><code>restrictions</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Restrictions of the parking space.</dd>
+</dl>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
-    Returns the full ElementTree of the class
-
+<p>get_element()
+Returns the full ElementTree representation of the ParkingSpace.
 get_attributes()
-    Returns a dictionary of all attributes of the class
-</code></pre>
-<p>initalize the ParkingSpace</p>
-<h2 id="parameters_1">Parameters</h2>
-<pre><code>access (Access): type of access of the parking space (optional)
-
-restrictions (string): restrictions of the parking space (optional)
-</code></pre></div>
+Returns a dictionary of all attributes of the ParkingSpace.</p>
+<p>Initialize the ParkingSpace.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>access</code></strong> :&ensp;<code>Access</code>, optional</dt>
+<dd>Type of access of the parking space. Default is None.</dd>
+<dt><strong><code>restrictions</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Restrictions of the parking space. Default is None.</dd>
+</dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
@@ -1589,15 +2388,21 @@ restrictions (string): restrictions of the parking space (optional)
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.signals_objects.ParkingSpace.get_attributes"><code class="name flex">
-<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+<span>def <span class="ident">get_attributes</span></span>(<span>self) ‑> dict[str, str]</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34;returns the attributes of ParkingSpace as a dict&#34;&#34;&#34;
+<pre><code class="python">def get_attributes(self) -&gt; dict[str, str]:
+    &#34;&#34;&#34;Return the attributes of the ParkingSpace as a dictionary.
+
+    Returns
+    -------
+    dict[str, str]
+        A dictionary containing the attributes of the ParkingSpace.
+    &#34;&#34;&#34;
     retdict = {}
     if self.access is not None:
         retdict[&#34;access&#34;] = enum2str(self.access)
@@ -1606,24 +2411,40 @@ restrictions (string): restrictions of the parking space (optional)
 
     return retdict</code></pre>
 </details>
-<div class="desc"><p>returns the attributes of ParkingSpace as a dict</p></div>
+<div class="desc"><p>Return the attributes of the ParkingSpace as a dictionary.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict[str, str]</code></dt>
+<dd>A dictionary containing the attributes of the ParkingSpace.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.ParkingSpace.get_element"><code class="name flex">
-<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+<span>def <span class="ident">get_element</span></span>(<span>self) ‑> xml.etree.ElementTree.Element</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_element(self):
-    &#34;&#34;&#34;returns the elementTree of ParkingSpace&#34;&#34;&#34;
+<pre><code class="python">def get_element(self) -&gt; ET.Element:
+    &#34;&#34;&#34;Return the ElementTree representation of the ParkingSpace.
+
+    Returns
+    -------
+    ET.Element
+        The XML ElementTree representation of the ParkingSpace.
+    &#34;&#34;&#34;
     element = ET.Element(&#34;parkingSpace&#34;, attrib=self.get_attributes())
     self._add_additional_data_to_element(element)
 
     return element</code></pre>
 </details>
-<div class="desc"><p>returns the elementTree of ParkingSpace</p></div>
+<div class="desc"><p>Return the ElementTree representation of the ParkingSpace.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ET.Element</code></dt>
+<dd>The XML ElementTree representation of the ParkingSpace.</dd>
+</dl></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -1638,7 +2459,7 @@ restrictions (string): restrictions of the parking space (optional)
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.Signal"><code class="flex name class">
 <span>class <span class="ident">Signal</span></span>
-<span>(</span><span>s,<br>t,<br>country,<br>Type,<br>subtype='-1',<br>countryRevision=None,<br>id=None,<br>name=None,<br>dynamic=Dynamic.no,<br>value=None,<br>unit=None,<br>zOffset=1.5,<br>orientation=Orientation.positive,<br>hOffset=0,<br>pitch=0,<br>roll=0,<br>height=None,<br>width=None,<br>length=None)</span>
+<span>(</span><span>s: float,<br>t: float,<br>country: str,<br>Type: <a title="scenariogeneration.xodr.enumerations.ObjectType" href="enumerations.html#scenariogeneration.xodr.enumerations.ObjectType">ObjectType</a> | str,<br>subtype: str = '-1',<br>countryRevision: str | None = None,<br>id: str | None = None,<br>name: str | None = None,<br>dynamic: <a title="scenariogeneration.xodr.enumerations.Dynamic" href="enumerations.html#scenariogeneration.xodr.enumerations.Dynamic">Dynamic</a> = Dynamic.no,<br>value: float | None = None,<br>unit: str | None = None,<br>zOffset: float = 1.5,<br>orientation: <a title="scenariogeneration.xodr.enumerations.Orientation" href="enumerations.html#scenariogeneration.xodr.enumerations.Orientation">Orientation</a> = Orientation.positive,<br>hOffset: float = 0,<br>pitch: float = 0,<br>roll: float = 0,<br>height: float | None = None,<br>width: float | None = None,<br>length: float | None = None)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -1646,128 +2467,141 @@ restrictions (string): restrictions of the parking space (optional)
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Signal(_SignalObjectBase):
-    &#34;&#34;&#34;Signal defines the signal element in Opendrive
+    &#34;&#34;&#34;Signal defines the signal element in OpenDRIVE.
 
     Attributes
     ----------
-        s (float): s-coordinate of Signal (init in base class)
-
-        t (float): t-coordinate of Signal (init in base class)
-
-        country (str): country code according to ISO 3166-1 (alpha-2 with two letters for OpenDRIVE 1.6, alpha-3 with three letters for OpenDRIVE 1.4)
-
-        countryRevision (str): defines the year of the applied traffic rules and may be necessary to ensure unique sign interpretation together with country, type and subtype (optional)
-
-        Type (SignalType or str): type of Signal (str) (init in base class)
-
-        subtype (string): subtype for further specification of Signal (init in base class)
-
-        id (string): id of Signal (init in base class)
-
-        name (string): name for identification of Signal (init in base class)
-
-        dynamic (Dynamic): specifies if Signal is static or dynamic (init in base class)
-
-        value (float): value for further specification of the signal
-
-        unit (str): unit, needs to be provided when value is given
-
-        zOffset (float): vertical offset of Signal with respect to centerline (init in base class)
-
-        orientation (Orientation): orientation of Signal with respect to road (init in base class)
-
-        hOffset (float): heading offset of the signal relative to orientation
-
-        pitch (float): pitch angle (rad) of Signal relative to the inertial system (xy-plane) (init in base class)
-
-        roll (float): roll angle (rad) of Signal after applying pitch, relative to the inertial system (x’’y’’-plane) (init in base class)
-
-        width (float): width of the Signal (init in base class)
-
-        height (float): height of Signal (init in base class)
-
-        length (float): length of the Signal (init in base class)
-
-        validity (Validity): explicit validity information for a signal (optional)
+    s : float
+        s-coordinate of the Signal (inherited from base class).
+    t : float
+        t-coordinate of the Signal (inherited from base class).
+    country : str
+        Country code according to ISO 3166-1 (alpha-2 for OpenDRIVE 1.6,
+        alpha-3 for OpenDRIVE 1.4).
+    countryRevision : str, optional
+        Year of the applied traffic rules, ensuring unique sign
+        interpretation with country, type, and subtype.
+    Type : SignalType or str
+        Type of the Signal (inherited from base class).
+    subtype : str
+        Subtype for further specification of the Signal (inherited from
+        base class).
+    id : str, optional
+        ID of the Signal (inherited from base class).
+    name : str, optional
+        Name for identification of the Signal (inherited from base class).
+    dynamic : Dynamic
+        Specifies if the Signal is static or dynamic (inherited from base
+        class).
+    value : float, optional
+        Value for further specification of the Signal.
+    unit : str, optional
+        Unit of the value, required if `value` is provided.
+    zOffset : float
+        Vertical offset of the Signal with respect to the centerline
+        (inherited from base class).
+    orientation : Orientation
+        Orientation of the Signal with respect to the road (inherited from
+        base class).
+    hOffset : float
+        Heading offset of the Signal relative to its orientation.
+    pitch : float
+        Pitch angle (rad) of the Signal relative to the inertial system
+        (inherited from base class).
+    roll : float
+        Roll angle (rad) of the Signal after applying pitch (inherited
+        from base class).
+    width : float, optional
+        Width of the Signal (inherited from base class).
+    height : float, optional
+        Height of the Signal (inherited from base class).
+    length : float, optional
+        Length of the Signal (inherited from base class).
+    validity : Validity, optional
+        Explicit validity information for the Signal.
 
     Methods
     -------
-        get_element()
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
-        add_validity(fromLane, toLane)
-            Adds a new validity between fromLane to toLane
-
+    get_element()
+        Returns the full ElementTree representation of the Signal.
+    get_attributes()
+        Returns a dictionary of all attributes of the Signal.
+    add_validity(fromLane, toLane)
+        Adds a new validity range for the Signal.
     &#34;&#34;&#34;
 
     def __init__(
         self,
-        s,
-        t,
-        country,
-        Type,
-        subtype=&#34;-1&#34;,
-        countryRevision=None,
-        id=None,
-        name=None,
-        dynamic=Dynamic.no,
-        value=None,
-        unit=None,
-        zOffset=1.5,
-        orientation=Orientation.positive,
-        hOffset=0,
-        pitch=0,
-        roll=0,
-        height=None,
-        width=None,
-        length=None,
-    ):
-        &#34;&#34;&#34;initalizes the Signal
+        s: float,
+        t: float,
+        country: str,
+        Type: Union[ObjectType, str],
+        subtype: str = &#34;-1&#34;,
+        countryRevision: Optional[str] = None,
+        id: Optional[str] = None,
+        name: Optional[str] = None,
+        dynamic: Dynamic = Dynamic.no,
+        value: Optional[float] = None,
+        unit: Optional[str] = None,
+        zOffset: float = 1.5,
+        orientation: Orientation = Orientation.positive,
+        hOffset: float = 0,
+        pitch: float = 0,
+        roll: float = 0,
+        height: Optional[float] = None,
+        width: Optional[float] = None,
+        length: Optional[float] = None,
+    ) -&gt; None:
+        &#34;&#34;&#34;Initialize the Signal.
 
         Parameters
         ----------
-            s (float): s-coordinate of Signal (init in base class)
-
-            t (float): t-coordinate of Signal (init in base class)
-
-            country (str): country code according to ISO 3166-1 (alpha-2 with two letters for OpenDRIVE 1.6, alpha-3 with three letters for OpenDRIVE 1.4)
-
-            countryRevision (str): defines the year of the applied traffic rules and may be necessary to ensure unique sign interpretation together with country, type and subtype (optional)
-
-            Type (SignalType or str): type of Signal (str) (init in base class)
-
-            subtype (string): subtype for further specification of Signal (init in base class)
-                Default: &#34;-1&#34;
-            id (string): id of Signal (init in base class)
-                Default: None
-            name (string): name for identification of Signal (init in base class)
-                Default: None
-            dynamic (Dynamic): specifies if Signal is static or dynamic (init in base class)
-                Default: Dynamic.no
-            value (float): value for further specification of the signal
-                Default: None
-            unit (str): unit, needs to be provided when value is given
-                Default: None
-            zOffset (float): vertical offset of Signal with respect to centerline (init in base class)
-                Default: 0
-            orientation (Orientation): orientation of Signal with respect to road (init in base class)
-                Default: Orientation.none
-            hOffset (float): heading offset of the signal relative to orientation
-                Default: 0
-            pitch (float): pitch angle (rad) of Signal relative to the inertial system (xy-plane) (init in base class)
-                Default: 0
-            roll (float): roll angle (rad) of Signal after applying pitch, relative to the inertial system (x’’y’’-plane) (init in base class)
-                Default: 0
-            width (float): width of the Signal (init in base class)
-                Default: None
-            height (float): height of Signal (init in base class)
-                Default: None
-            length (float): length of the Signal (init in base class)
-                Default: None
-
+        s : float
+            s-coordinate of the Signal.
+        t : float
+            t-coordinate of the Signal.
+        country : str
+            Country code according to ISO 3166-1 (alpha-2 for OpenDRIVE 1.6,
+            alpha-3 for OpenDRIVE 1.4).
+        Type : SignalType or str
+            Type of the Signal.
+        subtype : str, optional
+            Subtype for further specification of the Signal. Default is &#34;-1&#34;.
+        countryRevision : str, optional
+            Year of the applied traffic rules. Default is None.
+        id : str, optional
+            ID of the Signal. Default is None.
+        name : str, optional
+            Name for identification of the Signal. Default is None.
+        dynamic : Dynamic, optional
+            Specifies if the Signal is static or dynamic. Default is
+            Dynamic.no.
+        value : float, optional
+            Value for further specification of the Signal. Default is None.
+        unit : str, optional
+            Unit of the value, required if `value` is provided. Default is
+            None.
+        zOffset : float, optional
+            Vertical offset of the Signal with respect to the centerline.
+            Default is 1.5.
+        orientation : Orientation, optional
+            Orientation of the Signal with respect to the road. Default is
+            Orientation.positive.
+        hOffset : float, optional
+            Heading offset of the Signal relative to its orientation.
+            Default is 0.
+        pitch : float, optional
+            Pitch angle (rad) of the Signal relative to the inertial system.
+            Default is 0.
+        roll : float, optional
+            Roll angle (rad) of the Signal after applying pitch. Default is
+            0.
+        height : float, optional
+            Height of the Signal. Default is None.
+        width : float, optional
+            Width of the Signal. Default is None.
+        length : float, optional
+            Length of the Signal. Default is None.
         &#34;&#34;&#34;
 
         # get attributes that are common with signals
@@ -1801,13 +2635,20 @@ restrictions (string): restrictions of the parking space (optional)
         self.hOffset = hOffset
         self.validity = None
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -&gt; bool:
         if isinstance(other, Signal) and super().__eq__(other):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
 
-    def get_attributes(self):
+    def get_attributes(self) -&gt; dict[str, str]:
+        &#34;&#34;&#34;Return the attributes of the Signal as a dictionary.
+
+        Returns
+        -------
+        dict[str, str]
+            A dictionary containing the attributes of the Signal.
+        &#34;&#34;&#34;
         retdict = super().get_common_attributes()
         retdict[&#34;country&#34;] = str(self.country).upper()
         retdict[&#34;type&#34;] = str(self.type)
@@ -1825,112 +2666,154 @@ restrictions (string): restrictions of the parking space (optional)
             retdict[&#34;unit&#34;] = str(self.unit)
         return retdict
 
-    def add_validity(self, fromLane, toLane):
+    def add_validity(self, fromLane: int, toLane: int) -&gt; &#34;Signal&#34;:
+        &#34;&#34;&#34;Add a validity range to the Signal.
+
+        Parameters
+        ----------
+        fromLane : int
+            The starting lane for the validity range.
+        toLane : int
+            The ending lane for the validity range.
+
+        Returns
+        -------
+        Signal
+            The updated Signal object.
+
+        Raises
+        ------
+        ValueError
+            If a validity range is already set for the Signal.
+        &#34;&#34;&#34;
         if self.validity:
             raise ValueError(&#34;only one validity is allowed&#34;)
         self.validity = Validity(fromLane, toLane)
         return self
 
-    def get_element(self):
+    def get_element(self) -&gt; ET.Element:
+        &#34;&#34;&#34;Return the ElementTree representation of the Signal.
+
+        Returns
+        -------
+        ET.Element
+            The XML ElementTree representation of the Signal.
+        &#34;&#34;&#34;
         element = ET.Element(&#34;signal&#34;, attrib=self.get_attributes())
         self._add_additional_data_to_element(element)
         if self.validity:
             element.append(self.validity.get_element())
         return element</code></pre>
 </details>
-<div class="desc"><p>Signal defines the signal element in Opendrive</p>
+<div class="desc"><p>Signal defines the signal element in OpenDRIVE.</p>
 <h2 id="attributes">Attributes</h2>
-<pre><code>s (float): s-coordinate of Signal (init in base class)
-
-t (float): t-coordinate of Signal (init in base class)
-
-country (str): country code according to ISO 3166-1 (alpha-2 with two letters for OpenDRIVE 1.6, alpha-3 with three letters for OpenDRIVE 1.4)
-
-countryRevision (str): defines the year of the applied traffic rules and may be necessary to ensure unique sign interpretation together with country, type and subtype (optional)
-
-Type (SignalType or str): type of Signal (str) (init in base class)
-
-subtype (string): subtype for further specification of Signal (init in base class)
-
-id (string): id of Signal (init in base class)
-
-name (string): name for identification of Signal (init in base class)
-
-dynamic (Dynamic): specifies if Signal is static or dynamic (init in base class)
-
-value (float): value for further specification of the signal
-
-unit (str): unit, needs to be provided when value is given
-
-zOffset (float): vertical offset of Signal with respect to centerline (init in base class)
-
-orientation (Orientation): orientation of Signal with respect to road (init in base class)
-
-hOffset (float): heading offset of the signal relative to orientation
-
-pitch (float): pitch angle (rad) of Signal relative to the inertial system (xy-plane) (init in base class)
-
-roll (float): roll angle (rad) of Signal after applying pitch, relative to the inertial system (x’’y’’-plane) (init in base class)
-
-width (float): width of the Signal (init in base class)
-
-height (float): height of Signal (init in base class)
-
-length (float): length of the Signal (init in base class)
-
-validity (Validity): explicit validity information for a signal (optional)
-</code></pre>
+<dl>
+<dt><strong><code>s</code></strong> :&ensp;<code>float</code></dt>
+<dd>s-coordinate of the Signal (inherited from base class).</dd>
+<dt><strong><code>t</code></strong> :&ensp;<code>float</code></dt>
+<dd>t-coordinate of the Signal (inherited from base class).</dd>
+<dt><strong><code>country</code></strong> :&ensp;<code>str</code></dt>
+<dd>Country code according to ISO 3166-1 (alpha-2 for OpenDRIVE 1.6,
+alpha-3 for OpenDRIVE 1.4).</dd>
+<dt><strong><code>countryRevision</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Year of the applied traffic rules, ensuring unique sign
+interpretation with country, type, and subtype.</dd>
+<dt><strong><code>Type</code></strong> :&ensp;<code>SignalType</code> or <code>str</code></dt>
+<dd>Type of the Signal (inherited from base class).</dd>
+<dt><strong><code>subtype</code></strong> :&ensp;<code>str</code></dt>
+<dd>Subtype for further specification of the Signal (inherited from
+base class).</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>ID of the Signal (inherited from base class).</dd>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Name for identification of the Signal (inherited from base class).</dd>
+<dt><strong><code>dynamic</code></strong> :&ensp;<code>Dynamic</code></dt>
+<dd>Specifies if the Signal is static or dynamic (inherited from base
+class).</dd>
+<dt><strong><code>value</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Value for further specification of the Signal.</dd>
+<dt><strong><code>unit</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Unit of the value, required if <code>value</code> is provided.</dd>
+<dt><strong><code>zOffset</code></strong> :&ensp;<code>float</code></dt>
+<dd>Vertical offset of the Signal with respect to the centerline
+(inherited from base class).</dd>
+<dt><strong><code>orientation</code></strong> :&ensp;<code>Orientation</code></dt>
+<dd>Orientation of the Signal with respect to the road (inherited from
+base class).</dd>
+<dt><strong><code>hOffset</code></strong> :&ensp;<code>float</code></dt>
+<dd>Heading offset of the Signal relative to its orientation.</dd>
+<dt><strong><code>pitch</code></strong> :&ensp;<code>float</code></dt>
+<dd>Pitch angle (rad) of the Signal relative to the inertial system
+(inherited from base class).</dd>
+<dt><strong><code>roll</code></strong> :&ensp;<code>float</code></dt>
+<dd>Roll angle (rad) of the Signal after applying pitch (inherited
+from base class).</dd>
+<dt><strong><code>width</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Width of the Signal (inherited from base class).</dd>
+<dt><strong><code>height</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Height of the Signal (inherited from base class).</dd>
+<dt><strong><code>length</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Length of the Signal (inherited from base class).</dd>
+<dt><strong><code>validity</code></strong> :&ensp;<code><a title="scenariogeneration.xodr.signals_objects.Validity" href="#scenariogeneration.xodr.signals_objects.Validity">Validity</a></code>, optional</dt>
+<dd>Explicit validity information for the Signal.</dd>
+</dl>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
-    Returns the full ElementTree of the class
-
+<p>get_element()
+Returns the full ElementTree representation of the Signal.
 get_attributes()
-    Returns a dictionary of all attributes of the class
-
+Returns a dictionary of all attributes of the Signal.
 add_validity(fromLane, toLane)
-    Adds a new validity between fromLane to toLane
-</code></pre>
-<p>initalizes the Signal</p>
+Adds a new validity range for the Signal.</p>
+<p>Initialize the Signal.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>s (float): s-coordinate of Signal (init in base class)
-
-t (float): t-coordinate of Signal (init in base class)
-
-country (str): country code according to ISO 3166-1 (alpha-2 with two letters for OpenDRIVE 1.6, alpha-3 with three letters for OpenDRIVE 1.4)
-
-countryRevision (str): defines the year of the applied traffic rules and may be necessary to ensure unique sign interpretation together with country, type and subtype (optional)
-
-Type (SignalType or str): type of Signal (str) (init in base class)
-
-subtype (string): subtype for further specification of Signal (init in base class)
-    Default: "-1"
-id (string): id of Signal (init in base class)
-    Default: None
-name (string): name for identification of Signal (init in base class)
-    Default: None
-dynamic (Dynamic): specifies if Signal is static or dynamic (init in base class)
-    Default: Dynamic.no
-value (float): value for further specification of the signal
-    Default: None
-unit (str): unit, needs to be provided when value is given
-    Default: None
-zOffset (float): vertical offset of Signal with respect to centerline (init in base class)
-    Default: 0
-orientation (Orientation): orientation of Signal with respect to road (init in base class)
-    Default: Orientation.none
-hOffset (float): heading offset of the signal relative to orientation
-    Default: 0
-pitch (float): pitch angle (rad) of Signal relative to the inertial system (xy-plane) (init in base class)
-    Default: 0
-roll (float): roll angle (rad) of Signal after applying pitch, relative to the inertial system (x’’y’’-plane) (init in base class)
-    Default: 0
-width (float): width of the Signal (init in base class)
-    Default: None
-height (float): height of Signal (init in base class)
-    Default: None
-length (float): length of the Signal (init in base class)
-    Default: None
-</code></pre></div>
+<dl>
+<dt><strong><code>s</code></strong> :&ensp;<code>float</code></dt>
+<dd>s-coordinate of the Signal.</dd>
+<dt><strong><code>t</code></strong> :&ensp;<code>float</code></dt>
+<dd>t-coordinate of the Signal.</dd>
+<dt><strong><code>country</code></strong> :&ensp;<code>str</code></dt>
+<dd>Country code according to ISO 3166-1 (alpha-2 for OpenDRIVE 1.6,
+alpha-3 for OpenDRIVE 1.4).</dd>
+<dt><strong><code>Type</code></strong> :&ensp;<code>SignalType</code> or <code>str</code></dt>
+<dd>Type of the Signal.</dd>
+<dt><strong><code>subtype</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Subtype for further specification of the Signal. Default is "-1".</dd>
+<dt><strong><code>countryRevision</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Year of the applied traffic rules. Default is None.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>ID of the Signal. Default is None.</dd>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Name for identification of the Signal. Default is None.</dd>
+<dt><strong><code>dynamic</code></strong> :&ensp;<code>Dynamic</code>, optional</dt>
+<dd>Specifies if the Signal is static or dynamic. Default is
+Dynamic.no.</dd>
+<dt><strong><code>value</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Value for further specification of the Signal. Default is None.</dd>
+<dt><strong><code>unit</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Unit of the value, required if <code>value</code> is provided. Default is
+None.</dd>
+<dt><strong><code>zOffset</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Vertical offset of the Signal with respect to the centerline.
+Default is 1.5.</dd>
+<dt><strong><code>orientation</code></strong> :&ensp;<code>Orientation</code>, optional</dt>
+<dd>Orientation of the Signal with respect to the road. Default is
+Orientation.positive.</dd>
+<dt><strong><code>hOffset</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Heading offset of the Signal relative to its orientation.
+Default is 0.</dd>
+<dt><strong><code>pitch</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Pitch angle (rad) of the Signal relative to the inertial system.
+Default is 0.</dd>
+<dt><strong><code>roll</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Roll angle (rad) of the Signal after applying pitch. Default is
+0.</dd>
+<dt><strong><code>height</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Height of the Signal. Default is None.</dd>
+<dt><strong><code>width</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Width of the Signal. Default is None.</dd>
+<dt><strong><code>length</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Length of the Signal. Default is None.</dd>
+</dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>scenariogeneration.xodr.signals_objects._SignalObjectBase</li>
@@ -1939,30 +2822,73 @@ length (float): length of the Signal (init in base class)
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.signals_objects.Signal.add_validity"><code class="name flex">
-<span>def <span class="ident">add_validity</span></span>(<span>self, fromLane, toLane)</span>
+<span>def <span class="ident">add_validity</span></span>(<span>self, fromLane: int, toLane: int) ‑> <a title="scenariogeneration.xodr.signals_objects.Signal" href="#scenariogeneration.xodr.signals_objects.Signal">Signal</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_validity(self, fromLane, toLane):
+<pre><code class="python">def add_validity(self, fromLane: int, toLane: int) -&gt; &#34;Signal&#34;:
+    &#34;&#34;&#34;Add a validity range to the Signal.
+
+    Parameters
+    ----------
+    fromLane : int
+        The starting lane for the validity range.
+    toLane : int
+        The ending lane for the validity range.
+
+    Returns
+    -------
+    Signal
+        The updated Signal object.
+
+    Raises
+    ------
+    ValueError
+        If a validity range is already set for the Signal.
+    &#34;&#34;&#34;
     if self.validity:
         raise ValueError(&#34;only one validity is allowed&#34;)
     self.validity = Validity(fromLane, toLane)
     return self</code></pre>
 </details>
-<div class="desc"></div>
+<div class="desc"><p>Add a validity range to the Signal.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>fromLane</code></strong> :&ensp;<code>int</code></dt>
+<dd>The starting lane for the validity range.</dd>
+<dt><strong><code>toLane</code></strong> :&ensp;<code>int</code></dt>
+<dd>The ending lane for the validity range.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="scenariogeneration.xodr.signals_objects.Signal" href="#scenariogeneration.xodr.signals_objects.Signal">Signal</a></code></dt>
+<dd>The updated Signal object.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If a validity range is already set for the Signal.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.Signal.get_attributes"><code class="name flex">
-<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+<span>def <span class="ident">get_attributes</span></span>(<span>self) ‑> dict[str, str]</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_attributes(self):
+<pre><code class="python">def get_attributes(self) -&gt; dict[str, str]:
+    &#34;&#34;&#34;Return the attributes of the Signal as a dictionary.
+
+    Returns
+    -------
+    dict[str, str]
+        A dictionary containing the attributes of the Signal.
+    &#34;&#34;&#34;
     retdict = super().get_common_attributes()
     retdict[&#34;country&#34;] = str(self.country).upper()
     retdict[&#34;type&#34;] = str(self.type)
@@ -1980,24 +2906,41 @@ length (float): length of the Signal (init in base class)
         retdict[&#34;unit&#34;] = str(self.unit)
     return retdict</code></pre>
 </details>
-<div class="desc"></div>
+<div class="desc"><p>Return the attributes of the Signal as a dictionary.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict[str, str]</code></dt>
+<dd>A dictionary containing the attributes of the Signal.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.Signal.get_element"><code class="name flex">
-<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+<span>def <span class="ident">get_element</span></span>(<span>self) ‑> xml.etree.ElementTree.Element</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_element(self):
+<pre><code class="python">def get_element(self) -&gt; ET.Element:
+    &#34;&#34;&#34;Return the ElementTree representation of the Signal.
+
+    Returns
+    -------
+    ET.Element
+        The XML ElementTree representation of the Signal.
+    &#34;&#34;&#34;
     element = ET.Element(&#34;signal&#34;, attrib=self.get_attributes())
     self._add_additional_data_to_element(element)
     if self.validity:
         element.append(self.validity.get_element())
     return element</code></pre>
 </details>
-<div class="desc"></div>
+<div class="desc"><p>Return the ElementTree representation of the Signal.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ET.Element</code></dt>
+<dd>The XML ElementTree representation of the Signal.</dd>
+</dl></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -2012,7 +2955,7 @@ length (float): length of the Signal (init in base class)
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.SignalReference"><code class="flex name class">
 <span>class <span class="ident">SignalReference</span></span>
-<span>(</span><span>s, t, id=None, orientation=Orientation.positive)</span>
+<span>(</span><span>s: float,<br>t: float,<br>id: str | None = None,<br>orientation: <a title="scenariogeneration.xodr.enumerations.Orientation" href="enumerations.html#scenariogeneration.xodr.enumerations.Orientation">Orientation</a> = Orientation.positive)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -2020,44 +2963,38 @@ length (float): length of the Signal (init in base class)
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class SignalReference(XodrBase):
-    &#34;&#34;&#34;Signal defines the signal element in Opendrive
+    &#34;&#34;&#34;SignalReference defines the signal reference element in OpenDRIVE.
 
     Attributes
     ----------
-        s (float): s-coordinate of Signal (init in base class)
-
-        t (float): t-coordinate of Signal (init in base class)
-
-        id (string): id of Signal (init in base class)
-
-        orientation (Orientation): orientation of Signal with respect to road (init in base class)
-
-        validity (Validity): explicit validity information for a signal (optional)
-
-        _usedIDs ({[str]}): dictionary with list of used IDs, keys are class name SignalReference.
-        Shared to auto-generate unique IDs.
-
-        _IDCounter ({int}): dictionary with counter for auto-generation of IDs, keys are class name SignalReference.
-        Shared to auto-generate unique IDs.
+    s : float
+        s-coordinate of the SignalReference.
+    t : float
+        t-coordinate of the SignalReference.
+    id : str, optional
+        ID of the SignalReference.
+    orientation : Orientation
+        Orientation of the SignalReference with respect to the road.
+    validity : Validity, optional
+        Explicit validity information for the SignalReference.
+    _usedIDs : dict[str, list[str]]
+        Dictionary with a list of used IDs. Keys are class names of
+        SignalReference. Shared to auto-generate unique IDs.
+    _IDCounter : dict[str, int]
+        Dictionary with counters for auto-generation of IDs. Keys are
+        class names of SignalReference. Shared to auto-generate unique IDs.
 
     Methods
     -------
-        get_element()
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
-        add_validity(fromLane, toLane)
-            Adds a new validity between fromLane to toLane
-
-        get_common_attributes()
-            Returns a dictionary of all attributes of FileHeader
-
-        _update_id()
-            Ensures that an ID is assigned if none was provided and that provided IDs are unique
-            Should be called when adding an Object or Signal to the road
-
+    get_element()
+        Returns the full ElementTree representation of the SignalReference.
+    get_attributes()
+        Returns a dictionary of all attributes of the SignalReference.
+    add_validity(fromLane, toLane)
+        Adds a new validity range for the SignalReference.
+    _update_id()
+        Ensures that an ID is assigned if none was provided and that
+        provided IDs are unique.
     &#34;&#34;&#34;
 
     _usedIDs = {}
@@ -2065,25 +3002,24 @@ length (float): length of the Signal (init in base class)
 
     def __init__(
         self,
-        s,
-        t,
-        id=None,
-        orientation=Orientation.positive,
-    ):
-        &#34;&#34;&#34;initalizes the Signal
+        s: float,
+        t: float,
+        id: Optional[str] = None,
+        orientation: Orientation = Orientation.positive,
+    ) -&gt; None:
+        &#34;&#34;&#34;Initialize the SignalReference.
 
         Parameters
         ----------
-            s (float): s-coordinate of SignalReference
-
-            t (float): t-coordinate of SignalReference
-
-            id (string): id of SignalReference
-                Default: None
-
-            orientation (Orientation): orientation of SignalReference with respect to road
-                Default: Orientation.none
-
+        s : float
+            s-coordinate of the SignalReference.
+        t : float
+            t-coordinate of the SignalReference.
+        id : str, optional
+            ID of the SignalReference. Default is None.
+        orientation : Orientation, optional
+            Orientation of the SignalReference with respect to the road.
+            Default is Orientation.positive.
         &#34;&#34;&#34;
 
         # get attributes that are common with signals
@@ -2094,13 +3030,15 @@ length (float): length of the Signal (init in base class)
         self.validity = None
         self.id = id
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -&gt; bool:
         if isinstance(other, SignalReference) and super().__eq__(other):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
 
-    def _update_id(self):
+    def _update_id(self) -&gt; None:
+        &#34;&#34;&#34;Ensure that an ID is assigned if none was provided and that
+        provided IDs are unique.&#34;&#34;&#34;
         # ensure unique IDs
         try:
             if str(self.id) in self._usedIDs[self.__class__.__name__]:
@@ -2116,7 +3054,9 @@ length (float): length of the Signal (init in base class)
             self._usedIDs[self.__class__.__name__] = []
             self._IDCounter[self.__class__.__name__] = 0
 
-        if self.id == None or (str(self.id) in self._usedIDs[self.__class__.__name__]):
+        if self.id == None or (
+            str(self.id) in self._usedIDs[self.__class__.__name__]
+        ):
             while (
                 str(self._IDCounter[self.__class__.__name__])
                 in self._usedIDs[self.__class__.__name__]
@@ -2126,8 +3066,14 @@ length (float): length of the Signal (init in base class)
 
         self._usedIDs[self.__class__.__name__].append(str(self.id))
 
-    def get_attributes(self):
-        &#34;&#34;&#34;returns attributes of SignalReference as a dict&#34;&#34;&#34;
+    def get_attributes(self) -&gt; dict[str, str]:
+        &#34;&#34;&#34;Return the attributes of the SignalReference as a dictionary.
+
+        Returns
+        -------
+        dict[str, str]
+            A dictionary containing the attributes of the SignalReference.
+        &#34;&#34;&#34;
         retdict = {}
         retdict[&#34;id&#34;] = str(self.id)
         retdict[&#34;s&#34;] = str(self.s)
@@ -2141,66 +3087,88 @@ length (float): length of the Signal (init in base class)
 
         return retdict
 
-    def add_validity(self, fromLane, toLane):
+    def add_validity(self, fromLane: int, toLane: int) -&gt; &#34;SignalReference&#34;:
+        &#34;&#34;&#34;Add a validity range to the SignalReference.
+
+        Parameters
+        ----------
+        fromLane : int
+            The starting lane for the validity range.
+        toLane : int
+            The ending lane for the validity range.
+
+        Returns
+        -------
+        SignalReference
+            The updated SignalReference object.
+
+        Raises
+        ------
+        ValueError
+            If a validity range is already set for the SignalReference.
+        &#34;&#34;&#34;
         if self.validity:
             raise ValueError(&#34;only one validity is allowed&#34;)
         self.validity = Validity(fromLane, toLane)
         return self
 
-    def get_element(self):
+    def get_element(self) -&gt; ET.Element:
+        &#34;&#34;&#34;Return the ElementTree representation of the SignalReference.
+
+        Returns
+        -------
+        ET.Element
+            The XML ElementTree representation of the SignalReference.
+        &#34;&#34;&#34;
         element = ET.Element(&#34;signalReference&#34;, attrib=self.get_attributes())
         self._add_additional_data_to_element(element)
         if self.validity:
             element.append(self.validity.get_element())
         return element</code></pre>
 </details>
-<div class="desc"><p>Signal defines the signal element in Opendrive</p>
+<div class="desc"><p>SignalReference defines the signal reference element in OpenDRIVE.</p>
 <h2 id="attributes">Attributes</h2>
-<pre><code>s (float): s-coordinate of Signal (init in base class)
-
-t (float): t-coordinate of Signal (init in base class)
-
-id (string): id of Signal (init in base class)
-
-orientation (Orientation): orientation of Signal with respect to road (init in base class)
-
-validity (Validity): explicit validity information for a signal (optional)
-
-_usedIDs ({[str]}): dictionary with list of used IDs, keys are class name SignalReference.
-Shared to auto-generate unique IDs.
-
-_IDCounter ({int}): dictionary with counter for auto-generation of IDs, keys are class name SignalReference.
-Shared to auto-generate unique IDs.
-</code></pre>
+<dl>
+<dt><strong><code>s</code></strong> :&ensp;<code>float</code></dt>
+<dd>s-coordinate of the SignalReference.</dd>
+<dt><strong><code>t</code></strong> :&ensp;<code>float</code></dt>
+<dd>t-coordinate of the SignalReference.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>ID of the SignalReference.</dd>
+<dt><strong><code>orientation</code></strong> :&ensp;<code>Orientation</code></dt>
+<dd>Orientation of the SignalReference with respect to the road.</dd>
+<dt><strong><code>validity</code></strong> :&ensp;<code><a title="scenariogeneration.xodr.signals_objects.Validity" href="#scenariogeneration.xodr.signals_objects.Validity">Validity</a></code>, optional</dt>
+<dd>Explicit validity information for the SignalReference.</dd>
+<dt><strong><code>_usedIDs</code></strong> :&ensp;<code>dict[str, list[str]]</code></dt>
+<dd>Dictionary with a list of used IDs. Keys are class names of
+SignalReference. Shared to auto-generate unique IDs.</dd>
+<dt><strong><code>_IDCounter</code></strong> :&ensp;<code>dict[str, int]</code></dt>
+<dd>Dictionary with counters for auto-generation of IDs. Keys are
+class names of SignalReference. Shared to auto-generate unique IDs.</dd>
+</dl>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
-    Returns the full ElementTree of the class
-
+<p>get_element()
+Returns the full ElementTree representation of the SignalReference.
 get_attributes()
-    Returns a dictionary of all attributes of the class
-
+Returns a dictionary of all attributes of the SignalReference.
 add_validity(fromLane, toLane)
-    Adds a new validity between fromLane to toLane
-
-get_common_attributes()
-    Returns a dictionary of all attributes of FileHeader
-
+Adds a new validity range for the SignalReference.
 _update_id()
-    Ensures that an ID is assigned if none was provided and that provided IDs are unique
-    Should be called when adding an Object or Signal to the road
-</code></pre>
-<p>initalizes the Signal</p>
+Ensures that an ID is assigned if none was provided and that
+provided IDs are unique.</p>
+<p>Initialize the SignalReference.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>s (float): s-coordinate of SignalReference
-
-t (float): t-coordinate of SignalReference
-
-id (string): id of SignalReference
-    Default: None
-
-orientation (Orientation): orientation of SignalReference with respect to road
-    Default: Orientation.none
-</code></pre></div>
+<dl>
+<dt><strong><code>s</code></strong> :&ensp;<code>float</code></dt>
+<dd>s-coordinate of the SignalReference.</dd>
+<dt><strong><code>t</code></strong> :&ensp;<code>float</code></dt>
+<dd>t-coordinate of the SignalReference.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>ID of the SignalReference. Default is None.</dd>
+<dt><strong><code>orientation</code></strong> :&ensp;<code>Orientation</code>, optional</dt>
+<dd>Orientation of the SignalReference with respect to the road.
+Default is Orientation.positive.</dd>
+</dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
@@ -2208,31 +3176,73 @@ orientation (Orientation): orientation of SignalReference with respect to road
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.signals_objects.SignalReference.add_validity"><code class="name flex">
-<span>def <span class="ident">add_validity</span></span>(<span>self, fromLane, toLane)</span>
+<span>def <span class="ident">add_validity</span></span>(<span>self, fromLane: int, toLane: int) ‑> <a title="scenariogeneration.xodr.signals_objects.SignalReference" href="#scenariogeneration.xodr.signals_objects.SignalReference">SignalReference</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_validity(self, fromLane, toLane):
+<pre><code class="python">def add_validity(self, fromLane: int, toLane: int) -&gt; &#34;SignalReference&#34;:
+    &#34;&#34;&#34;Add a validity range to the SignalReference.
+
+    Parameters
+    ----------
+    fromLane : int
+        The starting lane for the validity range.
+    toLane : int
+        The ending lane for the validity range.
+
+    Returns
+    -------
+    SignalReference
+        The updated SignalReference object.
+
+    Raises
+    ------
+    ValueError
+        If a validity range is already set for the SignalReference.
+    &#34;&#34;&#34;
     if self.validity:
         raise ValueError(&#34;only one validity is allowed&#34;)
     self.validity = Validity(fromLane, toLane)
     return self</code></pre>
 </details>
-<div class="desc"></div>
+<div class="desc"><p>Add a validity range to the SignalReference.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>fromLane</code></strong> :&ensp;<code>int</code></dt>
+<dd>The starting lane for the validity range.</dd>
+<dt><strong><code>toLane</code></strong> :&ensp;<code>int</code></dt>
+<dd>The ending lane for the validity range.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="scenariogeneration.xodr.signals_objects.SignalReference" href="#scenariogeneration.xodr.signals_objects.SignalReference">SignalReference</a></code></dt>
+<dd>The updated SignalReference object.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If a validity range is already set for the SignalReference.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.SignalReference.get_attributes"><code class="name flex">
-<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+<span>def <span class="ident">get_attributes</span></span>(<span>self) ‑> dict[str, str]</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34;returns attributes of SignalReference as a dict&#34;&#34;&#34;
+<pre><code class="python">def get_attributes(self) -&gt; dict[str, str]:
+    &#34;&#34;&#34;Return the attributes of the SignalReference as a dictionary.
+
+    Returns
+    -------
+    dict[str, str]
+        A dictionary containing the attributes of the SignalReference.
+    &#34;&#34;&#34;
     retdict = {}
     retdict[&#34;id&#34;] = str(self.id)
     retdict[&#34;s&#34;] = str(self.s)
@@ -2246,24 +3256,41 @@ orientation (Orientation): orientation of SignalReference with respect to road
 
     return retdict</code></pre>
 </details>
-<div class="desc"><p>returns attributes of SignalReference as a dict</p></div>
+<div class="desc"><p>Return the attributes of the SignalReference as a dictionary.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict[str, str]</code></dt>
+<dd>A dictionary containing the attributes of the SignalReference.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.SignalReference.get_element"><code class="name flex">
-<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+<span>def <span class="ident">get_element</span></span>(<span>self) ‑> xml.etree.ElementTree.Element</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_element(self):
+<pre><code class="python">def get_element(self) -&gt; ET.Element:
+    &#34;&#34;&#34;Return the ElementTree representation of the SignalReference.
+
+    Returns
+    -------
+    ET.Element
+        The XML ElementTree representation of the SignalReference.
+    &#34;&#34;&#34;
     element = ET.Element(&#34;signalReference&#34;, attrib=self.get_attributes())
     self._add_additional_data_to_element(element)
     if self.validity:
         element.append(self.validity.get_element())
     return element</code></pre>
 </details>
-<div class="desc"></div>
+<div class="desc"><p>Return the ElementTree representation of the SignalReference.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ET.Element</code></dt>
+<dd>The XML ElementTree representation of the SignalReference.</dd>
+</dl></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -2290,28 +3317,27 @@ orientation (Orientation): orientation of SignalReference with respect to road
 
     Attributes
     ----------
-        s (float): s-coordinate of tunnel
-
-        length (float): length of tunnel
-
-        id (string): id of tunnel
-
-        name (string): name of the tunnel
-
-        tunnel_type (TunnelType): type of tunnel
-
-        daylight (float): value between 0.0 and 1.0 (application specific)
-
-        lighting (float): value between 0.0 and 1.0 (application specific)
+    s : float
+        s-coordinate of the tunnel.
+    length : float
+        Length of the tunnel.
+    id : str
+        ID of the tunnel.
+    name : str
+        Name of the tunnel.
+    tunnel_type : TunnelType
+        Type of the tunnel.
+    daylight : float
+        Value between 0.0 and 1.0 (application-specific).
+    lighting : float
+        Value between 0.0 and 1.0 (application-specific).
 
     Methods
     -------
-        get_element()
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all xml attributes
-
+    get_element()
+        Returns the full ElementTree representation of the Tunnel.
+    get_attributes()
+        Returns a dictionary of all XML attributes of the Tunnel.
     &#34;&#34;&#34;
 
     def __init__(
@@ -2323,25 +3349,25 @@ orientation (Orientation): orientation of SignalReference with respect to road
         tunnel_type: TunnelType = TunnelType.standard,
         daylight: float = 0.5,
         lighting: float = 0.5,
-    ):
-        &#34;&#34;&#34;Initialize a tunnel
+    ) -&gt; None:
+        &#34;&#34;&#34;Initialize a Tunnel.
 
         Parameters
         ----------
-            s (float): s-coordinate of tunnel
-
-            length (float): length of tunnel
-
-            id (string): id of tunnel
-
-            name (string): name of the tunnel
-
-            tunnel_type (TunnelType): type of tunnel
-                Default: TunnelType
-            daylight (float): value between 0.0 and 1.0 (application specific)
-                Default: 0.5
-            lighting (float): value between 0.0 and 1.0 (application specific)
-                Default: 0.5
+        s : float
+            s-coordinate of the tunnel.
+        length : float
+            Length of the tunnel.
+        id : str
+            ID of the tunnel.
+        name : str
+            Name of the tunnel.
+        tunnel_type : TunnelType, optional
+            Type of the tunnel. Default is TunnelType.standard.
+        daylight : float, optional
+            Value between 0.0 and 1.0 (application-specific). Default is 0.5.
+        lighting : float, optional
+            Value between 0.0 and 1.0 (application-specific). Default is 0.5.
         &#34;&#34;&#34;
         super().__init__()
         self.s = s
@@ -2352,14 +3378,20 @@ orientation (Orientation): orientation of SignalReference with respect to road
         self.daylight = daylight
         self.lighting = lighting
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -&gt; bool:
         if isinstance(other, Tunnel) and super().__eq__(other):
             if self.get_attributes() == other.get_attributes():
                 return True
         return False
 
-    def get_attributes(self):
-        &#34;&#34;&#34;Return a dictionary of all xml attributes&#34;&#34;&#34;
+    def get_attributes(self) -&gt; dict[str, str]:
+        &#34;&#34;&#34;Return a dictionary of all XML attributes of the Tunnel.
+
+        Returns
+        -------
+        dict[str, str]
+            A dictionary containing the attributes of the Tunnel.
+        &#34;&#34;&#34;
         retdict = {}
         retdict[&#34;s&#34;] = str(self.s)
         retdict[&#34;length&#34;] = str(self.length)
@@ -2370,51 +3402,58 @@ orientation (Orientation): orientation of SignalReference with respect to road
         retdict[&#34;lighting&#34;] = str(self.lighting)
         return retdict
 
-    def get_element(self):
-        &#34;&#34;&#34;Return the elementTree of the Tunnel&#34;&#34;&#34;
+    def get_element(self) -&gt; ET.Element:
+        &#34;&#34;&#34;Return the ElementTree representation of the Tunnel.
+
+        Returns
+        -------
+        ET.Element
+            The XML ElementTree representation of the Tunnel.
+        &#34;&#34;&#34;
         element = ET.Element(&#34;tunnel&#34;, attrib=self.get_attributes())
         return element</code></pre>
 </details>
 <div class="desc"><p>A tunnel road object (t_road_objects_tunnel).</p>
 <h2 id="attributes">Attributes</h2>
-<pre><code>s (float): s-coordinate of tunnel
-
-length (float): length of tunnel
-
-id (string): id of tunnel
-
-name (string): name of the tunnel
-
-tunnel_type (TunnelType): type of tunnel
-
-daylight (float): value between 0.0 and 1.0 (application specific)
-
-lighting (float): value between 0.0 and 1.0 (application specific)
-</code></pre>
+<dl>
+<dt><strong><code>s</code></strong> :&ensp;<code>float</code></dt>
+<dd>s-coordinate of the tunnel.</dd>
+<dt><strong><code>length</code></strong> :&ensp;<code>float</code></dt>
+<dd>Length of the tunnel.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>str</code></dt>
+<dd>ID of the tunnel.</dd>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
+<dd>Name of the tunnel.</dd>
+<dt><strong><code>tunnel_type</code></strong> :&ensp;<code>TunnelType</code></dt>
+<dd>Type of the tunnel.</dd>
+<dt><strong><code>daylight</code></strong> :&ensp;<code>float</code></dt>
+<dd>Value between 0.0 and 1.0 (application-specific).</dd>
+<dt><strong><code>lighting</code></strong> :&ensp;<code>float</code></dt>
+<dd>Value between 0.0 and 1.0 (application-specific).</dd>
+</dl>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
-    Returns the full ElementTree of the class
-
+<p>get_element()
+Returns the full ElementTree representation of the Tunnel.
 get_attributes()
-    Returns a dictionary of all xml attributes
-</code></pre>
-<p>Initialize a tunnel</p>
+Returns a dictionary of all XML attributes of the Tunnel.</p>
+<p>Initialize a Tunnel.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>s (float): s-coordinate of tunnel
-
-length (float): length of tunnel
-
-id (string): id of tunnel
-
-name (string): name of the tunnel
-
-tunnel_type (TunnelType): type of tunnel
-    Default: TunnelType
-daylight (float): value between 0.0 and 1.0 (application specific)
-    Default: 0.5
-lighting (float): value between 0.0 and 1.0 (application specific)
-    Default: 0.5
-</code></pre></div>
+<dl>
+<dt><strong><code>s</code></strong> :&ensp;<code>float</code></dt>
+<dd>s-coordinate of the tunnel.</dd>
+<dt><strong><code>length</code></strong> :&ensp;<code>float</code></dt>
+<dd>Length of the tunnel.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>str</code></dt>
+<dd>ID of the tunnel.</dd>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
+<dd>Name of the tunnel.</dd>
+<dt><strong><code>tunnel_type</code></strong> :&ensp;<code>TunnelType</code>, optional</dt>
+<dd>Type of the tunnel. Default is TunnelType.standard.</dd>
+<dt><strong><code>daylight</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Value between 0.0 and 1.0 (application-specific). Default is 0.5.</dd>
+<dt><strong><code>lighting</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Value between 0.0 and 1.0 (application-specific). Default is 0.5.</dd>
+</dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
@@ -2422,15 +3461,21 @@ lighting (float): value between 0.0 and 1.0 (application specific)
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.signals_objects.Tunnel.get_attributes"><code class="name flex">
-<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+<span>def <span class="ident">get_attributes</span></span>(<span>self) ‑> dict[str, str]</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34;Return a dictionary of all xml attributes&#34;&#34;&#34;
+<pre><code class="python">def get_attributes(self) -&gt; dict[str, str]:
+    &#34;&#34;&#34;Return a dictionary of all XML attributes of the Tunnel.
+
+    Returns
+    -------
+    dict[str, str]
+        A dictionary containing the attributes of the Tunnel.
+    &#34;&#34;&#34;
     retdict = {}
     retdict[&#34;s&#34;] = str(self.s)
     retdict[&#34;length&#34;] = str(self.length)
@@ -2441,22 +3486,38 @@ lighting (float): value between 0.0 and 1.0 (application specific)
     retdict[&#34;lighting&#34;] = str(self.lighting)
     return retdict</code></pre>
 </details>
-<div class="desc"><p>Return a dictionary of all xml attributes</p></div>
+<div class="desc"><p>Return a dictionary of all XML attributes of the Tunnel.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict[str, str]</code></dt>
+<dd>A dictionary containing the attributes of the Tunnel.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.Tunnel.get_element"><code class="name flex">
-<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+<span>def <span class="ident">get_element</span></span>(<span>self) ‑> xml.etree.ElementTree.Element</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_element(self):
-    &#34;&#34;&#34;Return the elementTree of the Tunnel&#34;&#34;&#34;
+<pre><code class="python">def get_element(self) -&gt; ET.Element:
+    &#34;&#34;&#34;Return the ElementTree representation of the Tunnel.
+
+    Returns
+    -------
+    ET.Element
+        The XML ElementTree representation of the Tunnel.
+    &#34;&#34;&#34;
     element = ET.Element(&#34;tunnel&#34;, attrib=self.get_attributes())
     return element</code></pre>
 </details>
-<div class="desc"><p>Return the elementTree of the Tunnel</p></div>
+<div class="desc"><p>Return the ElementTree representation of the Tunnel.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ET.Element</code></dt>
+<dd>The XML ElementTree representation of the Tunnel.</dd>
+</dl></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -2471,7 +3532,7 @@ lighting (float): value between 0.0 and 1.0 (application specific)
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.Validity"><code class="flex name class">
 <span>class <span class="ident">Validity</span></span>
-<span>(</span><span>fromLane, toLane)</span>
+<span>(</span><span>fromLane: int, toLane: int)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -2479,76 +3540,89 @@ lighting (float): value between 0.0 and 1.0 (application specific)
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Validity(XodrBase):
-    &#34;&#34;&#34;Validity is the explicit validity information for a signal
+    &#34;&#34;&#34;Validity is the explicit validity information for a signal.
 
     Attributes
     ----------
-        fromLane (int): minimum id of the lanes for which the object is valid
-
-        toLane (int): maximum id of the lanes for which the object is valid
+    fromLane : int
+        Minimum ID of the lanes for which the object is valid.
+    toLane : int
+        Maximum ID of the lanes for which the object is valid.
 
     Methods
     -------
-        get_element()
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
+    get_element()
+        Returns the full ElementTree representation of the Validity.
+    get_attributes()
+        Returns a dictionary of all attributes of the Validity.
     &#34;&#34;&#34;
 
-    def __init__(self, fromLane, toLane):
-        &#34;&#34;&#34;initalize the Validity
+    def __init__(self, fromLane: int, toLane: int) -&gt; None:
+        &#34;&#34;&#34;Initialize the Validity.
 
         Parameters
         ----------
-            fromLane (int): minimum id of the lanes for which the object is valid
-
-            toLane (int): maximum id of the lanes for which the object is valid
-
+        fromLane : int
+            Minimum ID of the lanes for which the object is valid.
+        toLane : int
+            Maximum ID of the lanes for which the object is valid.
         &#34;&#34;&#34;
         super().__init__()
         self.fromLane = fromLane
         self.toLane = toLane
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -&gt; bool:
         if isinstance(other, Validity) and super().__eq__(other):
             if self.fromLane == other.fromLane and self.toLane == other.toLane:
                 return True
         return False
 
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes of Validity as a dict&#34;&#34;&#34;
+    def get_attributes(self) -&gt; dict[str, str]:
+        &#34;&#34;&#34;Return the attributes of Validity as a dictionary.
+
+        Returns
+        -------
+        dict[str, str]
+            A dictionary containing the attributes of the Validity.
+        &#34;&#34;&#34;
         retdict = {}
         retdict[&#34;fromLane&#34;] = str(self.fromLane)
         retdict[&#34;toLane&#34;] = str(self.toLane)
         return retdict
 
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of Validity&#34;&#34;&#34;
+    def get_element(self) -&gt; ET.Element:
+        &#34;&#34;&#34;Return the ElementTree representation of the Validity.
+
+        Returns
+        -------
+        ET.Element
+            The XML ElementTree representation of the Validity.
+        &#34;&#34;&#34;
         element = ET.Element(&#34;validity&#34;, attrib=self.get_attributes())
         self._add_additional_data_to_element(element)
         return element</code></pre>
 </details>
-<div class="desc"><p>Validity is the explicit validity information for a signal</p>
+<div class="desc"><p>Validity is the explicit validity information for a signal.</p>
 <h2 id="attributes">Attributes</h2>
-<pre><code>fromLane (int): minimum id of the lanes for which the object is valid
-
-toLane (int): maximum id of the lanes for which the object is valid
-</code></pre>
+<dl>
+<dt><strong><code>fromLane</code></strong> :&ensp;<code>int</code></dt>
+<dd>Minimum ID of the lanes for which the object is valid.</dd>
+<dt><strong><code>toLane</code></strong> :&ensp;<code>int</code></dt>
+<dd>Maximum ID of the lanes for which the object is valid.</dd>
+</dl>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
-    Returns the full ElementTree of the class
-
+<p>get_element()
+Returns the full ElementTree representation of the Validity.
 get_attributes()
-    Returns a dictionary of all attributes of the class
-</code></pre>
-<p>initalize the Validity</p>
+Returns a dictionary of all attributes of the Validity.</p>
+<p>Initialize the Validity.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>fromLane (int): minimum id of the lanes for which the object is valid
-
-toLane (int): maximum id of the lanes for which the object is valid
-</code></pre></div>
+<dl>
+<dt><strong><code>fromLane</code></strong> :&ensp;<code>int</code></dt>
+<dd>Minimum ID of the lanes for which the object is valid.</dd>
+<dt><strong><code>toLane</code></strong> :&ensp;<code>int</code></dt>
+<dd>Maximum ID of the lanes for which the object is valid.</dd>
+</dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
@@ -2556,37 +3630,59 @@ toLane (int): maximum id of the lanes for which the object is valid
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.signals_objects.Validity.get_attributes"><code class="name flex">
-<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+<span>def <span class="ident">get_attributes</span></span>(<span>self) ‑> dict[str, str]</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34;returns the attributes of Validity as a dict&#34;&#34;&#34;
+<pre><code class="python">def get_attributes(self) -&gt; dict[str, str]:
+    &#34;&#34;&#34;Return the attributes of Validity as a dictionary.
+
+    Returns
+    -------
+    dict[str, str]
+        A dictionary containing the attributes of the Validity.
+    &#34;&#34;&#34;
     retdict = {}
     retdict[&#34;fromLane&#34;] = str(self.fromLane)
     retdict[&#34;toLane&#34;] = str(self.toLane)
     return retdict</code></pre>
 </details>
-<div class="desc"><p>returns the attributes of Validity as a dict</p></div>
+<div class="desc"><p>Return the attributes of Validity as a dictionary.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict[str, str]</code></dt>
+<dd>A dictionary containing the attributes of the Validity.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.signals_objects.Validity.get_element"><code class="name flex">
-<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+<span>def <span class="ident">get_element</span></span>(<span>self) ‑> xml.etree.ElementTree.Element</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_element(self):
-    &#34;&#34;&#34;returns the elementTree of Validity&#34;&#34;&#34;
+<pre><code class="python">def get_element(self) -&gt; ET.Element:
+    &#34;&#34;&#34;Return the ElementTree representation of the Validity.
+
+    Returns
+    -------
+    ET.Element
+        The XML ElementTree representation of the Validity.
+    &#34;&#34;&#34;
     element = ET.Element(&#34;validity&#34;, attrib=self.get_attributes())
     self._add_additional_data_to_element(element)
     return element</code></pre>
 </details>
-<div class="desc"><p>returns the elementTree of Validity</p></div>
+<div class="desc"><p>Return the ElementTree representation of the Validity.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ET.Element</code></dt>
+<dd>The XML ElementTree representation of the Validity.</dd>
+</dl></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -2636,8 +3732,18 @@ toLane (int): maximum id of the lanes for which the object is valid
 </ul>
 </li>
 <li>
+<h4><code><a title="scenariogeneration.xodr.signals_objects.Marking" href="#scenariogeneration.xodr.signals_objects.Marking">Marking</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xodr.signals_objects.Marking.add_cornerReference" href="#scenariogeneration.xodr.signals_objects.Marking.add_cornerReference">add_cornerReference</a></code></li>
+<li><code><a title="scenariogeneration.xodr.signals_objects.Marking.get_attributes" href="#scenariogeneration.xodr.signals_objects.Marking.get_attributes">get_attributes</a></code></li>
+<li><code><a title="scenariogeneration.xodr.signals_objects.Marking.get_element" href="#scenariogeneration.xodr.signals_objects.Marking.get_element">get_element</a></code></li>
+</ul>
+</li>
+<li>
 <h4><code><a title="scenariogeneration.xodr.signals_objects.Object" href="#scenariogeneration.xodr.signals_objects.Object">Object</a></code></h4>
 <ul class="two-column">
+<li><code><a title="scenariogeneration.xodr.signals_objects.Object.add_marking" href="#scenariogeneration.xodr.signals_objects.Object.add_marking">add_marking</a></code></li>
+<li><code><a title="scenariogeneration.xodr.signals_objects.Object.add_material" href="#scenariogeneration.xodr.signals_objects.Object.add_material">add_material</a></code></li>
 <li><code><a title="scenariogeneration.xodr.signals_objects.Object.add_outline" href="#scenariogeneration.xodr.signals_objects.Object.add_outline">add_outline</a></code></li>
 <li><code><a title="scenariogeneration.xodr.signals_objects.Object.add_parking_space" href="#scenariogeneration.xodr.signals_objects.Object.add_parking_space">add_parking_space</a></code></li>
 <li><code><a title="scenariogeneration.xodr.signals_objects.Object.add_validity" href="#scenariogeneration.xodr.signals_objects.Object.add_validity">add_validity</a></code></li>

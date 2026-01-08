@@ -55,7 +55,7 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <dl>
 <dt id="scenariogeneration.xodr.elevation.ElevationCalculator"><code class="flex name class">
 <span>class <span class="ident">ElevationCalculator</span></span>
-<span>(</span><span>main_road)</span>
+<span>(</span><span>main_road: Road)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -63,39 +63,42 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ElevationCalculator:
-    &#34;&#34;&#34;ElevationCalculator is a helper class to add elevation profiles to a road based on its neighbors
-    elevations.
+    &#34;&#34;&#34;ElevationCalculator is a helper class to add elevation profiles to a
+    road based on its neighbors&#39; elevations.
 
     Parameters
     ----------
-        main_road (Road): the road that an elevation should be added to
+    main_road : Road
+        The road that an elevation should be added to.
 
     Methods
     -------
-        add_successor(road)
-            adds a successor road to the main_road (note, can be done multiple times for junctions)
-
-        add_predecessor(road)
-            adds a predecessor road to the main_road (note, can be done multiple times for junctions)
-
-        create_profile(domain)
-            tries to create an profile of the domain (elevation or superelevation)
-
-        set_zero_elevation()
-            sets a elevation at zero for the main_road
+    add_successor(road)
+        Adds a successor road to the main_road. This can be done
+        multiple times for junctions.
+    add_predecessor(road)
+        Adds a predecessor road to the main_road. This can be done
+        multiple times for junctions.
+    create_profile(domain)
+        Tries to create a profile of the domain (elevation or
+        superelevation).
+    set_zero_elevation()
+        Sets an elevation at zero for the main_road.
     &#34;&#34;&#34;
 
-    def __init__(self, main_road):
+    def __init__(self, main_road: &#34;Road&#34;) -&gt; None:
         self.main_road = main_road
         self.successors = []
         self.predecessors = []
-        self._super_elevation_needed = not self.main_road.is_adjusted(&#34;superelevation&#34;)
+        self._super_elevation_needed = not self.main_road.is_adjusted(
+            &#34;superelevation&#34;
+        )
         self._elevation_needed = not self.main_road.is_adjusted(&#34;elevation&#34;)
         self._extra_elevation_needed = False
         self._reset_active_roads()
 
-    def _reset_active_roads(self):
-        &#34;&#34;&#34;resets all active roads for a calculation&#34;&#34;&#34;
+    def _reset_active_roads(self) -&gt; None:
+        &#34;&#34;&#34;Resets all active roads for a calculation.&#34;&#34;&#34;
         self._successor_road = None
         self._predecessor_road = None
         self._predecessor_cp = None
@@ -103,28 +106,36 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
         self._successor_lateral_offset = 0
         self._predecessor_lateral_offset = 0
 
-    def set_zero_elevation(self):
-        &#34;&#34;&#34;sets a elevation at zero for the main_road&#34;&#34;&#34;
+    def set_zero_elevation(self) -&gt; None:
+        &#34;&#34;&#34;Sets an elevation at zero for the main_road.&#34;&#34;&#34;
         self.main_road.add_elevation(0, 0, 0, 0, 0)
         self._elevation_needed = False
 
     def _calculate_lateral_elevation_offset(
-        self, road, lanesection, offsets, main_lanesection
-    ):
-        &#34;&#34;&#34;method used to calculate an elevation offset needed if a direct junction is present
+        self,
+        road: _ElevationConnectionHelper,
+        lanesection: int,
+        offsets: int,
+        main_lanesection: int,
+    ) -&gt; float:
+        &#34;&#34;&#34;Calculate an elevation offset needed if a direct junction is
+        present.
 
         Parameters
         ----------
-            road (_ElevationConnectionHelper): the road to calculate the offset from
+        road : _ElevationConnectionHelper
+            The road to calculate the offset from.
+        lanesection : int
+            The connected lanesection.
+        offsets : int
+            How many lanes the offset is.
+        main_lanesection : int
+            The lanesection of the main_road.
 
-            lanesection (int): the connected lanesection
-
-            offsets (int): how many lanes the offset is
-
-            main_lanesection (int): the lanesection of the main_road
-
-        returns
-            float: the elevation offset
+        Returns
+        -------
+        float
+            The elevation offset.
         &#34;&#34;&#34;
         s_value = 0
         tvalue = 0
@@ -167,14 +178,17 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
             self._extra_elevation_needed = True
         return road.lateralprofile.eval_t_superelevation_at_s(s_value, tvalue)
 
-    def _calculate_lateral_offsets_based_on_superelevation(self):
-        &#34;&#34;&#34;method used to calculate the elevation offsets based on superelevation,
-        this has to be run as soon as any road might have been updated to get correct offsets
+    def _calculate_lateral_offsets_based_on_superelevation(self) -&gt; None:
+        &#34;&#34;&#34;Calculate the elevation offsets based on superelevation.
+
+        This method must be run as soon as any road might have been
+        updated to ensure correct offsets.
         &#34;&#34;&#34;
         for successor_road in self.successors:
             if (
                 successor_road.road.predecessor
-                and successor_road.road.predecessor.element_type == ElementType.junction
+                and successor_road.road.predecessor.element_type
+                == ElementType.junction
                 and self.main_road.id
                 in list(successor_road.road.pred_direct_junction.keys())
             ):
@@ -189,7 +203,8 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 
             elif (
                 successor_road.road.successor
-                and successor_road.road.successor.element_type == ElementType.junction
+                and successor_road.road.successor.element_type
+                == ElementType.junction
                 and self.main_road.id
                 in list(successor_road.road.succ_direct_junction.keys())
             ):
@@ -204,7 +219,8 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
         for predecessor_road in self.predecessors:
             if (
                 predecessor_road.road.successor
-                and predecessor_road.road.successor.element_type == ElementType.junction
+                and predecessor_road.road.successor.element_type
+                == ElementType.junction
                 and self.main_road.id
                 in list(predecessor_road.road.succ_direct_junction.keys())
             ):
@@ -232,11 +248,15 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
                     )
                 )
 
-    def add_successor(self, successor_road):
-        &#34;&#34;&#34;adds a succeeding road to the main_road, can be called multiple times for junctions
+    def add_successor(self, successor_road: &#34;Road&#34;) -&gt; None:
+        &#34;&#34;&#34;Add a succeeding road to the main_road.
+
+        This method can be called multiple times for junctions.
 
         Parameters
-            successor_road (Road): a road succeeding the main_road
+        ----------
+        successor_road : Road
+            A road succeeding the main_road.
         &#34;&#34;&#34;
         successor_lateral_offset = 0
         if successor_road.predecessor is not None and (
@@ -244,10 +264,12 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
             and successor_road.predecessor.element_id == self.main_road.id
             or successor_road.predecessor.element_type == ElementType.junction
             and successor_road.pred_direct_junction
-            and self.main_road.id in list(successor_road.pred_direct_junction.keys())
+            and self.main_road.id
+            in list(successor_road.pred_direct_junction.keys())
             or successor_road.predecessor.element_type == ElementType.junction
             and not successor_road.pred_direct_junction
-            and self.main_road.road_type == successor_road.predecessor.element_id
+            and self.main_road.road_type
+            == successor_road.predecessor.element_id
         ):
             successor_cp = ContactPoint.start
         elif successor_road.successor is not None and (
@@ -255,7 +277,8 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
             and successor_road.successor.element_id == self.main_road.id
             or successor_road.successor.element_type == ElementType.junction
             and successor_road.succ_direct_junction
-            and self.main_road.id in list(successor_road.succ_direct_junction.keys())
+            and self.main_road.id
+            in list(successor_road.succ_direct_junction.keys())
             or successor_road.successor.element_type == ElementType.junction
             and not successor_road.succ_direct_junction
             and self.main_road.road_type == successor_road.successor.element_id
@@ -265,30 +288,44 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
             raise ValueError(&#34;could not figure out the contact point&#34;)
         self.successors.append(
             _ElevationConnectionHelper(
-                successor_road, &#34;successor&#34;, successor_cp, successor_lateral_offset
+                successor_road,
+                &#34;successor&#34;,
+                successor_cp,
+                successor_lateral_offset,
             )
         )
         self._calculate_lateral_offsets_based_on_superelevation()
 
-    def add_predecessor(self, predecessor_road):
-        &#34;&#34;&#34;adds a predeceeding road to the main_road, can be called multiple times for junctions
+    def add_predecessor(self, predecessor_road: &#34;Road&#34;) -&gt; None:
+        &#34;&#34;&#34;Adds a preceding road to the main_road.
+
+        This method can be called multiple times for junctions.
 
         Parameters
-            predecessor_road (Road): a road predeceeding the main_road
+        ----------
+        predecessor_road : Road
+            A road preceding the main_road.
         &#34;&#34;&#34;
         predecessor_lateral_offset = 0
         if predecessor_road.predecessor is not None and (
             predecessor_road.predecessor.element_type == ElementType.road
             and predecessor_road.predecessor.element_id == self.main_road.id
-            or predecessor_road.predecessor.element_type == ElementType.junction
+            or predecessor_road.predecessor.element_type
+            == ElementType.junction
             and predecessor_road.pred_direct_junction
-            and self.main_road.id in list(predecessor_road.pred_direct_junction.keys())
-            or predecessor_road.predecessor.element_type == ElementType.junction
+            and self.main_road.id
+            in list(predecessor_road.pred_direct_junction.keys())
+            or predecessor_road.predecessor.element_type
+            == ElementType.junction
             and not predecessor_road.pred_direct_junction
-            and self.main_road.road_type == predecessor_road.predecessor.element_id
+            and self.main_road.road_type
+            == predecessor_road.predecessor.element_id
         ):
             predecessor_cp = ContactPoint.start
-            if predecessor_road.predecessor.element_type == ElementType.junction:
+            if (
+                predecessor_road.predecessor.element_type
+                == ElementType.junction
+            ):
                 pass
 
         elif predecessor_road.successor is not None and (
@@ -296,10 +333,12 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
             and predecessor_road.successor.element_id == self.main_road.id
             or predecessor_road.successor.element_type == ElementType.junction
             and predecessor_road.succ_direct_junction
-            and self.main_road.id in list(predecessor_road.succ_direct_junction.keys())
+            and self.main_road.id
+            in list(predecessor_road.succ_direct_junction.keys())
             or predecessor_road.successor.element_type == ElementType.junction
             and not predecessor_road.succ_direct_junction
-            and self.main_road.road_type == predecessor_road.successor.element_id
+            and self.main_road.road_type
+            == predecessor_road.successor.element_id
         ):
             predecessor_cp = ContactPoint.end
             if predecessor_road.successor.element_type == ElementType.junction:
@@ -316,12 +355,14 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
         )
         self._calculate_lateral_offsets_based_on_superelevation()
 
-    def _set_active_roads(self, domain):
-        &#34;&#34;&#34;checks what successors/predecessor roads are adjusted in the wanted domain and set those for calculations
+    def _set_active_roads(self, domain: str) -&gt; None:
+        &#34;&#34;&#34;Checks what successors/predecessor roads are adjusted in the wanted
+        domain and set those for calculations.
 
         Parameters
         ----------
-            domain (str): the domain (elevation, or superelevation)
+        domain : str
+            The domain (elevation, or superelevation).
         &#34;&#34;&#34;
         for successor in self.successors:
             if successor.road.is_adjusted(domain):
@@ -335,10 +376,10 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
                 self._predecessor_cp = predecessor.contact_point
                 self._predecessor_lateral_offset = predecessor.lateral_offset
 
-    def _create_elevation(self):
-        &#34;&#34;&#34;method that calculates and adds the elevation profile to the main_road
-        based on the elevations on the predecessor or successor roads
-        &#34;&#34;&#34;
+    def _create_elevation(self) -&gt; None:
+        &#34;&#34;&#34;Method that calculates and adds the elevation profile to the
+        main_road based on the elevations on the predecessor or successor
+        roads.&#34;&#34;&#34;
         self._calculate_lateral_offsets_based_on_superelevation()
         self._set_active_roads(&#34;elevation&#34;)
         if self._successor_road and self._predecessor_road:
@@ -364,11 +405,15 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
                     self._successor_road.elevationprofile.eval_at_s(suc_s)
                     + self._successor_lateral_offset,
                     suc_sign
-                    * self._successor_road.elevationprofile.eval_derivative_at_s(suc_s),
+                    * self._successor_road.elevationprofile.eval_derivative_at_s(
+                        suc_s
+                    ),
                 ]
             )
             coeffs = np.linalg.solve(A, B)
-            self.main_road.add_elevation(0, coeffs[0], coeffs[1], coeffs[2], coeffs[3])
+            self.main_road.add_elevation(
+                0, coeffs[0], coeffs[1], coeffs[2], coeffs[3]
+            )
             self._elevation_needed = False
         elif self._successor_road or self._predecessor_road:
             if self.main_road.road_type != -1:
@@ -382,7 +427,9 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
                 sign,
                 main_s,
             ) = self._get_related_data_for_single_connection()
-            b = sign * related_road.elevationprofile.eval_derivative_at_s(neighbor_s)
+            b = sign * related_road.elevationprofile.eval_derivative_at_s(
+                neighbor_s
+            )
             a = (
                 related_road.elevationprofile.eval_at_s(neighbor_s)
                 - b * main_s
@@ -393,16 +440,22 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
             self._elevation_needed = False
         self._reset_active_roads()
 
-    def _get_related_data_for_single_connection(self):
-        &#34;&#34;&#34;common functionality for both elevation and superelevation
-        For a road that has elevations on one side to adjust to
+    def _get_related_data_for_single_connection(
+        self,
+    ) -&gt; tuple[&#34;Road&#34;, float, int, float]:
+        &#34;&#34;&#34;Common functionality for both elevation and superelevation. For a
+        road that has elevations on one side to adjust to.
 
         Returns
         -------
-            related_road - the road to adjust to
-            neighbor_s - s value to be used on the related_road
-            sign - sign switch
-            main_s - s to be used on the main_road
+        related_road : Road
+            The road to adjust to.
+        neighbor_s : float
+            S value to be used on the related_road.
+        sign : int
+            Sign switch.
+        main_s : float
+            S to be used on the main_road.
         &#34;&#34;&#34;
         if self._successor_road:
             main_s = self.main_road.planview.get_total_length()
@@ -424,18 +477,24 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
                 sign = 1
         return related_road, neighbor_s, sign, main_s
 
-    def _get_related_data_for_double_connection(self):
-        &#34;&#34;&#34;common functionality for both elevation and superelevation
-        For a road that has elevations on both sides to adjust to
+    def _get_related_data_for_double_connection(
+        self,
+    ) -&gt; tuple[float, int, float, int, np.ndarray]:
+        &#34;&#34;&#34;Common functionality for both elevation and superelevation. For a
+        road that has elevations on both sides to adjust to.
 
         Returns
         -------
-        pre_s - s of the predecessor
-        pre_sign - sign switch of predecessor
-        suc_s - s of the successor
-        suc_sign - sign switch of successor
-        A - Matrix for solving continuous derivative and value
-
+        pre_s : float
+            S of the predecessor.
+        pre_sign : int
+            Sign switch of predecessor.
+        suc_s : float
+            S of the successor.
+        suc_sign : int
+            Sign switch of successor.
+        A : numpy.ndarray
+            Matrix for solving continuous derivative and value.
         &#34;&#34;&#34;
         if self._predecessor_cp == ContactPoint.start:
             pre_s = 0
@@ -460,7 +519,7 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
         )
         return pre_s, pre_sign, suc_s, suc_sign, A
 
-    def _create_super_elevation(self):
+    def _create_super_elevation(self) -&gt; None:
         self._set_active_roads(&#34;superelevation&#34;)
         if self._successor_road and self._predecessor_road:
             (
@@ -509,19 +568,22 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
                 warn(
                     &#34;Having automatic elevation adjustment for junction roads will yeild in ambigious results, please set the elevation for the connecting roads.&#34;
                 )
-            a = sign * related_road.lateralprofile.eval_superelevation_at_s(neighbor_s)
+            a = sign * related_road.lateralprofile.eval_superelevation_at_s(
+                neighbor_s
+            )
             self.main_road.add_superelevation(0, a, 0, 0, 0)
             self._super_elevation_needed = False
 
         self._reset_active_roads()
 
-    def create_profile(self, domain=&#34;elevation&#34;):
-        &#34;&#34;&#34;main method to try to calculate an elevation or superelevation
+    def create_profile(self, domain: str = &#34;elevation&#34;) -&gt; None:
+        &#34;&#34;&#34;Main method to try to calculate an elevation or superelevation.
 
         Parameters
         ----------
-            domain (str): what domain to calculate (elevation or superelevation)
-                Default: elevation
+        domain : str
+            What domain to calculate (elevation or superelevation).
+            Default: elevation.
         &#34;&#34;&#34;
         if domain == &#34;elevation&#34;:
             if self._elevation_needed:
@@ -531,60 +593,74 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
                 self._create_super_elevation()
                 self._calculate_lateral_offsets_based_on_superelevation()
         elif domain == &#34;shape&#34;:
-            raise NotImplementedError(&#34;shape adjustment is not implemented yet&#34;)
+            raise NotImplementedError(
+                &#34;Shape adjustment is not implemented yet.&#34;
+            )
         else:
             raise ValueError(
-                &#34;domain can only be: geometry, elevation, superelevation, or shape , not &#34;
-                + domain
+                &#34;Domain can only be: elevation, superelevation, or shape, &#34;
+                f&#34;not {domain}.&#34;
             )</code></pre>
 </details>
-<div class="desc"><p>ElevationCalculator is a helper class to add elevation profiles to a road based on its neighbors
-elevations.</p>
+<div class="desc"><p>ElevationCalculator is a helper class to add elevation profiles to a
+road based on its neighbors' elevations.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>main_road (Road): the road that an elevation should be added to
-</code></pre>
+<dl>
+<dt><strong><code>main_road</code></strong> :&ensp;<code>Road</code></dt>
+<dd>The road that an elevation should be added to.</dd>
+</dl>
 <h2 id="methods">Methods</h2>
-<pre><code>add_successor(road)
-    adds a successor road to the main_road (note, can be done multiple times for junctions)
-
+<p>add_successor(road)
+Adds a successor road to the main_road. This can be done
+multiple times for junctions.
 add_predecessor(road)
-    adds a predecessor road to the main_road (note, can be done multiple times for junctions)
-
+Adds a predecessor road to the main_road. This can be done
+multiple times for junctions.
 create_profile(domain)
-    tries to create an profile of the domain (elevation or superelevation)
-
+Tries to create a profile of the domain (elevation or
+superelevation).
 set_zero_elevation()
-    sets a elevation at zero for the main_road
-</code></pre></div>
+Sets an elevation at zero for the main_road.</p></div>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.elevation.ElevationCalculator.add_predecessor"><code class="name flex">
-<span>def <span class="ident">add_predecessor</span></span>(<span>self, predecessor_road)</span>
+<span>def <span class="ident">add_predecessor</span></span>(<span>self, predecessor_road: Road)</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_predecessor(self, predecessor_road):
-    &#34;&#34;&#34;adds a predeceeding road to the main_road, can be called multiple times for junctions
+<pre><code class="python">def add_predecessor(self, predecessor_road: &#34;Road&#34;) -&gt; None:
+    &#34;&#34;&#34;Adds a preceding road to the main_road.
+
+    This method can be called multiple times for junctions.
 
     Parameters
-        predecessor_road (Road): a road predeceeding the main_road
+    ----------
+    predecessor_road : Road
+        A road preceding the main_road.
     &#34;&#34;&#34;
     predecessor_lateral_offset = 0
     if predecessor_road.predecessor is not None and (
         predecessor_road.predecessor.element_type == ElementType.road
         and predecessor_road.predecessor.element_id == self.main_road.id
-        or predecessor_road.predecessor.element_type == ElementType.junction
+        or predecessor_road.predecessor.element_type
+        == ElementType.junction
         and predecessor_road.pred_direct_junction
-        and self.main_road.id in list(predecessor_road.pred_direct_junction.keys())
-        or predecessor_road.predecessor.element_type == ElementType.junction
+        and self.main_road.id
+        in list(predecessor_road.pred_direct_junction.keys())
+        or predecessor_road.predecessor.element_type
+        == ElementType.junction
         and not predecessor_road.pred_direct_junction
-        and self.main_road.road_type == predecessor_road.predecessor.element_id
+        and self.main_road.road_type
+        == predecessor_road.predecessor.element_id
     ):
         predecessor_cp = ContactPoint.start
-        if predecessor_road.predecessor.element_type == ElementType.junction:
+        if (
+            predecessor_road.predecessor.element_type
+            == ElementType.junction
+        ):
             pass
 
     elif predecessor_road.successor is not None and (
@@ -592,10 +668,12 @@ set_zero_elevation()
         and predecessor_road.successor.element_id == self.main_road.id
         or predecessor_road.successor.element_type == ElementType.junction
         and predecessor_road.succ_direct_junction
-        and self.main_road.id in list(predecessor_road.succ_direct_junction.keys())
+        and self.main_road.id
+        in list(predecessor_road.succ_direct_junction.keys())
         or predecessor_road.successor.element_type == ElementType.junction
         and not predecessor_road.succ_direct_junction
-        and self.main_road.road_type == predecessor_road.successor.element_id
+        and self.main_road.road_type
+        == predecessor_road.successor.element_id
     ):
         predecessor_cp = ContactPoint.end
         if predecessor_road.successor.element_type == ElementType.junction:
@@ -612,23 +690,31 @@ set_zero_elevation()
     )
     self._calculate_lateral_offsets_based_on_superelevation()</code></pre>
 </details>
-<div class="desc"><p>adds a predeceeding road to the main_road, can be called multiple times for junctions</p>
-<p>Parameters
-predecessor_road (Road): a road predeceeding the main_road</p></div>
+<div class="desc"><p>Adds a preceding road to the main_road.</p>
+<p>This method can be called multiple times for junctions.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>predecessor_road</code></strong> :&ensp;<code>Road</code></dt>
+<dd>A road preceding the main_road.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.elevation.ElevationCalculator.add_successor"><code class="name flex">
-<span>def <span class="ident">add_successor</span></span>(<span>self, successor_road)</span>
+<span>def <span class="ident">add_successor</span></span>(<span>self, successor_road: Road)</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_successor(self, successor_road):
-    &#34;&#34;&#34;adds a succeeding road to the main_road, can be called multiple times for junctions
+<pre><code class="python">def add_successor(self, successor_road: &#34;Road&#34;) -&gt; None:
+    &#34;&#34;&#34;Add a succeeding road to the main_road.
+
+    This method can be called multiple times for junctions.
 
     Parameters
-        successor_road (Road): a road succeeding the main_road
+    ----------
+    successor_road : Road
+        A road succeeding the main_road.
     &#34;&#34;&#34;
     successor_lateral_offset = 0
     if successor_road.predecessor is not None and (
@@ -636,10 +722,12 @@ predecessor_road (Road): a road predeceeding the main_road</p></div>
         and successor_road.predecessor.element_id == self.main_road.id
         or successor_road.predecessor.element_type == ElementType.junction
         and successor_road.pred_direct_junction
-        and self.main_road.id in list(successor_road.pred_direct_junction.keys())
+        and self.main_road.id
+        in list(successor_road.pred_direct_junction.keys())
         or successor_road.predecessor.element_type == ElementType.junction
         and not successor_road.pred_direct_junction
-        and self.main_road.road_type == successor_road.predecessor.element_id
+        and self.main_road.road_type
+        == successor_road.predecessor.element_id
     ):
         successor_cp = ContactPoint.start
     elif successor_road.successor is not None and (
@@ -647,7 +735,8 @@ predecessor_road (Road): a road predeceeding the main_road</p></div>
         and successor_road.successor.element_id == self.main_road.id
         or successor_road.successor.element_type == ElementType.junction
         and successor_road.succ_direct_junction
-        and self.main_road.id in list(successor_road.succ_direct_junction.keys())
+        and self.main_road.id
+        in list(successor_road.succ_direct_junction.keys())
         or successor_road.successor.element_type == ElementType.junction
         and not successor_road.succ_direct_junction
         and self.main_road.road_type == successor_road.successor.element_id
@@ -657,30 +746,38 @@ predecessor_road (Road): a road predeceeding the main_road</p></div>
         raise ValueError(&#34;could not figure out the contact point&#34;)
     self.successors.append(
         _ElevationConnectionHelper(
-            successor_road, &#34;successor&#34;, successor_cp, successor_lateral_offset
+            successor_road,
+            &#34;successor&#34;,
+            successor_cp,
+            successor_lateral_offset,
         )
     )
     self._calculate_lateral_offsets_based_on_superelevation()</code></pre>
 </details>
-<div class="desc"><p>adds a succeeding road to the main_road, can be called multiple times for junctions</p>
-<p>Parameters
-successor_road (Road): a road succeeding the main_road</p></div>
+<div class="desc"><p>Add a succeeding road to the main_road.</p>
+<p>This method can be called multiple times for junctions.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>successor_road</code></strong> :&ensp;<code>Road</code></dt>
+<dd>A road succeeding the main_road.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.elevation.ElevationCalculator.create_profile"><code class="name flex">
-<span>def <span class="ident">create_profile</span></span>(<span>self, domain='elevation')</span>
+<span>def <span class="ident">create_profile</span></span>(<span>self, domain: str = 'elevation') ‑> None</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def create_profile(self, domain=&#34;elevation&#34;):
-    &#34;&#34;&#34;main method to try to calculate an elevation or superelevation
+<pre><code class="python">def create_profile(self, domain: str = &#34;elevation&#34;) -&gt; None:
+    &#34;&#34;&#34;Main method to try to calculate an elevation or superelevation.
 
     Parameters
     ----------
-        domain (str): what domain to calculate (elevation or superelevation)
-            Default: elevation
+    domain : str
+        What domain to calculate (elevation or superelevation).
+        Default: elevation.
     &#34;&#34;&#34;
     if domain == &#34;elevation&#34;:
         if self._elevation_needed:
@@ -690,33 +787,37 @@ successor_road (Road): a road succeeding the main_road</p></div>
             self._create_super_elevation()
             self._calculate_lateral_offsets_based_on_superelevation()
     elif domain == &#34;shape&#34;:
-        raise NotImplementedError(&#34;shape adjustment is not implemented yet&#34;)
+        raise NotImplementedError(
+            &#34;Shape adjustment is not implemented yet.&#34;
+        )
     else:
         raise ValueError(
-            &#34;domain can only be: geometry, elevation, superelevation, or shape , not &#34;
-            + domain
+            &#34;Domain can only be: elevation, superelevation, or shape, &#34;
+            f&#34;not {domain}.&#34;
         )</code></pre>
 </details>
-<div class="desc"><p>main method to try to calculate an elevation or superelevation</p>
+<div class="desc"><p>Main method to try to calculate an elevation or superelevation.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>domain (str): what domain to calculate (elevation or superelevation)
-    Default: elevation
-</code></pre></div>
+<dl>
+<dt><strong><code>domain</code></strong> :&ensp;<code>str</code></dt>
+<dd>What domain to calculate (elevation or superelevation).
+Default: elevation.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.elevation.ElevationCalculator.set_zero_elevation"><code class="name flex">
-<span>def <span class="ident">set_zero_elevation</span></span>(<span>self)</span>
+<span>def <span class="ident">set_zero_elevation</span></span>(<span>self) ‑> None</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def set_zero_elevation(self):
-    &#34;&#34;&#34;sets a elevation at zero for the main_road&#34;&#34;&#34;
+<pre><code class="python">def set_zero_elevation(self) -&gt; None:
+    &#34;&#34;&#34;Sets an elevation at zero for the main_road.&#34;&#34;&#34;
     self.main_road.add_elevation(0, 0, 0, 0, 0)
     self._elevation_needed = False</code></pre>
 </details>
-<div class="desc"><p>sets a elevation at zero for the main_road</p></div>
+<div class="desc"><p>Sets an elevation at zero for the main_road.</p></div>
 </dd>
 </dl>
 </dd>
@@ -729,50 +830,54 @@ successor_road (Road): a road succeeding the main_road</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ElevationProfile(XodrBase):
-    &#34;&#34;&#34;the ElevationProfile creates the elevationProfile element of the road in opendrive,
-
+    &#34;&#34;&#34;Create the elevationProfile element of the road in OpenDRIVE.
 
     Attributes
     ----------
-        elevations (list of _Poly3Profile):
+    elevations : list of _Poly3Profile
+        List of elevation profiles.
 
     Methods
     -------
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-        add_elevation(elevation)
-            adds an elevation profile to the road
+    get_element(elementname)
+        Returns the full ElementTree of the class.
+    add_elevation(elevation)
+        Adds an elevation profile to the road.
     &#34;&#34;&#34;
 
-    def __init__(self):
-        &#34;&#34;&#34;initalize the ElevationProfile class&#34;&#34;&#34;
+    def __init__(self) -&gt; None:
+        &#34;&#34;&#34;Initialize the ElevationProfile class.&#34;&#34;&#34;
         self.elevations = []
         super().__init__()
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -&gt; bool:
         if isinstance(other, ElevationProfile) and super().__eq__(other):
             if self.elevations == other.elevations:
                 return True
         return False
 
-    def eval_at_s(self, s):
+    def eval_at_s(self, s: float) -&gt; float:
         return self.elevations[
             [i for i, x in enumerate(self.elevations) if x.s &lt;= s][-1]
         ].eval_at_s(s)
 
-    def eval_derivative_at_s(self, s):
+    def eval_derivative_at_s(self, s: float) -&gt; float:
         return self.elevations[
             [i for i, x in enumerate(self.elevations) if x.s &lt;= s][-1]
         ].eval_derivative_at_s(s)
 
-    def add_elevation(self, elevation):
-        &#34;&#34;&#34;adds an elevation to the ElevationProfile
+    def add_elevation(self, elevation: &#34;_Poly3Profile&#34;) -&gt; &#34;ElevationProfile&#34;:
+        &#34;&#34;&#34;Add an elevation to the ElevationProfile.
 
         Parameters
         ----------
-            elevation (_Poly3Profile): the elevation profile to add to the ElevationProfile
+        elevation : _Poly3Profile
+            The elevation profile to add to the ElevationProfile.
 
+        Returns
+        -------
+        ElevationProfile
+            The updated ElevationProfile object.
         &#34;&#34;&#34;
         if not isinstance(elevation, _Poly3Profile):
             raise TypeError(
@@ -782,28 +887,32 @@ successor_road (Road): a road succeeding the main_road</p></div>
         self.elevations.append(elevation)
         return self
 
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the ElevationProfile&#34;&#34;&#34;
+    def get_element(self) -&gt; ET.Element:
+        &#34;&#34;&#34;Return the ElementTree of the ElevationProfile.
 
+        Returns
+        -------
+        xml.etree.ElementTree.Element
+            The elevationProfile element.
+        &#34;&#34;&#34;
         element = ET.Element(&#34;elevationProfile&#34;)
         self._add_additional_data_to_element(element)
         for i in self.elevations:
             element.append(i.get_element(&#34;elevation&#34;))
-
         return element</code></pre>
 </details>
-<div class="desc"><p>the ElevationProfile creates the elevationProfile element of the road in opendrive,</p>
+<div class="desc"><p>Create the elevationProfile element of the road in OpenDRIVE.</p>
 <h2 id="attributes">Attributes</h2>
-<pre><code>elevations (list of _Poly3Profile):
-</code></pre>
+<dl>
+<dt><strong><code>elevations</code></strong> :&ensp;<code>list</code> of <code>_Poly3Profile</code></dt>
+<dd>List of elevation profiles.</dd>
+</dl>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element(elementname)
-    Returns the full ElementTree of the class
-
+<p>get_element(elementname)
+Returns the full ElementTree of the class.
 add_elevation(elevation)
-    adds an elevation profile to the road
-</code></pre>
-<p>initalize the ElevationProfile class</p></div>
+Adds an elevation profile to the road.</p>
+<p>Initialize the ElevationProfile class.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
@@ -811,20 +920,25 @@ add_elevation(elevation)
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.elevation.ElevationProfile.add_elevation"><code class="name flex">
-<span>def <span class="ident">add_elevation</span></span>(<span>self, elevation)</span>
+<span>def <span class="ident">add_elevation</span></span>(<span>self, elevation: _Poly3Profile) ‑> <a title="scenariogeneration.xodr.elevation.ElevationProfile" href="#scenariogeneration.xodr.elevation.ElevationProfile">ElevationProfile</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_elevation(self, elevation):
-    &#34;&#34;&#34;adds an elevation to the ElevationProfile
+<pre><code class="python">def add_elevation(self, elevation: &#34;_Poly3Profile&#34;) -&gt; &#34;ElevationProfile&#34;:
+    &#34;&#34;&#34;Add an elevation to the ElevationProfile.
 
     Parameters
     ----------
-        elevation (_Poly3Profile): the elevation profile to add to the ElevationProfile
+    elevation : _Poly3Profile
+        The elevation profile to add to the ElevationProfile.
 
+    Returns
+    -------
+    ElevationProfile
+        The updated ElevationProfile object.
     &#34;&#34;&#34;
     if not isinstance(elevation, _Poly3Profile):
         raise TypeError(
@@ -834,20 +948,27 @@ add_elevation(elevation)
     self.elevations.append(elevation)
     return self</code></pre>
 </details>
-<div class="desc"><p>adds an elevation to the ElevationProfile</p>
+<div class="desc"><p>Add an elevation to the ElevationProfile.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>elevation (_Poly3Profile): the elevation profile to add to the ElevationProfile
-</code></pre></div>
+<dl>
+<dt><strong><code>elevation</code></strong> :&ensp;<code>_Poly3Profile</code></dt>
+<dd>The elevation profile to add to the ElevationProfile.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="scenariogeneration.xodr.elevation.ElevationProfile" href="#scenariogeneration.xodr.elevation.ElevationProfile">ElevationProfile</a></code></dt>
+<dd>The updated ElevationProfile object.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.elevation.ElevationProfile.eval_at_s"><code class="name flex">
-<span>def <span class="ident">eval_at_s</span></span>(<span>self, s)</span>
+<span>def <span class="ident">eval_at_s</span></span>(<span>self, s: float) ‑> float</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def eval_at_s(self, s):
+<pre><code class="python">def eval_at_s(self, s: float) -&gt; float:
     return self.elevations[
         [i for i, x in enumerate(self.elevations) if x.s &lt;= s][-1]
     ].eval_at_s(s)</code></pre>
@@ -855,14 +976,14 @@ add_elevation(elevation)
 <div class="desc"></div>
 </dd>
 <dt id="scenariogeneration.xodr.elevation.ElevationProfile.eval_derivative_at_s"><code class="name flex">
-<span>def <span class="ident">eval_derivative_at_s</span></span>(<span>self, s)</span>
+<span>def <span class="ident">eval_derivative_at_s</span></span>(<span>self, s: float) ‑> float</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def eval_derivative_at_s(self, s):
+<pre><code class="python">def eval_derivative_at_s(self, s: float) -&gt; float:
     return self.elevations[
         [i for i, x in enumerate(self.elevations) if x.s &lt;= s][-1]
     ].eval_derivative_at_s(s)</code></pre>
@@ -870,24 +991,33 @@ add_elevation(elevation)
 <div class="desc"></div>
 </dd>
 <dt id="scenariogeneration.xodr.elevation.ElevationProfile.get_element"><code class="name flex">
-<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+<span>def <span class="ident">get_element</span></span>(<span>self) ‑> xml.etree.ElementTree.Element</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_element(self):
-    &#34;&#34;&#34;returns the elementTree of the ElevationProfile&#34;&#34;&#34;
+<pre><code class="python">def get_element(self) -&gt; ET.Element:
+    &#34;&#34;&#34;Return the ElementTree of the ElevationProfile.
 
+    Returns
+    -------
+    xml.etree.ElementTree.Element
+        The elevationProfile element.
+    &#34;&#34;&#34;
     element = ET.Element(&#34;elevationProfile&#34;)
     self._add_additional_data_to_element(element)
     for i in self.elevations:
         element.append(i.get_element(&#34;elevation&#34;))
-
     return element</code></pre>
 </details>
-<div class="desc"><p>returns the elementTree of the ElevationProfile</p></div>
+<div class="desc"><p>Return the ElementTree of the ElevationProfile.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>xml.etree.ElementTree.Element</code></dt>
+<dd>The elevationProfile element.</dd>
+</dl></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -909,34 +1039,32 @@ add_elevation(elevation)
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class LateralProfile(XodrBase):
-    &#34;&#34;&#34;the LateralProfile creates the elevationProfile element of the road in opendrive,
-
+    &#34;&#34;&#34;Create the lateralProfile element of the road in OpenDRIVE.
 
     Attributes
     ----------
-        superelevation (list of _Poly3Profile): list of superelevations of the road
-
-        shape (list of _Poly3Profile): list of shapes for the road
+    superelevations : list of _Poly3Profile
+        List of superelevations of the road.
+    shapes : list of _Poly3Profile
+        List of shapes for the road.
 
     Methods
     -------
-        get_element(elementname)
-            Returns the full ElementTree of the class
-
-        add_superelevation(superelevation)
-            adds an superelevation profile to the road
-
-        add_shape(shape)
-            adds a shape to the lateral profile
+    get_element(elementname)
+        Returns the full ElementTree of the class.
+    add_superelevation(superelevation)
+        Adds a superelevation profile to the road.
+    add_shape(shape)
+        Adds a shape to the lateral profile.
     &#34;&#34;&#34;
 
-    def __init__(self):
-        &#34;&#34;&#34;initalize the LateralProfile class&#34;&#34;&#34;
+    def __init__(self) -&gt; None:
+        &#34;&#34;&#34;Initialize the LateralProfile class.&#34;&#34;&#34;
         super().__init__()
         self.superelevations = []
         self.shapes = []
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -&gt; bool:
         if isinstance(other, LateralProfile) and super().__eq__(other):
             if (
                 self.superelevations == other.superelevations
@@ -945,62 +1073,79 @@ add_elevation(elevation)
                 return True
         return False
 
-    def add_superelevation(self, superelevation):
-        &#34;&#34;&#34;adds an elevation to the LateralProfile
+    def add_superelevation(
+        self, superelevation: &#34;_Poly3Profile&#34;
+    ) -&gt; &#34;LateralProfile&#34;:
+        &#34;&#34;&#34;Add a superelevation to the LateralProfile.
 
         Parameters
         ----------
-            superelevation (_Poly3Profile): the elevation profile to add to the LateralProfile
+        superelevation : _Poly3Profile
+            The superelevation profile to add to the LateralProfile.
 
+        Returns
+        -------
+        LateralProfile
+            The updated LateralProfile object.
         &#34;&#34;&#34;
         if not isinstance(superelevation, _Poly3Profile):
             raise TypeError(
-                &#34;add_elevation requires an _Poly3Profile as input, not &#34;
+                &#34;add_superelevation requires an _Poly3Profile as input, not &#34;
                 + str(type(superelevation))
             )
         self.superelevations.append(superelevation)
         return self
 
-    def eval_superelevation_at_s(self, s):
+    def eval_superelevation_at_s(self, s: float) -&gt; float:
         if self.superelevations:
             return self.superelevations[
                 [i for i, x in enumerate(self.superelevations) if x.s &lt;= s][-1]
             ].eval_at_s(s)
         return 0
 
-    def eval_t_superelevation_at_s(self, s, t):
+    def eval_t_superelevation_at_s(self, s: float, t: float) -&gt; float:
         if self.superelevations:
             return self.superelevations[
                 [i for i, x in enumerate(self.superelevations) if x.s &lt;= s][-1]
             ].eval_t_at_s(s, t)
         return 0
 
-    def eval_superelevation_derivative_at_s(self, s):
+    def eval_superelevation_derivative_at_s(self, s: float) -&gt; float:
         if self.superelevations:
             return self.superelevations[
                 [i for i, x in enumerate(self.superelevations) if x.s &lt;= s][-1]
             ].eval_derivative_at_s(s)
         return 0
 
-    def add_shape(self, shape):
-        &#34;&#34;&#34;adds an elevation to the LateralProfile
+    def add_shape(self, shape: &#34;_Poly3Profile&#34;) -&gt; &#34;LateralProfile&#34;:
+        &#34;&#34;&#34;Add a shape to the LateralProfile.
 
         Parameters
         ----------
-            shape (_Poly3Profile): the elevation profile to add to the LateralProfile
+        shape : _Poly3Profile
+            The shape profile to add to the LateralProfile.
 
+        Returns
+        -------
+        LateralProfile
+            The updated LateralProfile object.
         &#34;&#34;&#34;
         if not isinstance(shape, _Poly3Profile):
             raise TypeError(
-                &#34;add_elevation requires an _Poly3Profile as input, not &#34;
+                &#34;add_shape requires an _Poly3Profile as input, not &#34;
                 + str(type(shape))
             )
         self.shapes.append(shape)
         return self
 
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the LateralProfile&#34;&#34;&#34;
+    def get_element(self) -&gt; ET.Element:
+        &#34;&#34;&#34;Return the ElementTree of the LateralProfile.
 
+        Returns
+        -------
+        xml.etree.ElementTree.Element
+            The lateralProfile element.
+        &#34;&#34;&#34;
         element = ET.Element(&#34;lateralProfile&#34;)
         self._add_additional_data_to_element(element)
         for i in self.superelevations:
@@ -1009,23 +1154,22 @@ add_elevation(elevation)
             element.append(i.get_element(&#34;shape&#34;))
         return element</code></pre>
 </details>
-<div class="desc"><p>the LateralProfile creates the elevationProfile element of the road in opendrive,</p>
+<div class="desc"><p>Create the lateralProfile element of the road in OpenDRIVE.</p>
 <h2 id="attributes">Attributes</h2>
-<pre><code>superelevation (list of _Poly3Profile): list of superelevations of the road
-
-shape (list of _Poly3Profile): list of shapes for the road
-</code></pre>
+<dl>
+<dt><strong><code>superelevations</code></strong> :&ensp;<code>list</code> of <code>_Poly3Profile</code></dt>
+<dd>List of superelevations of the road.</dd>
+<dt><strong><code>shapes</code></strong> :&ensp;<code>list</code> of <code>_Poly3Profile</code></dt>
+<dd>List of shapes for the road.</dd>
+</dl>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element(elementname)
-    Returns the full ElementTree of the class
-
+<p>get_element(elementname)
+Returns the full ElementTree of the class.
 add_superelevation(superelevation)
-    adds an superelevation profile to the road
-
+Adds a superelevation profile to the road.
 add_shape(shape)
-    adds a shape to the lateral profile
-</code></pre>
-<p>initalize the LateralProfile class</p></div>
+Adds a shape to the lateral profile.</p>
+<p>Initialize the LateralProfile class.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
@@ -1033,72 +1177,98 @@ add_shape(shape)
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.elevation.LateralProfile.add_shape"><code class="name flex">
-<span>def <span class="ident">add_shape</span></span>(<span>self, shape)</span>
+<span>def <span class="ident">add_shape</span></span>(<span>self, shape: _Poly3Profile) ‑> <a title="scenariogeneration.xodr.elevation.LateralProfile" href="#scenariogeneration.xodr.elevation.LateralProfile">LateralProfile</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_shape(self, shape):
-    &#34;&#34;&#34;adds an elevation to the LateralProfile
+<pre><code class="python">def add_shape(self, shape: &#34;_Poly3Profile&#34;) -&gt; &#34;LateralProfile&#34;:
+    &#34;&#34;&#34;Add a shape to the LateralProfile.
 
     Parameters
     ----------
-        shape (_Poly3Profile): the elevation profile to add to the LateralProfile
+    shape : _Poly3Profile
+        The shape profile to add to the LateralProfile.
 
+    Returns
+    -------
+    LateralProfile
+        The updated LateralProfile object.
     &#34;&#34;&#34;
     if not isinstance(shape, _Poly3Profile):
         raise TypeError(
-            &#34;add_elevation requires an _Poly3Profile as input, not &#34;
+            &#34;add_shape requires an _Poly3Profile as input, not &#34;
             + str(type(shape))
         )
     self.shapes.append(shape)
     return self</code></pre>
 </details>
-<div class="desc"><p>adds an elevation to the LateralProfile</p>
+<div class="desc"><p>Add a shape to the LateralProfile.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>shape (_Poly3Profile): the elevation profile to add to the LateralProfile
-</code></pre></div>
+<dl>
+<dt><strong><code>shape</code></strong> :&ensp;<code>_Poly3Profile</code></dt>
+<dd>The shape profile to add to the LateralProfile.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="scenariogeneration.xodr.elevation.LateralProfile" href="#scenariogeneration.xodr.elevation.LateralProfile">LateralProfile</a></code></dt>
+<dd>The updated LateralProfile object.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.elevation.LateralProfile.add_superelevation"><code class="name flex">
-<span>def <span class="ident">add_superelevation</span></span>(<span>self, superelevation)</span>
+<span>def <span class="ident">add_superelevation</span></span>(<span>self, superelevation: _Poly3Profile) ‑> <a title="scenariogeneration.xodr.elevation.LateralProfile" href="#scenariogeneration.xodr.elevation.LateralProfile">LateralProfile</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_superelevation(self, superelevation):
-    &#34;&#34;&#34;adds an elevation to the LateralProfile
+<pre><code class="python">def add_superelevation(
+    self, superelevation: &#34;_Poly3Profile&#34;
+) -&gt; &#34;LateralProfile&#34;:
+    &#34;&#34;&#34;Add a superelevation to the LateralProfile.
 
     Parameters
     ----------
-        superelevation (_Poly3Profile): the elevation profile to add to the LateralProfile
+    superelevation : _Poly3Profile
+        The superelevation profile to add to the LateralProfile.
 
+    Returns
+    -------
+    LateralProfile
+        The updated LateralProfile object.
     &#34;&#34;&#34;
     if not isinstance(superelevation, _Poly3Profile):
         raise TypeError(
-            &#34;add_elevation requires an _Poly3Profile as input, not &#34;
+            &#34;add_superelevation requires an _Poly3Profile as input, not &#34;
             + str(type(superelevation))
         )
     self.superelevations.append(superelevation)
     return self</code></pre>
 </details>
-<div class="desc"><p>adds an elevation to the LateralProfile</p>
+<div class="desc"><p>Add a superelevation to the LateralProfile.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>superelevation (_Poly3Profile): the elevation profile to add to the LateralProfile
-</code></pre></div>
+<dl>
+<dt><strong><code>superelevation</code></strong> :&ensp;<code>_Poly3Profile</code></dt>
+<dd>The superelevation profile to add to the LateralProfile.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="scenariogeneration.xodr.elevation.LateralProfile" href="#scenariogeneration.xodr.elevation.LateralProfile">LateralProfile</a></code></dt>
+<dd>The updated LateralProfile object.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.elevation.LateralProfile.eval_superelevation_at_s"><code class="name flex">
-<span>def <span class="ident">eval_superelevation_at_s</span></span>(<span>self, s)</span>
+<span>def <span class="ident">eval_superelevation_at_s</span></span>(<span>self, s: float) ‑> float</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def eval_superelevation_at_s(self, s):
+<pre><code class="python">def eval_superelevation_at_s(self, s: float) -&gt; float:
     if self.superelevations:
         return self.superelevations[
             [i for i, x in enumerate(self.superelevations) if x.s &lt;= s][-1]
@@ -1108,14 +1278,14 @@ add_shape(shape)
 <div class="desc"></div>
 </dd>
 <dt id="scenariogeneration.xodr.elevation.LateralProfile.eval_superelevation_derivative_at_s"><code class="name flex">
-<span>def <span class="ident">eval_superelevation_derivative_at_s</span></span>(<span>self, s)</span>
+<span>def <span class="ident">eval_superelevation_derivative_at_s</span></span>(<span>self, s: float) ‑> float</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def eval_superelevation_derivative_at_s(self, s):
+<pre><code class="python">def eval_superelevation_derivative_at_s(self, s: float) -&gt; float:
     if self.superelevations:
         return self.superelevations[
             [i for i, x in enumerate(self.superelevations) if x.s &lt;= s][-1]
@@ -1125,14 +1295,14 @@ add_shape(shape)
 <div class="desc"></div>
 </dd>
 <dt id="scenariogeneration.xodr.elevation.LateralProfile.eval_t_superelevation_at_s"><code class="name flex">
-<span>def <span class="ident">eval_t_superelevation_at_s</span></span>(<span>self, s, t)</span>
+<span>def <span class="ident">eval_t_superelevation_at_s</span></span>(<span>self, s: float, t: float) ‑> float</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def eval_t_superelevation_at_s(self, s, t):
+<pre><code class="python">def eval_t_superelevation_at_s(self, s: float, t: float) -&gt; float:
     if self.superelevations:
         return self.superelevations[
             [i for i, x in enumerate(self.superelevations) if x.s &lt;= s][-1]
@@ -1142,16 +1312,21 @@ add_shape(shape)
 <div class="desc"></div>
 </dd>
 <dt id="scenariogeneration.xodr.elevation.LateralProfile.get_element"><code class="name flex">
-<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+<span>def <span class="ident">get_element</span></span>(<span>self) ‑> xml.etree.ElementTree.Element</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_element(self):
-    &#34;&#34;&#34;returns the elementTree of the LateralProfile&#34;&#34;&#34;
+<pre><code class="python">def get_element(self) -&gt; ET.Element:
+    &#34;&#34;&#34;Return the ElementTree of the LateralProfile.
 
+    Returns
+    -------
+    xml.etree.ElementTree.Element
+        The lateralProfile element.
+    &#34;&#34;&#34;
     element = ET.Element(&#34;lateralProfile&#34;)
     self._add_additional_data_to_element(element)
     for i in self.superelevations:
@@ -1160,7 +1335,12 @@ add_shape(shape)
         element.append(i.get_element(&#34;shape&#34;))
     return element</code></pre>
 </details>
-<div class="desc"><p>returns the elementTree of the LateralProfile</p></div>
+<div class="desc"><p>Return the ElementTree of the LateralProfile.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>xml.etree.ElementTree.Element</code></dt>
+<dd>The lateralProfile element.</dd>
+</dl></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>

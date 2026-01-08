@@ -52,15 +52,38 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="scenariogeneration.xodr.enumerations.enumchecker"><code class="name flex">
-<span>def <span class="ident">enumchecker</span></span>(<span>value, enum_type, none_ok=False)</span>
+<span>def <span class="ident">enumchecker</span></span>(<span>value: enum.Enum | str | None,<br>enum_type: Type[enum.Enum],<br>none_ok: bool = False) ‑> enum.Enum</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def enumchecker(value, enum_type, none_ok=False):
-    &#34;&#34;&#34;checks if a enum is correct, and if input is a string, tries to convert it to the enum&#34;&#34;&#34;
+<pre><code class="python">def enumchecker(
+    value: Union[Enum, str, None], enum_type: Type[Enum], none_ok: bool = False
+) -&gt; Enum:
+    &#34;&#34;&#34;Check if an enum value is correct. If the input is a string, attempt to
+    convert it to the enum.
+
+    Parameters
+    ----------
+    value : Enum or str or None
+        The value to check or convert.
+    enum_type : Type[Enum]
+        The enumeration type to validate against.
+    none_ok : bool, optional
+        Whether None is an acceptable value. Defaults to False.
+
+    Returns
+    -------
+    Enum
+        The validated or converted enum value.
+
+    Raises
+    ------
+    TypeError
+        If the value is invalid or cannot be converted to the enum type.
+    &#34;&#34;&#34;
     if value is None:
         if none_ok:
             return value
@@ -71,7 +94,9 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
             return value
         else:
             raise TypeError(
-                value.get_name() + &#34; is not of Enumeration type :&#34; + str(enum_type)
+                value.get_name()
+                + &#34; is not of Enumeration type :&#34;
+                + str(enum_type)
             )
 
     elif isinstance(value, str):
@@ -84,9 +109,31 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
                 + str(enum_type)
             )
     else:
-        raise TypeError(&#34;Type: &#34; + type(enum_type) + &#34; is not a valid input for Enums.&#34;)</code></pre>
+        raise TypeError(
+            &#34;Type: &#34; + type(enum_type) + &#34; is not a valid input for Enums.&#34;
+        )</code></pre>
 </details>
-<div class="desc"><p>checks if a enum is correct, and if input is a string, tries to convert it to the enum</p></div>
+<div class="desc"><p>Check if an enum value is correct. If the input is a string, attempt to
+convert it to the enum.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>value</code></strong> :&ensp;<code>Enum</code> or <code>str</code> or <code>None</code></dt>
+<dd>The value to check or convert.</dd>
+<dt><strong><code>enum_type</code></strong> :&ensp;<code>Type[Enum]</code></dt>
+<dd>The enumeration type to validate against.</dd>
+<dt><strong><code>none_ok</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Whether None is an acceptable value. Defaults to False.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Enum</code></dt>
+<dd>The validated or converted enum value.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>TypeError</code></dt>
+<dd>If the value is invalid or cannot be converted to the enum type.</dd>
+</dl></div>
 </dd>
 </dl>
 </section>
@@ -103,7 +150,7 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Access(Enum):
-    &#34;&#34;&#34;Enum for ParkingSpace Access&#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for ParkingSpace Access.&#34;&#34;&#34;
 
     all = auto()
     bus = auto()
@@ -114,7 +161,7 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
     truck = auto()
     woman = auto()</code></pre>
 </details>
-<div class="desc"><p>Enum for ParkingSpace Access</p></div>
+<div class="desc"><p>Enum for ParkingSpace Access.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -165,12 +212,12 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ContactPoint(Enum):
-    &#34;&#34;&#34;Enum for ContactPoint&#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for ContactPoint.&#34;&#34;&#34;
 
     start = auto()
     end = auto()</code></pre>
 </details>
-<div class="desc"><p>Enum for ContactPoint</p></div>
+<div class="desc"><p>Enum for ContactPoint.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -197,12 +244,12 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Direction(Enum):
-    &#34;&#34;&#34;Enum for Direction&#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for Direction.&#34;&#34;&#34;
 
     same = auto()
     opposite = auto()</code></pre>
 </details>
-<div class="desc"><p>Enum for Direction</p></div>
+<div class="desc"><p>Enum for Direction.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -229,12 +276,12 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Dynamic(Enum):
-    &#34;&#34;&#34;Enum for Dynamic&#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for Dynamic.&#34;&#34;&#34;
 
     yes = auto()
     no = auto()</code></pre>
 </details>
-<div class="desc"><p>Enum for Dynamic</p></div>
+<div class="desc"><p>Enum for Dynamic.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -261,12 +308,12 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ElementType(Enum):
-    &#34;&#34;&#34;Enum for LaneChange&#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for LaneChange.&#34;&#34;&#34;
 
     road = auto()
     junction = auto()</code></pre>
 </details>
-<div class="desc"><p>Enum for LaneChange</p></div>
+<div class="desc"><p>Enum for LaneChange.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -293,7 +340,7 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class FillType(Enum):
-    &#34;&#34;&#34;Enum for FillType&#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for FillType.&#34;&#34;&#34;
 
     asphalt = auto()
     cobble = auto()
@@ -303,7 +350,7 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
     pavement = auto()
     soil = auto()</code></pre>
 </details>
-<div class="desc"><p>Enum for FillType</p></div>
+<div class="desc"><p>Enum for FillType.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -350,12 +397,12 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class JunctionGroupType(Enum):
-    &#34;&#34;&#34;Enum for JunctionGroup&#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for JunctionGroup.&#34;&#34;&#34;
 
     roundabout = auto()
     unknown = auto()</code></pre>
 </details>
-<div class="desc"><p>Enum for JunctionGroup</p></div>
+<div class="desc"><p>Enum for JunctionGroup.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -382,13 +429,13 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class JunctionType(Enum):
-    &#34;&#34;&#34;Enum for JunctionType&#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for JunctionType.&#34;&#34;&#34;
 
     default = auto()
     virtual = auto()
     direct = auto()</code></pre>
 </details>
-<div class="desc"><p>Enum for JunctionType</p></div>
+<div class="desc"><p>Enum for JunctionType.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -419,14 +466,14 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class LaneChange(Enum):
-    &#34;&#34;&#34;Enum for LaneChange&#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for LaneChange.&#34;&#34;&#34;
 
     increase = auto()
     decrease = auto()
     both = auto()
     none = auto()</code></pre>
 </details>
-<div class="desc"><p>Enum for LaneChange</p></div>
+<div class="desc"><p>Enum for LaneChange.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -461,7 +508,7 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class LaneType(Enum):
-    &#34;&#34;&#34;Enum for LaneType&#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for LaneType.&#34;&#34;&#34;
 
     none = auto()
     driving = auto()
@@ -492,7 +539,7 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
     mwyEntry = auto()
     mwyExit = auto()</code></pre>
 </details>
-<div class="desc"><p>Enum for LaneType</p></div>
+<div class="desc"><p>Enum for LaneType.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -623,13 +670,13 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class MarkRule(Enum):
-    &#34;&#34;&#34;Enum for MarkRule&#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for MarkRule.&#34;&#34;&#34;
 
     no_passing = auto()
     caution = auto()
     none = auto()</code></pre>
 </details>
-<div class="desc"><p>Enum for MarkRule</p></div>
+<div class="desc"><p>Enum for MarkRule.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -660,7 +707,8 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ObjectType(Enum):
-    &#34;&#34;&#34;Enum for ObjectType taken from OpenDRIVE 1.6 without deprecated types&#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for ObjectType taken from OpenDRIVE 1.6 without deprecated
+    types.&#34;&#34;&#34;
 
     none = auto()
     obstacle = auto()
@@ -679,7 +727,8 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
     soundBarrier = auto()
     roadMark = auto()</code></pre>
 </details>
-<div class="desc"><p>Enum for ObjectType taken from OpenDRIVE 1.6 without deprecated types</p></div>
+<div class="desc"><p>Enum for ObjectType taken from OpenDRIVE 1.6 without deprecated
+types.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -762,13 +811,13 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Orientation(Enum):
-    &#34;&#34;&#34;Enum for Orientation&#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for Orientation.&#34;&#34;&#34;
 
     positive = auto()
     negative = auto()
     none = auto()</code></pre>
 </details>
-<div class="desc"><p>Enum for Orientation</p></div>
+<div class="desc"><p>Enum for Orientation.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -799,14 +848,14 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class RawDataPostProcessing(Enum):
-    &#34;&#34;&#34;Enum for dataQuality RawData PostProcessing&#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for dataQuality RawData PostProcessing.&#34;&#34;&#34;
 
     cleaned = auto()
     fused = auto()
     property = auto()
     raw = auto()</code></pre>
 </details>
-<div class="desc"><p>Enum for dataQuality RawData PostProcessing</p></div>
+<div class="desc"><p>Enum for dataQuality RawData PostProcessing.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -841,13 +890,13 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class RawDataSource(Enum):
-    &#34;&#34;&#34;Enum for dataQuality RawData PostProcessing&#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for dataQuality RawData PostProcessing.&#34;&#34;&#34;
 
     cadaster = auto()
     custom = auto()
     sensor = auto()</code></pre>
 </details>
-<div class="desc"><p>Enum for dataQuality RawData PostProcessing</p></div>
+<div class="desc"><p>Enum for dataQuality RawData PostProcessing.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -878,7 +927,7 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class RoadMarkColor(Enum):
-    &#34;&#34;&#34;Enum for RoadMarkColor&#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for RoadMarkColor.&#34;&#34;&#34;
 
     standard = auto()
     blue = auto()
@@ -886,10 +935,9 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
     red = auto()
     white = auto()
     yellow = auto()
-    orange = auto()
-    faded_white = auto()</code></pre>
+    orange = auto()</code></pre>
 </details>
-<div class="desc"><p>Enum for RoadMarkColor</p></div>
+<div class="desc"><p>Enum for RoadMarkColor.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -897,10 +945,6 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <h3>Class variables</h3>
 <dl>
 <dt id="scenariogeneration.xodr.enumerations.RoadMarkColor.blue"><code class="name">var <span class="ident">blue</span></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="scenariogeneration.xodr.enumerations.RoadMarkColor.faded_white"><code class="name">var <span class="ident">faded_white</span></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -940,7 +984,7 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class RoadMarkType(Enum):
-    &#34;&#34;&#34;Enum for RoadMarkType&#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for RoadMarkType.&#34;&#34;&#34;
 
     none = auto()
     solid = auto()
@@ -955,7 +999,7 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
     custom = auto()
     edge = auto()</code></pre>
 </details>
-<div class="desc"><p>Enum for RoadMarkType</p></div>
+<div class="desc"><p>Enum for RoadMarkType.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -1022,12 +1066,12 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class RoadMarkWeight(Enum):
-    &#34;&#34;&#34;Enum for RoadMarkWeight&#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for RoadMarkWeight.&#34;&#34;&#34;
 
     standard = auto()
     bold = auto()</code></pre>
 </details>
-<div class="desc"><p>Enum for RoadMarkWeight</p></div>
+<div class="desc"><p>Enum for RoadMarkWeight.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -1054,13 +1098,13 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class RoadSide(Enum):
-    &#34;&#34;&#34;Enum for RoadSide&#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for RoadSide.&#34;&#34;&#34;
 
     both = auto()
     left = auto()
     right = auto()</code></pre>
 </details>
-<div class="desc"><p>Enum for RoadSide</p></div>
+<div class="desc"><p>Enum for RoadSide.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -1091,7 +1135,7 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class RoadType(Enum):
-    &#34;&#34;&#34;Enum for RoadType&#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for RoadType.&#34;&#34;&#34;
 
     unknown = auto()
     rural = auto()
@@ -1107,7 +1151,7 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
     townLocal = auto()
     townPlayStreet = auto()</code></pre>
 </details>
-<div class="desc"><p>Enum for RoadType</p></div>
+<div class="desc"><p>Enum for RoadType.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -1168,6 +1212,48 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 </dd>
 </dl>
 </dd>
+<dt id="scenariogeneration.xodr.enumerations.SideType"><code class="flex name class">
+<span>class <span class="ident">SideType</span></span>
+<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SideType(Enum):
+    &#34;&#34;&#34;Enum of the sideType&#34;&#34;&#34;
+
+    front = auto()
+    left = auto()
+    rear = auto()
+    right = auto()</code></pre>
+</details>
+<div class="desc"><p>Enum of the sideType</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="scenariogeneration.xodr.enumerations.SideType.front"><code class="name">var <span class="ident">front</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xodr.enumerations.SideType.left"><code class="name">var <span class="ident">left</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xodr.enumerations.SideType.rear"><code class="name">var <span class="ident">rear</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="scenariogeneration.xodr.enumerations.SideType.right"><code class="name">var <span class="ident">right</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
 <dt id="scenariogeneration.xodr.enumerations.TrafficRule"><code class="flex name class">
 <span>class <span class="ident">TrafficRule</span></span>
 <span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
@@ -1178,13 +1264,13 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class TrafficRule(Enum):
-    &#34;&#34;&#34;Enum for MarkRule&#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for TrafficRule.&#34;&#34;&#34;
 
     RHT = auto()
     LHT = auto()
     none = auto()</code></pre>
 </details>
-<div class="desc"><p>Enum for MarkRule</p></div>
+<div class="desc"><p>Enum for TrafficRule.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -1215,12 +1301,12 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class TunnelType(Enum):
-    &#34;&#34;&#34;Enum for TunnelType&#34;&#34;&#34;
+    &#34;&#34;&#34;Enum for TunnelType.&#34;&#34;&#34;
 
     standard = auto()
     underpass = auto()</code></pre>
 </details>
-<div class="desc"><p>Enum for TunnelType</p></div>
+<div class="desc"><p>Enum for TunnelType.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>enum.Enum</li>
@@ -1425,7 +1511,6 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <h4><code><a title="scenariogeneration.xodr.enumerations.RoadMarkColor" href="#scenariogeneration.xodr.enumerations.RoadMarkColor">RoadMarkColor</a></code></h4>
 <ul class="two-column">
 <li><code><a title="scenariogeneration.xodr.enumerations.RoadMarkColor.blue" href="#scenariogeneration.xodr.enumerations.RoadMarkColor.blue">blue</a></code></li>
-<li><code><a title="scenariogeneration.xodr.enumerations.RoadMarkColor.faded_white" href="#scenariogeneration.xodr.enumerations.RoadMarkColor.faded_white">faded_white</a></code></li>
 <li><code><a title="scenariogeneration.xodr.enumerations.RoadMarkColor.green" href="#scenariogeneration.xodr.enumerations.RoadMarkColor.green">green</a></code></li>
 <li><code><a title="scenariogeneration.xodr.enumerations.RoadMarkColor.orange" href="#scenariogeneration.xodr.enumerations.RoadMarkColor.orange">orange</a></code></li>
 <li><code><a title="scenariogeneration.xodr.enumerations.RoadMarkColor.red" href="#scenariogeneration.xodr.enumerations.RoadMarkColor.red">red</a></code></li>
@@ -1482,6 +1567,15 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <li><code><a title="scenariogeneration.xodr.enumerations.RoadType.townPlayStreet" href="#scenariogeneration.xodr.enumerations.RoadType.townPlayStreet">townPlayStreet</a></code></li>
 <li><code><a title="scenariogeneration.xodr.enumerations.RoadType.townPrivate" href="#scenariogeneration.xodr.enumerations.RoadType.townPrivate">townPrivate</a></code></li>
 <li><code><a title="scenariogeneration.xodr.enumerations.RoadType.unknown" href="#scenariogeneration.xodr.enumerations.RoadType.unknown">unknown</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="scenariogeneration.xodr.enumerations.SideType" href="#scenariogeneration.xodr.enumerations.SideType">SideType</a></code></h4>
+<ul class="">
+<li><code><a title="scenariogeneration.xodr.enumerations.SideType.front" href="#scenariogeneration.xodr.enumerations.SideType.front">front</a></code></li>
+<li><code><a title="scenariogeneration.xodr.enumerations.SideType.left" href="#scenariogeneration.xodr.enumerations.SideType.left">left</a></code></li>
+<li><code><a title="scenariogeneration.xodr.enumerations.SideType.rear" href="#scenariogeneration.xodr.enumerations.SideType.rear">rear</a></code></li>
+<li><code><a title="scenariogeneration.xodr.enumerations.SideType.right" href="#scenariogeneration.xodr.enumerations.SideType.right">right</a></code></li>
 </ul>
 </li>
 <li>

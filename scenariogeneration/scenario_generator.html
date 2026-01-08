@@ -62,9 +62,9 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ScenarioGenerator:
-    &#34;&#34;&#34;ScenarioTemplate is a class that should be inherited by a
-    Scenario class in order to generate xodr and xosc files based on
-    the submodules xodr and xosc
+    &#34;&#34;&#34;ScenarioTemplate is a class that should be inherited by a Scenario class
+    in order to generate xodr and xosc files based on the submodules xodr and
+    xosc.
 
     Two main uses, in your generation class define self.parameters as
     either as:
@@ -95,6 +95,14 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 
     encoding : str
         encoding of the outputs, default: utf-8
+
+    excluded_permutations : list[dict]
+        list of parameter dicts to exclude from generation
+
+    expand_permutations : list[dict[list]]
+        list of dicts where each dict has lists as values, all combinations
+        of these lists will be expanded and combined with the other
+        permutations
     &#34;&#34;&#34;
 
     def __init__(self):
@@ -115,9 +123,11 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
         self.encoding = &#34;utf-8&#34;
         self.all_permutations = None
         self.write_relative_road_path = None
+        self.excluded_permutations = []
+        self.expand_permutations = []
 
-    def road(self, **kwargs) -&gt; Optional[Road]:
-        &#34;&#34;&#34;Dummy method for generating an OpenDRIVE road
+    def road(self, **kwargs) -&gt; Optional[OpenDrive]:
+        &#34;&#34;&#34;Dummy method for generating an OpenDRIVE road.
 
         Should be overwritten by the user, and return a pyodrx.OpenDrive
         object
@@ -130,7 +140,7 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
         return None
 
     def scenario(self, **kwargs) -&gt; Optional[Scenario]:
-        &#34;&#34;&#34;Dummy method for generating a OpenScenario file
+        &#34;&#34;&#34;Dummy method for generating a OpenScenario file.
 
         Should be overwritten by the user, and return a pyoscx.Scenario
         object
@@ -143,18 +153,17 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
         return None
 
     def _reset_name_counter(self):
-        &#34;&#34;&#34;method to reset the counter if numerical naming is used.&#34;&#34;&#34;
+        &#34;&#34;&#34;Method to reset the counter if numerical naming is used.&#34;&#34;&#34;
         self._it = 0
 
     def _create_folder_structure(self, generation_folder: str):
-        &#34;&#34;&#34;method to create a folder structure (if needed) to generate
-        the scenarios and roads in
+        &#34;&#34;&#34;Method to create a folder structure (if needed) to generate the
+        scenarios and roads in.
 
         Parameters
         ----------
         generation_folder : str
             the path to a folder where the files should be generated
-
         &#34;&#34;&#34;
         xosc_folder = os.path.join(generation_folder, &#34;xosc&#34;)
         xodr_folder = os.path.join(generation_folder, &#34;xodr&#34;)
@@ -169,16 +178,15 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
         self._generation_folder = generation_folder
 
     def print_permutations(
-        self, override_parameters: Optional[list] | Optional[dict] = None
+        self, override_parameters: Optional[Union[list, dict]] = None
     ):
-        &#34;&#34;&#34;print_permutations will create a printout to view all
-        permutations created
+        &#34;&#34;&#34;print_permutations will create a printout to view all permutations
+        created.
 
         Parameters
         ----------
         override_parameters :Optional[list] | Optional[dict]
             overrides the self.parameters attribute
-
         &#34;&#34;&#34;
         if override_parameters:
             self.parameters = override_parameters
@@ -193,22 +201,51 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
             it += 1
 
     def _handle_input_parameters(self):
-        &#34;&#34;&#34;_handle_input_parameters takes care of different types of
-        parameters inputs,
-        such as list of dicts or a dict of lists
-        &#34;&#34;&#34;
+        &#34;&#34;&#34;_handle_input_parameters takes care of different types of parameters
+        inputs, such as list of dicts or a dict of lists.&#34;&#34;&#34;
+
+        def expand_dict_of_lists(d):
+            keys = d.keys()
+            values = d.values()
+            return [
+                dict(zip(keys, combo)) for combo in itertools.product(*values)
+            ]
+
+        def combine(base_dicts, variants):
+            permutations = []
+            for base in base_dicts:
+                for variant in variants:
+                    permutations.append({**base, **variant})
+            return permutations
 
         if isinstance(self.parameters, dict):
             self._create_permutations()
 
         elif isinstance(self.parameters, list):
             self.all_permutations = self.parameters
+            if self.expand_permutations:
+                for d in self.expand_permutations:
+                    expanded = expand_dict_of_lists(d)
+                    self.all_permutations = combine(
+                        self.all_permutations, expanded
+                    )
+
+        if self.excluded_permutations:
+            self.all_permutations = [
+                p
+                for p in self.all_permutations
+                if not any(
+                    set(ex.keys()) == set(p.keys())
+                    and all(p[k] == ex[k] for k in ex)
+                    for ex in self.excluded_permutations
+                )
+            ]
 
     def _generate_road_and_scenario(
         self, permutation: dict
-    ) -&gt; tuple[str, str]:
-        &#34;&#34;&#34;_generate_road_and_scenario takes a permutation and generates
-        the road/scenario (if specified)
+    ) -&gt; tuple[str, str, list[_GenerationStruct]]:
+        &#34;&#34;&#34;_generate_road_and_scenario takes a permutation and generates the
+        road/scenario (if specified)
 
         Parameters
         ----------
@@ -282,8 +319,8 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
         return scenario_file, self.road_file, files_to_write
 
     def _get_scenario_name(self, permutation: dict) -&gt; str:
-        &#34;&#34;&#34;_get_scenario_name generates the name of the wanted file,
-        based on the permutation
+        &#34;&#34;&#34;_get_scenario_name generates the name of the wanted file, based on
+        the permutation.
 
         Parameters
         ----------
@@ -329,13 +366,13 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
     def generate_single(
         self,
         generation_folder: str,
-        order: str | int = &#34;first&#34;,
-        override_parameters: Optional[list] | Optional[dict] = None,
+        order: Union[str, int] = &#34;first&#34;,
+        override_parameters: Optional[Union[list, dict]] = None,
         write_relative_road_path: bool = True,
         name_separator: Optional[str] = None,
         prettyprint: bool = True,
     ):
-        &#34;&#34;&#34;generate_single will generate only one scenario
+        &#34;&#34;&#34;generate_single will generate only one scenario.
 
         Parameters
         ----------
@@ -399,16 +436,15 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
     def generate(
         self,
         generation_folder: str,
-        override_parameters: Optional[list] | Optional[dict] = None,
+        override_parameters: Optional[Union[list, dict]] = None,
         write_relative_road_path: bool = True,
         name_separator: Optional[str] = None,
         prettyprint: bool = True,
     ):
-        &#34;&#34;&#34;generate uses the xosc.Scenario defined in the method
-        scenario and the xodr.OpenDrive (optional) in the road method
-        together with the parameters attribute to generate scenarios and
-        roads for all permutations defined and save those files in the
-        generation_folder.
+        &#34;&#34;&#34;Generate uses the xosc.Scenario defined in the method scenario and
+        the xodr.OpenDrive (optional) in the road method together with the
+        parameters attribute to generate scenarios and roads for all
+        permutations defined and save those files in the generation_folder.
 
         Parameters
         ----------
@@ -444,9 +480,11 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
         self._handle_input_parameters()
         files_to_write = []
         for p in self.all_permutations:
-            scenario_file, road_file, writables = (
-                self._generate_road_and_scenario(p)
-            )
+            (
+                scenario_file,
+                road_file,
+                writables,
+            ) = self._generate_road_and_scenario(p)
             scenario_files.append(scenario_file)
             road_files.append(road_file)
             files_to_write.extend(writables)
@@ -458,7 +496,7 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
         return scenario_files, road_files
 
     def _create_permutations(self):
-        &#34;&#34;&#34;generates all permutations of the defined parameters.&#34;&#34;&#34;
+        &#34;&#34;&#34;Generates all permutations of the defined parameters.&#34;&#34;&#34;
         parameterlist = []
         for key in self.parameters:
             parameterlist.append(self.parameters[key])
@@ -472,9 +510,9 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
                 inputdict[keys[i]] = p[i]
             self.all_permutations.append(inputdict)</code></pre>
 </details>
-<div class="desc"><p>ScenarioTemplate is a class that should be inherited by a
-Scenario class in order to generate xodr and xosc files based on
-the submodules xodr and xosc</p>
+<div class="desc"><p>ScenarioTemplate is a class that should be inherited by a Scenario class
+in order to generate xodr and xosc files based on the submodules xodr and
+xosc.</p>
 <p>Two main uses, in your generation class define self.parameters as
 either as:
 - a dict of lists, where the lists are the values you want to sweep
@@ -497,6 +535,12 @@ the list is one scenario</p>
 <dd>basename of the scenariofiles, default: name of file</dd>
 <dt><strong><code>encoding</code></strong> :&ensp;<code>str</code></dt>
 <dd>encoding of the outputs, default: utf-8</dd>
+<dt><strong><code>excluded_permutations</code></strong> :&ensp;<code>list[dict]</code></dt>
+<dd>list of parameter dicts to exclude from generation</dd>
+<dt><strong><code>expand_permutations</code></strong> :&ensp;<code>list[dict[list]]</code></dt>
+<dd>list of dicts where each dict has lists as values, all combinations
+of these lists will be expanded and combined with the other
+permutations</dd>
 </dl></div>
 <h3>Subclasses</h3>
 <ul class="hlist">
@@ -504,6 +548,7 @@ the list is one scenario</p>
 <li><a title="examples.generator.CCRm.Scenario" href="../examples/generator/CCRm.html#examples.generator.CCRm.Scenario">Scenario</a></li>
 <li><a title="examples.generator.CCRs.Scenario" href="../examples/generator/CCRs.html#examples.generator.CCRs.Scenario">Scenario</a></li>
 <li><a title="examples.generator.generate_from_main.Scenario" href="../examples/generator/generate_from_main.html#examples.generator.generate_from_main.Scenario">Scenario</a></li>
+<li><a title="examples.generator.generate_with_expanded_permutations.Scenario" href="../examples/generator/generate_with_expanded_permutations.html#examples.generator.generate_with_expanded_permutations.Scenario">Scenario</a></li>
 <li><a title="examples.generator.generate_with_fixed_parameter_sets.Scenario" href="../examples/generator/generate_with_fixed_parameter_sets.html#examples.generator.generate_with_fixed_parameter_sets.Scenario">Scenario</a></li>
 <li><a title="examples.generator.generate_with_permutations.Scenario" href="../examples/generator/generate_with_permutations.html#examples.generator.generate_with_permutations.Scenario">Scenario</a></li>
 <li><a title="examples.xodr.adjustable_planview.Scenario" href="../examples/xodr/adjustable_planview.html#examples.xodr.adjustable_planview.Scenario">Scenario</a></li>
@@ -540,6 +585,8 @@ the list is one scenario</p>
 <li><a title="examples.xosc.Acceleration_condition.Scenario" href="../examples/xosc/Acceleration_condition.html#examples.xosc.Acceleration_condition.Scenario">Scenario</a></li>
 <li><a title="examples.xosc.Speed_condition.Scenario" href="../examples/xosc/Speed_condition.html#examples.xosc.Speed_condition.Scenario">Scenario</a></li>
 <li><a title="examples.xosc.Stop_on_offroad.Scenario" href="../examples/xosc/Stop_on_offroad.html#examples.xosc.Stop_on_offroad.Scenario">Scenario</a></li>
+<li><a title="examples.xosc.angle_condition_trigger.Scenario" href="../examples/xosc/angle_condition_trigger.html#examples.xosc.angle_condition_trigger.Scenario">Scenario</a></li>
+<li><a title="examples.xosc.clothoid_spline_shape_trajectory.Scenario" href="../examples/xosc/clothoid_spline_shape_trajectory.html#examples.xosc.clothoid_spline_shape_trajectory.Scenario">Scenario</a></li>
 <li><a title="examples.xosc.end_of_road_reset_traffic.Scenario" href="../examples/xosc/end_of_road_reset_traffic.html#examples.xosc.end_of_road_reset_traffic.Scenario">Scenario</a></li>
 <li><a title="examples.xosc.multi_conditional_and_triggers.Scenario" href="../examples/xosc/multi_conditional_and_triggers.html#examples.xosc.multi_conditional_and_triggers.Scenario">Scenario</a></li>
 <li><a title="examples.xosc.multi_conditional_different_actions.Scenario" href="../examples/xosc/multi_conditional_different_actions.html#examples.xosc.multi_conditional_different_actions.Scenario">Scenario</a></li>
@@ -550,6 +597,7 @@ the list is one scenario</p>
 <li><a title="examples.xosc.route_in_crossing.Scenario" href="../examples/xosc/route_in_crossing.html#examples.xosc.route_in_crossing.Scenario">Scenario</a></li>
 <li><a title="examples.xosc.speed_profile.Scenario" href="../examples/xosc/speed_profile.html#examples.xosc.speed_profile.Scenario">Scenario</a></li>
 <li><a title="examples.xosc.syncronize_straight_example.Scenario" href="../examples/xosc/syncronize_straight_example.html#examples.xosc.syncronize_straight_example.Scenario">Scenario</a></li>
+<li><a title="examples.xosc.trailer_example.Scenario" href="../examples/xosc/trailer_example.html#examples.xosc.trailer_example.Scenario">Scenario</a></li>
 <li><a title="examples.xosc.trajectory_example.Scenario" href="../examples/xosc/trajectory_example.html#examples.xosc.trajectory_example.Scenario">Scenario</a></li>
 <li><a title="examples.xosc.variable_usage.Scenario" href="../examples/xosc/variable_usage.html#examples.xosc.variable_usage.Scenario">Scenario</a></li>
 <li><a title="examples.xosc.withcontroller.Scenario" href="../examples/xosc/withcontroller.html#examples.xosc.withcontroller.Scenario">Scenario</a></li>
@@ -567,16 +615,15 @@ the list is one scenario</p>
 <pre><code class="python">def generate(
     self,
     generation_folder: str,
-    override_parameters: Optional[list] | Optional[dict] = None,
+    override_parameters: Optional[Union[list, dict]] = None,
     write_relative_road_path: bool = True,
     name_separator: Optional[str] = None,
     prettyprint: bool = True,
 ):
-    &#34;&#34;&#34;generate uses the xosc.Scenario defined in the method
-    scenario and the xodr.OpenDrive (optional) in the road method
-    together with the parameters attribute to generate scenarios and
-    roads for all permutations defined and save those files in the
-    generation_folder.
+    &#34;&#34;&#34;Generate uses the xosc.Scenario defined in the method scenario and
+    the xodr.OpenDrive (optional) in the road method together with the
+    parameters attribute to generate scenarios and roads for all
+    permutations defined and save those files in the generation_folder.
 
     Parameters
     ----------
@@ -612,9 +659,11 @@ the list is one scenario</p>
     self._handle_input_parameters()
     files_to_write = []
     for p in self.all_permutations:
-        scenario_file, road_file, writables = (
-            self._generate_road_and_scenario(p)
-        )
+        (
+            scenario_file,
+            road_file,
+            writables,
+        ) = self._generate_road_and_scenario(p)
         scenario_files.append(scenario_file)
         road_files.append(road_file)
         files_to_write.extend(writables)
@@ -625,11 +674,10 @@ the list is one scenario</p>
     self._reset_name_counter()
     return scenario_files, road_files</code></pre>
 </details>
-<div class="desc"><p>generate uses the xosc.Scenario defined in the method
-scenario and the xodr.OpenDrive (optional) in the road method
-together with the parameters attribute to generate scenarios and
-roads for all permutations defined and save those files in the
-generation_folder.</p>
+<div class="desc"><p>Generate uses the xosc.Scenario defined in the method scenario and
+the xodr.OpenDrive (optional) in the road method together with the
+parameters attribute to generate scenarios and roads for all
+permutations defined and save those files in the generation_folder.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>generation_folder</code></strong> :&ensp;<code>str</code></dt>
@@ -659,13 +707,13 @@ writing to xml (will take longer time). Default: True</dd>
 <pre><code class="python">def generate_single(
     self,
     generation_folder: str,
-    order: str | int = &#34;first&#34;,
-    override_parameters: Optional[list] | Optional[dict] = None,
+    order: Union[str, int] = &#34;first&#34;,
+    override_parameters: Optional[Union[list, dict]] = None,
     write_relative_road_path: bool = True,
     name_separator: Optional[str] = None,
     prettyprint: bool = True,
 ):
-    &#34;&#34;&#34;generate_single will generate only one scenario
+    &#34;&#34;&#34;generate_single will generate only one scenario.
 
     Parameters
     ----------
@@ -726,7 +774,7 @@ writing to xml (will take longer time). Default: True</dd>
     self._reset_name_counter()
     return osc, odr</code></pre>
 </details>
-<div class="desc"><p>generate_single will generate only one scenario</p>
+<div class="desc"><p>generate_single will generate only one scenario.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>generation_folder</code></strong> :&ensp;<code>str</code></dt>
@@ -763,16 +811,15 @@ writing to xml (will take longer time). Default: True</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def print_permutations(
-    self, override_parameters: Optional[list] | Optional[dict] = None
+    self, override_parameters: Optional[Union[list, dict]] = None
 ):
-    &#34;&#34;&#34;print_permutations will create a printout to view all
-    permutations created
+    &#34;&#34;&#34;print_permutations will create a printout to view all permutations
+    created.
 
     Parameters
     ----------
     override_parameters :Optional[list] | Optional[dict]
         overrides the self.parameters attribute
-
     &#34;&#34;&#34;
     if override_parameters:
         self.parameters = override_parameters
@@ -786,22 +833,22 @@ writing to xml (will take longer time). Default: True</p></div>
         print(printstr)
         it += 1</code></pre>
 </details>
-<div class="desc"><p>print_permutations will create a printout to view all
-permutations created</p>
+<div class="desc"><p>print_permutations will create a printout to view all permutations
+created.</p>
 <h2 id="parameters">Parameters</h2>
 <p>override_parameters :Optional[list] | Optional[dict]
 overrides the self.parameters attribute</p></div>
 </dd>
 <dt id="scenariogeneration.scenario_generator.ScenarioGenerator.road"><code class="name flex">
-<span>def <span class="ident">road</span></span>(<span>self, **kwargs) ‑> <a title="scenariogeneration.xodr.opendrive.Road" href="xodr/opendrive.html#scenariogeneration.xodr.opendrive.Road">Road</a> | None</span>
+<span>def <span class="ident">road</span></span>(<span>self, **kwargs) ‑> <a title="scenariogeneration.xodr.opendrive.OpenDrive" href="xodr/opendrive.html#scenariogeneration.xodr.opendrive.OpenDrive">OpenDrive</a> | None</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def road(self, **kwargs) -&gt; Optional[Road]:
-    &#34;&#34;&#34;Dummy method for generating an OpenDRIVE road
+<pre><code class="python">def road(self, **kwargs) -&gt; Optional[OpenDrive]:
+    &#34;&#34;&#34;Dummy method for generating an OpenDRIVE road.
 
     Should be overwritten by the user, and return a pyodrx.OpenDrive
     object
@@ -813,7 +860,7 @@ overrides the self.parameters attribute</p></div>
     &#34;&#34;&#34;
     return None</code></pre>
 </details>
-<div class="desc"><p>Dummy method for generating an OpenDRIVE road</p>
+<div class="desc"><p>Dummy method for generating an OpenDRIVE road.</p>
 <p>Should be overwritten by the user, and return a pyodrx.OpenDrive
 object</p>
 <h2 id="return">Return</h2>
@@ -829,7 +876,7 @@ a road on xodr.OpenDrive format</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def scenario(self, **kwargs) -&gt; Optional[Scenario]:
-    &#34;&#34;&#34;Dummy method for generating a OpenScenario file
+    &#34;&#34;&#34;Dummy method for generating a OpenScenario file.
 
     Should be overwritten by the user, and return a pyoscx.Scenario
     object
@@ -841,7 +888,7 @@ a road on xodr.OpenDrive format</p></div>
     &#34;&#34;&#34;
     return None</code></pre>
 </details>
-<div class="desc"><p>Dummy method for generating a OpenScenario file</p>
+<div class="desc"><p>Dummy method for generating a OpenScenario file.</p>
 <p>Should be overwritten by the user, and return a pyoscx.Scenario
 object</p>
 <h2 id="return">Return</h2>

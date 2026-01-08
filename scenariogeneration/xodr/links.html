@@ -52,24 +52,30 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="scenariogeneration.xodr.links.are_roads_connected"><code class="name flex">
-<span>def <span class="ident">are_roads_connected</span></span>(<span>road1, road2)</span>
+<span>def <span class="ident">are_roads_connected</span></span>(<span>road1: Road, road2: Road) ‑> tuple[bool, str]</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def are_roads_connected(road1, road2):
-    &#34;&#34;&#34;checks if road1 and road2 are connected as successor/successor or predecessor/predecessor
+<pre><code class="python">def are_roads_connected(road1: &#34;Road&#34;, road2: &#34;Road&#34;) -&gt; tuple[bool, str]:
+    &#34;&#34;&#34;Check if `road1` and `road2` are connected as successor/successor or
+    predecessor/predecessor.
 
     Parameters
     ----------
-        road1 (Road): the first road
+    road1 : Road
+        The first road.
+    road2 : Road
+        The second road.
 
-        road1 (Road): the second road
     Returns
     -------
-        bool, str (successor or predecessor)
+    tuple[bool, str]
+        A tuple where the first element is a boolean indicating if the
+        roads are connected, and the second element is a string
+        (&#34;successor&#34; or &#34;predecessor&#34;) describing the connection type.
     &#34;&#34;&#34;
     if road1.successor is not None and road2.successor is not None:
         if (
@@ -93,35 +99,45 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
                 return True, &#34;predecessor&#34;
     return False, &#34;&#34;</code></pre>
 </details>
-<div class="desc"><p>checks if road1 and road2 are connected as successor/successor or predecessor/predecessor</p>
+<div class="desc"><p>Check if <code>road1</code> and <code>road2</code> are connected as successor/successor or
+predecessor/predecessor.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>road1 (Road): the first road
-
-road1 (Road): the second road
-</code></pre>
+<dl>
+<dt><strong><code>road1</code></strong> :&ensp;<code>Road</code></dt>
+<dd>The first road.</dd>
+<dt><strong><code>road2</code></strong> :&ensp;<code>Road</code></dt>
+<dd>The second road.</dd>
+</dl>
 <h2 id="returns">Returns</h2>
-<pre><code>bool, str (successor or predecessor)
-</code></pre></div>
+<dl>
+<dt><code>tuple[bool, str]</code></dt>
+<dd>A tuple where the first element is a boolean indicating if the
+roads are connected, and the second element is a string
+("successor" or "predecessor") describing the connection type.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.links.are_roads_consecutive"><code class="name flex">
-<span>def <span class="ident">are_roads_consecutive</span></span>(<span>road1, road2)</span>
+<span>def <span class="ident">are_roads_consecutive</span></span>(<span>road1: Road, road2: Road) ‑> bool</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def are_roads_consecutive(road1, road2):
-    &#34;&#34;&#34;checks if road2 follows road1
+<pre><code class="python">def are_roads_consecutive(road1: &#34;Road&#34;, road2: &#34;Road&#34;) -&gt; bool:
+    &#34;&#34;&#34;Check if `road2` follows `road1`.
 
     Parameters
     ----------
-        road1 (Road): the first road
+    road1 : Road
+        The first road.
+    road2 : Road
+        The second road.
 
-        road1 (Road): the second road
     Returns
     -------
-        bool
+    bool
+        True if `road2` follows `road1`, False otherwise.
     &#34;&#34;&#34;
 
     if road1.successor is not None and road2.predecessor is not None:
@@ -137,33 +153,38 @@ road1 (Road): the second road
 
     return False</code></pre>
 </details>
-<div class="desc"><p>checks if road2 follows road1</p>
+<div class="desc"><p>Check if <code>road2</code> follows <code>road1</code>.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>road1 (Road): the first road
-
-road1 (Road): the second road
-</code></pre>
+<dl>
+<dt><strong><code>road1</code></strong> :&ensp;<code>Road</code></dt>
+<dd>The first road.</dd>
+<dt><strong><code>road2</code></strong> :&ensp;<code>Road</code></dt>
+<dd>The second road.</dd>
+</dl>
 <h2 id="returns">Returns</h2>
-<pre><code>bool
-</code></pre></div>
+<dl>
+<dt><code>bool</code></dt>
+<dd>True if <code>road2</code> follows <code>road1</code>, False otherwise.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.links.create_lane_links"><code class="name flex">
-<span>def <span class="ident">create_lane_links</span></span>(<span>road1, road2)</span>
+<span>def <span class="ident">create_lane_links</span></span>(<span>road1: Road, road2: Road)</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def create_lane_links(road1, road2):
-    &#34;&#34;&#34;create_lane_links takes two roads and if they are connected, match their lanes
-    and creates lane links.
+<pre><code class="python">def create_lane_links(road1: &#34;Road&#34;, road2: &#34;Road&#34;) -&gt; None:
+    &#34;&#34;&#34;Match lanes of two roads and create lane links if they are
+    connected.
 
     Parameters
     ----------
-        road1 (Road): first road to be lane linked
-
-        road2 (Road): second road to be lane linked
+    road1 : Road
+        The first road to be lane linked.
+    road2 : Road
+        The second road to be lane linked.
     &#34;&#34;&#34;
     if road1.road_type == -1 and road2.road_type == -1:
         # both are roads
@@ -181,44 +202,61 @@ road1 (Road): the second road
     elif road2.road_type != -1:
         _create_links_connecting_road(road2, road1)</code></pre>
 </details>
-<div class="desc"><p>create_lane_links takes two roads and if they are connected, match their lanes
-and creates lane links.</p>
+<div class="desc"><p>Match lanes of two roads and create lane links if they are
+connected.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>road1 (Road): first road to be lane linked
-
-road2 (Road): second road to be lane linked
-</code></pre></div>
+<dl>
+<dt><strong><code>road1</code></strong> :&ensp;<code>Road</code></dt>
+<dd>The first road to be lane linked.</dd>
+<dt><strong><code>road2</code></strong> :&ensp;<code>Road</code></dt>
+<dd>The second road to be lane linked.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.links.create_lane_links_from_ids"><code class="name flex">
-<span>def <span class="ident">create_lane_links_from_ids</span></span>(<span>road1, road2, road1_lane_ids, road2_lane_ids)</span>
+<span>def <span class="ident">create_lane_links_from_ids</span></span>(<span>road1: Road, road2: Road, road1_lane_ids: list[int], road2_lane_ids: list[int])</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def create_lane_links_from_ids(road1, road2, road1_lane_ids, road2_lane_ids):
-    &#34;&#34;&#34;
-    Experimental function to connect lanes of two roads given the corresponding lane IDs
-    (numbers).
+<pre><code class="python">def create_lane_links_from_ids(
+    road1: &#34;Road&#34;,
+    road2: &#34;Road&#34;,
+    road1_lane_ids: list[int],
+    road2_lane_ids: list[int],
+) -&gt; None:
+    &#34;&#34;&#34;Connect lanes of two roads given their corresponding lane IDs.
 
-    NOTE: Usually only necessary when there is not the same amount of lanes at the
-    connection of two roads or there are new lanes with zero width at the beginning of a
-    road.
+    NOTE: This function is typically used when the number of lanes at
+    the connection of two roads differs or when new lanes with zero
+    width exist at the beginning of a road.
 
     Parameters
     ----------
-        road1 (Road): the first road
+    road1 : Road
+        The first road.
+    road2 : Road
+        The second road.
+    road1_lane_ids : list of int
+        List of lane IDs for `road1` (do not include the center lane with ID 0).
+    road2_lane_ids : list of int
+        List of lane IDs for `road2` (do not include the center lane with ID 0).
 
-        road2 (Road): the second road
-
-        road1_lane_ids (list of int): list of the ids of road1 (do not use the 0 lane)
-
-        road2_lane_ids (list of int): list of the ids of road2 (do not use the 0 lane)
-
+    Raises
+    ------
+    GeneralIssueInputArguments
+        If the lengths of `road1_lane_ids` and `road2_lane_ids` differ.
+    ValueError
+        If the center lane (ID 0) is included in either `road1_lane_ids`
+        or `road2_lane_ids`.
+    NotImplementedError
+        If linking with junction connecting roads is not supported.
     &#34;&#34;&#34;
     if len(road1_lane_ids) != len(road2_lane_ids):
-        raise GeneralIssueInputArguments(&#34;Length of the lane ID lists is not the same.&#34;)
+        raise GeneralIssueInputArguments(
+            &#34;Length of the lane ID lists is not the same.&#34;
+        )
 
     if (0 in road1_lane_ids) or (0 in road2_lane_ids):
         raise ValueError(&#34;The center lane (ID 0) should not be linked.&#34;)
@@ -227,9 +265,11 @@ road2 (Road): second road to be lane linked
         first_linktype, _, first_connecting_lanesec = _get_related_lanesection(
             road1, road2
         )
-        second_linktype, _, second_connecting_lanesec = _get_related_lanesection(
-            road2, road1
-        )
+        (
+            second_linktype,
+            _,
+            second_connecting_lanesec,
+        ) = _get_related_lanesection(road2, road1)
 
         # The road links need to be reciprocal for the lane linking to succeed
         if first_linktype == None or second_linktype == None:
@@ -263,20 +303,31 @@ road2 (Road): second road to be lane linked
             &#34;This API currently does not support linking with junction connecting roads.&#34;
         )</code></pre>
 </details>
-<div class="desc"><p>Experimental function to connect lanes of two roads given the corresponding lane IDs
-(numbers).</p>
-<p>NOTE: Usually only necessary when there is not the same amount of lanes at the
-connection of two roads or there are new lanes with zero width at the beginning of a
-road.</p>
+<div class="desc"><p>Connect lanes of two roads given their corresponding lane IDs.</p>
+<p>NOTE: This function is typically used when the number of lanes at
+the connection of two roads differs or when new lanes with zero
+width exist at the beginning of a road.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>road1 (Road): the first road
-
-road2 (Road): the second road
-
-road1_lane_ids (list of int): list of the ids of road1 (do not use the 0 lane)
-
-road2_lane_ids (list of int): list of the ids of road2 (do not use the 0 lane)
-</code></pre></div>
+<dl>
+<dt><strong><code>road1</code></strong> :&ensp;<code>Road</code></dt>
+<dd>The first road.</dd>
+<dt><strong><code>road2</code></strong> :&ensp;<code>Road</code></dt>
+<dd>The second road.</dd>
+<dt><strong><code>road1_lane_ids</code></strong> :&ensp;<code>list</code> of <code>int</code></dt>
+<dd>List of lane IDs for <code>road1</code> (do not include the center lane with ID 0).</dd>
+<dt><strong><code>road2_lane_ids</code></strong> :&ensp;<code>list</code> of <code>int</code></dt>
+<dd>List of lane IDs for <code>road2</code> (do not include the center lane with ID 0).</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>GeneralIssueInputArguments</code></dt>
+<dd>If the lengths of <code>road1_lane_ids</code> and <code>road2_lane_ids</code> differ.</dd>
+<dt><code>ValueError</code></dt>
+<dd>If the center lane (ID 0) is included in either <code>road1_lane_ids</code>
+or <code>road2_lane_ids</code>.</dd>
+<dt><code>NotImplementedError</code></dt>
+<dd>If linking with junction connecting roads is not supported.</dd>
+</dl></div>
 </dd>
 </dl>
 </section>
@@ -285,7 +336,7 @@ road2_lane_ids (list of int): list of the ids of road2 (do not use the 0 lane)
 <dl>
 <dt id="scenariogeneration.xodr.links.Connection"><code class="flex name class">
 <span>class <span class="ident">Connection</span></span>
-<span>(</span><span>incoming_road, connecting_road, contact_point, id=None)</span>
+<span>(</span><span>incoming_road: int,<br>connecting_road: int,<br>contact_point: <a title="scenariogeneration.xodr.enumerations.ContactPoint" href="enumerations.html#scenariogeneration.xodr.enumerations.ContactPoint">ContactPoint</a>,<br>id: int | None = None)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -293,54 +344,61 @@ road2_lane_ids (list of int): list of the ids of road2 (do not use the 0 lane)
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Connection(XodrBase):
-    &#34;&#34;&#34;Connection creates a connection as a base of junction
+    &#34;&#34;&#34;Create a connection as a base of a junction in OpenDRIVE.
 
     Parameters
     ----------
-        incoming_road (int): the id of the incoming road to the junction
-
-        connecting_road (int): id of the connecting road (type junction)
-
-        contact_point (ContactPoint): the contact point of the link
-
-        id (int): id of the junction (automated?)
+    incoming_road : int
+        The ID of the incoming road to the junction.
+    connecting_road : int
+        The ID of the connecting road (type junction).
+    contact_point : ContactPoint
+        The contact point of the link.
+    id : int, optional
+        The ID of the connection (automated). Default is None.
 
     Attributes
     ----------
-        incoming_road (int): the id of the incoming road to the junction
-
-        connecting_road (int): id of the connecting road (type junction)
-
-        contact_point (ContactPoint): the contact point of the link
-
-        id (int): id of the connection (automated?)
-
-        links (list of tuple(int) ): a list of all lanelinks in the connection
+    incoming_road : int
+        The ID of the incoming road to the junction.
+    connecting_road : int
+        The ID of the connecting road (type junction).
+    contact_point : ContactPoint
+        The contact point of the link.
+    id : int or None
+        The ID of the connection (automated).
+    links : list of tuple(int, int)
+        A list of all lane links in the connection.
 
     Methods
     -------
-        get_element()
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
-        add_lanelink(in_lane,out_lane)
-            Adds a lane link to the connection
+    add_lanelink(in_lane, out_lane)
+        Add a lane link to the connection.
+    get_attributes(junctiontype=JunctionType.default)
+        Return the attributes of the connection as a dictionary.
+    get_element(junctiontype=JunctionType.default)
+        Return the ElementTree representation of the connection.
     &#34;&#34;&#34;
 
-    def __init__(self, incoming_road, connecting_road, contact_point, id=None):
-        &#34;&#34;&#34;initalize the Connection
+    def __init__(
+        self,
+        incoming_road: int,
+        connecting_road: int,
+        contact_point: ContactPoint,
+        id: Optional[int] = None,
+    ) -&gt; None:
+        &#34;&#34;&#34;Initialize the `Connection` object.
 
         Parameters
         ----------
-            incoming_road (int): the id of the incoming road to the junction
-
-            connecting_road (int): id of the connecting road (for junctiontypes virutal and default), or the linkedRoad (for junctiontype direct)
-
-            contact_point (ContactPoint): the contact point of the link
-
-            id (int): id of the junction (automated)
+        incoming_road : int
+            The ID of the incoming road to the junction.
+        connecting_road : int
+            The ID of the connecting road (type junction).
+        contact_point : ContactPoint
+            The contact point of the link.
+        id : int, optional
+            The ID of the connection (automated). Default is None.
         &#34;&#34;&#34;
         super().__init__()
         self.incoming_road = incoming_road
@@ -349,7 +407,7 @@ road2_lane_ids (list of int): list of the ids of road2 (do not use the 0 lane)
         self.id = id
         self.links = []
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -&gt; bool:
         if isinstance(other, Connection) and super().__eq__(other):
             if (
                 self.get_attributes() == other.get_attributes()
@@ -358,35 +416,50 @@ road2_lane_ids (list of int): list of the ids of road2 (do not use the 0 lane)
                 return True
         return False
 
-    def _set_id(self, id):
-        &#34;&#34;&#34;id is set
+    def _set_id(self, id: int) -&gt; None:
+        &#34;&#34;&#34;Set the ID of the connection.
 
         Parameters
         ----------
-            id (int): the id of the connection
+        id : int
+            The ID to assign to the connection.
         &#34;&#34;&#34;
         if self.id == None:
             self.id = id
 
-    def add_lanelink(self, in_lane, out_lane):
-        &#34;&#34;&#34;Adds a new link to the connection
+    def add_lanelink(self, in_lane: int, out_lane: int) -&gt; &#34;Connection&#34;:
+        &#34;&#34;&#34;Add a new lane link to the connection.
 
         Parameters
         ----------
-            in_lane: lane id of the incoming road
+        in_lane : int
+            The lane ID of the incoming road.
+        out_lane : int
+            The lane ID of the outgoing road.
 
-            out_lane: lane id of the outgoing road
+        Returns
+        -------
+        Connection
+            The updated `Connection` object.
         &#34;&#34;&#34;
         self.links.append((in_lane, out_lane))
         return self
 
-    def get_attributes(self, junctiontype=JunctionType.default):
-        &#34;&#34;&#34;returns the attributes as a dict of the Connection
+    def get_attributes(
+        self, junctiontype: JunctionType = JunctionType.default
+    ) -&gt; dict:
+        &#34;&#34;&#34;Return the attributes of the connection as a dictionary.
 
         Parameters
         ----------
-            junctiontype (JunctionType): type of junction created (connections will be different)
+        junctiontype : JunctionType, optional
+            The type of junction created (connections will differ).
+            Default is `JunctionType.default`.
 
+        Returns
+        -------
+        dict
+            A dictionary containing the attributes of the connection.
         &#34;&#34;&#34;
         retdict = {}
         retdict[&#34;incomingRoad&#34;] = str(self.incoming_road)
@@ -398,64 +471,79 @@ road2_lane_ids (list of int): list of the ids of road2 (do not use the 0 lane)
             retdict[&#34;connectingRoad&#34;] = str(self.connecting_road)
         return retdict
 
-    def get_element(self, junctiontype=JunctionType.default):
-        &#34;&#34;&#34;returns the elementTree of the Connection
+    def get_element(
+        self, junctiontype: JunctionType = JunctionType.default
+    ) -&gt; ET.Element:
+        &#34;&#34;&#34;Return the ElementTree representation of the connection.
 
         Parameters
         ----------
-            junctiontype (JunctionType): type of junction created (connections will be different)
+        junctiontype : JunctionType, optional
+            The type of junction created (connections will differ).
+            Default is `JunctionType.default`.
 
+        Returns
+        -------
+        ET.Element
+            The XML ElementTree representation of the connection.
         &#34;&#34;&#34;
 
-        element = ET.Element(&#34;connection&#34;, attrib=self.get_attributes(junctiontype))
+        element = ET.Element(
+            &#34;connection&#34;, attrib=self.get_attributes(junctiontype)
+        )
         self._add_additional_data_to_element(element)
         for l in sorted(self.links, key=lambda x: x[0], reverse=True):
             ET.SubElement(
-                element, &#34;laneLink&#34;, attrib={&#34;from&#34;: str(l[0]), &#34;to&#34;: str(l[1])}
+                element,
+                &#34;laneLink&#34;,
+                attrib={&#34;from&#34;: str(l[0]), &#34;to&#34;: str(l[1])},
             )
         return element</code></pre>
 </details>
-<div class="desc"><p>Connection creates a connection as a base of junction</p>
+<div class="desc"><p>Create a connection as a base of a junction in OpenDRIVE.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>incoming_road (int): the id of the incoming road to the junction
-
-connecting_road (int): id of the connecting road (type junction)
-
-contact_point (ContactPoint): the contact point of the link
-
-id (int): id of the junction (automated?)
-</code></pre>
+<dl>
+<dt><strong><code>incoming_road</code></strong> :&ensp;<code>int</code></dt>
+<dd>The ID of the incoming road to the junction.</dd>
+<dt><strong><code>connecting_road</code></strong> :&ensp;<code>int</code></dt>
+<dd>The ID of the connecting road (type junction).</dd>
+<dt><strong><code>contact_point</code></strong> :&ensp;<code>ContactPoint</code></dt>
+<dd>The contact point of the link.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>The ID of the connection (automated). Default is None.</dd>
+</dl>
 <h2 id="attributes">Attributes</h2>
-<pre><code>incoming_road (int): the id of the incoming road to the junction
-
-connecting_road (int): id of the connecting road (type junction)
-
-contact_point (ContactPoint): the contact point of the link
-
-id (int): id of the connection (automated?)
-
-links (list of tuple(int) ): a list of all lanelinks in the connection
-</code></pre>
+<dl>
+<dt><strong><code>incoming_road</code></strong> :&ensp;<code>int</code></dt>
+<dd>The ID of the incoming road to the junction.</dd>
+<dt><strong><code>connecting_road</code></strong> :&ensp;<code>int</code></dt>
+<dd>The ID of the connecting road (type junction).</dd>
+<dt><strong><code>contact_point</code></strong> :&ensp;<code>ContactPoint</code></dt>
+<dd>The contact point of the link.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code> or <code>None</code></dt>
+<dd>The ID of the connection (automated).</dd>
+<dt><strong><code>links</code></strong> :&ensp;<code>list</code> of <code>tuple(int, int)</code></dt>
+<dd>A list of all lane links in the connection.</dd>
+</dl>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
-    Returns the full ElementTree of the class
-
-get_attributes()
-    Returns a dictionary of all attributes of the class
-
-add_lanelink(in_lane,out_lane)
-    Adds a lane link to the connection
-</code></pre>
-<p>initalize the Connection</p>
+<p>add_lanelink(in_lane, out_lane)
+Add a lane link to the connection.
+get_attributes(junctiontype=JunctionType.default)
+Return the attributes of the connection as a dictionary.
+get_element(junctiontype=JunctionType.default)
+Return the ElementTree representation of the connection.</p>
+<p>Initialize the <code><a title="scenariogeneration.xodr.links.Connection" href="#scenariogeneration.xodr.links.Connection">Connection</a></code> object.</p>
 <h2 id="parameters_1">Parameters</h2>
-<pre><code>incoming_road (int): the id of the incoming road to the junction
-
-connecting_road (int): id of the connecting road (for junctiontypes virutal and default), or the linkedRoad (for junctiontype direct)
-
-contact_point (ContactPoint): the contact point of the link
-
-id (int): id of the junction (automated)
-</code></pre></div>
+<dl>
+<dt><strong><code>incoming_road</code></strong> :&ensp;<code>int</code></dt>
+<dd>The ID of the incoming road to the junction.</dd>
+<dt><strong><code>connecting_road</code></strong> :&ensp;<code>int</code></dt>
+<dd>The ID of the connecting road (type junction).</dd>
+<dt><strong><code>contact_point</code></strong> :&ensp;<code>ContactPoint</code></dt>
+<dd>The contact point of the link.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>The ID of the connection (automated). Default is None.</dd>
+</dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
@@ -463,47 +551,68 @@ id (int): id of the junction (automated)
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.links.Connection.add_lanelink"><code class="name flex">
-<span>def <span class="ident">add_lanelink</span></span>(<span>self, in_lane, out_lane)</span>
+<span>def <span class="ident">add_lanelink</span></span>(<span>self, in_lane: int, out_lane: int) ‑> <a title="scenariogeneration.xodr.links.Connection" href="#scenariogeneration.xodr.links.Connection">Connection</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_lanelink(self, in_lane, out_lane):
-    &#34;&#34;&#34;Adds a new link to the connection
+<pre><code class="python">def add_lanelink(self, in_lane: int, out_lane: int) -&gt; &#34;Connection&#34;:
+    &#34;&#34;&#34;Add a new lane link to the connection.
 
     Parameters
     ----------
-        in_lane: lane id of the incoming road
+    in_lane : int
+        The lane ID of the incoming road.
+    out_lane : int
+        The lane ID of the outgoing road.
 
-        out_lane: lane id of the outgoing road
+    Returns
+    -------
+    Connection
+        The updated `Connection` object.
     &#34;&#34;&#34;
     self.links.append((in_lane, out_lane))
     return self</code></pre>
 </details>
-<div class="desc"><p>Adds a new link to the connection</p>
+<div class="desc"><p>Add a new lane link to the connection.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>in_lane: lane id of the incoming road
-
-out_lane: lane id of the outgoing road
-</code></pre></div>
+<dl>
+<dt><strong><code>in_lane</code></strong> :&ensp;<code>int</code></dt>
+<dd>The lane ID of the incoming road.</dd>
+<dt><strong><code>out_lane</code></strong> :&ensp;<code>int</code></dt>
+<dd>The lane ID of the outgoing road.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="scenariogeneration.xodr.links.Connection" href="#scenariogeneration.xodr.links.Connection">Connection</a></code></dt>
+<dd>The updated <code><a title="scenariogeneration.xodr.links.Connection" href="#scenariogeneration.xodr.links.Connection">Connection</a></code> object.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.links.Connection.get_attributes"><code class="name flex">
-<span>def <span class="ident">get_attributes</span></span>(<span>self, junctiontype=JunctionType.default)</span>
+<span>def <span class="ident">get_attributes</span></span>(<span>self,<br>junctiontype: <a title="scenariogeneration.xodr.enumerations.JunctionType" href="enumerations.html#scenariogeneration.xodr.enumerations.JunctionType">JunctionType</a> = JunctionType.default) ‑> dict</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_attributes(self, junctiontype=JunctionType.default):
-    &#34;&#34;&#34;returns the attributes as a dict of the Connection
+<pre><code class="python">def get_attributes(
+    self, junctiontype: JunctionType = JunctionType.default
+) -&gt; dict:
+    &#34;&#34;&#34;Return the attributes of the connection as a dictionary.
 
     Parameters
     ----------
-        junctiontype (JunctionType): type of junction created (connections will be different)
+    junctiontype : JunctionType, optional
+        The type of junction created (connections will differ).
+        Default is `JunctionType.default`.
 
+    Returns
+    -------
+    dict
+        A dictionary containing the attributes of the connection.
     &#34;&#34;&#34;
     retdict = {}
     retdict[&#34;incomingRoad&#34;] = str(self.incoming_road)
@@ -515,40 +624,68 @@ out_lane: lane id of the outgoing road
         retdict[&#34;connectingRoad&#34;] = str(self.connecting_road)
     return retdict</code></pre>
 </details>
-<div class="desc"><p>returns the attributes as a dict of the Connection</p>
+<div class="desc"><p>Return the attributes of the connection as a dictionary.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>junctiontype (JunctionType): type of junction created (connections will be different)
-</code></pre></div>
+<dl>
+<dt><strong><code>junctiontype</code></strong> :&ensp;<code>JunctionType</code>, optional</dt>
+<dd>The type of junction created (connections will differ).
+Default is <code>JunctionType.default</code>.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict</code></dt>
+<dd>A dictionary containing the attributes of the connection.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.links.Connection.get_element"><code class="name flex">
-<span>def <span class="ident">get_element</span></span>(<span>self, junctiontype=JunctionType.default)</span>
+<span>def <span class="ident">get_element</span></span>(<span>self,<br>junctiontype: <a title="scenariogeneration.xodr.enumerations.JunctionType" href="enumerations.html#scenariogeneration.xodr.enumerations.JunctionType">JunctionType</a> = JunctionType.default) ‑> xml.etree.ElementTree.Element</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_element(self, junctiontype=JunctionType.default):
-    &#34;&#34;&#34;returns the elementTree of the Connection
+<pre><code class="python">def get_element(
+    self, junctiontype: JunctionType = JunctionType.default
+) -&gt; ET.Element:
+    &#34;&#34;&#34;Return the ElementTree representation of the connection.
 
     Parameters
     ----------
-        junctiontype (JunctionType): type of junction created (connections will be different)
+    junctiontype : JunctionType, optional
+        The type of junction created (connections will differ).
+        Default is `JunctionType.default`.
 
+    Returns
+    -------
+    ET.Element
+        The XML ElementTree representation of the connection.
     &#34;&#34;&#34;
 
-    element = ET.Element(&#34;connection&#34;, attrib=self.get_attributes(junctiontype))
+    element = ET.Element(
+        &#34;connection&#34;, attrib=self.get_attributes(junctiontype)
+    )
     self._add_additional_data_to_element(element)
     for l in sorted(self.links, key=lambda x: x[0], reverse=True):
         ET.SubElement(
-            element, &#34;laneLink&#34;, attrib={&#34;from&#34;: str(l[0]), &#34;to&#34;: str(l[1])}
+            element,
+            &#34;laneLink&#34;,
+            attrib={&#34;from&#34;: str(l[0]), &#34;to&#34;: str(l[1])},
         )
     return element</code></pre>
 </details>
-<div class="desc"><p>returns the elementTree of the Connection</p>
+<div class="desc"><p>Return the ElementTree representation of the connection.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>junctiontype (JunctionType): type of junction created (connections will be different)
-</code></pre></div>
+<dl>
+<dt><strong><code>junctiontype</code></strong> :&ensp;<code>JunctionType</code>, optional</dt>
+<dd>The type of junction created (connections will differ).
+Default is <code>JunctionType.default</code>.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ET.Element</code></dt>
+<dd>The XML ElementTree representation of the connection.</dd>
+</dl></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -563,7 +700,7 @@ out_lane: lane id of the outgoing road
 </dd>
 <dt id="scenariogeneration.xodr.links.Junction"><code class="flex name class">
 <span>class <span class="ident">Junction</span></span>
-<span>(</span><span>name,<br>id,<br>junction_type=JunctionType.default,<br>orientation=None,<br>sstart=None,<br>send=None,<br>mainroad=None)</span>
+<span>(</span><span>name: str,<br>id: int,<br>junction_type: <a title="scenariogeneration.xodr.enumerations.JunctionType" href="enumerations.html#scenariogeneration.xodr.enumerations.JunctionType">JunctionType</a> = JunctionType.default,<br>orientation: <a title="scenariogeneration.xodr.enumerations.Orientation" href="enumerations.html#scenariogeneration.xodr.enumerations.Orientation">Orientation</a> | None = None,<br>sstart: float | None = None,<br>send: float | None = None,<br>mainroad: int | None = None)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -571,90 +708,93 @@ out_lane: lane id of the outgoing road
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Junction(XodrBase):
-    &#34;&#34;&#34;Junction creates a junction of OpenDRIVE
+    &#34;&#34;&#34;Create a junction in OpenDRIVE.
 
     Parameters
     ----------
-        name (str): name of the junction
-
-        id (int): id of the junction
-
-        junction_type (JunctionType): type of junction
-            Default: JunctionType.default
-
-        orientation (Orientation): the orientation of the junction (only used for virtual junction)
-            Default: None
-
-        sstart (float): start of the virtual junction (only used for virtual junction)
-            Default: None
-
-        send (float): end of the virtual junction (only used for virtual junction)
-            Default: None
-
-        mainroad (int): main road for a virtual junction
-            Default: None
+    name : str
+        The name of the junction.
+    id : int
+        The ID of the junction.
+    junction_type : JunctionType, optional
+        The type of the junction. Default is `JunctionType.default`.
+    orientation : Orientation, optional
+        The orientation of the junction (used for virtual junctions).
+        Default is None.
+    sstart : float, optional
+        The start of the virtual junction (used for virtual junctions).
+        Default is None.
+    send : float, optional
+        The end of the virtual junction (used for virtual junctions).
+        Default is None.
+    mainroad : int, optional
+        The main road for a virtual junction. Default is None.
 
     Attributes
     ----------
-        name (str): name of the junction
-
-        id (int): id of the junction
-
-        connections (list of Connection): all the connections in the junction
-
-        junction_type (JunctionType): type of junction
-            Default: JunctionType.default
-
-        orientation (Orientation): the orientation of the junction (only used for virtual junction)
-
-        sstart (float): start of the virtual junction (only used for virtual junction)
-
-        send (float): end of the virtual junction (only used for virtual junction)
-
-        mainroad (int): main road for a virtual junction
-
+    name : str
+        The name of the junction.
+    id : int
+        The ID of the junction.
+    connections : list of Connection
+        All the connections in the junction.
+    junction_type : JunctionType
+        The type of the junction.
+    orientation : Orientation or None
+        The orientation of the junction (used for virtual junctions).
+    sstart : float or None
+        The start of the virtual junction (used for virtual junctions).
+    send : float or None
+        The end of the virtual junction (used for virtual junctions).
+    mainroad : int or None
+        The main road for a virtual junction.
 
     Methods
     -------
-        get_element()
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
-        add_connection(connection)
-            Adds a connection to the junction
+    add_connection(connection)
+        Add a connection to the junction.
+    get_attributes()
+        Return the attributes of the junction as a dictionary.
+    get_element()
+        Return the ElementTree representation of the junction.
     &#34;&#34;&#34;
 
     def __init__(
         self,
-        name,
-        id,
-        junction_type=JunctionType.default,
-        orientation=None,
-        sstart=None,
-        send=None,
-        mainroad=None,
-    ):
-        &#34;&#34;&#34;initalize the Junction
+        name: str,
+        id: int,
+        junction_type: JunctionType = JunctionType.default,
+        orientation: Optional[Orientation] = None,
+        sstart: Optional[float] = None,
+        send: Optional[float] = None,
+        mainroad: Optional[int] = None,
+    ) -&gt; None:
+        &#34;&#34;&#34;Initialize the `Junction` object.
 
         Parameters
         ----------
-            name (str): name of the junction
+        name : str
+            The name of the junction.
+        id : int
+            The ID of the junction.
+        junction_type : JunctionType, optional
+            The type of the junction. Default is `JunctionType.default`.
+        orientation : Orientation, optional
+            The orientation of the junction (used for virtual junctions).
+            Default is None.
+        sstart : float, optional
+            The start of the virtual junction (used for virtual junctions).
+            Default is None.
+        send : float, optional
+            The end of the virtual junction (used for virtual junctions).
+            Default is None.
+        mainroad : int, optional
+            The main road for a virtual junction. Default is None.
 
-            id (int): id of the junction
-
-            junction_type (JunctionType): type of junction
-                Default: JunctionType.default
-
-            orientation (Orientation): the orientation of the junction (only used for virtual junction)
-
-            sstart (float): start of the virtual junction (only used for virtual junction)
-
-            send (float): end of the virtual junction (only used for virtual junction)
-
-            mainroad (int): main road for a virtual junction
-
+        Raises
+        ------
+        NotEnoughInputArguments
+            If required parameters for a virtual junction are missing.
         &#34;&#34;&#34;
         super().__init__()
         self.name = name
@@ -678,7 +818,7 @@ out_lane: lane id of the outgoing road
         self.mainroad = mainroad
         self.orientation = enumchecker(orientation, Orientation, True)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -&gt; bool:
         if isinstance(other, Junction) and super().__eq__(other):
             if (
                 self.get_attributes() == other.get_attributes()
@@ -687,13 +827,23 @@ out_lane: lane id of the outgoing road
                 return True
         return False
 
-    def add_connection(self, connection):
-        &#34;&#34;&#34;Adds a new link to the Junction
+    def add_connection(self, connection: Connection) -&gt; &#34;Junction&#34;:
+        &#34;&#34;&#34;Add a new connection to the junction.
 
         Parameters
         ----------
-            connection (Connection): adds a connection to the junction
+        connection : Connection
+            The connection to add to the junction.
 
+        Returns
+        -------
+        Junction
+            The updated `Junction` object.
+
+        Raises
+        ------
+        TypeError
+            If `connection` is not of type `Connection`.
         &#34;&#34;&#34;
         if not isinstance(connection, Connection):
             raise TypeError(&#34;connection is not of type Connection&#34;)
@@ -702,8 +852,14 @@ out_lane: lane id of the outgoing road
         self.connections.append(connection)
         return self
 
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes as a dict of the Junction&#34;&#34;&#34;
+    def get_attributes(self) -&gt; dict:
+        &#34;&#34;&#34;Return the attributes of the junction as a dictionary.
+
+        Returns
+        -------
+        dict
+            A dictionary containing the attributes of the junction.
+        &#34;&#34;&#34;
         retdict = {}
         retdict[&#34;name&#34;] = self.name
         retdict[&#34;id&#34;] = str(self.id)
@@ -720,80 +876,93 @@ out_lane: lane id of the outgoing road
             retdict[&#34;mainRoad&#34;] = str(self.mainroad)
         return retdict
 
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the Junction&#34;&#34;&#34;
+    def get_element(self) -&gt; ET.Element:
+        &#34;&#34;&#34;Return the ElementTree representation of the junction.
+
+        Returns
+        -------
+        ET.Element
+            The XML ElementTree representation of the junction.
+        &#34;&#34;&#34;
         element = ET.Element(&#34;junction&#34;, attrib=self.get_attributes())
         self._add_additional_data_to_element(element)
         for con in self.connections:
             element.append(con.get_element(self.junction_type))
         return element</code></pre>
 </details>
-<div class="desc"><p>Junction creates a junction of OpenDRIVE</p>
+<div class="desc"><p>Create a junction in OpenDRIVE.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>name (str): name of the junction
-
-id (int): id of the junction
-
-junction_type (JunctionType): type of junction
-    Default: JunctionType.default
-
-orientation (Orientation): the orientation of the junction (only used for virtual junction)
-    Default: None
-
-sstart (float): start of the virtual junction (only used for virtual junction)
-    Default: None
-
-send (float): end of the virtual junction (only used for virtual junction)
-    Default: None
-
-mainroad (int): main road for a virtual junction
-    Default: None
-</code></pre>
+<dl>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
+<dd>The name of the junction.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code></dt>
+<dd>The ID of the junction.</dd>
+<dt><strong><code>junction_type</code></strong> :&ensp;<code>JunctionType</code>, optional</dt>
+<dd>The type of the junction. Default is <code>JunctionType.default</code>.</dd>
+<dt><strong><code>orientation</code></strong> :&ensp;<code>Orientation</code>, optional</dt>
+<dd>The orientation of the junction (used for virtual junctions).
+Default is None.</dd>
+<dt><strong><code>sstart</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>The start of the virtual junction (used for virtual junctions).
+Default is None.</dd>
+<dt><strong><code>send</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>The end of the virtual junction (used for virtual junctions).
+Default is None.</dd>
+<dt><strong><code>mainroad</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>The main road for a virtual junction. Default is None.</dd>
+</dl>
 <h2 id="attributes">Attributes</h2>
-<pre><code>name (str): name of the junction
-
-id (int): id of the junction
-
-connections (list of Connection): all the connections in the junction
-
-junction_type (JunctionType): type of junction
-    Default: JunctionType.default
-
-orientation (Orientation): the orientation of the junction (only used for virtual junction)
-
-sstart (float): start of the virtual junction (only used for virtual junction)
-
-send (float): end of the virtual junction (only used for virtual junction)
-
-mainroad (int): main road for a virtual junction
-</code></pre>
+<dl>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
+<dd>The name of the junction.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code></dt>
+<dd>The ID of the junction.</dd>
+<dt><strong><code>connections</code></strong> :&ensp;<code>list</code> of <code><a title="scenariogeneration.xodr.links.Connection" href="#scenariogeneration.xodr.links.Connection">Connection</a></code></dt>
+<dd>All the connections in the junction.</dd>
+<dt><strong><code>junction_type</code></strong> :&ensp;<code>JunctionType</code></dt>
+<dd>The type of the junction.</dd>
+<dt><strong><code>orientation</code></strong> :&ensp;<code>Orientation</code> or <code>None</code></dt>
+<dd>The orientation of the junction (used for virtual junctions).</dd>
+<dt><strong><code>sstart</code></strong> :&ensp;<code>float</code> or <code>None</code></dt>
+<dd>The start of the virtual junction (used for virtual junctions).</dd>
+<dt><strong><code>send</code></strong> :&ensp;<code>float</code> or <code>None</code></dt>
+<dd>The end of the virtual junction (used for virtual junctions).</dd>
+<dt><strong><code>mainroad</code></strong> :&ensp;<code>int</code> or <code>None</code></dt>
+<dd>The main road for a virtual junction.</dd>
+</dl>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
-    Returns the full ElementTree of the class
-
+<p>add_connection(connection)
+Add a connection to the junction.
 get_attributes()
-    Returns a dictionary of all attributes of the class
-
-add_connection(connection)
-    Adds a connection to the junction
-</code></pre>
-<p>initalize the Junction</p>
+Return the attributes of the junction as a dictionary.
+get_element()
+Return the ElementTree representation of the junction.</p>
+<p>Initialize the <code><a title="scenariogeneration.xodr.links.Junction" href="#scenariogeneration.xodr.links.Junction">Junction</a></code> object.</p>
 <h2 id="parameters_1">Parameters</h2>
-<pre><code>name (str): name of the junction
-
-id (int): id of the junction
-
-junction_type (JunctionType): type of junction
-    Default: JunctionType.default
-
-orientation (Orientation): the orientation of the junction (only used for virtual junction)
-
-sstart (float): start of the virtual junction (only used for virtual junction)
-
-send (float): end of the virtual junction (only used for virtual junction)
-
-mainroad (int): main road for a virtual junction
-</code></pre></div>
+<dl>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
+<dd>The name of the junction.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code></dt>
+<dd>The ID of the junction.</dd>
+<dt><strong><code>junction_type</code></strong> :&ensp;<code>JunctionType</code>, optional</dt>
+<dd>The type of the junction. Default is <code>JunctionType.default</code>.</dd>
+<dt><strong><code>orientation</code></strong> :&ensp;<code>Orientation</code>, optional</dt>
+<dd>The orientation of the junction (used for virtual junctions).
+Default is None.</dd>
+<dt><strong><code>sstart</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>The start of the virtual junction (used for virtual junctions).
+Default is None.</dd>
+<dt><strong><code>send</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>The end of the virtual junction (used for virtual junctions).
+Default is None.</dd>
+<dt><strong><code>mainroad</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>The main road for a virtual junction. Default is None.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>NotEnoughInputArguments</code></dt>
+<dd>If required parameters for a virtual junction are missing.</dd>
+</dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
@@ -801,20 +970,30 @@ mainroad (int): main road for a virtual junction
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.links.Junction.add_connection"><code class="name flex">
-<span>def <span class="ident">add_connection</span></span>(<span>self, connection)</span>
+<span>def <span class="ident">add_connection</span></span>(<span>self,<br>connection: <a title="scenariogeneration.xodr.links.Connection" href="#scenariogeneration.xodr.links.Connection">Connection</a>) ‑> <a title="scenariogeneration.xodr.links.Junction" href="#scenariogeneration.xodr.links.Junction">Junction</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_connection(self, connection):
-    &#34;&#34;&#34;Adds a new link to the Junction
+<pre><code class="python">def add_connection(self, connection: Connection) -&gt; &#34;Junction&#34;:
+    &#34;&#34;&#34;Add a new connection to the junction.
 
     Parameters
     ----------
-        connection (Connection): adds a connection to the junction
+    connection : Connection
+        The connection to add to the junction.
 
+    Returns
+    -------
+    Junction
+        The updated `Junction` object.
+
+    Raises
+    ------
+    TypeError
+        If `connection` is not of type `Connection`.
     &#34;&#34;&#34;
     if not isinstance(connection, Connection):
         raise TypeError(&#34;connection is not of type Connection&#34;)
@@ -823,21 +1002,39 @@ mainroad (int): main road for a virtual junction
     self.connections.append(connection)
     return self</code></pre>
 </details>
-<div class="desc"><p>Adds a new link to the Junction</p>
+<div class="desc"><p>Add a new connection to the junction.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>connection (Connection): adds a connection to the junction
-</code></pre></div>
+<dl>
+<dt><strong><code>connection</code></strong> :&ensp;<code><a title="scenariogeneration.xodr.links.Connection" href="#scenariogeneration.xodr.links.Connection">Connection</a></code></dt>
+<dd>The connection to add to the junction.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="scenariogeneration.xodr.links.Junction" href="#scenariogeneration.xodr.links.Junction">Junction</a></code></dt>
+<dd>The updated <code><a title="scenariogeneration.xodr.links.Junction" href="#scenariogeneration.xodr.links.Junction">Junction</a></code> object.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>TypeError</code></dt>
+<dd>If <code>connection</code> is not of type <code><a title="scenariogeneration.xodr.links.Connection" href="#scenariogeneration.xodr.links.Connection">Connection</a></code>.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.links.Junction.get_attributes"><code class="name flex">
-<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+<span>def <span class="ident">get_attributes</span></span>(<span>self) ‑> dict</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34;returns the attributes as a dict of the Junction&#34;&#34;&#34;
+<pre><code class="python">def get_attributes(self) -&gt; dict:
+    &#34;&#34;&#34;Return the attributes of the junction as a dictionary.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the attributes of the junction.
+    &#34;&#34;&#34;
     retdict = {}
     retdict[&#34;name&#34;] = self.name
     retdict[&#34;id&#34;] = str(self.id)
@@ -854,25 +1051,41 @@ mainroad (int): main road for a virtual junction
         retdict[&#34;mainRoad&#34;] = str(self.mainroad)
     return retdict</code></pre>
 </details>
-<div class="desc"><p>returns the attributes as a dict of the Junction</p></div>
+<div class="desc"><p>Return the attributes of the junction as a dictionary.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict</code></dt>
+<dd>A dictionary containing the attributes of the junction.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.links.Junction.get_element"><code class="name flex">
-<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+<span>def <span class="ident">get_element</span></span>(<span>self) ‑> xml.etree.ElementTree.Element</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_element(self):
-    &#34;&#34;&#34;returns the elementTree of the Junction&#34;&#34;&#34;
+<pre><code class="python">def get_element(self) -&gt; ET.Element:
+    &#34;&#34;&#34;Return the ElementTree representation of the junction.
+
+    Returns
+    -------
+    ET.Element
+        The XML ElementTree representation of the junction.
+    &#34;&#34;&#34;
     element = ET.Element(&#34;junction&#34;, attrib=self.get_attributes())
     self._add_additional_data_to_element(element)
     for con in self.connections:
         element.append(con.get_element(self.junction_type))
     return element</code></pre>
 </details>
-<div class="desc"><p>returns the elementTree of the Junction</p></div>
+<div class="desc"><p>Return the ElementTree representation of the junction.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ET.Element</code></dt>
+<dd>The XML ElementTree representation of the junction.</dd>
+</dl></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -887,7 +1100,7 @@ mainroad (int): main road for a virtual junction
 </dd>
 <dt id="scenariogeneration.xodr.links.JunctionGroup"><code class="flex name class">
 <span>class <span class="ident">JunctionGroup</span></span>
-<span>(</span><span>name, group_id, junction_type=JunctionGroupType.roundabout)</span>
+<span>(</span><span>name: str,<br>group_id: int,<br>junction_type: <a title="scenariogeneration.xodr.enumerations.JunctionGroupType" href="enumerations.html#scenariogeneration.xodr.enumerations.JunctionGroupType">JunctionGroupType</a> = JunctionGroupType.roundabout)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -895,48 +1108,56 @@ mainroad (int): main road for a virtual junction
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class JunctionGroup(XodrBase):
-    &#34;&#34;&#34;JunctionGroup creates a JunctionGroup of OpenDRIVE
+    &#34;&#34;&#34;Create a JunctionGroup in OpenDRIVE.
 
     Parameters
     ----------
-        name (str): name of the junctiongroup
-
-        group_id (int): id of the junctiongroup
-
-        junction_type (JunctionGroupType): type of junction
-            Default: JunctionGroupType.roundabout
+    name : str
+        The name of the junction group.
+    group_id : int
+        The ID of the junction group.
+    junction_type : JunctionGroupType, optional
+        The type of the junction group.
+        Default is `JunctionGroupType.roundabout`.
 
     Attributes
     ----------
-        name (str): name of the junctiongroup
-
-        group_id (int): id of the junctiongroup
-
-        junctions (list of int): all the junctions in the junctiongroup
+    name : str
+        The name of the junction group.
+    group_id : int
+        The ID of the junction group.
+    junctions : list of int
+        All the junctions in the junction group.
+    junction_type : JunctionGroupType
+        The type of the junction group.
 
     Methods
     -------
-        get_element()
-            Returns the full ElementTree of the class
-
-        get_attributes()
-            Returns a dictionary of all attributes of the class
-
-        add_junction(junction_id)
-            Adds a connection to the junction
+    add_junction(junction_id)
+        Add a junction to the junction group.
+    get_attributes()
+        Return the attributes of the junction group as a dictionary.
+    get_element()
+        Return the ElementTree representation of the junction group.
     &#34;&#34;&#34;
 
-    def __init__(self, name, group_id, junction_type=JunctionGroupType.roundabout):
-        &#34;&#34;&#34;initalize the JunctionGroup
+    def __init__(
+        self,
+        name: str,
+        group_id: int,
+        junction_type: JunctionGroupType = JunctionGroupType.roundabout,
+    ) -&gt; None:
+        &#34;&#34;&#34;Initialize the JunctionGroup.
 
         Parameters
         ----------
-            name (str): name of the junctiongroup
-
-            group_id (int): id of the junctiongroup
-
-            junction_type (JunctionGroupType): type of junction
-                Default: JunctionGroupType.roundabout
+        name : str
+            The name of the junction group.
+        group_id : int
+            The ID of the junction group.
+        junction_type : JunctionGroupType, optional
+            The type of the junction group.
+            Default is `JunctionGroupType.roundabout`.
         &#34;&#34;&#34;
         super().__init__()
         self.name = name
@@ -944,7 +1165,7 @@ mainroad (int): main road for a virtual junction
         self.junctions = []
         self.junction_type = enumchecker(junction_type, JunctionGroupType)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -&gt; bool:
         if isinstance(other, JunctionGroup) and super().__eq__(other):
             if (
                 self.get_attributes() == other.get_attributes()
@@ -953,68 +1174,92 @@ mainroad (int): main road for a virtual junction
                 return True
         return False
 
-    def add_junction(self, junction_id):
-        &#34;&#34;&#34;Adds a new link to the JunctionGroup
+    def add_junction(self, junction_id: int) -&gt; &#34;JunctionGroup&#34;:
+        &#34;&#34;&#34;Add a new junction to the JunctionGroup.
 
         Parameters
         ----------
-            junction_id (int): adds a junction to the junctiongroup
+        junction_id : int
+            The ID of the junction to add.
 
+        Returns
+        -------
+        JunctionGroup
+            The updated JunctionGroup object.
         &#34;&#34;&#34;
         self.junctions.append(junction_id)
         return self
 
-    def get_attributes(self):
-        &#34;&#34;&#34;returns the attributes as a dict of the JunctionGroup&#34;&#34;&#34;
+    def get_attributes(self) -&gt; dict:
+        &#34;&#34;&#34;Return the attributes of the JunctionGroup as a dictionary.
+
+        Returns
+        -------
+        dict
+            A dictionary containing the attributes of the JunctionGroup.
+        &#34;&#34;&#34;
         retdict = {}
         retdict[&#34;name&#34;] = self.name
         retdict[&#34;id&#34;] = str(self.group_id)
         retdict[&#34;type&#34;] = enum2str(self.junction_type)
         return retdict
 
-    def get_element(self):
-        &#34;&#34;&#34;returns the elementTree of the Junction&#34;&#34;&#34;
+    def get_element(self) -&gt; ET.Element:
+        &#34;&#34;&#34;Return the ElementTree representation of the JunctionGroup.
+
+        Returns
+        -------
+        ET.Element
+            The XML ElementTree representation of the JunctionGroup.
+        &#34;&#34;&#34;
         element = ET.Element(&#34;junctionGroup&#34;, attrib=self.get_attributes())
         self._add_additional_data_to_element(element)
         for j in self.junctions:
-            ET.SubElement(element, &#34;junctionReference&#34;, attrib={&#34;junction&#34;: str(j)})
+            ET.SubElement(
+                element, &#34;junctionReference&#34;, attrib={&#34;junction&#34;: str(j)}
+            )
         return element</code></pre>
 </details>
-<div class="desc"><p>JunctionGroup creates a JunctionGroup of OpenDRIVE</p>
+<div class="desc"><p>Create a JunctionGroup in OpenDRIVE.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>name (str): name of the junctiongroup
-
-group_id (int): id of the junctiongroup
-
-junction_type (JunctionGroupType): type of junction
-    Default: JunctionGroupType.roundabout
-</code></pre>
+<dl>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
+<dd>The name of the junction group.</dd>
+<dt><strong><code>group_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>The ID of the junction group.</dd>
+<dt><strong><code>junction_type</code></strong> :&ensp;<code>JunctionGroupType</code>, optional</dt>
+<dd>The type of the junction group.
+Default is <code>JunctionGroupType.roundabout</code>.</dd>
+</dl>
 <h2 id="attributes">Attributes</h2>
-<pre><code>name (str): name of the junctiongroup
-
-group_id (int): id of the junctiongroup
-
-junctions (list of int): all the junctions in the junctiongroup
-</code></pre>
+<dl>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
+<dd>The name of the junction group.</dd>
+<dt><strong><code>group_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>The ID of the junction group.</dd>
+<dt><strong><code>junctions</code></strong> :&ensp;<code>list</code> of <code>int</code></dt>
+<dd>All the junctions in the junction group.</dd>
+<dt><strong><code>junction_type</code></strong> :&ensp;<code>JunctionGroupType</code></dt>
+<dd>The type of the junction group.</dd>
+</dl>
 <h2 id="methods">Methods</h2>
-<pre><code>get_element()
-    Returns the full ElementTree of the class
-
+<p>add_junction(junction_id)
+Add a junction to the junction group.
 get_attributes()
-    Returns a dictionary of all attributes of the class
-
-add_junction(junction_id)
-    Adds a connection to the junction
-</code></pre>
-<p>initalize the JunctionGroup</p>
+Return the attributes of the junction group as a dictionary.
+get_element()
+Return the ElementTree representation of the junction group.</p>
+<p>Initialize the JunctionGroup.</p>
 <h2 id="parameters_1">Parameters</h2>
-<pre><code>name (str): name of the junctiongroup
-
-group_id (int): id of the junctiongroup
-
-junction_type (JunctionGroupType): type of junction
-    Default: JunctionGroupType.roundabout
-</code></pre></div>
+<dl>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
+<dd>The name of the junction group.</dd>
+<dt><strong><code>group_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>The ID of the junction group.</dd>
+<dt><strong><code>junction_type</code></strong> :&ensp;<code>JunctionGroupType</code>, optional</dt>
+<dd>The type of the junction group.
+Default is <code>JunctionGroupType.roundabout</code>.</dd>
+</dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="scenariogeneration.xodr.utils.XodrBase" href="utils.html#scenariogeneration.xodr.utils.XodrBase">XodrBase</a></li>
@@ -1022,64 +1267,100 @@ junction_type (JunctionGroupType): type of junction
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.links.JunctionGroup.add_junction"><code class="name flex">
-<span>def <span class="ident">add_junction</span></span>(<span>self, junction_id)</span>
+<span>def <span class="ident">add_junction</span></span>(<span>self, junction_id: int) ‑> <a title="scenariogeneration.xodr.links.JunctionGroup" href="#scenariogeneration.xodr.links.JunctionGroup">JunctionGroup</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_junction(self, junction_id):
-    &#34;&#34;&#34;Adds a new link to the JunctionGroup
+<pre><code class="python">def add_junction(self, junction_id: int) -&gt; &#34;JunctionGroup&#34;:
+    &#34;&#34;&#34;Add a new junction to the JunctionGroup.
 
     Parameters
     ----------
-        junction_id (int): adds a junction to the junctiongroup
+    junction_id : int
+        The ID of the junction to add.
 
+    Returns
+    -------
+    JunctionGroup
+        The updated JunctionGroup object.
     &#34;&#34;&#34;
     self.junctions.append(junction_id)
     return self</code></pre>
 </details>
-<div class="desc"><p>Adds a new link to the JunctionGroup</p>
+<div class="desc"><p>Add a new junction to the JunctionGroup.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>junction_id (int): adds a junction to the junctiongroup
-</code></pre></div>
+<dl>
+<dt><strong><code>junction_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>The ID of the junction to add.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="scenariogeneration.xodr.links.JunctionGroup" href="#scenariogeneration.xodr.links.JunctionGroup">JunctionGroup</a></code></dt>
+<dd>The updated JunctionGroup object.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.links.JunctionGroup.get_attributes"><code class="name flex">
-<span>def <span class="ident">get_attributes</span></span>(<span>self)</span>
+<span>def <span class="ident">get_attributes</span></span>(<span>self) ‑> dict</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_attributes(self):
-    &#34;&#34;&#34;returns the attributes as a dict of the JunctionGroup&#34;&#34;&#34;
+<pre><code class="python">def get_attributes(self) -&gt; dict:
+    &#34;&#34;&#34;Return the attributes of the JunctionGroup as a dictionary.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the attributes of the JunctionGroup.
+    &#34;&#34;&#34;
     retdict = {}
     retdict[&#34;name&#34;] = self.name
     retdict[&#34;id&#34;] = str(self.group_id)
     retdict[&#34;type&#34;] = enum2str(self.junction_type)
     return retdict</code></pre>
 </details>
-<div class="desc"><p>returns the attributes as a dict of the JunctionGroup</p></div>
+<div class="desc"><p>Return the attributes of the JunctionGroup as a dictionary.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict</code></dt>
+<dd>A dictionary containing the attributes of the JunctionGroup.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.links.JunctionGroup.get_element"><code class="name flex">
-<span>def <span class="ident">get_element</span></span>(<span>self)</span>
+<span>def <span class="ident">get_element</span></span>(<span>self) ‑> xml.etree.ElementTree.Element</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_element(self):
-    &#34;&#34;&#34;returns the elementTree of the Junction&#34;&#34;&#34;
+<pre><code class="python">def get_element(self) -&gt; ET.Element:
+    &#34;&#34;&#34;Return the ElementTree representation of the JunctionGroup.
+
+    Returns
+    -------
+    ET.Element
+        The XML ElementTree representation of the JunctionGroup.
+    &#34;&#34;&#34;
     element = ET.Element(&#34;junctionGroup&#34;, attrib=self.get_attributes())
     self._add_additional_data_to_element(element)
     for j in self.junctions:
-        ET.SubElement(element, &#34;junctionReference&#34;, attrib={&#34;junction&#34;: str(j)})
+        ET.SubElement(
+            element, &#34;junctionReference&#34;, attrib={&#34;junction&#34;: str(j)}
+        )
     return element</code></pre>
 </details>
-<div class="desc"><p>returns the elementTree of the Junction</p></div>
+<div class="desc"><p>Return the ElementTree representation of the JunctionGroup.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ET.Element</code></dt>
+<dd>The XML ElementTree representation of the JunctionGroup.</dd>
+</dl></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -1101,87 +1382,129 @@ junction_type (JunctionGroupType): type of junction
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class LaneLinker:
-    &#34;&#34;&#34;LaneLinker stored information for linking lane sections
-    NOTE: Not part of OpenDRIVE, but a helper to link lanes for the user.
+    &#34;&#34;&#34;Store information for linking lane sections.
 
-    Parameters
-    ----------
+    NOTE: This class is not part of OpenDRIVE but serves as a helper to
+    link lanes for the user.
 
     Attributes
     ----------
-        links: all lane links added (predlane (Lane), succlane (Lane), found=bool)
+    links : list of _lanelink
+        All lane links added, each represented as a tuple of predecessor
+        lane, successor lane, and a boolean indicating if the link is
+        found.
 
     Methods
     -------
-        add_link(predlane, succlane)
-            adds a lane link
-
+    add_link(predlane, succlane, connecting_road=None)
+        Add a lane link to the list.
     &#34;&#34;&#34;
 
-    def __init__(self):
-        &#34;&#34;&#34;initalize the _Links&#34;&#34;&#34;
+    def __init__(self) -&gt; None:
+        &#34;&#34;&#34;Initialize the `LaneLinker` object.
+
+        Attributes
+        ----------
+        links : list of _lanelink
+            A list to store all lane links added to this object.
+        &#34;&#34;&#34;
 
         self.links = []
 
-    def add_link(self, predlane, succlane, connecting_road=None):
-        &#34;&#34;&#34;Adds a _Link
+    def add_link(
+        self,
+        predlane: &#34;Lane&#34;,
+        succlane: &#34;Lane&#34;,
+        connecting_road: Optional[int] = None,
+    ) -&gt; &#34;LaneLinker&#34;:
+        &#34;&#34;&#34;Add a lane link to the list.
 
         Parameters
         ----------
-            predlane (Lane): predecessor lane
+        predlane : Lane
+            The predecessor lane.
+        succlane : Lane
+            The successor lane.
+        connecting_road : int, optional
+            The ID of a connecting road (used for junctions). Default is None.
 
-            succlane (Lane): successor lane
-
-            connecting_road (id): id of a connecting road (used for junctions)
-
+        Returns
+        -------
+        LaneLinker
+            The updated `LaneLinker` object.
         &#34;&#34;&#34;
         self.links.append(_lanelink(predlane, succlane, connecting_road))
         return self</code></pre>
 </details>
-<div class="desc"><p>LaneLinker stored information for linking lane sections
-NOTE: Not part of OpenDRIVE, but a helper to link lanes for the user.</p>
-<h2 id="parameters">Parameters</h2>
+<div class="desc"><p>Store information for linking lane sections.</p>
+<p>NOTE: This class is not part of OpenDRIVE but serves as a helper to
+link lanes for the user.</p>
 <h2 id="attributes">Attributes</h2>
-<pre><code>links: all lane links added (predlane (Lane), succlane (Lane), found=bool)
-</code></pre>
+<dl>
+<dt><strong><code>links</code></strong> :&ensp;<code>list</code> of <code>_lanelink</code></dt>
+<dd>All lane links added, each represented as a tuple of predecessor
+lane, successor lane, and a boolean indicating if the link is
+found.</dd>
+</dl>
 <h2 id="methods">Methods</h2>
-<pre><code>add_link(predlane, succlane)
-    adds a lane link
-</code></pre>
-<p>initalize the _Links</p></div>
+<p>add_link(predlane, succlane, connecting_road=None)
+Add a lane link to the list.</p>
+<p>Initialize the <code><a title="scenariogeneration.xodr.links.LaneLinker" href="#scenariogeneration.xodr.links.LaneLinker">LaneLinker</a></code> object.</p>
+<h2 id="attributes_1">Attributes</h2>
+<dl>
+<dt><strong><code>links</code></strong> :&ensp;<code>list</code> of <code>_lanelink</code></dt>
+<dd>A list to store all lane links added to this object.</dd>
+</dl></div>
 <h3>Methods</h3>
 <dl>
 <dt id="scenariogeneration.xodr.links.LaneLinker.add_link"><code class="name flex">
-<span>def <span class="ident">add_link</span></span>(<span>self, predlane, succlane, connecting_road=None)</span>
+<span>def <span class="ident">add_link</span></span>(<span>self, predlane: Lane, succlane: Lane, connecting_road: int | None = None) ‑> <a title="scenariogeneration.xodr.links.LaneLinker" href="#scenariogeneration.xodr.links.LaneLinker">LaneLinker</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_link(self, predlane, succlane, connecting_road=None):
-    &#34;&#34;&#34;Adds a _Link
+<pre><code class="python">def add_link(
+    self,
+    predlane: &#34;Lane&#34;,
+    succlane: &#34;Lane&#34;,
+    connecting_road: Optional[int] = None,
+) -&gt; &#34;LaneLinker&#34;:
+    &#34;&#34;&#34;Add a lane link to the list.
 
     Parameters
     ----------
-        predlane (Lane): predecessor lane
+    predlane : Lane
+        The predecessor lane.
+    succlane : Lane
+        The successor lane.
+    connecting_road : int, optional
+        The ID of a connecting road (used for junctions). Default is None.
 
-        succlane (Lane): successor lane
-
-        connecting_road (id): id of a connecting road (used for junctions)
-
+    Returns
+    -------
+    LaneLinker
+        The updated `LaneLinker` object.
     &#34;&#34;&#34;
     self.links.append(_lanelink(predlane, succlane, connecting_road))
     return self</code></pre>
 </details>
-<div class="desc"><p>Adds a _Link</p>
+<div class="desc"><p>Add a lane link to the list.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>predlane (Lane): predecessor lane
-
-succlane (Lane): successor lane
-
-connecting_road (id): id of a connecting road (used for junctions)
-</code></pre></div>
+<dl>
+<dt><strong><code>predlane</code></strong> :&ensp;<code>Lane</code></dt>
+<dd>The predecessor lane.</dd>
+<dt><strong><code>succlane</code></strong> :&ensp;<code>Lane</code></dt>
+<dd>The successor lane.</dd>
+<dt><strong><code>connecting_road</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>The ID of a connecting road (used for junctions). Default is None.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="scenariogeneration.xodr.links.LaneLinker" href="#scenariogeneration.xodr.links.LaneLinker">LaneLinker</a></code></dt>
+<dd>The updated <code><a title="scenariogeneration.xodr.links.LaneLinker" href="#scenariogeneration.xodr.links.LaneLinker">LaneLinker</a></code> object.</dd>
+</dl></div>
 </dd>
 </dl>
 </dd>

@@ -52,7 +52,7 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="scenariogeneration.xodr.generators.create_3cloths"><code class="name flex">
-<span>def <span class="ident">create_3cloths</span></span>(<span>cloth1_start,<br>cloth1_end,<br>cloth1_length,<br>cloth2_start,<br>cloth2_end,<br>cloth2_length,<br>cloth3_start,<br>cloth3_end,<br>cloth3_length,<br>r_id,<br>junction=1,<br>n_lanes=1,<br>lane_offset=3,<br>road_marks=&lt;scenariogeneration.xodr.lane.RoadMark object&gt;)</span>
+<span>def <span class="ident">create_3cloths</span></span>(<span>cloth1_start: float,<br>cloth1_end: float,<br>cloth1_length: float,<br>cloth2_start: float,<br>cloth2_end: float,<br>cloth2_length: float,<br>cloth3_start: float,<br>cloth3_end: float,<br>cloth3_length: float,<br>r_id: int,<br>junction: int = 1,<br>n_lanes: int = 1,<br>lane_offset: int = 3,<br>road_marks: <a title="scenariogeneration.xodr.lane.RoadMark" href="lane.html#scenariogeneration.xodr.lane.RoadMark">RoadMark</a> = &lt;scenariogeneration.xodr.lane.RoadMark object&gt;)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -60,59 +60,58 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def create_3cloths(
-    cloth1_start,
-    cloth1_end,
-    cloth1_length,
-    cloth2_start,
-    cloth2_end,
-    cloth2_length,
-    cloth3_start,
-    cloth3_end,
-    cloth3_length,
-    r_id,
-    junction=1,
-    n_lanes=1,
-    lane_offset=3,
-    road_marks=std_roadmark_broken(),
+    cloth1_start: float,
+    cloth1_end: float,
+    cloth1_length: float,
+    cloth2_start: float,
+    cloth2_end: float,
+    cloth2_length: float,
+    cloth3_start: float,
+    cloth3_end: float,
+    cloth3_length: float,
+    r_id: int,
+    junction: int = 1,
+    n_lanes: int = 1,
+    lane_offset: int = 3,
+    road_marks: RoadMark = std_roadmark_broken(),
 ):
-    &#34;&#34;&#34;creates a curved Road  with a Spiral - Arc - Spiral, and two lanes
+    &#34;&#34;&#34;Create a curved road with a Spiral-Spiral-Spiral and two lanes.
 
     Parameters
     ----------
-        cloth1_start (float): initial curvature of spiral 1
-
-        cloth1_end (float): ending curvature of spiral 1
-
-        cloth1_length (float): total length of spiral 1
-
-        cloth2_start (float): initial curvature of spiral 2
-
-        cloth2_end (float): ending curvature of spiral 2
-
-        cloth2_length (float): total length of spiral 2
-
-        cloth3_start (float): initial curvature of spiral 3
-
-        cloth3_end (float): ending curvature of spiral 3
-
-        cloth3_length (float): total length of spiral 3
-
-        r_id (int): the id of the road
-
-        junction (int): if the Road belongs to a junction
-            default: 1
-
-        cloth_start (float): staring curvature of clothoids
-
-        n_lanes (int): number of lanes
-            default: 1
-
-        lane_offset (int): width of the road
-            default: 3
+    cloth1_start : float
+        Initial curvature of spiral 1.
+    cloth1_end : float
+        Ending curvature of spiral 1.
+    cloth1_length : float
+        Total length of spiral 1.
+    cloth2_start : float
+        Initial curvature of spiral 2.
+    cloth2_end : float
+        Ending curvature of spiral 2.
+    cloth2_length : float
+        Total length of spiral 2.
+    cloth3_start : float
+        Initial curvature of spiral 3.
+    cloth3_end : float
+        Ending curvature of spiral 3.
+    cloth3_length : float
+        Total length of spiral 3.
+    r_id : int
+        The ID of the road.
+    junction : int, optional
+        Indicates if the road belongs to a junction. Default is 1.
+    n_lanes : int, optional
+        Number of lanes. Default is 1.
+    lane_offset : int, optional
+        Width of the road. Default is 3.
+    road_marks : RoadMark, optional
+        Road mark used for the standard lane. Default is RoadMark(broken).
 
     Returns
     -------
-        road (Road): a road built up of a Spiral-Spiral-Spiral
+    Road
+        A road built up of a Spiral-Spiral-Spiral.
     &#34;&#34;&#34;
     warn(
         &#34;create_cloth_arc_cloth should not be used anymore, please use the create_road (see exampels/xodr/clothoid_generation.py) function instead&#34;,
@@ -150,46 +149,46 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
     # create road
     return Road(r_id, pv, lanes, road_type=junction)</code></pre>
 </details>
-<div class="desc"><p>creates a curved Road
-with a Spiral - Arc - Spiral, and two lanes</p>
+<div class="desc"><p>Create a curved road with a Spiral-Spiral-Spiral and two lanes.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>cloth1_start (float): initial curvature of spiral 1
-
-cloth1_end (float): ending curvature of spiral 1
-
-cloth1_length (float): total length of spiral 1
-
-cloth2_start (float): initial curvature of spiral 2
-
-cloth2_end (float): ending curvature of spiral 2
-
-cloth2_length (float): total length of spiral 2
-
-cloth3_start (float): initial curvature of spiral 3
-
-cloth3_end (float): ending curvature of spiral 3
-
-cloth3_length (float): total length of spiral 3
-
-r_id (int): the id of the road
-
-junction (int): if the Road belongs to a junction
-    default: 1
-
-cloth_start (float): staring curvature of clothoids
-
-n_lanes (int): number of lanes
-    default: 1
-
-lane_offset (int): width of the road
-    default: 3
-</code></pre>
+<dl>
+<dt><strong><code>cloth1_start</code></strong> :&ensp;<code>float</code></dt>
+<dd>Initial curvature of spiral 1.</dd>
+<dt><strong><code>cloth1_end</code></strong> :&ensp;<code>float</code></dt>
+<dd>Ending curvature of spiral 1.</dd>
+<dt><strong><code>cloth1_length</code></strong> :&ensp;<code>float</code></dt>
+<dd>Total length of spiral 1.</dd>
+<dt><strong><code>cloth2_start</code></strong> :&ensp;<code>float</code></dt>
+<dd>Initial curvature of spiral 2.</dd>
+<dt><strong><code>cloth2_end</code></strong> :&ensp;<code>float</code></dt>
+<dd>Ending curvature of spiral 2.</dd>
+<dt><strong><code>cloth2_length</code></strong> :&ensp;<code>float</code></dt>
+<dd>Total length of spiral 2.</dd>
+<dt><strong><code>cloth3_start</code></strong> :&ensp;<code>float</code></dt>
+<dd>Initial curvature of spiral 3.</dd>
+<dt><strong><code>cloth3_end</code></strong> :&ensp;<code>float</code></dt>
+<dd>Ending curvature of spiral 3.</dd>
+<dt><strong><code>cloth3_length</code></strong> :&ensp;<code>float</code></dt>
+<dd>Total length of spiral 3.</dd>
+<dt><strong><code>r_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>The ID of the road.</dd>
+<dt><strong><code>junction</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Indicates if the road belongs to a junction. Default is 1.</dd>
+<dt><strong><code>n_lanes</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Number of lanes. Default is 1.</dd>
+<dt><strong><code>lane_offset</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Width of the road. Default is 3.</dd>
+<dt><strong><code>road_marks</code></strong> :&ensp;<code>RoadMark</code>, optional</dt>
+<dd>Road mark used for the standard lane. Default is RoadMark(broken).</dd>
+</dl>
 <h2 id="returns">Returns</h2>
-<pre><code>road (Road): a road built up of a Spiral-Spiral-Spiral
-</code></pre></div>
+<dl>
+<dt><code>Road</code></dt>
+<dd>A road built up of a Spiral-Spiral-Spiral.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.generators.create_cloth_arc_cloth"><code class="name flex">
-<span>def <span class="ident">create_cloth_arc_cloth</span></span>(<span>arc_curv,<br>arc_angle,<br>cloth_angle,<br>r_id,<br>junction=1,<br>cloth_start=1e-09,<br>n_lanes=1,<br>lane_offset=3)</span>
+<span>def <span class="ident">create_cloth_arc_cloth</span></span>(<span>arc_curv: float,<br>arc_angle: float,<br>cloth_angle: float,<br>r_id: int,<br>junction: int = 1,<br>cloth_start: float = 1e-09,<br>n_lanes: int = 1,<br>lane_offset: int = 3)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -197,41 +196,41 @@ lane_offset (int): width of the road
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def create_cloth_arc_cloth(
-    arc_curv,
-    arc_angle,
-    cloth_angle,
-    r_id,
-    junction=1,
-    cloth_start=STD_START_CLOTH,
-    n_lanes=1,
-    lane_offset=3,
+    arc_curv: float,
+    arc_angle: float,
+    cloth_angle: float,
+    r_id: int,
+    junction: int = 1,
+    cloth_start: float = STD_START_CLOTH,
+    n_lanes: int = 1,
+    lane_offset: int = 3,
 ):
-    &#34;&#34;&#34;creates a curved Road  with a Spiral - Arc - Spiral, and two lanes
+    &#34;&#34;&#34;Create a curved road with a Spiral-Arc-Spiral and two lanes.
 
     Parameters
     ----------
-        arc_curv (float): curvature of the arc (and max clothoid of clothoids)
-
-        arc_angle (float): how much of the curv should be the arc
-
-        cloth_angle (float): how much of the curv should be the clothoid (will be doubled since there are two clothoids)
-
-        r_id (int): the id of the road
-
-        junction (int): if the Road belongs to a junction
-            default: 1
-
-        cloth_start (float): staring curvature of clothoids
-
-        n_lanes (int): number of lanes
-            default: 1
-
-        lane_offset (int): width of the road
-            default: 3
+    arc_curv : float
+        Curvature of the arc (and max clothoid of clothoids).
+    arc_angle : float
+        How much of the curve should be the arc.
+    cloth_angle : float
+        How much of the curve should be the clothoid (will be doubled
+        since there are two clothoids).
+    r_id : int
+        The ID of the road.
+    junction : int, optional
+        Indicates if the road belongs to a junction. Default is 1.
+    cloth_start : float, optional
+        Starting curvature of clothoids. Default is 1 / 1000000000.
+    n_lanes : int, optional
+        Number of lanes. Default is 1.
+    lane_offset : int, optional
+        Width of the road. Default is 3.
 
     Returns
     -------
-        road (Road): a road built up of a Spiral-Arc-Spiral
+    Road
+        A road built up of a Spiral-Arc-Spiral.
     &#34;&#34;&#34;
     warn(
         &#34;create_cloth_arc_cloth should not be used anymore, please use the create_road (see exampels/xodr/clothoid_generation.py) function instead&#34;,
@@ -266,103 +265,122 @@ lane_offset (int): width of the road
     # create road
     return Road(r_id, pv, lanes, road_type=junction)</code></pre>
 </details>
-<div class="desc"><p>creates a curved Road
-with a Spiral - Arc - Spiral, and two lanes</p>
+<div class="desc"><p>Create a curved road with a Spiral-Arc-Spiral and two lanes.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>arc_curv (float): curvature of the arc (and max clothoid of clothoids)
-
-arc_angle (float): how much of the curv should be the arc
-
-cloth_angle (float): how much of the curv should be the clothoid (will be doubled since there are two clothoids)
-
-r_id (int): the id of the road
-
-junction (int): if the Road belongs to a junction
-    default: 1
-
-cloth_start (float): staring curvature of clothoids
-
-n_lanes (int): number of lanes
-    default: 1
-
-lane_offset (int): width of the road
-    default: 3
-</code></pre>
+<dl>
+<dt><strong><code>arc_curv</code></strong> :&ensp;<code>float</code></dt>
+<dd>Curvature of the arc (and max clothoid of clothoids).</dd>
+<dt><strong><code>arc_angle</code></strong> :&ensp;<code>float</code></dt>
+<dd>How much of the curve should be the arc.</dd>
+<dt><strong><code>cloth_angle</code></strong> :&ensp;<code>float</code></dt>
+<dd>How much of the curve should be the clothoid (will be doubled
+since there are two clothoids).</dd>
+<dt><strong><code>r_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>The ID of the road.</dd>
+<dt><strong><code>junction</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Indicates if the road belongs to a junction. Default is 1.</dd>
+<dt><strong><code>cloth_start</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Starting curvature of clothoids. Default is 1 / 1000000000.</dd>
+<dt><strong><code>n_lanes</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Number of lanes. Default is 1.</dd>
+<dt><strong><code>lane_offset</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Width of the road. Default is 3.</dd>
+</dl>
 <h2 id="returns">Returns</h2>
-<pre><code>road (Road): a road built up of a Spiral-Arc-Spiral
-</code></pre></div>
+<dl>
+<dt><code>Road</code></dt>
+<dd>A road built up of a Spiral-Arc-Spiral.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.generators.create_direct_junction"><code class="name flex">
-<span>def <span class="ident">create_direct_junction</span></span>(<span>roads, id, name='my direct junction')</span>
+<span>def <span class="ident">create_direct_junction</span></span>(<span>roads: List[<a title="scenariogeneration.xodr.opendrive.Road" href="opendrive.html#scenariogeneration.xodr.opendrive.Road">Road</a>],<br>id: int,<br>name: str = 'my direct junction') ‑> <a title="scenariogeneration.xodr.links.Junction" href="links.html#scenariogeneration.xodr.links.Junction">Junction</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def create_direct_junction(roads, id, name=&#34;my direct junction&#34;):
-    &#34;&#34;&#34;create_direct_junction creates the junction struct for a set of roads, for a direct junction
+<pre><code class="python">def create_direct_junction(
+    roads: List[Road], id: int, name: str = &#34;my direct junction&#34;
+) -&gt; Junction:
+    &#34;&#34;&#34;Create the junction structure for a set of roads, for a direct junction.
 
     Parameters
     ----------
-        roads (list of Road): all roads that are building up the direct junction
-
-        id (int): the id of the junction
-
-        name(str): name of the junction
-        default: &#39;my direct junction&#39;
+    roads : list of Road
+        All roads that are building up the direct junction.
+    id : int
+        The ID of the junction.
+    name : str, optional
+        Name of the junction. Default is &#34;my direct junction&#34;.
 
     Returns
     -------
-        junction (Junction): the junction struct ready to use
+    Junction
+        The junction structure ready to use.
 
+    Raises
+    ------
+    RemovedFunctionality
+        If the function is called, as it has been deprecated.
     &#34;&#34;&#34;
     raise RemovedFunctionality(
         &#34;The create_direct_junction has been removed, due to its very limited functionality, please try the xodr.DirectJunctionCreator instead.&#34;
     )</code></pre>
 </details>
-<div class="desc"><p>create_direct_junction creates the junction struct for a set of roads, for a direct junction</p>
+<div class="desc"><p>Create the junction structure for a set of roads, for a direct junction.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>roads (list of Road): all roads that are building up the direct junction
-
-id (int): the id of the junction
-
-name(str): name of the junction
-default: 'my direct junction'
-</code></pre>
+<dl>
+<dt><strong><code>roads</code></strong> :&ensp;<code>list</code> of <code>Road</code></dt>
+<dd>All roads that are building up the direct junction.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code></dt>
+<dd>The ID of the junction.</dd>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Name of the junction. Default is "my direct junction".</dd>
+</dl>
 <h2 id="returns">Returns</h2>
-<pre><code>junction (Junction): the junction struct ready to use
-</code></pre></div>
+<dl>
+<dt><code>Junction</code></dt>
+<dd>The junction structure ready to use.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>RemovedFunctionality</code></dt>
+<dd>If the function is called, as it has been deprecated.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.generators.create_junction"><code class="name flex">
-<span>def <span class="ident">create_junction</span></span>(<span>junction_roads, id, roads, name='my junction')</span>
+<span>def <span class="ident">create_junction</span></span>(<span>junction_roads: List[<a title="scenariogeneration.xodr.opendrive.Road" href="opendrive.html#scenariogeneration.xodr.opendrive.Road">Road</a>],<br>id: int,<br>roads: List[<a title="scenariogeneration.xodr.opendrive.Road" href="opendrive.html#scenariogeneration.xodr.opendrive.Road">Road</a>],<br>name: str = 'my junction') ‑> <a title="scenariogeneration.xodr.links.Junction" href="links.html#scenariogeneration.xodr.links.Junction">Junction</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def create_junction(junction_roads, id, roads, name=&#34;my junction&#34;):
-    &#34;&#34;&#34;create_junction creates the junction struct for a set of roads
-
+<pre><code class="python">def create_junction(
+    junction_roads: List[Road],
+    id: int,
+    roads: List[Road],
+    name: str = &#34;my junction&#34;,
+) -&gt; Junction:
+    &#34;&#34;&#34;Create a junction structure for a set of roads.
 
     Parameters
     ----------
-        junction_roads (list of Road): all connecting roads in the junction
-
-        id (int): the id of the junction
-
-        roads (list of Road): all incomming roads to the junction
-
-        name(str): name of the junction
-        default: &#39;my junction&#39;
+    junction_roads : list of Road
+        All connecting roads in the junction.
+    id : int
+        The ID of the junction.
+    roads : list of Road
+        All incoming roads to the junction.
+    name : str, optional
+        Name of the junction. Default is &#34;my junction&#34;.
 
     Returns
     -------
-        junction (Junction): the junction struct ready to use
-
+    Junction
+        The junction structure ready to use.
     &#34;&#34;&#34;
-
     junc = Junction(name, id)
 
     for jr in junction_roads:
@@ -389,7 +407,9 @@ default: 'my direct junction'
         junc.add_connection(conne1)
 
         # handle predecessor lanes
-        conne2 = Connection(jr.predecessor.element_id, jr.id, ContactPoint.start)
+        conne2 = Connection(
+            jr.predecessor.element_id, jr.id, ContactPoint.start
+        )
         _, sign, _ = _get_related_lanesection(
             jr, get_road_by_id(roads, jr.predecessor.element_id)
         )
@@ -410,23 +430,26 @@ default: 'my direct junction'
         junc.add_connection(conne2)
     return junc</code></pre>
 </details>
-<div class="desc"><p>create_junction creates the junction struct for a set of roads</p>
+<div class="desc"><p>Create a junction structure for a set of roads.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>junction_roads (list of Road): all connecting roads in the junction
-
-id (int): the id of the junction
-
-roads (list of Road): all incomming roads to the junction
-
-name(str): name of the junction
-default: 'my junction'
-</code></pre>
+<dl>
+<dt><strong><code>junction_roads</code></strong> :&ensp;<code>list</code> of <code>Road</code></dt>
+<dd>All connecting roads in the junction.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code></dt>
+<dd>The ID of the junction.</dd>
+<dt><strong><code>roads</code></strong> :&ensp;<code>list</code> of <code>Road</code></dt>
+<dd>All incoming roads to the junction.</dd>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Name of the junction. Default is "my junction".</dd>
+</dl>
 <h2 id="returns">Returns</h2>
-<pre><code>junction (Junction): the junction struct ready to use
-</code></pre></div>
+<dl>
+<dt><code>Junction</code></dt>
+<dd>The junction structure ready to use.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.generators.create_junction_roads"><code class="name flex">
-<span>def <span class="ident">create_junction_roads</span></span>(<span>roads,<br>angles,<br>R,<br>junction=1,<br>arc_part=0.3333333333333333,<br>startnum=100,<br>inner_road_marks=None,<br>outer_road_marks=&lt;scenariogeneration.xodr.lane.RoadMark object&gt;)</span>
+<span>def <span class="ident">create_junction_roads</span></span>(<span>roads: List[<a title="scenariogeneration.xodr.opendrive.Road" href="opendrive.html#scenariogeneration.xodr.opendrive.Road">Road</a>],<br>angles: List[float],<br>R: float | List[float],<br>junction: int = 1,<br>arc_part: float = 0.3333333333333333,<br>startnum: int = 100,<br>inner_road_marks: <a title="scenariogeneration.xodr.lane.RoadMark" href="lane.html#scenariogeneration.xodr.lane.RoadMark">RoadMark</a> | None = None,<br>outer_road_marks: <a title="scenariogeneration.xodr.lane.RoadMark" href="lane.html#scenariogeneration.xodr.lane.RoadMark">RoadMark</a> = &lt;scenariogeneration.xodr.lane.RoadMark object&gt;) ‑> List[<a title="scenariogeneration.xodr.opendrive.Road" href="opendrive.html#scenariogeneration.xodr.opendrive.Road">Road</a>]</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -434,45 +457,54 @@ default: 'my junction'
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def create_junction_roads(
-    roads,
-    angles,
-    R,
-    junction=1,
-    arc_part=1 / 3,
-    startnum=100,
-    inner_road_marks=None,
-    outer_road_marks=std_roadmark_solid(),
-):
-    &#34;&#34;&#34;creates all needed roads for some simple junctions, the curved parts of the junction are created as a spiral-arc-spiral combo
-    R is value to the the radius of the whole junction (meaning R = distance between the center of the junction and any external road attached to the junction)
-    Supportes all angles and number of roads.
+    roads: List[Road],
+    angles: List[float],
+    R: Union[float, List[float]],
+    junction: int = 1,
+    arc_part: float = 1 / 3,
+    startnum: int = 100,
+    inner_road_marks: Optional[RoadMark] = None,
+    outer_road_marks: RoadMark = std_roadmark_solid(),
+) -&gt; List[Road]:
+    &#34;&#34;&#34;Create all needed roads for some simple junctions.
+
+    The curved parts of the junction are created as a spiral-arc-spiral
+    combination. `R` is the radius of the whole junction, meaning the
+    distance between the center of the junction and any external road
+    attached to the junction. Supports all angles and numbers of roads.
 
     Parameters
     ----------
-        roads (list of Road): all roads that should go into the junction
+    roads : list of Road
+        All roads that should go into the junction.
+    angles : list of float
+        The angles from where the roads should be coming in (see
+        description for what is supported). Angles should be defined in
+        mathematically positive order, beginning with the first incoming
+        road [0, +2π].
+    R : list of float
+        The radius of the whole junction, meaning the distance between
+        roads and the center of the junction. If only one value is
+        specified, then all roads will have the same distance.
+    junction : int, optional
+        The ID of the junction. Default is 1.
+    spiral_part : float, optional
+        The part of the curve that should be spirals (two of these).
+        `spiral_part * 2 + arc_part = angle of the turn`. Default is 1/3.
+    startnum : int, optional
+        Start number of the roads in the junction (will increase by 1
+        for each road). Default is 100.
+    inner_road_marks : RoadMark, optional
+        The RoadMark that all lanes inside the junction will have
+        (outer will be solid). Default is None.
+    outer_road_marks : RoadMark, optional
+        The RoadMark that will be on the edge of the connecting roads
+        (limits the junction). Default is std_roadmark_solid().
 
-        angles (list of float): the angles from where the roads should be coming in (see description for what is supported),
-                                to be defined in mathimatically positive order, beginning with the first incoming road [0, +2pi]
-
-        R (list of float): the radius of the whole junction, meaning the distance between roads and the center of the junction. If only one value is specified, then all roads will have the same distance.
-
-        junction (int): the id of the junction
-            default: 1
-
-        spiral_part (float): the part of the curve that should be spirals (two of these) spiral_part*2 + arcpart = angle of the turn
-            default: (1/3)
-
-        startnum (int): start number of the roads in the junctions (will increase with 1 for each road)
-            default: 100
-
-        inner_road_marks (RoadMark): the RoadMark that all lanes inside the junction will have (outer will be solid)
-            Default: None
-
-        outer_road_marks (RoadMark): the roadmark that will be on the edge of the connecting roads (limit the junction)
-            Default: std_roadmark_solid()
     Returns
     -------
-        junction_roads (list of Road): a list of all roads needed for all traffic connecting the roads
+    list of Road
+        A list of all roads needed for all traffic connecting the roads.
     &#34;&#34;&#34;
     warn(
         &#34;create_junction_roads_from_arc should not be used anymore, please use the CommonJunctionCreator function instead&#34;,
@@ -480,12 +512,16 @@ default: 'my junction'
         2,
     )
     if len(roads) is not len(angles):
-        raise GeneralIssueInputArguments(&#34;roads and angles do not have the same size.&#34;)
+        raise GeneralIssueInputArguments(
+            &#34;roads and angles do not have the same size.&#34;
+        )
 
     if len(R) == 1:
         R = R * np.ones(len(roads))
     elif len(R) &gt; 1 and len(R) is not len(roads):
-        raise GeneralIssueInputArguments(&#34;roads and R do not have the same size.&#34;)
+        raise GeneralIssueInputArguments(
+            &#34;roads and R do not have the same size.&#34;
+        )
 
     # linelength = 2*R
     junction_roads = []
@@ -592,7 +628,9 @@ default: 'my junction'
                     )
             # add predecessor and successor
             tmp_junc.add_predecessor(ElementType.road, roads[i].id, cp)
-            tmp_junc.add_successor(ElementType.road, roads[j].id, ContactPoint.start)
+            tmp_junc.add_successor(
+                ElementType.road, roads[j].id, ContactPoint.start
+            )
             startnum += 1
             junction_roads.append(tmp_junc)
 
@@ -601,38 +639,47 @@ default: 'my junction'
 
     return junction_roads</code></pre>
 </details>
-<div class="desc"><p>creates all needed roads for some simple junctions, the curved parts of the junction are created as a spiral-arc-spiral combo
-R is value to the the radius of the whole junction (meaning R = distance between the center of the junction and any external road attached to the junction)
-Supportes all angles and number of roads.</p>
+<div class="desc"><p>Create all needed roads for some simple junctions.</p>
+<p>The curved parts of the junction are created as a spiral-arc-spiral
+combination. <code>R</code> is the radius of the whole junction, meaning the
+distance between the center of the junction and any external road
+attached to the junction. Supports all angles and numbers of roads.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>roads (list of Road): all roads that should go into the junction
-
-angles (list of float): the angles from where the roads should be coming in (see description for what is supported),
-                        to be defined in mathimatically positive order, beginning with the first incoming road [0, +2pi]
-
-R (list of float): the radius of the whole junction, meaning the distance between roads and the center of the junction. If only one value is specified, then all roads will have the same distance.
-
-junction (int): the id of the junction
-    default: 1
-
-spiral_part (float): the part of the curve that should be spirals (two of these) spiral_part*2 + arcpart = angle of the turn
-    default: (1/3)
-
-startnum (int): start number of the roads in the junctions (will increase with 1 for each road)
-    default: 100
-
-inner_road_marks (RoadMark): the RoadMark that all lanes inside the junction will have (outer will be solid)
-    Default: None
-
-outer_road_marks (RoadMark): the roadmark that will be on the edge of the connecting roads (limit the junction)
-    Default: std_roadmark_solid()
-</code></pre>
+<dl>
+<dt><strong><code>roads</code></strong> :&ensp;<code>list</code> of <code>Road</code></dt>
+<dd>All roads that should go into the junction.</dd>
+<dt><strong><code>angles</code></strong> :&ensp;<code>list</code> of <code>float</code></dt>
+<dd>The angles from where the roads should be coming in (see
+description for what is supported). Angles should be defined in
+mathematically positive order, beginning with the first incoming
+road [0, +2π].</dd>
+<dt><strong><code>R</code></strong> :&ensp;<code>list</code> of <code>float</code></dt>
+<dd>The radius of the whole junction, meaning the distance between
+roads and the center of the junction. If only one value is
+specified, then all roads will have the same distance.</dd>
+<dt><strong><code>junction</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>The ID of the junction. Default is 1.</dd>
+<dt><strong><code>spiral_part</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>The part of the curve that should be spirals (two of these).
+<code>spiral_part * 2 + arc_part = angle of the turn</code>. Default is 1/3.</dd>
+<dt><strong><code>startnum</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Start number of the roads in the junction (will increase by 1
+for each road). Default is 100.</dd>
+<dt><strong><code>inner_road_marks</code></strong> :&ensp;<code>RoadMark</code>, optional</dt>
+<dd>The RoadMark that all lanes inside the junction will have
+(outer will be solid). Default is None.</dd>
+<dt><strong><code>outer_road_marks</code></strong> :&ensp;<code>RoadMark</code>, optional</dt>
+<dd>The RoadMark that will be on the edge of the connecting roads
+(limits the junction). Default is std_roadmark_solid().</dd>
+</dl>
 <h2 id="returns">Returns</h2>
-<pre><code>junction_roads (list of Road): a list of all roads needed for all traffic connecting the roads
-</code></pre></div>
+<dl>
+<dt><code>list</code> of <code>Road</code></dt>
+<dd>A list of all roads needed for all traffic connecting the roads.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.generators.create_junction_roads_from_arc"><code class="name flex">
-<span>def <span class="ident">create_junction_roads_from_arc</span></span>(<span>roads, angles, r=0, junction=1, arc_part=0.3333333333333333, startnum=100)</span>
+<span>def <span class="ident">create_junction_roads_from_arc</span></span>(<span>roads: List[<a title="scenariogeneration.xodr.opendrive.Road" href="opendrive.html#scenariogeneration.xodr.opendrive.Road">Road</a>],<br>angles: List[float],<br>r: float = 0,<br>junction: int = 1,<br>arc_part: float = 0.3333333333333333,<br>startnum: int = 100) ‑> List[<a title="scenariogeneration.xodr.opendrive.Road" href="opendrive.html#scenariogeneration.xodr.opendrive.Road">Road</a>]</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -640,36 +687,45 @@ outer_road_marks (RoadMark): the roadmark that will be on the edge of the connec
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def create_junction_roads_from_arc(
-    roads, angles, r=0, junction=1, arc_part=1 / 3, startnum=100
-):
-    &#34;&#34;&#34;creates all needed roads for some simple junctions, the curved parts of the junction are created as a spiral-arc-spiral combo
-    Supported junctions:
-    - 3way crossings (either a T junction, or 120 deg junction)
-    - 4way crossing (all 90 degree turns)
+    roads: List[Road],
+    angles: List[float],
+    r: float = 0,
+    junction: int = 1,
+    arc_part: float = 1 / 3,
+    startnum: int = 100,
+) -&gt; List[Road]:
+    &#34;&#34;&#34;Create all needed roads for simple junctions.
+
+    The curved parts of the junction are created as a spiral-arc-spiral
+    combination. Supported junctions include:
+    - 3-way crossings (either a T-junction or 120-degree junction).
+    - 4-way crossings (all 90-degree turns).
 
     Parameters
     ----------
-        roads (list of Road): all roads that should go into the junction
-
-        angles (list of float): the angles from where the roads should be coming in (see description for what is supported),
-                                to be defined in mathimatically positive order, beginning with the first incoming road [0, +2pi]
-
-        r (float): the radius of the arcs in the junction (will determine the size of the junction)
-
-        junction (int): the id of the junction
-            default: 1
-
-        spiral_part (float): the part of the curve that should be spirals (two of these) spiral_part*2 + arcpart = angle of the turn
-            default: (1/3)
-
-        arc_part (float): the part of the curve that should be an arc:  spiral_part*2 + arcpart = angle of the turn
-            default: (1/3)
-
-        startnum (int): start number of the roads in the junctions (will increase with 1 for each road)
+    roads : list of Road
+        All roads that should go into the junction.
+    angles : list of float
+        The angles from where the roads should be coming in (see
+        description for what is supported). Angles should be defined in
+        mathematically positive order, beginning with the first incoming
+        road [0, +2π].
+    r : float
+        The radius of the arcs in the junction (determines the size of
+        the junction).
+    junction : int, optional
+        The ID of the junction. Default is 1.
+    arc_part : float, optional
+        The part of the curve that should be an arc:
+        `spiral_part * 2 + arc_part = angle of the turn`. Default is 1/3.
+    startnum : int, optional
+        Start number of the roads in the junction (will increase by 1
+        for each road). Default is 100.
 
     Returns
     -------
-        junction_roads (list of Road): a list of all roads needed for all traffic connecting the roads
+    list of Road
+        A list of all roads needed for all traffic connecting the roads.
     &#34;&#34;&#34;
     warn(
         &#34;create_junction_roads_from_arc should not be used anymore, please use the CommonJunctionCreator function instead&#34;,
@@ -746,7 +802,9 @@ outer_road_marks (RoadMark): the roadmark that will be on the edge of the connec
 
             # add predecessor and successor
             tmp_junc.add_predecessor(ElementType.road, roads[i].id, cp)
-            tmp_junc.add_successor(ElementType.road, roads[j].id, ContactPoint.start)
+            tmp_junc.add_successor(
+                ElementType.road, roads[j].id, ContactPoint.start
+            )
             startnum += 1
             junction_roads.append(tmp_junc)
 
@@ -755,35 +813,40 @@ outer_road_marks (RoadMark): the roadmark that will be on the edge of the connec
 
     return junction_roads</code></pre>
 </details>
-<div class="desc"><p>creates all needed roads for some simple junctions, the curved parts of the junction are created as a spiral-arc-spiral combo
-Supported junctions:
-- 3way crossings (either a T junction, or 120 deg junction)
-- 4way crossing (all 90 degree turns)</p>
+<div class="desc"><p>Create all needed roads for simple junctions.</p>
+<p>The curved parts of the junction are created as a spiral-arc-spiral
+combination. Supported junctions include:
+- 3-way crossings (either a T-junction or 120-degree junction).
+- 4-way crossings (all 90-degree turns).</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>roads (list of Road): all roads that should go into the junction
-
-angles (list of float): the angles from where the roads should be coming in (see description for what is supported),
-                        to be defined in mathimatically positive order, beginning with the first incoming road [0, +2pi]
-
-r (float): the radius of the arcs in the junction (will determine the size of the junction)
-
-junction (int): the id of the junction
-    default: 1
-
-spiral_part (float): the part of the curve that should be spirals (two of these) spiral_part*2 + arcpart = angle of the turn
-    default: (1/3)
-
-arc_part (float): the part of the curve that should be an arc:  spiral_part*2 + arcpart = angle of the turn
-    default: (1/3)
-
-startnum (int): start number of the roads in the junctions (will increase with 1 for each road)
-</code></pre>
+<dl>
+<dt><strong><code>roads</code></strong> :&ensp;<code>list</code> of <code>Road</code></dt>
+<dd>All roads that should go into the junction.</dd>
+<dt><strong><code>angles</code></strong> :&ensp;<code>list</code> of <code>float</code></dt>
+<dd>The angles from where the roads should be coming in (see
+description for what is supported). Angles should be defined in
+mathematically positive order, beginning with the first incoming
+road [0, +2π].</dd>
+<dt><strong><code>r</code></strong> :&ensp;<code>float</code></dt>
+<dd>The radius of the arcs in the junction (determines the size of
+the junction).</dd>
+<dt><strong><code>junction</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>The ID of the junction. Default is 1.</dd>
+<dt><strong><code>arc_part</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>The part of the curve that should be an arc:
+<code>spiral_part * 2 + arc_part = angle of the turn</code>. Default is 1/3.</dd>
+<dt><strong><code>startnum</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Start number of the roads in the junction (will increase by 1
+for each road). Default is 100.</dd>
+</dl>
 <h2 id="returns">Returns</h2>
-<pre><code>junction_roads (list of Road): a list of all roads needed for all traffic connecting the roads
-</code></pre></div>
+<dl>
+<dt><code>list</code> of <code>Road</code></dt>
+<dd>A list of all roads needed for all traffic connecting the roads.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.generators.create_junction_roads_standalone"><code class="name flex">
-<span>def <span class="ident">create_junction_roads_standalone</span></span>(<span>angles,<br>r,<br>junction=1,<br>spiral_part=0.3333333333333333,<br>arc_part=0.3333333333333333,<br>startnum=100,<br>n_lanes=1,<br>lane_width=3)</span>
+<span>def <span class="ident">create_junction_roads_standalone</span></span>(<span>angles: List[float],<br>r: float,<br>junction: int = 1,<br>spiral_part: float = 0.3333333333333333,<br>arc_part: float = 0.3333333333333333,<br>startnum: int = 100,<br>n_lanes: int = 1,<br>lane_width: float = 3) ‑> List[<a title="scenariogeneration.xodr.opendrive.Road" href="opendrive.html#scenariogeneration.xodr.opendrive.Road">Road</a>]</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -791,47 +854,60 @@ startnum (int): start number of the roads in the junctions (will increase with 1
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def create_junction_roads_standalone(
-    angles,
-    r,
-    junction=1,
-    spiral_part=1 / 3,
-    arc_part=1 / 3,
-    startnum=100,
-    n_lanes=1,
-    lane_width=3,
-):
-    &#34;&#34;&#34;creates all needed roads for some simple junctions, the curved parts of the junction are created as a spiral-arc-spiral combo
-    - 3way crossings (either a T junction, or 120 deg junction)
-    - 4way crossing (all 90 degree turns)
-    NOTE: this will not generate any links or add any successor/predecessors to the roads, and has to be added manually,
-    if you have the connecting roads please use create_junction_roads
+    angles: List[float],
+    r: float,
+    junction: int = 1,
+    spiral_part: float = 1 / 3,
+    arc_part: float = 1 / 3,
+    startnum: int = 100,
+    n_lanes: int = 1,
+    lane_width: float = 3,
+) -&gt; List[Road]:
+    &#34;&#34;&#34;Create all needed roads for simple junctions.
+
+    The curved parts of the junction are created as a spiral-arc-spiral
+    combination. Supported junctions include:
+    - 3-way crossings (either a T-junction or 120-degree junction).
+    - 4-way crossings (all 90-degree turns).
+
+    Note
+    ----
+    This function does not generate any links or add any successors/
+    predecessors to the roads. These must be added manually. If you
+    have the connecting roads, use `create_junction_roads` instead.
 
     Parameters
     ----------
+    angles : list of float
+        The angles from where the roads should be coming in (see
+        description for what is supported). Angles should be defined in
+        mathematically positive order, beginning with the first incoming
+        road.
+    r : float
+        The radius of the arcs in the junction (determines the size of
+        the junction).
+    junction : int, optional
+        The ID of the junction. Default is 1.
+    spiral_part : float, optional
+        The part of the curve that should be spirals (two of these).
+        `spiral_part * 2 + arc_part = angle of the turn`. Default is
+        1/3.
+    arc_part : float, optional
+        The part of the curve that should be an arc.
+        `spiral_part * 2 + arc_part = angle of the turn`. Default is
+        1/3.
+    startnum : int, optional
+        Start number of the roads in the junction (will increase by 1
+        for each road). Default is 100.
+    n_lanes : int, optional
+        The number of lanes in the junction. Default is 1.
+    lane_width : float, optional
+        The lane width of the lanes in the junction. Default is 3.
 
-        angles (list of float): the angles from where the roads should be coming in (see description for what is supported),
-                                to be defined in mathimatically positive order, beginning with the first incoming road
-
-        r (float): the radius of the arcs in the junction (will determine the size of the junction)
-
-        junction (int): the id of the junction
-            default: 1
-
-        spiral_part (float): the part of the curve that should be spirals (two of these) spiral_part*2 + arcpart = angle of the turn
-            default: (1/3)
-
-        arc_part (float): the part of the curve that should be an arc:  spiral_part*2 + arcpart = angle of the turn
-            default: (1/3)
-
-        startnum (int): start number of the roads in the junctions (will increase with 1 for each road)
-
-        n_lanes (int): the number of lanes in the junction
-
-        lane_width (float): the lane width of the lanes in the junction
     Returns
     -------
-        junction_roads (list of Road): a list of all roads in a junction without connections added
-
+    list of Road
+        A list of all roads in a junction without connections added.
     &#34;&#34;&#34;
     warn(
         &#34;create_junction_roads_standalone should not be used anymore, please use the CommonJunctionCreator function instead&#34;,
@@ -896,38 +972,51 @@ startnum (int): start number of the roads in the junctions (will increase with 1
 
     return junction_roads</code></pre>
 </details>
-<div class="desc"><p>creates all needed roads for some simple junctions, the curved parts of the junction are created as a spiral-arc-spiral combo
-- 3way crossings (either a T junction, or 120 deg junction)
-- 4way crossing (all 90 degree turns)
-NOTE: this will not generate any links or add any successor/predecessors to the roads, and has to be added manually,
-if you have the connecting roads please use create_junction_roads</p>
+<div class="desc"><p>Create all needed roads for simple junctions.</p>
+<p>The curved parts of the junction are created as a spiral-arc-spiral
+combination. Supported junctions include:
+- 3-way crossings (either a T-junction or 120-degree junction).
+- 4-way crossings (all 90-degree turns).</p>
+<h2 id="note">Note</h2>
+<p>This function does not generate any links or add any successors/
+predecessors to the roads. These must be added manually. If you
+have the connecting roads, use <code><a title="scenariogeneration.xodr.generators.create_junction_roads" href="#scenariogeneration.xodr.generators.create_junction_roads">create_junction_roads()</a></code> instead.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>angles (list of float): the angles from where the roads should be coming in (see description for what is supported),
-                        to be defined in mathimatically positive order, beginning with the first incoming road
-
-r (float): the radius of the arcs in the junction (will determine the size of the junction)
-
-junction (int): the id of the junction
-    default: 1
-
-spiral_part (float): the part of the curve that should be spirals (two of these) spiral_part*2 + arcpart = angle of the turn
-    default: (1/3)
-
-arc_part (float): the part of the curve that should be an arc:  spiral_part*2 + arcpart = angle of the turn
-    default: (1/3)
-
-startnum (int): start number of the roads in the junctions (will increase with 1 for each road)
-
-n_lanes (int): the number of lanes in the junction
-
-lane_width (float): the lane width of the lanes in the junction
-</code></pre>
+<dl>
+<dt><strong><code>angles</code></strong> :&ensp;<code>list</code> of <code>float</code></dt>
+<dd>The angles from where the roads should be coming in (see
+description for what is supported). Angles should be defined in
+mathematically positive order, beginning with the first incoming
+road.</dd>
+<dt><strong><code>r</code></strong> :&ensp;<code>float</code></dt>
+<dd>The radius of the arcs in the junction (determines the size of
+the junction).</dd>
+<dt><strong><code>junction</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>The ID of the junction. Default is 1.</dd>
+<dt><strong><code>spiral_part</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>The part of the curve that should be spirals (two of these).
+<code>spiral_part * 2 + arc_part = angle of the turn</code>. Default is
+1/3.</dd>
+<dt><strong><code>arc_part</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>The part of the curve that should be an arc.
+<code>spiral_part * 2 + arc_part = angle of the turn</code>. Default is
+1/3.</dd>
+<dt><strong><code>startnum</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Start number of the roads in the junction (will increase by 1
+for each road). Default is 100.</dd>
+<dt><strong><code>n_lanes</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>The number of lanes in the junction. Default is 1.</dd>
+<dt><strong><code>lane_width</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>The lane width of the lanes in the junction. Default is 3.</dd>
+</dl>
 <h2 id="returns">Returns</h2>
-<pre><code>junction_roads (list of Road): a list of all roads in a junction without connections added
-</code></pre></div>
+<dl>
+<dt><code>list</code> of <code>Road</code></dt>
+<dd>A list of all roads in a junction without connections added.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.generators.create_road"><code class="name flex">
-<span>def <span class="ident">create_road</span></span>(<span>geometry,<br>id,<br>left_lanes=1,<br>right_lanes=1,<br>road_type=-1,<br>center_road_mark=&lt;scenariogeneration.xodr.lane.RoadMark object&gt;,<br>lane_width=3,<br>lane_width_end=None)</span>
+<span>def <span class="ident">create_road</span></span>(<span>geometry: <a title="scenariogeneration.xodr.geometry.Line" href="geometry.html#scenariogeneration.xodr.geometry.Line">Line</a> | <a title="scenariogeneration.xodr.geometry.Spiral" href="geometry.html#scenariogeneration.xodr.geometry.Spiral">Spiral</a> | ForwardRef('ParamPoly3') | <a title="scenariogeneration.xodr.geometry.Arc" href="geometry.html#scenariogeneration.xodr.geometry.Arc">Arc</a> | List[<a title="scenariogeneration.xodr.geometry.Line" href="geometry.html#scenariogeneration.xodr.geometry.Line">Line</a> | <a title="scenariogeneration.xodr.geometry.Spiral" href="geometry.html#scenariogeneration.xodr.geometry.Spiral">Spiral</a> | ForwardRef('ParamPoly3') | <a title="scenariogeneration.xodr.geometry.Arc" href="geometry.html#scenariogeneration.xodr.geometry.Arc">Arc</a>] | <a title="scenariogeneration.xodr.geometry.AdjustablePlanview" href="geometry.html#scenariogeneration.xodr.geometry.AdjustablePlanview">AdjustablePlanview</a>,<br>id: int,<br>left_lanes: List[<a title="scenariogeneration.xodr.lane_def.LaneDef" href="lane_def.html#scenariogeneration.xodr.lane_def.LaneDef">LaneDef</a>] | int = 1,<br>right_lanes: List[<a title="scenariogeneration.xodr.lane_def.LaneDef" href="lane_def.html#scenariogeneration.xodr.lane_def.LaneDef">LaneDef</a>] | int = 1,<br>road_type: int = -1,<br>center_road_mark: <a title="scenariogeneration.xodr.lane.RoadMark" href="lane.html#scenariogeneration.xodr.lane.RoadMark">RoadMark</a> = &lt;scenariogeneration.xodr.lane.RoadMark object&gt;,<br>lane_width: float = 3,<br>lane_width_end: float | None = None) ‑> <a title="scenariogeneration.xodr.opendrive.Road" href="opendrive.html#scenariogeneration.xodr.opendrive.Road">Road</a></span>
 </code></dt>
 <dd>
 <details class="source">
@@ -935,42 +1024,58 @@ lane_width (float): the lane width of the lanes in the junction
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def create_road(
-    geometry,
-    id,
-    left_lanes=1,
-    right_lanes=1,
-    road_type=-1,
-    center_road_mark=std_roadmark_solid(),
-    lane_width=3,
-    lane_width_end=None,
-):
-    &#34;&#34;&#34;create_road creates a road with one lanesection with different number of lanes, lane marks will be of type broken,
-    except the outer lane, that will be solid.
-    The lane_width_end parameter can only be used when inputs for left_lanes and right_lanes are int
+    geometry: Union[
+        Line,
+        Spiral,
+        &#34;ParamPoly3&#34;,
+        Arc,
+        List[Union[Line, Spiral, &#34;ParamPoly3&#34;, Arc]],
+        AdjustablePlanview,
+    ],
+    id: int,
+    left_lanes: Union[List[LaneDef], int] = 1,
+    right_lanes: Union[List[LaneDef], int] = 1,
+    road_type: int = -1,
+    center_road_mark: RoadMark = std_roadmark_solid(),
+    lane_width: float = 3,
+    lane_width_end: Optional[float] = None,
+) -&gt; Road:
+    &#34;&#34;&#34;Create a road with one lane section and different numbers of lanes.
+
+    Lane marks will be of type broken, except for the outer lane, which
+    will be solid. The `lane_width_end` parameter can only be used when
+    inputs for `left_lanes` and `right_lanes` are integers.
 
     Parameters
     ----------
-        geometry (Line, Spiral, ParamPoly3, Arc, a list of(Line, Spiral, ParamPoly3, Arc), or AdjustablePlanview ): geometries to build the road
-
-        id (int): id of the new road
-
-        left_lanes (list of LaneDef, or an int): a list of the splits/merges that are wanted on the left side of the road, if int constant number of lanes.
-            Default: 1
-
-        right_lanes (list of LaneDef, or an int): a list of the splits/merges that are wanted on the right side of the road, if int constant number of lanes
-            Default: 1
-
-        road_type (int): type of road, -1 normal road, otherwise connecting road
-
-        center_road_mark (RoadMark): roadmark for the center line
-
-        lane_width (float): the width of all lanes
-
-        lane_width_end (float): the end width of all lanes
+    geometry : Line, Spiral, ParamPoly3, Arc, list of (Line, Spiral,
+               ParamPoly3, Arc), or AdjustablePlanview
+        Geometries to build the road.
+    id : int
+        ID of the new road.
+    left_lanes : list of LaneDef or int, optional
+        A list of the splits/merges that are wanted on the left side of
+        the road. If an integer, it specifies a constant number of
+        lanes. Default is 1.
+    right_lanes : list of LaneDef or int, optional
+        A list of the splits/merges that are wanted on the right side of
+        the road. If an integer, it specifies a constant number of
+        lanes. Default is 1.
+    road_type : int, optional
+        Type of road. Use -1 for a normal road, or another value for a
+        connecting road. Default is -1.
+    center_road_mark : RoadMark, optional
+        Road mark for the center line. Default is RoadMark(solid).
+    lane_width : float, optional
+        The width of all lanes. Default is 3.
+    lane_width_end : float, optional
+        The end width of all lanes. Can only be used when `left_lanes`
+        and `right_lanes` are integers.
 
     Returns
     -------
-        road (Road): a straight road
+    Road
+        A straight road.
     &#34;&#34;&#34;
 
     if isinstance(left_lanes, LaneDef):
@@ -1034,61 +1139,76 @@ lane_width (float): the lane width of the lanes in the junction
 
     return road</code></pre>
 </details>
-<div class="desc"><p>create_road creates a road with one lanesection with different number of lanes, lane marks will be of type broken,
-except the outer lane, that will be solid.
-The lane_width_end parameter can only be used when inputs for left_lanes and right_lanes are int</p>
+<div class="desc"><p>Create a road with one lane section and different numbers of lanes.</p>
+<p>Lane marks will be of type broken, except for the outer lane, which
+will be solid. The <code>lane_width_end</code> parameter can only be used when
+inputs for <code>left_lanes</code> and <code>right_lanes</code> are integers.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>geometry (Line, Spiral, ParamPoly3, Arc, a list of(Line, Spiral, ParamPoly3, Arc), or AdjustablePlanview ): geometries to build the road
-
-id (int): id of the new road
-
-left_lanes (list of LaneDef, or an int): a list of the splits/merges that are wanted on the left side of the road, if int constant number of lanes.
-    Default: 1
-
-right_lanes (list of LaneDef, or an int): a list of the splits/merges that are wanted on the right side of the road, if int constant number of lanes
-    Default: 1
-
-road_type (int): type of road, -1 normal road, otherwise connecting road
-
-center_road_mark (RoadMark): roadmark for the center line
-
-lane_width (float): the width of all lanes
-
-lane_width_end (float): the end width of all lanes
-</code></pre>
+<dl>
+<dt><strong><code>geometry</code></strong> :&ensp;<code>Line, Spiral, ParamPoly3, Arc, list</code> of <code>(Line, Spiral,</code></dt>
+<dd>ParamPoly3, Arc), or AdjustablePlanview
+Geometries to build the road.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code></dt>
+<dd>ID of the new road.</dd>
+<dt><strong><code>left_lanes</code></strong> :&ensp;<code>list</code> of <code>LaneDef</code> or <code>int</code>, optional</dt>
+<dd>A list of the splits/merges that are wanted on the left side of
+the road. If an integer, it specifies a constant number of
+lanes. Default is 1.</dd>
+<dt><strong><code>right_lanes</code></strong> :&ensp;<code>list</code> of <code>LaneDef</code> or <code>int</code>, optional</dt>
+<dd>A list of the splits/merges that are wanted on the right side of
+the road. If an integer, it specifies a constant number of
+lanes. Default is 1.</dd>
+<dt><strong><code>road_type</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Type of road. Use -1 for a normal road, or another value for a
+connecting road. Default is -1.</dd>
+<dt><strong><code>center_road_mark</code></strong> :&ensp;<code>RoadMark</code>, optional</dt>
+<dd>Road mark for the center line. Default is RoadMark(solid).</dd>
+<dt><strong><code>lane_width</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>The width of all lanes. Default is 3.</dd>
+<dt><strong><code>lane_width_end</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>The end width of all lanes. Can only be used when <code>left_lanes</code>
+and <code>right_lanes</code> are integers.</dd>
+</dl>
 <h2 id="returns">Returns</h2>
-<pre><code>road (Road): a straight road
-</code></pre></div>
+<dl>
+<dt><code>Road</code></dt>
+<dd>A straight road.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.generators.create_straight_road"><code class="name flex">
-<span>def <span class="ident">create_straight_road</span></span>(<span>road_id, length=100, junction=-1, n_lanes=1, lane_offset=3)</span>
+<span>def <span class="ident">create_straight_road</span></span>(<span>road_id: int,<br>length: float = 100,<br>junction: int = -1,<br>n_lanes: int = 1,<br>lane_offset: int = 3) ‑> <a title="scenariogeneration.xodr.opendrive.Road" href="opendrive.html#scenariogeneration.xodr.opendrive.Road">Road</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def create_straight_road(road_id, length=100, junction=-1, n_lanes=1, lane_offset=3):
-    &#34;&#34;&#34;creates a standard straight road with two lanes
+<pre><code class="python">def create_straight_road(
+    road_id: int,
+    length: float = 100,
+    junction: int = -1,
+    n_lanes: int = 1,
+    lane_offset: int = 3,
+) -&gt; Road:
+    &#34;&#34;&#34;Create a standard straight road with two lanes.
+
     Parameters
     ----------
-        road_id (int): id of the road to create
-
-        length (float): length of the road
-            default: 100
-
-        junction (int): if the road belongs to a junction or not
-            default: -1
-
-        n_lanes (int): number of lanes
-            default: 1
-
-        lane_offset (int): width of the road
-            default: 3
+    road_id : int
+        ID of the road to create.
+    length : float, optional
+        Length of the road. Default is 100.
+    junction : int, optional
+        Indicates if the road belongs to a junction. Default is -1.
+    n_lanes : int, optional
+        Number of lanes. Default is 1.
+    lane_offset : int, optional
+        Width of the road. Default is 3.
 
     Returns
     -------
-        road (Road): a straight road
+    Road
+        A straight road.
     &#34;&#34;&#34;
     warn(
         &#34;create_straight_road should not be used anymore, please use the create_road function instead&#34;,
@@ -1115,50 +1235,62 @@ lane_width_end (float): the end width of all lanes
     # finally create the roads
     return Road(road_id, planview1, lanes1, road_type=junction)</code></pre>
 </details>
-<div class="desc"><p>creates a standard straight road with two lanes
-Parameters</p>
-<hr>
-<pre><code>road_id (int): id of the road to create
-
-length (float): length of the road
-    default: 100
-
-junction (int): if the road belongs to a junction or not
-    default: -1
-
-n_lanes (int): number of lanes
-    default: 1
-
-lane_offset (int): width of the road
-    default: 3
-</code></pre>
+<div class="desc"><p>Create a standard straight road with two lanes.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>road_id</code></strong> :&ensp;<code>int</code></dt>
+<dd>ID of the road to create.</dd>
+<dt><strong><code>length</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Length of the road. Default is 100.</dd>
+<dt><strong><code>junction</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Indicates if the road belongs to a junction. Default is -1.</dd>
+<dt><strong><code>n_lanes</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Number of lanes. Default is 1.</dd>
+<dt><strong><code>lane_offset</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Width of the road. Default is 3.</dd>
+</dl>
 <h2 id="returns">Returns</h2>
-<pre><code>road (Road): a straight road
-</code></pre></div>
+<dl>
+<dt><code>Road</code></dt>
+<dd>A straight road.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.generators.get_lanes_offset"><code class="name flex">
-<span>def <span class="ident">get_lanes_offset</span></span>(<span>road1, road2, contactpoint)</span>
+<span>def <span class="ident">get_lanes_offset</span></span>(<span>road1: <a title="scenariogeneration.xodr.opendrive.Road" href="opendrive.html#scenariogeneration.xodr.opendrive.Road">Road</a>,<br>road2: <a title="scenariogeneration.xodr.opendrive.Road" href="opendrive.html#scenariogeneration.xodr.opendrive.Road">Road</a>,<br>contactpoint: <a title="scenariogeneration.xodr.enumerations.ContactPoint" href="enumerations.html#scenariogeneration.xodr.enumerations.ContactPoint">ContactPoint</a>) ‑> tuple[int, int]</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_lanes_offset(road1, road2, contactpoint):
-    &#34;&#34;&#34;returns number of lanes (hp #left lanes = # right lanes) and their offset (hp offset is constant)
+<pre><code class="python">def get_lanes_offset(
+    road1: Road, road2: Road, contactpoint: ContactPoint
+) -&gt; tuple[int, int]:
+    &#34;&#34;&#34;Return the number of lanes and their offset.
 
+    Assumes that the number of left lanes equals the number of right
+    lanes and that the offset is constant.
 
     Parameters
     ----------
-        road1 (Road): first road
-
-        road2 (Road): second road
+    road1 : Road
+        The first road.
+    road2 : Road
+        The second road.
+    contactpoint : ContactPoint
+        The contact point indicating the connection type.
 
     Returns
     -------
-        n_lanes (int):
+    tuple[int, int]
+        A tuple containing:
+        - n_lanes (int): The number of lanes.
+        - lane_offset (int): The offset of the lanes.
 
-        lane_offset (int):
+    Raises
+    ------
+    NotSameAmountOfLanesError
+        If the incoming and outgoing roads do not have the same number of left lanes.
     &#34;&#34;&#34;
 
     # now we always look at lanesection[0] to take the number of lanes
@@ -1173,7 +1305,9 @@ lane_offset (int): width of the road
         road2.lanes.lanesections[0].rightlanes
     ):
         n_lanes = len(road1.lanes.lanesections[n_lanesection].leftlanes)
-        lane_offset = road1.lanes.lanesections[n_lanesection].leftlanes[0].widths[0].a
+        lane_offset = (
+            road1.lanes.lanesections[n_lanesection].leftlanes[0].widths[0].a
+        )
     else:
         raise NotSameAmountOfLanesError(
             &#34;Incoming road &#34;,
@@ -1185,92 +1319,115 @@ lane_offset (int): width of the road
 
     return n_lanes, lane_offset</code></pre>
 </details>
-<div class="desc"><p>returns number of lanes (hp #left lanes = # right lanes) and their offset (hp offset is constant)</p>
+<div class="desc"><p>Return the number of lanes and their offset.</p>
+<p>Assumes that the number of left lanes equals the number of right
+lanes and that the offset is constant.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>road1 (Road): first road
-
-road2 (Road): second road
-</code></pre>
+<dl>
+<dt><strong><code>road1</code></strong> :&ensp;<code>Road</code></dt>
+<dd>The first road.</dd>
+<dt><strong><code>road2</code></strong> :&ensp;<code>Road</code></dt>
+<dd>The second road.</dd>
+<dt><strong><code>contactpoint</code></strong> :&ensp;<code>ContactPoint</code></dt>
+<dd>The contact point indicating the connection type.</dd>
+</dl>
 <h2 id="returns">Returns</h2>
-<pre><code>n_lanes (int):
-
-lane_offset (int):
-</code></pre></div>
+<dl>
+<dt><code>tuple[int, int]</code></dt>
+<dd>A tuple containing:
+- n_lanes (int): The number of lanes.
+- lane_offset (int): The offset of the lanes.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>NotSameAmountOfLanesError</code></dt>
+<dd>If the incoming and outgoing roads do not have the same number of left lanes.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.generators.get_road_by_id"><code class="name flex">
-<span>def <span class="ident">get_road_by_id</span></span>(<span>roads, id)</span>
+<span>def <span class="ident">get_road_by_id</span></span>(<span>roads: List[<a title="scenariogeneration.xodr.opendrive.Road" href="opendrive.html#scenariogeneration.xodr.opendrive.Road">Road</a>],<br>id: int) ‑> <a title="scenariogeneration.xodr.opendrive.Road" href="opendrive.html#scenariogeneration.xodr.opendrive.Road">Road</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_road_by_id(roads, id):
-    &#34;&#34;&#34;get_road_by_id returns a road based on the road id
+<pre><code class="python">def get_road_by_id(roads: List[Road], id: int) -&gt; Road:
+    &#34;&#34;&#34;Return a road based on the road ID.
 
     Parameters
     ----------
-        roads (list of Roads): a list of roads to seach through
-
-        id (int): the id of the road wanted
+    roads : list of Road
+        A list of roads to search through.
+    id : int
+        The ID of the road to retrieve.
 
     Returns
     -------
-        Road
+    Road
+        The road with the specified ID.
     &#34;&#34;&#34;
     for r in roads:
         if r.id == id:
             return r</code></pre>
 </details>
-<div class="desc"><p>get_road_by_id returns a road based on the road id</p>
+<div class="desc"><p>Return a road based on the road ID.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>roads (list of Roads): a list of roads to seach through
-
-id (int): the id of the road wanted
-</code></pre>
+<dl>
+<dt><strong><code>roads</code></strong> :&ensp;<code>list</code> of <code>Road</code></dt>
+<dd>A list of roads to search through.</dd>
+<dt><strong><code>id</code></strong> :&ensp;<code>int</code></dt>
+<dd>The ID of the road to retrieve.</dd>
+</dl>
 <h2 id="returns">Returns</h2>
-<pre><code>Road
-</code></pre></div>
+<dl>
+<dt><code>Road</code></dt>
+<dd>The road with the specified ID.</dd>
+</dl></div>
 </dd>
 <dt id="scenariogeneration.xodr.generators.standard_lane"><code class="name flex">
-<span>def <span class="ident">standard_lane</span></span>(<span>offset=3, rm=&lt;scenariogeneration.xodr.lane.RoadMark object&gt;)</span>
+<span>def <span class="ident">standard_lane</span></span>(<span>offset: int = 3,<br>rm: <a title="scenariogeneration.xodr.lane.RoadMark" href="lane.html#scenariogeneration.xodr.lane.RoadMark">RoadMark</a> = &lt;scenariogeneration.xodr.lane.RoadMark object&gt;) ‑> <a title="scenariogeneration.xodr.lane.Lane" href="lane.html#scenariogeneration.xodr.lane.Lane">Lane</a></span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def standard_lane(offset=3, rm=std_roadmark_broken()):
-    &#34;&#34;&#34;standard_lane creates a simple lane with an offset an a roadmark
+<pre><code class="python">def standard_lane(
+    offset: int = 3, rm: RoadMark = std_roadmark_broken()
+) -&gt; Lane:
+    &#34;&#34;&#34;Create a simple lane with an offset and a roadmark.
 
     Parameters
     ----------
-        offset (int): width of the lane
-            default: 3
+    offset : int, optional
+        Width of the lane. Default is 3.
+    rm : RoadMark, optional
+        Road mark used for the standard lane. Default is RoadMark(solid).
 
-        rm (RoadMark): road mark used for the standard lane
-            default:  RoadMark(solid)
     Returns
     -------
-        lane (Lane): the lane
-
+    Lane
+        The created lane.
     &#34;&#34;&#34;
     lc = Lane(a=offset)
     if rm is not None:
         lc.add_roadmark(rm)
     return lc</code></pre>
 </details>
-<div class="desc"><p>standard_lane creates a simple lane with an offset an a roadmark</p>
+<div class="desc"><p>Create a simple lane with an offset and a roadmark.</p>
 <h2 id="parameters">Parameters</h2>
-<pre><code>offset (int): width of the lane
-    default: 3
-
-rm (RoadMark): road mark used for the standard lane
-    default:  RoadMark(solid)
-</code></pre>
+<dl>
+<dt><strong><code>offset</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Width of the lane. Default is 3.</dd>
+<dt><strong><code>rm</code></strong> :&ensp;<code>RoadMark</code>, optional</dt>
+<dd>Road mark used for the standard lane. Default is RoadMark(solid).</dd>
+</dl>
 <h2 id="returns">Returns</h2>
-<pre><code>lane (Lane): the lane
-</code></pre></div>
+<dl>
+<dt><code>Lane</code></dt>
+<dd>The created lane.</dd>
+</dl></div>
 </dd>
 </dl>
 </section>

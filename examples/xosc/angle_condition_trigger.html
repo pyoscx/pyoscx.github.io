@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.6">
-<title>examples.xodr.road_link_unequal_number_of_lanes API documentation</title>
+<title>examples.xosc.angle_condition_trigger API documentation</title>
 <meta name="description" content="scenariogeneration
 https://github.com/pyoscx/scenariogeneration …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
@@ -34,19 +34,12 @@ el.replaceWith(d);
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>examples.xodr.road_link_unequal_number_of_lanes</code></h1>
+<h1 class="title">Module <code>examples.xosc.angle_condition_trigger</code></h1>
 </header>
 <section id="section-intro">
 <p>scenariogeneration
 <a href="https://github.com/pyoscx/scenariogeneration">https://github.com/pyoscx/scenariogeneration</a></p>
-<p>This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozilla.org/MPL/2.0/.</a></p>
-<p>Copyright (c) 2022 The scenariogeneration Authors.</p>
-<p>Example for linking two roads with an unequal number of lanes.</p>
-<p>Note: This is possible and valid according to the OpenDRIVE standard. It is
-sometimes necessary to use this approach but it might often be prefered to begin
-a new lane section to change the number of lanes instead.</p>
+<p>Example showing how to use AngleCondition as a trigger for an event.</p>
 </section>
 <section>
 </section>
@@ -57,7 +50,7 @@ a new lane section to change the number of lanes instead.</p>
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="examples.xodr.road_link_unequal_number_of_lanes.Scenario"><code class="flex name class">
+<dt id="examples.xosc.angle_condition_trigger.Scenario"><code class="flex name class">
 <span>class <span class="ident">Scenario</span></span>
 </code></dt>
 <dd>
@@ -68,50 +61,122 @@ a new lane section to change the number of lanes instead.</p>
 <pre><code class="python">class Scenario(ScenarioGenerator):
     def __init__(self):
         super().__init__()
+        self.open_scenario_version = 3
 
-    def road(self, **kwargs):
-        # Create roads
-        length_road = 100.0
-        road_first = xodr.create_road([xodr.Line(length_road)], 1, 2, 3)
-        road_first.planview.adjust_geometries()
+    def scenario(self, **kwargs):
+        # Catalogs
+        catalog = xosc.Catalog()
+        catalog.add_catalog(&#34;VehicleCatalog&#34;, &#34;../xosc/Catalogs/Vehicles&#34;)
 
-        road_second = xodr.create_road([xodr.Line(length_road)], 2, 2, 4)
-        road_second.planview.set_start_point(100, 0, 0)
-        road_second.planview.adjust_geometries()
-        # Make a new lane open up/branch out
-        new_lane_width = 3.0
-        road_second.lanes.lanesections[0].rightlanes[2].a = 0.0
-        road_second.lanes.lanesections[0].rightlanes[2].b = 0.0
-        road_second.lanes.lanesections[0].rightlanes[2].c = (
-            3.0 / length_road**2 * new_lane_width
-        )
-        road_second.lanes.lanesections[0].rightlanes[2].d = (
-            -2.0 / length_road**3 * new_lane_width
+        # Road
+        road = xosc.RoadNetwork(
+            roadfile=&#34;../xodr/e6mini.xodr&#34;, scenegraph=&#34;../models/e6mini.osgb&#34;
         )
 
-        ## Create the OpenDrive class (Master class)
-        odr = xodr.OpenDrive(&#34;myroads&#34;)
+        # Parameters
+        paramdec = xosc.ParameterDeclarations()
 
-        ## Finally add roads to Opendrive
-        odr.add_road(road_first)
-        odr.add_road(road_second)
-
-        # Link roads
-        road_first.add_successor(
-            xodr.ElementType.road, 2, xodr.ContactPoint.start
+        # Entities
+        egoname = &#34;Ego&#34;
+        targetname = &#34;Target&#34;
+        entities = xosc.Entities()
+        entities.add_scenario_object(
+            egoname, xosc.CatalogReference(&#34;VehicleCatalog&#34;, &#34;car_white&#34;)
         )
-        road_second.add_predecessor(
-            xodr.ElementType.road, 1, xodr.ContactPoint.end
-        )
-
-        # Link lanes but do not link the newly beginning lane
-        link_lane_ids_first = [2, 1, -1, -2, -3]
-        link_lane_ids_second = [2, 1, -1, -2, -4]
-        xodr.create_lane_links_from_ids(
-            road_first, road_second, link_lane_ids_first, link_lane_ids_second
+        entities.add_scenario_object(
+            targetname, xosc.CatalogReference(&#34;VehicleCatalog&#34;, &#34;car_yellow&#34;)
         )
 
-        return odr</code></pre>
+        # Init
+        init = xosc.Init()
+        init.add_init_action(
+            egoname, xosc.TeleportAction(xosc.LanePosition(10, 0, -2, 0))
+        )
+        init.add_init_action(
+            egoname,
+            xosc.AbsoluteSpeedAction(
+                20,
+                xosc.TransitionDynamics(
+                    xosc.DynamicsShapes.linear, xosc.DynamicsDimension.time, 1
+                ),
+            ),
+        )
+        init.add_init_action(
+            targetname, xosc.TeleportAction(xosc.LanePosition(50, 0, -3, 0))
+        )
+        init.add_init_action(
+            targetname,
+            xosc.AbsoluteSpeedAction(
+                10,
+                xosc.TransitionDynamics(
+                    xosc.DynamicsShapes.linear, xosc.DynamicsDimension.time, 1
+                ),
+            ),
+        )
+
+        deg = 60
+        rad = math.radians(deg)
+        # AngleCondition (trigger when Ego&#39;s orientation is 60 degrees with 0.1 tolerance)
+        angle_condition = AngleCondition(
+            angle=rad,
+            angle_tolerance=0.1,
+            angle_type=xosc.AngleType.heading,
+            coordinate_system=xosc.CoordinateSystem.world,
+        )
+
+        # Trigger
+
+        angle_trigger = xosc.EntityTrigger(
+            &#34;trigger&#34;, 0, xosc.ConditionEdge.none, angle_condition, egoname
+        )
+
+        # Event and Maneuver
+        event = xosc.Event(&#34;angle_event&#34;, xosc.Priority.overwrite)
+        event.add_trigger(angle_trigger)
+
+        event.add_action(
+            &#34;speedup&#34;,
+            xosc.AbsoluteSpeedAction(
+                30,
+                xosc.TransitionDynamics(
+                    xosc.DynamicsShapes.linear, xosc.DynamicsDimension.time, 2
+                ),
+            ),
+        )
+        man = xosc.Maneuver(&#34;angle_maneuver&#34;)
+        man.add_event(event)
+        mangr = xosc.ManeuverGroup(&#34;angle_mangroup&#34;)
+        mangr.add_actor(&#34;$owner&#34;)
+        mangr.add_maneuver(man)
+
+        # Act
+        act = xosc.Act(&#34;angle_act&#34;, angle_trigger)
+        act.add_maneuver_group(mangr)
+
+        # Story
+        storyparam = xosc.ParameterDeclarations()
+        storyparam.add_parameter(
+            xosc.Parameter(&#34;$owner&#34;, xosc.ParameterType.string, egoname)
+        )
+        story = xosc.Story(&#34;angle_story&#34;, storyparam)
+        story.add_act(act)
+
+        # Storyboard
+        sb = xosc.StoryBoard(init)
+        sb.add_story(story)
+
+        # Scenario
+        sce = xosc.Scenario(
+            &#34;AngleCondition_trigger_example&#34;,
+            &#34;ekelidar&#34;,
+            paramdec,
+            entities=entities,
+            storyboard=sb,
+            roadnetwork=road,
+            catalog=catalog,
+            osc_minor_version=self.open_scenario_version,
+        )
+        return sce</code></pre>
 </details>
 <div class="desc"><p>ScenarioTemplate is a class that should be inherited by a Scenario class
 in order to generate xodr and xosc files based on the submodules xodr and
@@ -172,13 +237,13 @@ permutations</dd>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="examples.xodr" href="index.html">examples.xodr</a></code></li>
+<li><code><a title="examples.xosc" href="index.html">examples.xosc</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="examples.xodr.road_link_unequal_number_of_lanes.Scenario" href="#examples.xodr.road_link_unequal_number_of_lanes.Scenario">Scenario</a></code></h4>
+<h4><code><a title="examples.xosc.angle_condition_trigger.Scenario" href="#examples.xosc.angle_condition_trigger.Scenario">Scenario</a></code></h4>
 </li>
 </ul>
 </li>
