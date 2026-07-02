@@ -236,10 +236,6 @@ the python object.</p>
     minor_version = loaded_xosc.find(&#34;FileHeader&#34;).attrib[&#34;revMinor&#34;]
     major_version = loaded_xosc.find(&#34;FileHeader&#34;).attrib[&#34;revMajor&#34;]
     print(f&#34;OpenSCENARIO version detected: {major_version}.{minor_version}&#34;)
-    if int(minor_version) &gt; 3 or int(major_version) != 1:
-        raise ValueError(
-            f&#34;OpenSCENARIO version {major_version}.{minor_version} does not exist in the schema files provided.&#34;
-        )
     if minor_version == &#34;3&#34; and major_version == &#34;1&#34;:
         minor_version = &#34;3_1&#34;
     xsd_path = os.path.join(

@@ -569,7 +569,7 @@ required.</p>
             The catalogs used in the scenario.
         osc_minor_version : int, optional
             Used to set if another than the newest version of
-            OpenSCENARIO should be used. Default is 3.
+            OpenSCENARIO should be used. Default is 1.
         license : License, optional
             Optional license to the file header (valid from OSC
             V1.1). Default is None.
@@ -584,11 +584,6 @@ required.</p>
         monitor_declarations : MonitorDeclarations, optional
             Monitor declarations (valid from OSC V1.3).
         &#34;&#34;&#34;
-        if int(osc_minor_version) &gt; 3:
-            raise OpenSCENARIOVersionError(
-                f&#34;OpenSCENARIO V1.{osc_minor_version} is not supported. &#34;
-                f&#34;Max supported version is V1.{_MINOR_VERSION}.&#34;
-            )
         if not isinstance(entities, Entities):
             raise TypeError(&#34;entities input is not of type Entities&#34;)
         if not isinstance(storyboard, StoryBoard):
@@ -601,6 +596,7 @@ required.</p>
             raise TypeError(
                 &#34;parameters input is not of type ParameterDeclarations&#34;
             )
+
         self.monitor_declarations = monitor_declarations
         self.variable_declaration = variable_declaration
         self.entities = entities
@@ -816,7 +812,7 @@ Writes an OpenScenario XML file.</p>
 <dd>The catalogs used in the scenario.</dd>
 <dt><strong><code>osc_minor_version</code></strong> :&ensp;<code>int</code>, optional</dt>
 <dd>Used to set if another than the newest version of
-OpenSCENARIO should be used. Default is 3.</dd>
+OpenSCENARIO should be used. Default is 1.</dd>
 <dt><strong><code>license</code></strong> :&ensp;<code>License</code>, optional</dt>
 <dd>Optional license to the file header (valid from OSC
 V1.1). Default is None.</dd>

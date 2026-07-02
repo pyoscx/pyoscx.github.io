@@ -78,7 +78,7 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
 <pre><code class="python">class Scenario(ScenarioGenerator):
     def __init__(self):
         super().__init__()
-        self.open_scenario_version = 2
+        self.open_scenario_version = 3
 
     def scenario(self, **kwargs):
         ### create catalogs
@@ -257,8 +257,8 @@ file, You can obtain one at <a href="https://mozilla.org/MPL/2.0/.">https://mozi
         paramdec = xosc.ParameterDeclarations()
         ## create the scenario
         sce = xosc.Scenario(
-            &#34;adapt_speed_example&#34;,
-            &#34;Mandolin&#34;,
+            &#34;trailer_example&#34;,
+            &#34;HLINDST9&#34;,
             paramdec,
             entities=entities,
             storyboard=sb,
@@ -293,12 +293,6 @@ the list is one scenario</p>
 <dd>basename of the scenariofiles, default: name of file</dd>
 <dt><strong><code>encoding</code></strong> :&ensp;<code>str</code></dt>
 <dd>encoding of the outputs, default: utf-8</dd>
-<dt><strong><code>excluded_permutations</code></strong> :&ensp;<code>list[dict]</code></dt>
-<dd>list of parameter dicts to exclude from generation</dd>
-<dt><strong><code>expand_permutations</code></strong> :&ensp;<code>list[dict[list]]</code></dt>
-<dd>list of dicts where each dict has lists as values, all combinations
-of these lists will be expanded and combined with the other
-permutations</dd>
 </dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">

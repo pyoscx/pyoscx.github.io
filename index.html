@@ -241,7 +241,7 @@ odr.adjust_roads_and_lanes()
 <p>To utilize this, let your Scenario class inherit ScenarioGenerator and initalize it.</p>
 <p>Some options can be used to parameterize your Scenario:</p>
 <ul>
-<li><strong>Dict containing lists</strong>: let self.parameters be a dict containing lists. This in turn will yield all permutations of the inputs (<strong>WARNING:</strong> this grows quickly, so be careful). </li>
+<li><strong>Dict containing lists</strong>: let self.parameters be a dict containing lists. This in turn will yield all permutations of the inputs (<strong>WARNING:</strong> this grows quickly, so be careful).</li>
 </ul>
 <p>Example: <code>self.parameters = {'road_curvature': [0.001, 0.002], 'speed': [10, 20, 30]}</code></p>
 <p>This will generate 6 scenarios (2 curvatures × 3 speeds):</p>
@@ -443,10 +443,14 @@ To connect the scenario and the generated road, create the RoadNetwork object in
 <li>
 <p>'parameter_no_lists' - will give parameter and their value, except if the value is a list, then an integrer will be set instead (like numerical)</p>
 </li>
+<li>
+<p>'user_defined' - will enable <em>naming_function</em> to be used</p>
+</li>
+<li><em>number_of_parallel_writings</em>: an integrer that will tell how many parallel processes should be used to write the xml files.</li>
 </ul>
 </li>
 <li>
-<p><em>number_of_parallel_writings</em>: an integrer that will tell how many parallel processes should be used to write the xml files.</p>
+<p><em>naming_function</em>: an optional callable (input a dict output a string) will provide the an interface for the user to define its own naming of files.</p>
 </li>
 </ul>
 <h1 id="useful-links">Useful Links</h1>
